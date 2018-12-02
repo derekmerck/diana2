@@ -1,0 +1,5 @@
+attr
+requests
+click
+flask
+pydicom

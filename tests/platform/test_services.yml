@@ -1,0 +1,28 @@
+---
+# DIANA Test Services
+
+orthanc01:
+  type: Orthanc
+  host: orthanc01
+  domains:
+    pacs: orthanc01
+
+orthanc02:
+  type: Orthanc
+  host: orthanc02
+
+pacs:
+  type: GenericDicom
+  proxy: orthanc01
+
+redis:
+  type: Redis
+  host: redis
+  port: 5432
+
+splunk:
+  type: Splunk
+  host: splunk
+  port: 8089
+  hec_port: 8088
+  hec_token: ABCD-EFGH-IJKL-MNOP
