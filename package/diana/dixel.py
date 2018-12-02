@@ -15,6 +15,10 @@ class Dixel(Serializable):
     def sid(self):
         return self.meta.get('AccessionNumber')
 
+    # filename
+    def fn(self):
+        return self.meta.get('FileName')
+
     def level(self):
         return self.meta.get('level')
 

@@ -91,10 +91,10 @@ class Redis(Endpoint, Serializable):
 
         if isinstance(item, str):
             k = item
-        elif isinstance(item, Serializable):
-            k = item.sid
+        elif isinstance(item, Serializable) or hasattr(item, "sid"):
+            k = item.sid()
         else:
-            raise ValueError("Item is not explicitly Serializable, so it requires an explicit key")
+            raise ValueError("Item has no sid attribute, so it requires an explicit key")
 
         result = self.gateway.get(k)
         logging.debug(result)
