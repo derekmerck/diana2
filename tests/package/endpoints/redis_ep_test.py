@@ -2,6 +2,7 @@ import logging
 from diana.endpoints import Redis
 from diana.utils import Serializable
 import attr
+from datetime import datetime
 
 """
 $ docker run -p 6379:6379 -d redis
@@ -22,7 +23,7 @@ def test_redis_ep():
             return self.sid() == other.sid() and \
                    self.data == other.data
 
-    t = Test(data={"dog": 2, "foo": {'bar': 3}})
+    t = Test(data={"myDateTime": datetime.now(), "foo": {'bar': 3}})
     id = R.put(t)
     s = R.get(id)
 

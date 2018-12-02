@@ -44,7 +44,14 @@ class DcmDir(Endpoint, Serializable):
             fn = item.fn()
         else:
             raise ValueError("Item has no fn attribute, so it requires an explicit filename")
-        return self.gateway.read(fn)
+
+        if not self.exists(fn):
+            raise FileNotFoundError
+
+        ds = self.gateway.read(fn)
+        result = Dixel.from_pydicom(ds, fn)
+        return result
+
 
     def delete(self, item: Union[str, Dixel], **kwargs):
         logger = logging.getLogger(self.name)

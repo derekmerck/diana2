@@ -38,8 +38,6 @@ class Redis(Endpoint, Serializable):
             logger.error(e)
             return False
 
-
-
     @staticmethod
     def serialize(item):
 
@@ -47,8 +45,7 @@ class Redis(Endpoint, Serializable):
 
         if isinstance(item, Serializable):
             # AttrsSerializable class
-            _data = item.asdict()
-            data = json.dumps(_data)
+            data = item.json()
             key = item.sid()
             return key, data
 

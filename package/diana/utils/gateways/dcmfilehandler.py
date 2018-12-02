@@ -1,5 +1,6 @@
 import os, logging
 import attr
+import pydicom
 
 @attr.s
 class DcmFileHandler():
@@ -25,14 +26,21 @@ class DcmFileHandler():
         logger.debug("Writing {}".format(fp))
         raise NotImplementedError
 
-    def read(self, fn: str):
+    def read(self, fn: str, get_pixels=False):
         fp = self.make_path(fn)
         logger = logging.getLogger(self.name)
         logger.debug("Reading {}".format(fp))
-        raise NotImplementedError
+        ds = pydicom.dcmread(fp, stop_before_pixels=not get_pixels)
+        return ds
 
     def exists(self, fn: str):
         fp = self.make_path(fn)
         logger = logging.getLogger(self.name)
         logger.debug("Checking exists {}".format(fp))
         return os.path.exists(fp)
+
+    def delete(self, fn: str):
+        fp = self.make_path(fn)
+        logger = logging.getLogger(self.name)
+        logger.debug("Deleting {}".format(fp))
+        os.remove(fp)

@@ -1,13 +1,16 @@
-import logging, os
+import logging, os, json
+from datetime import datetime
 from diana.endpoints import DcmDir
 import pytest
+from diana.utils import Serializable
+from diana.dixel import Dixel
+
 
 @pytest.mark.parametrize('base_path', ["."])
 def test(base_path):
 
     D = DcmDir(path=os.path.join(base_path, "resources/dcm"))
     logging.debug(D)
-    print(D)
     assert( D.check() )
     assert( D.exists("IM2263") )
     assert( not D.exists("abcd") )
@@ -17,6 +20,19 @@ def test(base_path):
     assert( D.check() )
     assert( D.exists("IM2263") )
     assert( not D.exists("abcd") )
+
+    logging.debug("Checking round-trip")
+
+    d = D.get("IM2263")
+    dd = d.json()
+    ee = json.loads(dd)
+    e = Serializable.Factory.create(**ee)
+
+    logging.debug(d)
+    logging.debug(e)
+
+    assert( d == e )
+
 
 if __name__=="__main__":
 
