@@ -1,7 +1,7 @@
 import os, logging
 from typing import Union
 import attr
-from ..dixel import Dixel
+from diana.dixel.dixel import Dixel
 from ..utils import Endpoint, Serializable
 from ..utils.gateways import DcmFileHandler
 
@@ -26,7 +26,7 @@ class DcmDir(Endpoint, Serializable):
         logger.debug("EP PUT")
         if not item.file:
             raise ValueError("Dixel has no file attribute, can only save file data")
-        self.gateway.write(Dixel.fn(), Dixel.file)
+        self.gateway.write(item.fn(), item.file)
 
     def update(self, fn: str, item: Dixel, **kwargs):
         logger = logging.getLogger(self.name)

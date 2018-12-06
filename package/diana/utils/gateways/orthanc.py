@@ -35,12 +35,13 @@ class Orthanc(Requester):
     port = attr.ib(default=8042)
     user = attr.ib(default="orthanc")
     password = attr.ib(default="passw0rd!")
+    aet = attr.ib(default="ORTHANC")
 
     def find(self, query):
         resource = "tools/find"
         return self._post(resource, json=query)
 
-    def rfind(self, query, domain):
+    def rfind(self, query, domain, retrieve=False):
         # logger = logging.getLogger(name=self.name)
 
         result = []
@@ -50,21 +51,23 @@ class Orthanc(Requester):
         # logger.debug(response0)
 
         if response0.get('ID'):
-            resource = "/queries/{}/answers".format(response0.get('ID'))
+            resource = "queries/{}/answers".format(response0.get('ID'))
             response1 = self._get(resource)
             # logger.debug(response1)
 
             for answer in response1:
                 # logger.debug(answer)
-                resource = "/queries/{}/answers/{}/content?simplify".format(response0.get('ID'), answer)
+                resource = "queries/{}/answers/{}/content?simplify".format(response0.get('ID'), answer)
                 response2 = self._get(resource)
                 result.append(response2)
+
+                if retrieve:
+                    resource = "queries/{}/answers/{}/retrieve".format(response0.get('ID'), answer)
+                    response3 = self._post(resource, data=self.aet)
 
                 # logger.debug(response2)
 
         return result
-
-
 
 
     def put(self, file):
@@ -81,10 +84,26 @@ class Orthanc(Requester):
         elif view == OrthancView.INFO:
             resource = "{!s}/{}".format(level, oid)
         elif view == OrthancView.FILE:
-            resource = "{!s}/{}/file".format(level, oid)
+            if level == DicomLevel.INSTANCES:
+                resource = "{!s}/{}/file".format(level, oid)
+            else:
+                resource = "{!s}/{}/archive".format(level, oid)
         else:
             raise TypeError("Unknown view requested")
 
+        return self._get(resource)
+
+    def delete(self, oid, level):
+        resource = "{!s}/{}".format(level, oid)
+        return self._delete(resource)
+
+    def anonymize(self, oid, level, replacement_map):
+        resource = "{!s}/{}/anonymize".format(level, oid)
+        response = self._post(resource, json=replacement_map)
+        return response.get("ID")
+
+    def inventory(self, level = DicomLevel.STUDIES):
+        resource = "{!r}".format(level)
         return self._get(resource)
 
     def statistics(self):

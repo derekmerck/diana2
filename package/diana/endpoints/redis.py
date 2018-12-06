@@ -2,7 +2,7 @@ import logging, hashlib, json
 from typing import Any, Union, Mapping
 import redis
 import attr
-from ..dixel import Dixel
+from diana.dixel.dixel import Dixel
 from ..utils import Endpoint, Serializable
 
 @attr.s

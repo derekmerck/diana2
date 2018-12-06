@@ -44,7 +44,10 @@ class Endpoint(ABC):
         if isinstance(item, Mapping):
             return self.find(item) is not None
         else:
-            return self.get(item) is not None
+            try:
+                return self.get(item) is not None
+            except Exception:
+                return False
 
     # Update
     def update(self, item: Union[ItemID, Item], data: Mapping, **kwargs) -> ItemID:

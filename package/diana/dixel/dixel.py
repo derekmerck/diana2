@@ -3,12 +3,12 @@ import logging
 from dateutil import parser as DatetimeParser
 import attr
 import pydicom
-from .utils.dicom import DicomLevel
-from .utils import Serializable
-from .utils.gateways import orthanc_id
+from diana.utils.dicom import DicomLevel
+from diana.utils import Serializable
+from diana.utils.gateways import orthanc_id
 
 
-@attr.s
+@attr.s(cmp=False)
 class Dixel(Serializable):
 
     meta = attr.ib(factory=dict)
@@ -17,6 +17,13 @@ class Dixel(Serializable):
 
     # Making this init=False removes it from the serializer
     file = attr.ib(default=None, repr=False, init=False)
+
+    def __hash__(self):
+        # return hash(self.oid())
+        return hash(self.tags.values())
+    #
+    # def __eq__(self, other):
+    #     return hash(self) == hash(other)
 
     @staticmethod
     def from_pydicom(ds: pydicom.Dataset, fn: str, file=None):

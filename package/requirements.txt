@@ -1,5 +1,7 @@
-attr
+attrs
 requests
 click
 flask
 pydicom
+pyyaml
+redis

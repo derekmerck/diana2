@@ -1,7 +1,7 @@
 from hashlib import sha1
 from typing import Union
 from datetime import date, timedelta
-from dateutil import parser as DateTimeParser
+from dateutil.parser import parser as DateTimeParser
 import random
 import logging
 import re
@@ -9,14 +9,7 @@ from enum import Enum
 import base64
 from pathlib import Path
 
-
-def dicom_name(names: list) -> str:
-    s = "^".join(names).upper()
-    return s
-
-def dicom_date(dt: date) -> str:
-    s = dt.strftime("%Y%m%d")
-    return s
+from ..utils.dicom import dicom_name, dicom_date
 
 
 # New dob is within 3 months
@@ -50,7 +43,7 @@ class GUIDMint(object):
             names = "-".join(names)
             return names
 
-        def handle_dob(dob: date=None, age: int=0, reference_date: date=None) -> date:
+        def handle_dob(dob: date=None, age: int=None, reference_date: date=None) -> date:
 
             if not dob and not age:
                 raise KeyError("Minting a GUID requires either a date or an age")
@@ -58,6 +51,7 @@ class GUIDMint(object):
                 if not reference_date:
                     reference_date = date.today()
                     logger.warning("Creating non-reproducible GUID using current date")
+                logger.info("Inferring  date of birth given age and ref")
                 dob = reference_date - timedelta(days = age*365.25)
 
             return dob
@@ -85,7 +79,7 @@ class GUIDMint(object):
         logger = logging.getLogger("GUIDMint")
 
         s = base64.b32encode(h.digest()).decode("UTF-8")
-        while not s[0:2].isalpha():
+        while not s[0:3].isalpha():
             h = sha1(h.digest())
             s = base64.b32encode(h.digest()).decode("UTF-8")
         logger.debug(s)
@@ -147,34 +141,31 @@ class GUIDMint(object):
         return [last, first, middle]
 
     @classmethod
-    def get_sham_id(cls, name: str,
+    def get_sham_id(cls,
+                    name: str,
                     dob: Union[date, str]=None,
                     age: int=None,
-                    reference_date: date=None,
+                    reference_date: Union[date,str]=None,
                     gender="U"):
 
         if isinstance(dob, str):
             P = DateTimeParser()
             dob = P.parse(dob).date()
 
+        if isinstance(reference_date, str):
+            P = DateTimeParser()
+            reference_date = P.parse(reference_date).date()
+
         gender = GUIDGender(gender)
 
-        _hash, _dob = M.get_hash(name, dob=dob, age=age, gender=gender)
-        _id = M.get_id(_hash)
-        _name = M.get_name(_id, gender)
+        _hash, _dob = cls.get_hash(name,
+                                   dob=dob,
+                                   age=age,
+                                   reference_date=reference_date,
+                                   gender=gender)
+        _id = cls.get_id(_hash)
+        _name = cls.get_name(_id, gender)
 
         return _id, dicom_name(_name), dicom_date(_dob)
 
 
-
-
-
-logging.basicConfig(level=logging.DEBUG)
-
-
-M = GUIDMint()
-
-s = "HELLO^THERE^ME^^"
-age = 10
-
-logging.debug( M.get_sham_id(s, age=age))

@@ -41,10 +41,13 @@ class Requester(object):
     def handle_result(self, result):
         if result.status_code > 299 or result.status_code < 200:
             result.raise_for_status()
-        elif result.json():
-            return result.json()
-        else:
-            return result
+
+        # logging.debug(result.headers)
+
+        if 'application/json' in result.headers.get('Content-type'):
+            if result.json():
+                return result.json()
+        return result.content
 
     def _get(self, resource, params=None, headers=None):
         logger = logging.getLogger(self.name)
@@ -52,9 +55,11 @@ class Requester(object):
         url = self.make_url(resource)
         try:
             result = requests.get(url, params=params, headers=headers, auth=self.auth)
-        except requests.exceptions.ConnectionError as e:
+            return self.handle_result(result)
+
+        except (requests.exceptions.ConnectionError,
+                requests.exceptions.HTTPError) as e:
             raise GatewayConnectionError(e)
-        return self.handle_result(result)
 
     def _put(self, resource, params=None, headers=None):
         logger = logging.getLogger(self.name)

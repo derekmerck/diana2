@@ -1,9 +1,7 @@
 import logging, os, json
-from datetime import datetime
 from diana.endpoints import DcmDir
 import pytest
 from diana.utils import Serializable
-from diana.dixel import Dixel
 
 
 @pytest.mark.parametrize('base_path', ["."])

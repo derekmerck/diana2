@@ -24,7 +24,8 @@ class DcmFileHandler():
         fp = self.make_path(fn)
         logger = logging.getLogger(self.name)
         logger.debug("Writing {}".format(fp))
-        raise NotImplementedError
+        with open(fp, "wb" ) as f:
+            f.write(fdata)
 
     def read(self, fn: str, get_pixels=False):
         fp = self.make_path(fn)
