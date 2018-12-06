@@ -5,6 +5,7 @@ import attr
 import pydicom
 from .utils.dicom import DicomLevel
 from .utils import Serializable
+from .utils.gateways import orthanc_id
 
 
 @attr.s
@@ -32,7 +33,7 @@ class Dixel(Serializable):
         # Most relevant tags for indexing
         tags = {
             'AccessionNumber': ds.AccessionNumber,
-            'PatientName': str(ds.PatientName),
+            'PatientName': str(ds.PatientName),  # Odd unserializing type
             'PatientID': ds.PatientID,
             'PatientBirthDate': ds.PatientBirthDate,
 
@@ -82,6 +83,23 @@ class Dixel(Serializable):
 
     # orthanc id
     def oid(self):
+        if not self.meta.get('ID'):
+            if self.level == DicomLevel.PATIENTS:
+                self.meta['ID'] = orthanc_id(self.tags.get('PatientID'))
+            elif self.level == DicomLevel.STUDIES:
+                self.meta['ID'] = orthanc_id(self.tags.get('PatientID'),
+                                             self.tags.get('StudyInstanceUID'))
+            elif self.level == DicomLevel.SERIES:
+                self.meta['ID'] = orthanc_id(self.tags.get('PatientID'),
+                                             self.tags.get('StudyInstanceUID'),
+                                             self.tags.get('SeriesInstanceUID'))
+            elif self.level == DicomLevel.INSTANCES:
+                self.meta['ID'] = orthanc_id(self.tags.get('PatientID'),
+                                             self.tags.get('StudyInstanceUID'),
+                                             self.tags.get('SeriesInstanceUID'),
+                                             self.tags.get('SOPInstanceUID'))
+            else:
+                raise ValueError("Unknown DicomLevel for oid")
         return self.meta.get('ID')
 
     # serializer id

@@ -16,6 +16,7 @@ Query = NewType('Query', Mapping)
 class Endpoint(ABC):
 
     name = attr.ib(type=str, default="Endpoint")
+    ctype = attr.ib(default=None)
 
     def check(self) -> bool:
         """Check endpoint health"""

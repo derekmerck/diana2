@@ -1,3 +1,4 @@
+import os
 import json as _json
 import logging
 import requests
@@ -29,7 +30,7 @@ class Requester(object):
             host = self.host,
             port = self.port )
         if self.path:
-            self.base_url = "{}/{}".format( self.base_url, self.path )
+            base_url = os.path.join( base_url, self.path )
         self.base_url = base_url
         if self.user:
             self.auth = (self.user, self.password)

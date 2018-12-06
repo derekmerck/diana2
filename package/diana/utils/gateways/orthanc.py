@@ -1,13 +1,32 @@
+import logging
+from hashlib import sha1
+from enum import Enum
 from .requester import Requester
 from ..dicom import DicomLevel
 import attr
 
-from enum import Enum
+
+def orthanc_hash(PatientID: str, StudyInstanceUID: str, SeriesInstanceUID=None, SOPInstanceUID=None) -> sha1:
+    if not SeriesInstanceUID:
+        s = "|".join([PatientID, StudyInstanceUID])
+    elif not SOPInstanceUID:
+        s = "|".join([PatientID, StudyInstanceUID, SeriesInstanceUID])
+    else:
+        s = "|".join([PatientID, StudyInstanceUID, SeriesInstanceUID, SOPInstanceUID])
+    return sha1(s.encode("UTF8"))
+
+
+def orthanc_id(PatientID: str, StudyInstanceUID: str, SeriesInstanceUID=None, SOPInstanceUID=None) -> str:
+    h = orthanc_hash(PatientID, StudyInstanceUID, SeriesInstanceUID, SOPInstanceUID)
+    d = h.hexdigest()
+    return '-'.join(d[i:i+8] for i in range(0, len(d), 8))
+
 
 class OrthancView(Enum):
     TAGS = "tags"
     INFO = "info"
     FILE = "file"
+
 
 @attr.s
 class Orthanc(Requester):
@@ -20,6 +39,33 @@ class Orthanc(Requester):
     def find(self, query):
         resource = "tools/find"
         return self._post(resource, json=query)
+
+    def rfind(self, query, domain):
+        # logger = logging.getLogger(name=self.name)
+
+        result = []
+
+        resource = "modalities/{}/query".format(domain)
+        response0 = self._post(resource, json=query)
+        # logger.debug(response0)
+
+        if response0.get('ID'):
+            resource = "/queries/{}/answers".format(response0.get('ID'))
+            response1 = self._get(resource)
+            # logger.debug(response1)
+
+            for answer in response1:
+                # logger.debug(answer)
+                resource = "/queries/{}/answers/{}/content?simplify".format(response0.get('ID'), answer)
+                response2 = self._get(resource)
+                result.append(response2)
+
+                # logger.debug(response2)
+
+        return result
+
+
+
 
     def put(self, file):
         resource = "instances"
