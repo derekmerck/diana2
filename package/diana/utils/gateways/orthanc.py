@@ -1,9 +1,8 @@
-import logging
 from hashlib import sha1
 from enum import Enum
+import attr
 from .requester import Requester
 from ..dicom import DicomLevel
-import attr
 
 
 def orthanc_hash(PatientID: str, StudyInstanceUID: str, SeriesInstanceUID=None, SOPInstanceUID=None) -> sha1:
@@ -108,3 +107,10 @@ class Orthanc(Requester):
 
     def statistics(self):
         return self._get("statistics")
+
+    def reset(self):
+        return self._post("tools/reset")
+
+    def changes(self, current=0, limit=10):
+        params = { 'since': current, 'limit': limit }
+        return self._get("changes", params=params)

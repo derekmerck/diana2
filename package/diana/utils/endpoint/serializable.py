@@ -1,3 +1,4 @@
+from abc import ABC
 import attr
 from uuid import uuid4
 import json
@@ -5,7 +6,7 @@ from datetime import datetime
 from dateutil import parser as DateTimeParser
 
 @attr.s
-class AttrSerializable(object):
+class AttrSerializable(ABC):
 
     uuid = attr.ib(repr=False)
     @uuid.default

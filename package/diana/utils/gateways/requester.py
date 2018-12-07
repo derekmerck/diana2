@@ -3,7 +3,6 @@ import json as _json
 import logging
 import requests
 import attr
-
 from .exceptions import GatewayConnectionError
 
 

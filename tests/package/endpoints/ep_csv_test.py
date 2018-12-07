@@ -3,7 +3,7 @@ from pprint import pformat
 from diana.endpoints import CsvFile
 from diana.utils.dicom import DicomLevel
 
-from diana.guid.mint import GUIDMint
+from diana.utils.guid.mint import GUIDMint
 
 
 def skip_it():

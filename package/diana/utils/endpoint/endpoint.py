@@ -4,8 +4,8 @@ CRUD Endpoint API
 
 from abc import ABC
 from typing import Mapping, TypeVar, NewType, Union, Sequence
-import attr
 import logging
+import attr
 
 Item = TypeVar('Item')
 ItemID = NewType('ItemID', str)
@@ -58,5 +58,4 @@ class Endpoint(ABC):
     def delete(self, item: Union[ItemID, Item], **kwargs) -> bool:
         """Remove an item from the endpoint"""
         raise NotImplementedError
-
 

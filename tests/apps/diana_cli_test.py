@@ -1,5 +1,5 @@
 import logging
-import click
+# import click
 from click.testing import CliRunner
 
 app = __import__('diana-cli')

@@ -1,16 +1,14 @@
+from enum import Enum
 from hashlib import sha1
 from typing import Union
 from datetime import date, timedelta
-from dateutil.parser import parser as DateTimeParser
 import random
 import logging
 import re
-from enum import Enum
 import base64
 from pathlib import Path
-
-from ..utils.dicom import dicom_name, dicom_date
-
+from dateutil import parser as DateTimeParser
+from ..dicom import dicom_name, dicom_date
 
 # New dob is within 3 months
 DOB_DISTANCE = 90
@@ -149,12 +147,10 @@ class GUIDMint(object):
                     gender="U"):
 
         if isinstance(dob, str):
-            P = DateTimeParser()
-            dob = P.parse(dob).date()
+            dob = DateTimeParser.parse(dob).date()
 
         if isinstance(reference_date, str):
-            P = DateTimeParser()
-            reference_date = P.parse(reference_date).date()
+            reference_date = DateTimeParser.parse(reference_date).date()
 
         gender = GUIDGender(gender)
 

@@ -1,8 +1,8 @@
 import logging, hashlib, json
 from typing import Any, Union, Mapping
-import redis
+from redis import Redis as RedisGateway, exceptions as RedisExceptions
 import attr
-from diana.dixel.dixel import Dixel
+from ..dixel import Dixel
 from ..utils import Endpoint, Serializable
 
 @attr.s
@@ -20,9 +20,9 @@ class Redis(Endpoint, Serializable):
 
     @gateway.default
     def set_gateway(self):
-        return redis.Redis(host=self.host,
-                           port=self.port,
-                           db=self.db)
+        return RedisGateway(host=self.host,
+                            port=self.port,
+                            db=self.db)
 
     def check(self):
         logger = logging.getLogger(self.name)
@@ -32,7 +32,7 @@ class Redis(Endpoint, Serializable):
             info = self.gateway.info()
             logger.debug(info)
             return info is not None
-        except redis.exceptions.ConnectionError as e:
+        except RedisExceptions.ConnectionError as e:
             logger.warning("Failed to connect to EP")
             logger.error(type(e))
             logger.error(e)

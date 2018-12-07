@@ -1,11 +1,12 @@
 import logging
 import hashlib
 from typing import Mapping, Union
-from diana.dixel.dixel import Dixel
-from ..utils import Endpoint, Serializable
-from ..utils.gateways import Orthanc as OrthancGateway, OrthancView, GatewayConnectionError
-from ..utils.dicom import DicomLevel
 import attr
+from ..dixel import Dixel
+from ..utils import Endpoint, Serializable
+from ..utils.gateways import Orthanc as OrthancGateway, GatewayConnectionError
+from ..utils.gateways.orthanc import OrthancView as View
+from ..utils.dicom import DicomLevel
 
 
 def sham_map(d: Dixel):
@@ -83,7 +84,7 @@ class Orthanc(Endpoint, Serializable):
 
     def get(self, item: Union[Dixel, str],
             level: DicomLevel=DicomLevel.STUDIES,
-            view: OrthancView=OrthancView.TAGS, **kwargs):
+            view: View=View.TAGS, **kwargs):
         logger = logging.getLogger(self.name)
         logger.debug("Get")
 
@@ -98,22 +99,22 @@ class Orthanc(Endpoint, Serializable):
         if r:
             if isinstance(item, Dixel):
                 # Want to update with data
-                if view==OrthancView.TAGS:
+                if view==View.TAGS:
                     item.tags.update(r)
-                elif view==OrthancView.FILE:
+                elif view==View.FILE:
                     item.file = r
-                elif view==OrthancView.META:
+                elif view==View.META:
                     item.meta.update(r)
                 return item
             else:
                 # Want a new file
-                if view==OrthancView.TAGS:
+                if view==View.TAGS:
                     return Dixel(meta={"ID": oid}, tags=r, level=level)
-                elif view==OrthancView.FILE:
+                elif view==View.FILE:
                     d = Dixel(meta={"ID": oid}, level=level)
                     d.file = r
                     return d
-                elif view==OrthancView.META:
+                elif view==View.META:
                     return Dixel(meta=r, level=level)
 
         raise FileNotFoundError("Item {} does not exist".format(item))

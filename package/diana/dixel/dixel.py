@@ -1,11 +1,11 @@
 from typing import Mapping
-import logging
+# import logging
 from dateutil import parser as DatetimeParser
 import attr
 import pydicom
-from diana.utils.dicom import DicomLevel
-from diana.utils import Serializable
-from diana.utils.gateways import orthanc_id
+from ..utils.dicom import DicomLevel
+from ..utils import Serializable
+from ..utils.gateways.orthanc import orthanc_id
 
 
 @attr.s(cmp=False)
@@ -21,9 +21,12 @@ class Dixel(Serializable):
     def __hash__(self):
         # return hash(self.oid())
         return hash(self.tags.values())
-    #
-    # def __eq__(self, other):
-    #     return hash(self) == hash(other)
+
+    def __cmp__(self, other):
+        return self.sid() == other.sid() and \
+               self.tags == other.tags and \
+               self.meta == other.meta and \
+               self.level == other.level
 
     @staticmethod
     def from_pydicom(ds: pydicom.Dataset, fn: str, file=None):
@@ -116,12 +119,6 @@ class Dixel(Serializable):
     # filename
     def fn(self):
         return self.meta.get('FileName')
-
-    def __cmp__(self, other):
-        return self.sid() == other.sid() and \
-               self.tags == other.tags and \
-               self.meta == other.meta and \
-               self.level == other.level
 
 
 Serializable.Factory.register(Dixel)
