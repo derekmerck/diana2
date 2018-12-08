@@ -8,10 +8,11 @@ import re
 import base64
 from pathlib import Path
 from dateutil import parser as DateTimeParser
-from ..dicom import dicom_name, dicom_date
 
 # New dob is within 3 months
-DOB_DISTANCE = 90
+DOB_DISTANCE = timedelta(days=90)
+# New study date/time is within 6 months and 60 minutes time of day
+TIME_DISTANCE = timedelta(days=90,seconds=60*60)
 
 class GUIDGender(Enum):
 
@@ -35,21 +36,20 @@ class GUIDMint(object):
 
         def handle_name(name: str) -> str:
             names = name.lower()
-            names = re.split('[^a-z]', names)
+            names = re.split('[^a-z0-9]', names)
             names = [x for x in names if x]
             names.sort()
             names = "-".join(names)
             return names
 
         def handle_dob(dob: date=None, age: int=None, reference_date: date=None) -> date:
-
             if not dob and not age:
                 raise KeyError("Minting a GUID requires either a date or an age")
             if not dob:
                 if not reference_date:
                     reference_date = date.today()
                     logger.warning("Creating non-reproducible GUID using current date")
-                logger.info("Inferring  date of birth given age and ref")
+                logger.info("Inferring date of birth given age and ref")
                 dob = reference_date - timedelta(days = age*365.25)
 
             return dob
@@ -59,21 +59,15 @@ class GUIDMint(object):
         key = "|".join([handle_name(name),
                         dob.isoformat(),
                         gender.value])
-        logger.debug("key: {}".format(key))
-
-        random.seed(key)
-        dob_offset = random.randint(-DOB_DISTANCE, DOB_DISTANCE)
-        new_dob = dob + timedelta(days=dob_offset)
-        logger.debug(new_dob.isoformat())
+        logger.debug("key: '{}'".format(key))
 
         h = sha1(key.encode("UTF-8"))
         logger.debug(h.digest())
 
-        return h, new_dob
+        return h, dob
 
     @classmethod
     def get_id(cls, h: sha1) -> str:
-
         logger = logging.getLogger("GUIDMint")
 
         s = base64.b32encode(h.digest()).decode("UTF-8")
@@ -83,14 +77,37 @@ class GUIDMint(object):
         logger.debug(s)
         return s
 
+    @classmethod
+    def get_new_dob(cls, id: str, dob: date):
+        logger = logging.getLogger("GUIDMint")
+
+        random.seed(id)
+        days = random.randint(-DOB_DISTANCE.days, DOB_DISTANCE.days)
+        offset = timedelta(days=days)
+        new_dob = dob + offset
+        logger.debug(new_dob.isoformat())
+
+        return new_dob
+
+    @classmethod
+    def get_time_offset(cls, id: str):
+        logger = logging.getLogger("GUIDMint")
+
+        random.seed(id)
+        days = random.randint(-TIME_DISTANCE.days, TIME_DISTANCE.days)
+        seconds = random.randint(-TIME_DISTANCE.seconds, TIME_DISTANCE.seconds)
+        offset = timedelta(days=days, seconds=seconds)
+        logger.debug(offset)
+
+        return offset
+
     names = {}
 
     @classmethod
     def get_name(cls, id: str, gender=GUIDGender.UNKNOWN) -> list:
-
         logger = logging.getLogger("GUIDMint")
-        random.seed(id+str(gender))
 
+        random.seed(id)
         def init_name_banks():
             here = Path(__file__).parent
 
@@ -99,7 +116,6 @@ class GUIDMint(object):
                    ("dist.male.first.txt", "male")]
 
             for fn, var in fns:
-
                 with open(here/'us_census'/fn) as f:
                     data = []
                     lines = f.readlines()
@@ -152,6 +168,9 @@ class GUIDMint(object):
         if isinstance(reference_date, str):
             reference_date = DateTimeParser.parse(reference_date).date()
 
+        if isinstance(age, str):
+            age = int(age)
+
         gender = GUIDGender(gender)
 
         _hash, _dob = cls.get_hash(name,
@@ -160,8 +179,17 @@ class GUIDMint(object):
                                    reference_date=reference_date,
                                    gender=gender)
         _id = cls.get_id(_hash)
+        _new_dob = cls.get_new_dob(_id, _dob)
         _name = cls.get_name(_id, gender)
+        _time_offset = cls.get_time_offset(_id)
 
-        return _id, dicom_name(_name), dicom_date(_dob)
+        result = {
+            "ID": _id,
+            "Name": _name,
+            "BirthDate": _new_dob,
+            "TimeOffset": _time_offset
+        }
+
+        return result
 
 

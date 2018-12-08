@@ -5,3 +5,5 @@ flask
 pydicom
 pyyaml
 redis
+docker
+pytest

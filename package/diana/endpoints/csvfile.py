@@ -1,4 +1,4 @@
-import csv, logging
+import csv, logging, json
 import attr
 from ..dixel import Dixel
 from ..utils import Endpoint, Serializable
@@ -24,8 +24,14 @@ class CsvFile(Endpoint, Serializable):
             reader = csv.DictReader(f)
             self.fieldnames = reader.fieldnames
             for item in reader:
+
+                meta = {k[1:]:v for (k,v) in item.items() if k.startswith("_")}
+                tags = {k:v for (k,v) in item.items() if not k.startswith("_")}
+
                 # logger.debug(item)
-                d = Dixel(tags=dict(item), level=self.level)
+                d = Dixel(meta=meta,
+                          tags=tags,
+                          level=self.level)
                 self.dixels.add(d)
 
     def write(self, fp: str=None):
@@ -40,4 +46,6 @@ class CsvFile(Endpoint, Serializable):
             writer = csv.DictWriter(f, fieldnames=fields, extrasaction="ignore")
             writer.writeheader()
             for item in self.dixels:
-                writer.writerow(item.tags)
+                data = {("_"+k):v for (k,v) in item.meta.items()}
+                data.update(item.tags)
+                writer.writerow(data)

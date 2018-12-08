@@ -4,12 +4,12 @@ from click.testing import CliRunner
 
 app = __import__('diana-cli')
 
-def test_cli_svc_check():
+def test_cli_svc_check(setup_orthanc, setup_redis):
     runner = CliRunner()
     result = runner.invoke(app.cli, ["--help"])
     print(result.output)
 
-    result = runner.invoke(app.cli, ["-S", "../.secrets/test_services.yml", "check"])
+    result = runner.invoke(app.cli, ["-S", "../../.secrets/test_services.yml", "check"])
     print(result.output)
 
     assert( "orthanc: Ready" in result.output )

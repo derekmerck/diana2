@@ -1,44 +1,53 @@
 import logging
-from pprint import pformat
+from datetime import date
+from diana.dixel import Dixel, ShamDixel
 from diana.endpoints import CsvFile
-from diana.utils.dicom import DicomLevel
 
-from diana.utils.guid.mint import GUIDMint
+def test_csv():
+
+    file = "/Users/derek/Desktop/tmp.csv"
+
+    ep0 = CsvFile(fp=file)
+    ep0.fieldnames = ["_Age", "PatientName", "AccessionNumber"]
+
+    for i in range(10):
+
+        tags = {
+            "PatientName": "Subject {}".format(i),
+            "AccessionNumber": "Study {}".format(i)
+        }
+
+        meta = {
+            "Age": 20+i
+        }
+
+        ep0.dixels.add(Dixel(tags=tags, meta=meta))
+
+    ep0.write()
+
+    ep1 = CsvFile(fp=file)
+    ep1.read()
+    d = ep1.dixels.pop()
+
+    logging.debug(d)
+
+    assert( d.meta['Age']>="20" )
+    assert( d.tags['PatientName'].startswith("Subject"))
+
+    logging.debug(ep1.fieldnames)
+
+    ep2 = CsvFile(fp=file)
+    ep2.fieldnames = ['_ShamID', '_ShamBirthDate', '_ShamAccessionNumber', 'PatientName', 'AccessionNumber']
+
+    ShamDixel.REFERENCE_DATE = date(year=2018, month=1, day=1)
+    for d in ep0.dixels:
+        logging.debug(d)
+        ep2.dixels.add( ShamDixel.from_dixel(d) )
+
+    ep2.write()
 
 
-def skip_it():
+if __name__ == "__main__":
 
     logging.basicConfig(level=logging.DEBUG)
-
-    fpi = "/Users/derek/Desktop/uldrs.phi.csv"
-    fpo = "/Users/derek/Desktop/uldrs.key.csv"
-
-    C = CsvFile(fp=fpi, level=DicomLevel.SERIES)
-
-    C.read()
-
-    logging.debug(pformat(C.dixels))
-
-
-    M = GUIDMint()
-
-    for d in C.dixels:
-
-        study_type = "HIGH" if "high" in d.tags['Format'] else "LOW"
-
-        name = d.tags['PatientName'] + "^" + study_type
-        dob = d.tags['PatientBirthDate']
-        gender = d.tags['PatientSex']
-
-        sham_id = M.get_sham_id(name=name, dob=dob, gender=gender)
-        logging.debug(sham_id)
-
-        d.tags['ShamPatientID'] = sham_id[0]
-        d.tags['ShamPatientName'] = sham_id[1]
-        d.tags['ShamPatientBirthDate'] = sham_id[2]
-
-    logging.debug(C.fieldnames)
-    C.fieldnames += ["ShamPatientID", "ShamPatientName", "ShamPatientBirthDate"]
-
-    logging.debug(C.fieldnames)
-    C.write(fp=fpo)
+    test_csv()

@@ -1,7 +1,7 @@
 import logging
 from diana.endpoints import Orthanc
 
-def test_orthanc_ep():
+def test_orthanc_ep(setup_orthanc):
 
     logging.debug("Test Orthanc EP")
 

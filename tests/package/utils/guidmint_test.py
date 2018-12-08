@@ -1,11 +1,18 @@
-import logging
+import logging, datetime
 from diana.utils.guid.mint import GUIDMint
 
 def test_guids():
 
     M = GUIDMint()
 
-    expected = ('JGHVCZSDBOFIA2QZ4H6EI43K4HAPB3IM', 'JAMESON^GRAHAM^H', '20080209')
+    expected = {
+        'ID': 'JGHVCZSDBOFIA2QZ4H6EI43K4HAPB3IM',
+        'Name': ['JACKSITS', 'GENE', 'H'],
+        'BirthDate': datetime.date(2007, 10, 8),
+        'TimeOffset': datetime.timedelta(-86, 3040)
+    }
+
+    # expected = ('JGHVCZSDBOFIA2QZ4H6EI43K4HAPB3IM', 'JAMESON^GRAHAM^H', '20080209')
 
     s = "FOO^BAR^Z^^"
     age = 10
@@ -29,7 +36,6 @@ def test_guids():
 
     out = M.get_sham_id(name=s, age=age, reference_date=reference_date)
     logging.debug(out)
-
 
     assert( out == expected )
 

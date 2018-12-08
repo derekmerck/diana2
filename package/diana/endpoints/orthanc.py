@@ -2,30 +2,33 @@ import logging
 import hashlib
 from typing import Mapping, Union
 import attr
-from ..dixel import Dixel
+from ..dixel import Dixel, ShamDixel
 from ..utils import Endpoint, Serializable
 from ..utils.gateways import Orthanc as OrthancGateway, GatewayConnectionError
 from ..utils.gateways.orthanc import OrthancView as View
 from ..utils.dicom import DicomLevel
 
 
-def sham_map(d: Dixel):
+def sham_map(d: ShamDixel):
+
+    if d.level > DicomLevel.STUDIES:
+        raise NotImplementedError("Can only create default sham maps for STUDIES")
 
     logging.debug(d)
 
     m = {
         "Replace": {
-            "PatientName": d.tags["ShamPatientName"],
-            "PatientID": d.tags["ShamPatientID"],
-            "PatientBirthDate": d.tags["ShamPatientBirthDate"],
-            "AccessionNumber": hashlib.md5( d.tags["AccessionNumber"].encode("UTF-8") ).hexdigest()
+            "PatientName": d.meta["ShamName"],
+            "PatientID": d.meta["ShamID"],
+            "PatientBirthDate": d.meta["ShamBirthDate"],
+            "AccessionNumber": d.meta["ShamAccessionNumber"],
+            "StudyDate": d.ShamStudyDate,
+            "StudyTime": d.ShamStudyTime,
             },
         "Keep": [
             "PatientSex",
             'StudyDescription',
             'SeriesDescription',
-            'StudyDate',
-            'StudyTime'
             ],
         "Force": True
     }

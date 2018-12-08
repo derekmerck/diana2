@@ -8,7 +8,7 @@ from datetime import datetime
 $ docker run -p 6379:6379 -d redis
 """
 
-def test_redis_ep():
+def test_redis_ep(setup_redis):
 
     logging.debug("Test Redis EP")
 

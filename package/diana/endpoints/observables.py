@@ -1,6 +1,6 @@
 import attr
 from . import Orthanc, DcmDir
-from ..utils.endpoint import Observable, Serializable
+from ..utils.endpoint import Event, Observable, Serializable
 from ..utils.dicom import DicomEvent
 
 
@@ -18,14 +18,26 @@ class ObservableOrthanc(Orthanc, Observable):
             r = self.gateway.changes(current=self.current_change)
             for change in r['Changes']:
                 if change['ChangeType'] == 'NewInstance':
-                    oid = change['ID']
-                    event_queue.append((DicomEvent.INSTANCE_ADDED, oid))
+                    e = Event(
+                        etype=DicomEvent.INSTANCE_ADDED,
+                        source=self,
+                        data={"oid": change['ID']}
+                    )
+                    event_queue.append(e)
                 elif change['ChangeType'] == 'StableSeries':
-                    oid = change['ID']
-                    event_queue.append((DicomEvent.SERIES_ADDED, oid))
+                    e = Event(
+                        etype=DicomEvent.SERIES_ADDED,
+                        source=self,
+                        data={"oid": change['ID']}
+                    )
+                    event_queue.append(e)
                 elif change['ChangeType'] == 'StableStudy':
-                    oid = change['ID']
-                    event_queue.append((DicomEvent.STUDY_ADDED, oid))
+                    e = Event(
+                        etype=DicomEvent.STUDY_ADDED,
+                        source=self,
+                        data={"oid": change['ID']}
+                    )
+                    event_queue.append(e)
                 else:
                     # self.logger.debug("Found unhandled change type: {}".format( change['ChangeType']))
                     pass
