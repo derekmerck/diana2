@@ -13,7 +13,7 @@ class Dixel(Serializable):
 
     meta = attr.ib(factory=dict)
     tags = attr.ib(factory=dict)
-    level = attr.ib(default=DicomLevel.STUDIES, convert=DicomLevel)
+    level = attr.ib(default=DicomLevel.STUDIES, converter=DicomLevel)
 
     # Making this init=False removes it from the serializer
     file = attr.ib(default=None, repr=False, init=False)

@@ -1,5 +1,6 @@
 import logging
 import docker
+import pytest
 from diana.utils.endpoint import Containerized
 
 def test():
@@ -16,6 +17,10 @@ def test():
     c = client.containers.get("testing")
     assert( c.status == "running" )
 
+    C.stop_service()
+
+    with pytest.raises(Exception):
+        c = client.containers.get("testing")
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)

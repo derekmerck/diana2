@@ -37,7 +37,7 @@ class DcmDir(Endpoint, Serializable):
         self.gateway.write(fn, Dixel.file)
 
 
-    def get(self, item: Union[str, Dixel], **kwargs):
+    def get(self, item: Union[str, Dixel], get_pixels=False, get_file=False, **kwargs):
         logger = logging.getLogger(self.name)
         logger.debug("EP GET")
         if isinstance(item, str):
@@ -50,8 +50,12 @@ class DcmDir(Endpoint, Serializable):
         if not self.exists(fn):
             raise FileNotFoundError
 
-        ds = self.gateway.read(fn)
+        ds = self.gateway.read(fn, get_pixels=get_pixels)
         result = Dixel.from_pydicom(ds, fn)
+
+        if get_file:
+            result.file = self.gateway.get_file(fn)
+
         return result
 
 

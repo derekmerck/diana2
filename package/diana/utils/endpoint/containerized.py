@@ -44,4 +44,9 @@ class Containerized(object):
     def stop_service(self):
         logger = logging.getLogger(self.dkr_service)
         logger.info("Tearing down service")
-        self.dkr_container.stop()
+
+        try:
+            self.dkr_container.stop()
+        except:
+            logging.warning("Failed to stop service {}".format(self.dkr_service))
+            pass

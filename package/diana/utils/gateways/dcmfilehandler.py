@@ -34,6 +34,14 @@ class DcmFileHandler():
         ds = pydicom.dcmread(fp, stop_before_pixels=not get_pixels)
         return ds
 
+    def get_file(self, fn: str):
+        fp = self.make_path(fn)
+        logger = logging.getLogger(self.name)
+        logger.debug("Getting file {}".format(fp))
+        with open(fp, "rb") as f:
+            fdata = f.read()
+        return fdata
+
     def exists(self, fn: str):
         fp = self.make_path(fn)
         logger = logging.getLogger(self.name)

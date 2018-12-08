@@ -1,8 +1,8 @@
 import logging
+from datetime import datetime
+import attr
 from diana.endpoints import Redis
 from diana.utils import Serializable
-import attr
-from datetime import datetime
 
 """
 $ docker run -p 6379:6379 -d redis
@@ -55,9 +55,9 @@ def test_redis_ep(setup_redis):
     assert( a == b )
 
 
-
-
 if __name__=="__main__":
 
     logging.basicConfig(level=logging.DEBUG)
-    test_redis_ep()
+    from conftest import setup_redis
+    for i in setup_redis():
+        test_redis_ep()

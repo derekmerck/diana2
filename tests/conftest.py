@@ -1,12 +1,10 @@
-import logging, time
-from diana.utils.gateways import Orthanc
+import logging
 from diana.utils.endpoint import Containerized
 import pytest
 import docker
+import sys
 
-"""
-$ docker run derekmerck/orthanc-confd -p 8042:8042
-"""
+sys.path.append('test_utils')
 
 @pytest.fixture(scope="module")
 def setup_orthanc():
@@ -22,7 +20,7 @@ def setup_orthanc():
 
     client = docker.from_env()
     c = client.containers.get("orthanc")
-    print(c.status)
+    print("{}: {}".format(S.dkr_service, c.status))
 
     yield S
 
@@ -43,7 +41,7 @@ def setup_redis():
 
     client = docker.from_env()
     c = client.containers.get("redis")
-    print(c.status)
+    print("{}: {}".format(S.dkr_service, c.status))
 
     yield S
 
