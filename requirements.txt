@@ -7,3 +7,5 @@ pyyaml
 redis
 docker
 pytest
+bs4
+jsmin

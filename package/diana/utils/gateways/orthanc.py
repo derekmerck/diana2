@@ -1,3 +1,5 @@
+# Diana-agnostic API for Orthanc, with no endpoint or dixel dependencies
+
 from hashlib import sha1
 from enum import Enum
 import attr

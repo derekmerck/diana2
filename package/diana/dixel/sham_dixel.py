@@ -52,6 +52,7 @@ class ShamDixel(Dixel):
 
 
     def __attrs_post_init__(self):
+        Dixel.update_meta(self)
         self.update_shams()
 
 
@@ -60,31 +61,24 @@ class ShamDixel(Dixel):
         logging.debug(self)
 
         self.meta["ShamID"] = self.sham_info["ID"]
-
         self.meta["ShamName"] = dicom_name(self.sham_info["Name"])
-
         self.meta["ShamBirthDate"] = dicom_date(self.sham_info["BirthDate"])
 
         if self.tags.get("AccessionNumber"):
             self.meta["ShamAccessionNumber"] = \
                 hashlib.md5(self.tags["AccessionNumber"].encode("UTF-8")).hexdigest()
 
-        if self.tags.get("StudyDate") and self.tags.get("StudyTime"):
-            dt = DateTimeParser.parse(self.tags['StudyDate'] + self.tags['StudyTime'])
-            new_dt = dt + self.sham_info['TimeOffset']
-            self.meta["ShamStudyDateTime"] = new_dt
+        if self.meta.get("StudyDateTime"):
+           self.meta["ShamStudyDateTime"] = self.meta.get("StudyDateTime") + self.sham_info['TimeOffset']
 
-        if self.level > DicomLevel.STUDIES and \
-                self.tags.get("SeriesDate") and self.tags.get("SeriesTime"):
-            dt = DateTimeParser.parse(self.tags['SeriesDate'] + self.tags['SeriesTime'])
-            new_dt = dt + self.sham_info['TimeOffset']
-            self.meta["ShamSeriesDateTime"] = new_dt
+        if self.level >= DicomLevel.SERIES and \
+                self.meta.get("SeriesDatetime"):
+            self.meta["ShamSeriesDateTime"] = self.meta.get("SeriesDatetime") + self.sham_info['TimeOffset']
 
-        if self.level > DicomLevel.SERIES and \
-                self.tags.get("InstanceCreationDate") and self.tags.get("InstanceCreationTime"):
-            dt = DateTimeParser.parse(self.tags['InstanceCreationDate'] + self.tags['InstanceCretionTime'])
-            new_dt = dt + self.sham_info['TimeOffset']
-            self.meta["ShamInstanceCreationDateTime"] = new_dt
+        if self.level >= DicomLevel.INSTANCES and \
+                self.tags.get("InstanceDateTime"):
+            self.meta["ShamInstanceCreationDateTime"] = self.tags.get("InstanceDateTime") + \
+                                                        self.sham_info['TimeOffset']
 
     @property
     def ShamStudyDate(self):

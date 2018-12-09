@@ -11,7 +11,7 @@ def test():
         dkr_command="tail -f > /dev/null"
     )
 
-    C.start_servive()
+    C.start_service()
 
     client = docker.from_env()
     c = client.containers.get("testing")

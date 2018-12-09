@@ -1,3 +1,5 @@
+# Diana-agnostic API for DICOM files, with no endpoint or dixel dependencies
+
 import os, logging
 import attr
 import pydicom

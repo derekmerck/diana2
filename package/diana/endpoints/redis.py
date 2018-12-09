@@ -3,7 +3,8 @@ from typing import Any, Union, Mapping
 from redis import Redis as RedisGateway, exceptions as RedisExceptions
 import attr
 from ..dixel import Dixel
-from ..utils import Endpoint, Serializable
+from ..utils.endpoint import Endpoint, Serializable
+from ..utils import SmartJSONEncoder
 
 @attr.s
 class Redis(Endpoint, Serializable):
@@ -56,7 +57,7 @@ class Redis(Endpoint, Serializable):
             # Primitive
             _data = item
 
-        data = json.dumps(_data)
+        data = json.dumps(_data, cls=SmartJSONEncoder)
         key = hashlib.md5(data.encode("UTF8")).hexdigest()
 
         return key, data

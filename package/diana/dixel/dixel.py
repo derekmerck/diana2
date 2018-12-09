@@ -1,11 +1,16 @@
 from typing import Mapping
-# import logging
 from dateutil import parser as DatetimeParser
 import attr
 import pydicom
 from ..utils.dicom import DicomLevel
 from ..utils import Serializable
 from ..utils.gateways.orthanc import orthanc_id
+
+
+def mktime(datestr, timestr):
+    dt_str = datestr + timestr
+    dt = DatetimeParser.parse(dt_str)
+    return dt
 
 
 @attr.s(cmp=False)
@@ -16,6 +21,7 @@ class Dixel(Serializable):
     level = attr.ib(default=DicomLevel.STUDIES, converter=DicomLevel)
 
     # Making this init=False removes it from the serializer
+    # Use a "from" constructor or add "file" manually after creation
     file = attr.ib(default=None, repr=False, init=False)
 
     def __hash__(self):
@@ -28,13 +34,20 @@ class Dixel(Serializable):
                self.meta == other.meta and \
                self.level == other.level
 
+    def __attrs_post_init__(self):
+        self.update_meta()
+
+    def update_meta(self):
+        if self.tags.get("StudyDate"):
+            self.meta["StudyDateTime"] = mktime(self.tags.get("StudyDate"), self.tags.get("StudyTime"))
+        if self.tags.get("SeriesDate") and self.level >= DicomLevel.SERIES:
+            self.meta["SeriesDateTime"] = mktime(self.tags.get("SeriesDate"), self.tags.get("SeriesTime"))
+        if self.tags.get("InstanceCreationDate") and self.level >= DicomLevel.INSTANCES:
+            self.meta["InstanceDateTime"] = mktime(self.tags.get("InstanceCreationDate"),
+                                                   self.tags.get("InstanceCreationTime"))
+
     @staticmethod
     def from_pydicom(ds: pydicom.Dataset, fn: str, file=None):
-
-        def mktime(datestr, timestr):
-            dt_str = datestr + timestr
-            dt = DatetimeParser.parse(dt_str)
-            return dt
 
         meta = {
             'FileName': fn
@@ -46,26 +59,20 @@ class Dixel(Serializable):
             'PatientName': str(ds.PatientName),  # Odd unserializing type
             'PatientID': ds.PatientID,
             'PatientBirthDate': ds.PatientBirthDate,
-
             'StudyInstanceUID': ds.StudyInstanceUID,
             'StudyDescription': ds.StudyDescription,
-            'StudyDateTime': mktime(
-                ds.StudyDate,
-                ds.StudyTime),
-
+            'StudyDate': ds.StudyDate,
+            'StudyTime': ds.StudyTime,
             'SeriesDescription': ds.SeriesDescription,
             'SeriesNumber': ds.SeriesNumber,
             'SeriesInstanceUID': ds.SeriesInstanceUID,
-            'SeriesDateTime': mktime(
-                ds.SeriesDate,
-                ds.SeriesTime),
-
+            'SeriesDate': ds.SeriesDate,
+            'SeriesTime': ds.SeriesTime,
             'SOPInstanceUID': ds.SOPInstanceUID,
-            'InstanceCreationDateTime': mktime(
-                ds.InstanceCreationDate,
-                ds.InstanceCreationTime),
-
+            'InstanceCreationDate': ds.InstanceCreationDate,
+            'InstanceCreationTime': ds.InstanceCreationTime,
         }
+
         level = DicomLevel.INSTANCES
         d = Dixel(meta=meta,
                   tags=tags,
@@ -85,9 +92,11 @@ class Dixel(Serializable):
                      level=level)
 
     @staticmethod
-    def from_orthanc(meta: Mapping, tags: Mapping=None, file=None):
+    def from_orthanc(meta: Mapping=None, tags: Mapping=None, level: DicomLevel=DicomLevel.STUDIES, file=None):
+
         d = Dixel(meta=meta,
-                  tags=tags)
+                  tags=tags,
+                  level=level)
         if file:
             d.file = file
 

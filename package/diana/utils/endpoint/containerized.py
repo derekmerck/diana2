@@ -15,7 +15,7 @@ class Containerized(object):
 
     dkr_container = attr.ib(init=False, repr=False)
 
-    def start_servive(self):
+    def start_service(self):
         logger = logging.getLogger(self.dkr_service)
         logger.info("Starting up service")
 

@@ -42,8 +42,7 @@ class CsvFile(Endpoint, Serializable):
             raise ValueError("No file provided")
 
         with open(fp, "w") as f:
-            fields = self.fieldnames
-            writer = csv.DictWriter(f, fieldnames=fields, extrasaction="ignore")
+            writer = csv.DictWriter(f, fieldnames=self.fieldnames, extrasaction="ignore")
             writer.writeheader()
             for item in self.dixels:
                 data = {("_"+k):v for (k,v) in item.meta.items()}

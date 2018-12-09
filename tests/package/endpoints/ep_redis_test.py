@@ -22,6 +22,7 @@ def test_redis_ep(setup_redis):
         def __cmp__(self, other):
             return self.sid() == other.sid() and \
                    self.data == other.data
+    Serializable.Factory.register(Test)
 
     t = Test(data={"myDateTime": datetime.now(), "foo": {'bar': 3}})
     id = R.put(t)

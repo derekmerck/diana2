@@ -32,6 +32,8 @@ class TestEP(Endpoint, Serializable):
     def update(self, id, new_data, **kwargs):
         self.cache[id] = new_data
 
+Serializable.Factory.register(TestEP)
+
 
 @pytest.mark.parametrize("item1,item2", [
     ("abcd", 123),

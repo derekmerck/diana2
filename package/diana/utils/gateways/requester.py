@@ -1,9 +1,8 @@
-import os
-import json as _json
-import logging
+import os, logging, json as _json
 import requests
 import attr
-from .exceptions import GatewayConnectionError
+from . import GatewayConnectionError
+from .. import SmartJSONEncoder
 
 
 @attr.s
@@ -75,7 +74,7 @@ class Requester(object):
         logger.debug("Calling post")
         url = self.make_url(resource)
         if json:
-            data = _json.dumps(json)
+            data = _json.dumps(json, cls=SmartJSONEncoder)
         try:
             result = requests.post(url, data=data, headers=headers, auth=self.auth)
         except requests.exceptions.ConnectionError as e:

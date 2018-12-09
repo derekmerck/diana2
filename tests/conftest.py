@@ -16,7 +16,7 @@ def setup_orthanc():
             dkr_image = "derekmerck/orthanc-confd",
             dkr_ports = {"8042/tcp": 8042}
         )
-    S.start_servive()
+    S.start_service()
 
     client = docker.from_env()
     c = client.containers.get("orthanc")
@@ -37,7 +37,7 @@ def setup_redis():
             dkr_image = "redis",
             dkr_ports = {"6379/tcp": 6379}
         )
-    S.start_servive()
+    S.start_service()
 
     client = docker.from_env()
     c = client.containers.get("redis")
