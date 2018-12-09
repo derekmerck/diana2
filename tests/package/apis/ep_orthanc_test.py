@@ -1,6 +1,6 @@
 import logging
 from test_utils import find_resource
-from diana.endpoints import Orthanc, DcmDir
+from diana.apis import Orthanc, DcmDir
 
 def test_orthanc_ep(setup_orthanc):
 

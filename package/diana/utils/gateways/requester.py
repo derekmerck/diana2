@@ -1,8 +1,8 @@
 import os, logging, json as _json
 import requests
 import attr
-from . import GatewayConnectionError
-from .. import SmartJSONEncoder
+from .exceptions import GatewayConnectionError
+from ..smart_json import SmartJSONEncoder
 
 
 @attr.s
@@ -15,8 +15,8 @@ class Requester(object):
     port = attr.ib(default=80)
     path = attr.ib(default=None)
 
-    user = attr.ib(default=None)
-    password = attr.ib(default=None)
+    user = attr.ib(default="diana")
+    password = attr.ib(default="passw0rd!")
 
     base_url = attr.ib(init=False, repr=False)
     auth = attr.ib(init=False, default=None)

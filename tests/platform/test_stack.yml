@@ -33,7 +33,7 @@ services:
 
   traefik:
     image: traefik
-    command: "--api --docker --docker.swarmmode"
+    command: "--apis --docker --docker.swarmmode"
     ports:
       - "80:80"
       - "433:433"

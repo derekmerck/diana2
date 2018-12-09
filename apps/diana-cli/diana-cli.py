@@ -28,6 +28,9 @@ def cli(ctx, verbose, services, services_path):
 from commands import check
 cli.add_command(check)
 
+from commands import ofind
+cli.add_command(ofind)
+
 
 if __name__ == '__main__':
     cli(obj={})

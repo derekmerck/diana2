@@ -1,5 +1,5 @@
 import logging
-from diana.endpoints.dcmdir import DcmFileHandler
+from diana.utils.gateways import DcmFileHandler
 
 
 def test_paths():

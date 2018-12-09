@@ -1,10 +1,10 @@
+import json, inspect
 from uuid import uuid4
-import json
-from datetime import datetime
 import attr
 from dateutil import parser as DateTimeParser
+from ..smart_json import SmartJSONEncoder
 
-@attr.s
+@attr.s(cmp=False, hash=None)
 class AttrSerializable(object):
 
     uuid = attr.ib(repr=False)
@@ -12,14 +12,15 @@ class AttrSerializable(object):
     def set_uuid(self):
         return str(uuid4())
 
+    def __hash__(self):
+        return hash(self.uuid)
+
+    def __eq__(self, other):
+        return hash(self) == hash(other)
+
     def sid(self):
         """Overload in sub-classes to assign specific id fields for serializers"""
         return str(self.uuid)
-
-    # It can be useful for a sub-class member to self-register if the
-    # sub-class is not explicitly registered.
-    def __attrs_post_init__(self):
-        self.Factory.register(self.__class__)
 
     def asdict(self):
         # Remove non-init and default variables
@@ -30,40 +31,40 @@ class AttrSerializable(object):
                 d[k[1:]] = v
                 del d[k]
         d['ctype'] = self.__class__.__name__
+        self.Factory.registry['ctype'] = self.__class__
         return d
 
     def json(self):
 
-        class DatetimeEncoder(json.JSONEncoder):
-            def default(self, obj):
-                if isinstance(obj, datetime):
-                    return obj.isoformat()
-                return json.JSONEncoder.default(obj)
-
         map = self.asdict()
-        data = json.dumps(map, cls=DatetimeEncoder)
+        data = json.dumps(map, cls=SmartJSONEncoder)
         return data
 
 
     class AttrFactory(object):
-        registry = {}
 
-        @classmethod
-        def register(cls, new_class):
-            cls.registry[new_class.__name__] = new_class
+        registry = {}
 
         @classmethod
         def create(cls, **kwargs):
             ctype = kwargs.pop('ctype')
             if not ctype:
                 raise TypeError("No ctype, cannot instantiate")
-            if not ctype in cls.registry.keys():
-                raise TypeError("No class for ctype {} is registered, cannot instantiate".format(ctype))
+
+            # Anything that has been "asdict" serialized will be registered
+            _cls = cls.registry.get("ctype")
+            if not _cls:
+                # Voodoo for unregistered root objects
+                _cls = inspect.stack()[1][0].f_globals.get(ctype)
+            if not _cls:
+                raise TypeError("No class {} is registered, cannot instantiate".format(ctype))
             for k, v in kwargs.items():
                 if hasattr(v, "keys"):
                     for kk, vv in v.items():
                         if "DateTime" in kk:
                             v[kk] = DateTimeParser.parse(vv)
-            return cls.registry[ctype](**kwargs)
+
+            return _cls(**kwargs)
+
 
     Factory = AttrFactory()

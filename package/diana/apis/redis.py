@@ -120,5 +120,3 @@ class Redis(Endpoint, Serializable):
 
         self.gateway.delete(item)
 
-
-Serializable.Factory.register(Redis)

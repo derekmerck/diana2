@@ -1,7 +1,7 @@
 import logging
 from datetime import date
 from diana.dixel import Dixel, ShamDixel
-from diana.endpoints import CsvFile
+from diana.apis import CsvFile
 
 def test_csv():
 

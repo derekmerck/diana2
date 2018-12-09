@@ -1,11 +1,11 @@
 import attr
 from . import Orthanc, DcmDir
-from ..utils.endpoint import Event, Observable, Serializable
+from ..utils.endpoint import Event, ObservableMixin
 from ..utils.dicom import DicomEvent
 
 
 @attr.s
-class ObservableOrthanc(Orthanc, Observable):
+class ObservableOrthanc(Orthanc, ObservableMixin):
 
     current_change = attr.ib(init=False, default=0)
 
@@ -48,13 +48,9 @@ class ObservableOrthanc(Orthanc, Observable):
             # self.logger.debug("Found {} Orthanc changes for {}".format(len(event_queue), self.location))
             return event_queue
 
-Serializable.Factory.register(ObservableOrthanc)
 
-
-class ObservableDcmDir(DcmDir, Observable):
+class ObservableDcmDir(DcmDir, ObservableMixin):
 
     def changes(self, **kwargs):
         raise NotImplementedError
 
-
-Serializable.Factory.register(ObservableDcmDir)

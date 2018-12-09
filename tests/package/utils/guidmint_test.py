@@ -1,5 +1,5 @@
 import logging, datetime
-from diana.utils.guid.mint import GUIDMint
+from diana.utils.guid import GUIDMint
 
 def test_guids():
 

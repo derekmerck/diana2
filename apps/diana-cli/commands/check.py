@@ -1,7 +1,7 @@
 import click
 from diana.utils import Serializable
-# importing these classes allows them to be immediately deserialized
-from diana.endpoints import Orthanc, Redis, DcmDir
+# importing the apis allows them to be immediately deserialized
+from diana.apis import *
 
 @click.command()
 @click.argument('endpoints', default=None, nargs=-1)

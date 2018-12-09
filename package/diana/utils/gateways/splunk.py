@@ -3,7 +3,7 @@
 # splunk-sdk does not support Python 3; this gateway provides a minimal
 # replacement to 'find' and 'put' events
 
-import time, logging, datetime, json as _json
+import time, logging, datetime, json as _json, socket
 from pprint import pformat
 from datetime import timedelta
 # from pprint import pprint
@@ -13,19 +13,24 @@ import attr
 from bs4 import BeautifulSoup
 import requests
 from .requester import Requester
-from . import GatewayConnectionError
+from .exceptions import GatewayConnectionError
 from .. import SmartJSONEncoder
 
 @attr.s
 class Splunk(Requester):
 
-    name = attr.ib(default="Splunk")
+    name = attr.ib(default="SplunkGateway")
     port = attr.ib( default="8088")
     user     = attr.ib( default="admin" )
     password = attr.ib( default="passw0rd!" )
     hec_protocol = attr.ib( default="http" )
     hec_port = attr.ib( default="8089" )
     hec_token = attr.ib( default=None, type=str )
+    index = attr.ib( default="dicom" )
+    hostname = attr.ib( )
+    @hostname.default
+    def set_hostname(self):
+        socket.gethostname()
 
     def find_events(self, q, timerange=None):
         logger = logging.getLogger(self.name)
@@ -93,13 +98,17 @@ class Splunk(Requester):
     def put_event( self,
                    timestamp: datetime,
                    event: Mapping,
-                   host: str,
-                   index: str,
-                   token: str ):
+                   hostname: str = None,
+                   index: str = None,
+                   hec_token: str = None ):
         logger = logging.getLogger(self.name)
 
         if not timestamp:
             timestamp = datetime.datetime.now()
+
+        hec_token = hec_token or self.hec_token
+        index = index or self.index
+        hostname = hostname or self.hostname
 
         def epoch(dt):
             tt = dt.timetuple()
@@ -108,7 +117,7 @@ class Splunk(Requester):
         event_json = _json.dumps(event, cls=SmartJSONEncoder)
 
         data = OrderedDict([('time', epoch(timestamp)),
-                            ('host', host),
+                            ('host', hostname),
                             ('sourcetype', '_json'),
                             ('index', index ),
                             ('event', event_json )])
@@ -131,7 +140,7 @@ class Splunk(Requester):
             data = None
             if json:
                 data = _json.dumps(json, cls=SmartJSONEncoder)
-            headers = {'Authorization': 'Splunk {0}'.format(self.hec_token)}
+            headers = {'Authorization': 'Splunk {0}'.format(hec_token)}
 
             try:
                 result = requests.post(url, data=data, headers=headers, auth=self.auth)

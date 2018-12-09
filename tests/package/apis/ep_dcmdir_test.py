@@ -1,5 +1,5 @@
 import logging, os, json
-from diana.endpoints import DcmDir
+from diana.apis import DcmDir
 import pytest
 from diana.utils import Serializable
 

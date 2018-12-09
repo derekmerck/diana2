@@ -1,6 +1,7 @@
 import attr
 from abc import ABC
 
+
 @attr.s
 class Event(object):
 
@@ -9,7 +10,7 @@ class Event(object):
     data = attr.ib(default=None)
 
 
-class Observable(ABC):
+class ObservableMixin(ABC):
 
     def changes(self, **kwargs) -> list:
         raise NotImplementedError

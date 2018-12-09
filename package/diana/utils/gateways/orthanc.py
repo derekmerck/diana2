@@ -1,4 +1,4 @@
-# Diana-agnostic API for Orthanc, with no endpoint or dixel dependencies
+# Diana-agnostic API and helpers for Orthanc, with no endpoint or dixel dependencies
 
 from hashlib import sha1
 from enum import Enum
@@ -32,7 +32,7 @@ class OrthancView(Enum):
 @attr.s
 class Orthanc(Requester):
 
-    name = attr.ib(default="Orthanc")
+    name = attr.ib(default="OrthancGateway")
     port = attr.ib(default=8042)
     user = attr.ib(default="orthanc")
     password = attr.ib(default="passw0rd!")

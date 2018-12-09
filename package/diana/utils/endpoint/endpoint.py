@@ -16,7 +16,6 @@ Query = NewType('Query', Mapping)
 class Endpoint(ABC):
 
     name = attr.ib(type=str, default="Endpoint")
-    ctype = attr.ib(default=None)
 
     def check(self) -> bool:
         """Check endpoint health"""
@@ -53,6 +52,11 @@ class Endpoint(ABC):
     def update(self, item: Union[ItemID, Item], data: Mapping, **kwargs) -> ItemID:
         """Update data for an item in the endpoint"""
         raise NotImplementedError
+
+    def handle(self, item: Union[ItemID, Item], method: str, *args, **kwargs):
+        """Call a class-specific method"""
+        func = self.__getattribute__(method)
+        return func(item, *args, **kwargs)
 
     # Delete
     def delete(self, item: Union[ItemID, Item], **kwargs) -> bool:

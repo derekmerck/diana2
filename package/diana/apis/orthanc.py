@@ -207,5 +207,3 @@ class Orthanc(Endpoint, Serializable):
     def instances(self):
         return self.gateway.inventory(level=DicomLevel.INSTANCES)
 
-
-Serializable.Factory.register(Orthanc)

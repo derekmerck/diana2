@@ -20,8 +20,9 @@ apps
 
 - diana-cli (click)
   - check eps
+  - put ep fn
   - get ep id
-  - find ep q
+  - find ep q (ofind, sfind, mfind)
   - pull ep dest id/wk
   - index ep create ep/ls/put id ep
   - send ep id dest
@@ -40,17 +41,18 @@ package
 
 - diana
 
-  - Endpoints - map DIANA API actions to application APIs
-    - ProxiedDicom, Orthanc, DicomFiles, Redis, Splunk, CSVFile, Montage
+  - apis - map DIANA API actions to application APIs
+    - ProxiedDicom, Orthanc, DcmDir, Redis, Splunk, CSVFile, Montage
+    - ObserableOrthanc, ObservableDcmDir
     - from_kwargs()
 
-  - Daemon
+  - daemons
     - Mock, Watcher
     - WatchableEndpoint
     - from_kwargs()
     - add_handler(ep, event, partial func)
 
-  - Dixel (map)
+  - dixel
     - DicomLevel
     - from_kwargs()
     - from_file()
@@ -58,15 +60,16 @@ package
     - id(ep type)
     - set_shams()
 
-  - Report
+  - report
 
-  - Worklist (set)
+  - worklist (set)
     - from_txt() (accession nums)
     - from_csv()
     - from_montage_csv()
     - from_inventory()
 
-  - GUIDMint
+  - guid
+    - GUIDMint
 
   - utils
     - gateways - Expose application apis
@@ -74,12 +77,17 @@ package
       - Orthanc
       - Splunk
       - Montage
-      - DicomFile
+      - DcmFileHandler
     - dicom
       - DicomStrings
       - DicomLevel
+      - DicomEvent
       - DicomJson
-    - watcher
+    - endpoint - ABCs
+      - Endpoint
+      - Observable
+      - Serializable
+      - Containerized
 
 
 API Actions

@@ -13,7 +13,7 @@ def mktime(datestr, timestr):
     return dt
 
 
-@attr.s(cmp=False)
+@attr.s(cmp=False, hash=None)
 class Dixel(Serializable):
 
     meta = attr.ib(factory=dict)
@@ -23,16 +23,6 @@ class Dixel(Serializable):
     # Making this init=False removes it from the serializer
     # Use a "from" constructor or add "file" manually after creation
     file = attr.ib(default=None, repr=False, init=False)
-
-    def __hash__(self):
-        # return hash(self.oid())
-        return hash(self.tags.values())
-
-    def __cmp__(self, other):
-        return self.sid() == other.sid() and \
-               self.tags == other.tags and \
-               self.meta == other.meta and \
-               self.level == other.level
 
     def __attrs_post_init__(self):
         self.update_meta()
@@ -128,6 +118,3 @@ class Dixel(Serializable):
     # filename
     def fn(self):
         return self.meta.get('FileName')
-
-
-Serializable.Factory.register(Dixel)
