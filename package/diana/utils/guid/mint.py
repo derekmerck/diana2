@@ -35,7 +35,7 @@ class GUIDMint(object):
         logger = logging.getLogger("GUIDMint")
 
         def handle_name(name: str) -> str:
-            names = name.lower()
+            names = str(name).lower()
             names = re.split('[^a-z0-9]', names)
             names = [x for x in names if x]
             names.sort()

@@ -1,6 +1,8 @@
 import click
 import yaml
 import logging
+import commands
+
 
 @click.group()
 @click.option('--verbose/--no-verbose', default=False)
@@ -25,11 +27,10 @@ def cli(ctx, verbose, services, services_path):
             ctx.obj['services'] = services
 
 
-from commands import check
-cli.add_command(check)
-
-from commands import ofind
-cli.add_command(ofind)
+cli.add_command(commands.check)
+cli.add_command(commands.ofind)
+cli.add_command(commands.index)
+cli.add_command(commands.indexed_pull)
 
 
 if __name__ == '__main__':

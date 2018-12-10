@@ -31,8 +31,31 @@ def test(base_path):
 
     assert( d == e )
 
+def test_indexer():
+
+    from diana.apis import Redis, Orthanc
+    R = Redis(port=6380)
+    O = Orthanc(port=8043)
+
+    path = "/Users/derek/data/dicom/christianson"
+    D = DcmDir(path=path, subpath_depth=2, subpath_width=2)
+    # D.index_to(R)
+
+    studies = D.indexed_studies(R)
+    print(studies)
+
+    for s in studies:
+        worklist = D.get_indexed_study(s, R)
+        print(worklist)
+
+        for fn in worklist:
+            d = D.get(fn, get_file=True)
+            print(d)
+            O.put(d)
+
 
 if __name__=="__main__":
 
     logging. basicConfig(level=logging.DEBUG)
-    test("../../")
+    # test("../../")
+    test_indexer()

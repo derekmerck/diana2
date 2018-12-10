@@ -23,6 +23,7 @@ class Dixel(Serializable):
     # Making this init=False removes it from the serializer
     # Use a "from" constructor or add "file" manually after creation
     file = attr.ib(default=None, repr=False, init=False)
+    children = attr.ib(init=False, factory=list)
 
     def __attrs_post_init__(self):
         self.update_meta()

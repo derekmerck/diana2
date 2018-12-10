@@ -1,0 +1,2 @@
+class DicomFormatError(Exception):
+    pass

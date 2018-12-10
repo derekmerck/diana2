@@ -1,7 +1,8 @@
-import os, logging
+import os, logging, hashlib
 from typing import Union
 import attr
 from ..dixel import Dixel
+from . import Redis
 from ..utils import Endpoint, Serializable
 from ..utils.gateways import DcmFileHandler
 
@@ -20,7 +21,6 @@ class DcmDir(Endpoint, Serializable):
         return DcmFileHandler(path=self.path,
                               subpath_width = self.subpath_width,
                               subpath_depth = self.subpath_depth)
-
 
     def put(self, item: Dixel, **kwargs):
         logger = logging.getLogger(self.name)
@@ -75,8 +75,33 @@ class DcmDir(Endpoint, Serializable):
         logger.debug("EP EXISTS")
         return self.gateway.exists(fn)
 
-
     def check(self):
         logger = logging.getLogger(self.name)
         logger.debug("EP CHECK")
         return os.path.exists(self.path)
+
+    def index_to(self, R: Redis):
+        """If indexing Orthanc dir, use subpath width/depth = 2"""
+
+        prefix = hashlib.md5(self.path.encode("UTF-*")).hexdigest()[0:4] + "-"
+
+        for root, dirs, fns in os.walk(self.path, topdown = False):
+            for fn in fns:
+                try:
+                    ds = self.gateway.read(fn=fn)
+                    d = Dixel.from_pydicom(ds, fn)
+                    R.register(d, prefix=prefix)
+                except:
+                    # logging.warning("Failed to read file {}".format(fn))
+                    pass
+
+    def indexed_studies(self, R: Redis):
+        prefix = hashlib.md5(self.path.encode("UTF-*")).hexdigest()[0:4] + "-"
+        result = R.registry_items(prefix)
+        return result
+
+
+    def get_indexed_study(self, item: str, R: Redis):
+        prefix = hashlib.md5(self.path.encode("UTF-*")).hexdigest()[0:4] + "-"
+        result = R.registry_item_data(item, prefix=prefix)
+        return result

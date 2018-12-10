@@ -120,3 +120,34 @@ class Redis(Endpoint, Serializable):
 
         self.gateway.delete(item)
 
+
+    def register(self, item: Dixel, prefix: str=None):
+
+        fn = item.meta["FileName"]
+        rid = prefix + item.tags["AccessionNumber"]
+
+        # Store the dixel by fn
+        # self.update(prefix+fn, item)
+
+        # Register the dixel as a study member:
+        logger = logging.getLogger(self.name)
+        logger.info("Registering {} under {}".format(fn, rid))
+        self.gateway.sadd(rid, fn)
+
+    def registry_items(self, prefix: str=None):
+        keys = self.gateway.keys(prefix+"*")
+        result = []
+        l = len(prefix)
+        for k in keys:
+            result.append( k[l:].decode("UTF-8") )
+        return result
+
+    def registry_item_data(self, item: str, prefix: str=None):
+        rid = prefix + item
+        logger = logging.getLogger(self.name)
+        logger.info("Collecting {}".format(rid))
+        data = self.gateway.smembers(rid)
+        result = []
+        for d in data:
+            result.append( d.decode("UTF-8") )
+        return result
