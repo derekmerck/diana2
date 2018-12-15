@@ -1,24 +1,26 @@
-# DICOM Image Analysis and Archive (DIANA)
+DICOM Image Analysis and Archive (DIANA)
+==================
 
 Derek Merck  
 Rhode Island Hospital  
 
-## Setup
+[![Build Status](https://travis-ci.org/derekmerck/diana2.svg?branch=master)](https://travis-ci.org/derekmerck/diana2)
+[![codecov](https://codecov.io/gh/derekmerck/diana2/branch/master/graph/badge.svg)](https://codecov.io/gh/derekmerck/diana2)
 
-### Requirements
+Derek Merck <derek_merck@brown.edu>  
+Brown University and Rhode Island Hospital  
+Winter 2019
 
-Package reqs:
+Source: <https://www.github.com/derekmerck/diana2>  
+Documentation: <https://diana.readthedocs.io>
 
-- requests
-- pydicom
 
-App reqs:
+Overview
+----------------
 
-- flask
-- click
+Hospital picture archive and communications systems (PACS) are not well suited for "big data" analysis.  It is difficult to identify and extract datasets in bulk, and moreover, high resolution data is often not even stored in the clinical systems.
 
-Platform reqs:
+**DIANA** is a [DICOM][] imaging informatics platform that can be attached to the clinical systems with a very small footprint, and then tuned to support a range of tasks from high-resolution image archival to cohort discovery to radiation dose monitoring.  It provides DICOM services, image data indexing, REST endpoints for scripting, and user access control through an amalgamation of free and free and open source (FOSS) systems.
 
-- docker
-- py-docker
+[DICOM]: http://www.dicomstandard.org/
 
