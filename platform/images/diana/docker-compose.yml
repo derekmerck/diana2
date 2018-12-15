@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+
+  diana2-amd64:
+    build:
+      context: .
+    image: diana2-amd64
+
+  diana2-arm32v7:
+    build:
+      context: .
+      args:
+        RESIN_ARCH:   armv7hf
+        DOCKER_ARCH:  arm32v7
+    image: diana2-arm32v7
+
+  diana2-arm64v8:
+    build:
+      context: .
+      args:
+        RESIN_ARCH:   aarch64
+        DOCKER_ARCH:  arm64v8
+    image: diana2-arm64v8

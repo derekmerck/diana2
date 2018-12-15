@@ -34,3 +34,7 @@ script:
 
 after_success:
   - codecov
+
+#  - cd platform/images/diana
+#  - docker-compose build diana2-amd64
+#  - docker tag diana2-amd64 diana2:amd64-latest

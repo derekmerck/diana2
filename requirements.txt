@@ -1,12 +1,18 @@
+# PKG REQS
 attrs >= 18.1.0
 requests
-click
 pydicom
 pyyaml
 redis
 docker
-pytest >= 4.0
-pytest-cov
 bs4
 pillow
 python-dateutil
+
+# APP REQS
+click
+
+# TESTING REQS
+pytest >= 4.0
+pytest-cov
+interruptingcow

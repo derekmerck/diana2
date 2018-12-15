@@ -1,8 +1,7 @@
 import attr
-from . import Orthanc, DcmDir
-from ..utils.endpoint import Event, ObservableMixin
-from ..utils.dicom import DicomEvent
-
+from diana.apis import Orthanc
+from diana.utils.endpoint import Event, ObservableMixin
+from diana.utils.dicom import DicomEvent
 
 @attr.s
 class ObservableOrthanc(Orthanc, ObservableMixin):
@@ -19,22 +18,22 @@ class ObservableOrthanc(Orthanc, ObservableMixin):
             for change in r['Changes']:
                 if change['ChangeType'] == 'NewInstance':
                     e = Event(
-                        etype=DicomEvent.INSTANCE_ADDED,
-                        source=self,
+                        evtype=DicomEvent.INSTANCE_ADDED,
+                        source_id=self.uuid,
                         data={"oid": change['ID']}
                     )
                     event_queue.append(e)
                 elif change['ChangeType'] == 'StableSeries':
                     e = Event(
-                        etype=DicomEvent.SERIES_ADDED,
-                        source=self,
+                        evtype=DicomEvent.SERIES_ADDED,
+                        source_id=self.uuid,
                         data={"oid": change['ID']}
                     )
                     event_queue.append(e)
                 elif change['ChangeType'] == 'StableStudy':
                     e = Event(
-                        etype=DicomEvent.STUDY_ADDED,
-                        source=self,
+                        evtype=DicomEvent.STUDY_ADDED,
+                        source_id=self.uuid,
                         data={"oid": change['ID']}
                     )
                     event_queue.append(e)
@@ -47,10 +46,3 @@ class ObservableOrthanc(Orthanc, ObservableMixin):
         if event_queue:
             # self.logger.debug("Found {} Orthanc changes for {}".format(len(event_queue), self.location))
             return event_queue
-
-
-class ObservableDcmDir(DcmDir, ObservableMixin):
-
-    def changes(self, **kwargs):
-        raise NotImplementedError
-
