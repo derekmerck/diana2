@@ -3,7 +3,7 @@ import docker
 import pytest
 from diana.utils.endpoint import Containerized
 
-def test():
+def test_containers():
 
     C = Containerized(
         dkr_service="testing",
@@ -24,5 +24,5 @@ def test():
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    test()
+    test_containers()
 

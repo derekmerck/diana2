@@ -1,13 +1,14 @@
-import logging
+import logging, os
+from pathlib import Path
 from datetime import date
 from diana.dixel import Dixel, ShamDixel
 from diana.apis import CsvFile
 
-def test_csv():
+def test_csv(tmp_path):
 
-    file = "/Users/derek/Desktop/tmp.csv"
+    fp = tmp_path / "tmp.csv"
 
-    ep0 = CsvFile(fp=file)
+    ep0 = CsvFile(fp=fp)
     ep0.fieldnames = ["_Age", "PatientName", "AccessionNumber"]
 
     for i in range(10):
@@ -25,7 +26,7 @@ def test_csv():
 
     ep0.write()
 
-    ep1 = CsvFile(fp=file)
+    ep1 = CsvFile(fp=fp)
     ep1.read()
     d = ep1.dixels.pop()
 
@@ -36,7 +37,7 @@ def test_csv():
 
     logging.debug(ep1.fieldnames)
 
-    ep2 = CsvFile(fp=file)
+    ep2 = CsvFile(fp=fp)
     ep2.fieldnames = ['_ShamID', '_ShamBirthDate', '_ShamAccessionNumber', 'PatientName', 'AccessionNumber']
 
     ShamDixel.REFERENCE_DATE = date(year=2018, month=1, day=1)
@@ -45,9 +46,10 @@ def test_csv():
         ep2.dixels.add( ShamDixel.from_dixel(d) )
 
     ep2.write()
+    os.remove(fp)
 
 
 if __name__ == "__main__":
 
     logging.basicConfig(level=logging.DEBUG)
-    test_csv()
+    test_csv(Path("/Users/derek/tmp"))
