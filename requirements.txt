@@ -5,7 +5,8 @@ pydicom
 pyyaml
 redis
 docker
-pytest
+pytest >= 4.0
+pytest-cov
 bs4
 pillow
 python-dateutil

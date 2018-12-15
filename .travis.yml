@@ -30,7 +30,7 @@ install:
 script:
 
   - cd tests
-  - pytest
+  - pytest --cov=./
 
 after_success:
   - bash < (curl -s https://codecov.io/bash)
