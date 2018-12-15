@@ -18,7 +18,7 @@ import logging
 from typing import Union
 from . import Orthanc
 from ..dixel import Dixel
-from diana.utils.dicom import DicomLevel
+from ..utils.dicom import DicomLevel
 
 
 def get_annotation(source: Orthanc, study: Dixel) -> Union[dict, None]:

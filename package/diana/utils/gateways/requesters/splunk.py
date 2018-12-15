@@ -13,8 +13,8 @@ import attr
 from bs4 import BeautifulSoup
 import requests
 from .requester import Requester
-from .exceptions import GatewayConnectionError
-from .. import SmartJSONEncoder
+from ..exceptions import GatewayConnectionError
+from ...smart_json import SmartJSONEncoder
 
 @attr.s
 class Splunk(Requester):

@@ -1,0 +1,27 @@
+
+dist: trusty
+language: python
+group: edge
+
+python:
+  - "3.6"
+services:
+  - docker
+
+env:
+  PYTHONPATH="$TRAVIS_BUILD_DIR/apps/diana-cli"
+
+addons:
+  apt:
+    packages:
+      - docker-ce
+
+
+install:
+
+  - pip install -e package
+
+script:
+
+  - cd tests
+  - pytest test

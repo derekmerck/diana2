@@ -1,10 +1,8 @@
 attrs
 requests
-click
 pydicom
 pyyaml
 redis
 docker
-pytest
 bs4
 pillow

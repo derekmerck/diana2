@@ -27,15 +27,14 @@ class DcmDir(Endpoint, Serializable):
         logger.debug("EP PUT")
         if not item.file:
             raise ValueError("Dixel has no file attribute, can only save file data")
-        self.gateway.write(item.fn(), item.file)
+        self.gateway.write_file(item.fn(), item.file)
 
     def update(self, fn: str, item: Dixel, **kwargs):
         logger = logging.getLogger(self.name)
         logger.debug("EP UPDATE")
         if not item.file:
             raise ValueError("Dixel has no file attribute, can only save file data")
-        self.gateway.write(fn, Dixel.file)
-
+        self.gateway.write_file(fn, Dixel.file)
 
     def get(self, item: Union[str, Dixel], get_pixels=False, get_file=False, **kwargs):
         logger = logging.getLogger(self.name)
@@ -50,11 +49,11 @@ class DcmDir(Endpoint, Serializable):
         if not self.exists(fn):
             raise FileNotFoundError
 
-        ds = self.gateway.read(fn, get_pixels=get_pixels)
+        ds = self.gateway.get(fn, get_pixels=get_pixels)
         result = Dixel.from_pydicom(ds, fn)
 
         if get_file:
-            result.file = self.gateway.get_file(fn)
+            result.file = self.gateway.read_file(fn)
 
         return result
 
@@ -88,7 +87,7 @@ class DcmDir(Endpoint, Serializable):
         for root, dirs, fns in os.walk(self.path, topdown = False):
             for fn in fns:
                 try:
-                    ds = self.gateway.read(fn=fn)
+                    ds = self.gateway.get(fn=fn)
                     d = Dixel.from_pydicom(ds, fn)
                     R.register(d, prefix=prefix)
                 except:
@@ -99,7 +98,6 @@ class DcmDir(Endpoint, Serializable):
         prefix = hashlib.md5(self.path.encode("UTF-*")).hexdigest()[0:4] + "-"
         result = R.registry_items(prefix)
         return result
-
 
     def get_indexed_study(self, item: str, R: Redis):
         prefix = hashlib.md5(self.path.encode("UTF-*")).hexdigest()[0:4] + "-"

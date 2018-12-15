@@ -1,3 +1,10 @@
+"""
+Minting reproducible UIDs is important for anticipating the OIDs of anonymized
+studies and for ensuring studies are linked by StudyUID even when individual series
+are anonymized with different conditions.
+"""
+
+
 import attr
 import hashlib
 
@@ -25,8 +32,10 @@ class DicomUIDMint(object):
 
     app_id = attr.ib(converter=hash_str, default="dicom")
 
-    def hierarchical_suffix(self, PatientID: str, StudyInstanceUID: str,
-                            SeriesInstanceUID=None, SOPInstanceUID=None):
+    def hierarchical_suffix(self, PatientID: str,
+                            StudyInstanceUID: str,
+                            SeriesInstanceUID=None,
+                            SOPInstanceUID=None):
 
         """
         A hierarchical asset uid has the form:
@@ -54,7 +63,6 @@ class DicomUIDMint(object):
                 entries.append(hash_str(SOPInstanceUID, 4))
 
         return ".".join(entries)
-
 
 
     def uid(self, PatientID: str = None,

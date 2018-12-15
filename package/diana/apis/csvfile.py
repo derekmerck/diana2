@@ -34,15 +34,23 @@ class CsvFile(Endpoint, Serializable):
                           level=self.level)
                 self.dixels.add(d)
 
-    def write(self, fp: str=None):
+    def write(self, fp: str=None, fieldnames=None):
         logger = logging.getLogger(self.name)
 
         fp = fp or self.fp
         if not fp:
             raise ValueError("No file provided")
 
+        if fieldnames=="ALL":
+            sample = list(self.dixels)[0]
+            data = {("_" + k): v for (k, v) in sample.meta.items()}
+            data.update(sample.tags)
+            fieldnames = data.keys()
+
+        fieldnames = fieldnames or self.fieldnames
+
         with open(fp, "w") as f:
-            writer = csv.DictWriter(f, fieldnames=self.fieldnames, extrasaction="ignore")
+            writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
             writer.writeheader()
             for item in self.dixels:
                 data = {("_"+k):v for (k,v) in item.meta.items()}

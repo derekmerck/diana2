@@ -4,7 +4,7 @@ from hashlib import sha1
 from enum import Enum
 import attr
 from .requester import Requester
-from ..dicom import DicomLevel
+from ...dicom import DicomLevel
 
 
 def orthanc_hash(PatientID: str, StudyInstanceUID: str, SeriesInstanceUID=None, SOPInstanceUID=None) -> sha1:
@@ -66,14 +66,18 @@ class Orthanc(Requester):
                     resource = "queries/{}/answers/{}/retrieve".format(response0.get('ID'), answer)
                     response3 = self._post(resource, data=self.aet)
 
-                # logger.debug(response2)
-
         return result
-
 
     def put(self, file):
         resource = "instances"
         return self._post(resource, data=file)
+
+    def send(self, oid: str, dest: str, dest_type):
+        """dest_type should be either 'peers' or 'modalities' """
+        resource = "{}/{}/store".format(dest_type, dest)
+        data = oid
+        headers = {'content-type': 'application/text'}
+        self._post(resource, data=data, headers=headers)
 
     def get(self, oid: str, level: DicomLevel, view: OrthancView=OrthancView.TAGS):
 
@@ -102,6 +106,15 @@ class Orthanc(Requester):
         resource = "{!s}/{}/anonymize".format(level, oid)
         response = self._post(resource, json=replacement_map)
         return response.get("ID")
+
+    def get_metadata(self, oid: str, level: DicomLevel, key: str ):
+        resource = "{}/{}/metadata/{}".format(level, oid, key)
+        return self._get(resource)
+
+    def put_metadata(self, oid: str, level: DicomLevel, key: str, value: str):
+        resource = "{}/{}/metadata/{}".format(level, oid, key)
+        data = value
+        return self._put(resource, data=data)
 
     def inventory(self, level = DicomLevel.STUDIES):
         resource = "{!r}".format(level)

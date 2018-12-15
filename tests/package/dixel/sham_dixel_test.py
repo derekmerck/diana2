@@ -11,21 +11,21 @@ def test_shams():
         "AccessionNumber": "12345678"
     }
 
-    expected = {
-        'ID': 'NTE3OTYH32XNES3LPNKR2U6CVOCZXDIL',
-        'Name': ['NADERMAN', 'TRACY', 'E'],
-        'BirthDate': datetime.date(1999, 10, 9),
-        'TimeOffset': datetime.timedelta(-84, 902)
+    expected_meta = {
+        'ShamID': 'NTE3OTYH32XNES3LPNKR2U6CVOCZXDIL',
+        'ShamName': 'NADERMAN^TRACY^E',
+        'ShamBirthDate': "19991009",
+        'ShamStudyDateTime': datetime.datetime(2017, 10, 10, 12, 15, 3)
     }
 
 
     d = ShamDixel(tags=tags)
     logging.debug(d)
 
-    assert( d.sham_info == expected )
+    assert( expected_meta.items() <= d.meta.items() )
 
     assert( d.meta["ShamName"] == "NADERMAN^TRACY^E" )
-    assert( d.ShamStudyDate == "20171010" )
+    assert( d.ShamStudyDate() == "20171010" )
     assert( d.meta["ShamAccessionNumber"] == "25d55ad283aa400af464c76d713c07ad")
 
     c = Dixel(tags=tags)

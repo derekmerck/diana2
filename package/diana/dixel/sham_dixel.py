@@ -1,12 +1,12 @@
-from datetime import datetime, timedelta
 import logging
 import hashlib
-from dateutil import parser as DateTimeParser
 import attr
 from . import Dixel
+from ..utils.gateways import orthanc_id
 from ..utils.guid import GUIDMint
 from ..utils.dicom import dicom_date, dicom_name, dicom_datetime, DicomLevel, DicomUIDMint
 
+# TODO: Minor reformat to handle pre-shammed Dixels, ie, don't assume sham_info must be created
 
 @attr.s(cmp=False)
 class ShamDixel(Dixel):
@@ -65,8 +65,11 @@ class ShamDixel(Dixel):
         self.meta["ShamBirthDate"] = dicom_date(self.sham_info["BirthDate"])
 
         if self.tags.get("AccessionNumber"):
+            anum = self.tags.get("AccessionNumber")
+            if self.salt:
+                anum = "{}+{}".format(anum, self.salt)
             self.meta["ShamAccessionNumber"] = \
-                hashlib.md5(self.tags["AccessionNumber"].encode("UTF-8")).hexdigest()
+                hashlib.md5(anum.encode("UTF-8")).hexdigest()
 
         if self.meta.get("StudyDateTime"):
            self.meta["ShamStudyDateTime"] = self.meta.get("StudyDateTime") + self.sham_info['TimeOffset']
@@ -110,10 +113,35 @@ class ShamDixel(Dixel):
                          SeriesInstanceUID=self.meta["ShamSeriesNumber"],
                          SOPInstanceUID=self.tags["InstanceNumber"])
 
+    # orthanc id
+    def sham_oid(self):
+        if not self.meta.get('ID'):
+            if self.level == DicomLevel.PATIENTS:
+                self.meta['ShamOID'] = orthanc_id(self.meta.get('ShamID'))
+            elif self.level == DicomLevel.STUDIES:
+                self.meta['ShamOID'] = orthanc_id(self.meta.get('ShamID'),
+                                             ShamDixel.ShamStudyUID(self))
+            elif self.level == DicomLevel.SERIES:
+                self.meta['ShamOID'] = orthanc_id(self.meta.get('ShamID'),
+                                                  ShamDixel.ShamStudyUID(self),
+                                                  ShamDixel.ShamSeriesUID(self))
+            elif self.level == DicomLevel.INSTANCES:
+                self.meta['ShamOID'] = orthanc_id(self.tags.get('ShamID'),
+                                                  ShamDixel.ShamStudyUID(self),
+                                                  ShamDixel.ShamSeriesUID(self),
+                                                  ShamDixel.ShamInstanceUID(self))
+            else:
+                raise ValueError("Unknown DicomLevel for oid")
+        return self.meta.get('ShamOID')
+
     def orthanc_sham_map(self):
 
+        # Formatted calls to invoke ShamDixel methods even when called with a
+        # base-class Dixel, as long as _Sham_ meta exists...
+
         if self.level >= DicomLevel.INSTANCES:
-            raise NotImplementedError
+            # TODO: Validate instance creation time maps
+            raise NotImplementedError("Validate instance creation time mapping")
 
         replace = {
                 "PatientName": self.meta["ShamName"],

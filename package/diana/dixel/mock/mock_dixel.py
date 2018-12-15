@@ -2,9 +2,9 @@ from datetime import datetime
 from itertools import count
 import random
 import attr
-from . import Dixel
-from ..utils.dicom import DicomLevel, dicom_datetime
-from ..utils.guid import GUIDMint
+from diana.dixel import Dixel
+from diana.utils.dicom import DicomLevel, dicom_datetime
+from diana.utils.guid import GUIDMint
 
 
 @attr.s

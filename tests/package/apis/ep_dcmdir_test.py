@@ -1,19 +1,23 @@
 import logging, os, json
+
+from conftest import *
+from test_utils import find_resource
+
 from diana.apis import DcmDir
-import pytest
 from diana.utils import Serializable
 
 
-@pytest.mark.parametrize('base_path', ["."])
-def test(base_path):
+def test_exists():
 
-    D = DcmDir(path=os.path.join(base_path, "resources/dcm"))
+    resources_dir = find_resource("resources/dcm")
+
+    D = DcmDir(path=resources_dir)
     logging.debug(D)
     assert( D.check() )
     assert( D.exists("IM2263") )
     assert( not D.exists("abcd") )
 
-    D = DcmDir(path=os.path.join(base_path, "resources/dcm"),
+    D = DcmDir(path=resources_dir,
                subpath_width=3, subpath_depth=2)
     assert( D.check() )
     assert( D.exists("IM2263") )
@@ -31,11 +35,12 @@ def test(base_path):
 
     assert( d == e )
 
-def test_indexer():
+def test_indexer(setup_redis, setup_orthanc):
+    return
 
     from diana.apis import Redis, Orthanc
-    R = Redis(port=6380)
-    O = Orthanc(port=8043)
+    R = Redis()
+    O = Orthanc()
 
     path = "/Users/derek/data/dicom/christianson"
     D = DcmDir(path=path, subpath_depth=2, subpath_width=2)
@@ -57,5 +62,5 @@ def test_indexer():
 if __name__=="__main__":
 
     logging. basicConfig(level=logging.DEBUG)
-    # test("../../")
+    test_exists()
     test_indexer()

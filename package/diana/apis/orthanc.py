@@ -1,11 +1,9 @@
 import logging
-import hashlib
 from typing import Mapping, Union
 import attr
 from ..dixel import Dixel, ShamDixel
 from ..utils import Endpoint, Serializable
-from ..utils.gateways import Orthanc as OrthancGateway, GatewayConnectionError
-from ..utils.gateways.orthanc import OrthancView as View
+from ..utils.gateways import Orthanc as OrthancGateway, OrthancView as View, GatewayConnectionError
 from ..utils.dicom import DicomLevel
 
 
@@ -45,6 +43,7 @@ class Orthanc(Endpoint, Serializable):
     port = attr.ib(default=8042)
     path = attr.ib(default=None)
     aet = attr.ib(default="ORTHANC")
+    peername = attr.ib(default="orthanc")
 
     user = attr.ib(default="orthanc")
     password = attr.ib(default="passw0rd!")
@@ -83,6 +82,17 @@ class Orthanc(Endpoint, Serializable):
             return item, level
         else:
             raise TypeError("Unable to get id for type {}".format(type(item)))
+
+    def psend(self, item: Union[Dixel, str], dest: Union['Orthanc', str]):
+        logger = logging.getLogger(self.name)
+        logger.debug("Get")
+
+        oid, _ = self.id_from_item(item, None)
+
+        if isinstance(dest, Orthanc):
+            dest = dest.peername
+
+        self.gateway.send(oid, dest, "peers")
 
 
     def get(self, item: Union[Dixel, str],

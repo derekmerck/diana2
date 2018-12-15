@@ -4,7 +4,7 @@ import attr
 import pydicom
 from ..utils.dicom import DicomLevel
 from ..utils import Serializable
-from ..utils.gateways.orthanc import orthanc_id
+from ..utils.gateways import orthanc_id
 
 
 def mktime(datestr, timestr):
@@ -23,6 +23,8 @@ class Dixel(Serializable):
     # Making this init=False removes it from the serializer
     # Use a "from" constructor or add "file" manually after creation
     file = attr.ib(default=None, repr=False, init=False)
+    pixels = attr.ib(default=None, repr=False, init=False)
+    report = attr.ib(default=None, repr=False, init=False)
     children = attr.ib(init=False, factory=list)
 
     def __attrs_post_init__(self):
@@ -41,7 +43,10 @@ class Dixel(Serializable):
     def from_pydicom(ds: pydicom.Dataset, fn: str, file=None):
 
         meta = {
-            'FileName': fn
+            'FileName': fn,
+            'TransferSyntaxUID': ds.file_meta.TransferSyntaxUID,
+            'TransferSyntax': str(ds.file_meta.TransferSyntaxUID),
+            'MediaStorage': str(ds.file_meta.MediaStorageSOPClassUID),
         }
 
         # Most relevant tags for indexing
@@ -62,6 +67,7 @@ class Dixel(Serializable):
             'SOPInstanceUID': ds.SOPInstanceUID,
             'InstanceCreationDate': ds.InstanceCreationDate,
             'InstanceCreationTime': ds.InstanceCreationTime,
+            'PhotometricInterpretation': ds[0x0028, 0x0004].value,  # MONOCHROME, RGB etc.
         }
 
         level = DicomLevel.INSTANCES
@@ -71,16 +77,41 @@ class Dixel(Serializable):
         if file:
             d.file = file
 
+        if hasattr(ds, "PixelData"):
+            d.pixels = ds.pixel_array
+
         return d
 
     @staticmethod
-    def from_montage(ds: Mapping):
-        meta = {}
-        tags = ds
+    def from_montage(data: Mapping):
+
+        tags = {
+            "AccessionNumber": data["Accession Number"],
+            "PatientID": data["Patient MRN"],
+            'StudyDescription': data['Exam Description'],
+            'ReferringPhysicianName': data['Ordered By'],
+            'PatientSex': data['Patient Sex'],
+            "StudyDate": data['Exam Completed Date'],
+            'Organization': data['Organization'],
+        }
+
+        meta = {
+            'PatientName': "{}^{}".format(
+                data["Patient Last Name"].upper(),
+                data["Patient First Name"].upper()),
+            'PatientAge': data['Patient Age'],
+            "OrderCode": data["Exam Code"],
+            "PatientStatus": data["Patient Status"],
+            "ReportText": data["Report Text"]
+        }
+
         level = DicomLevel.STUDIES
-        return Dixel(meta=meta,
+        d = Dixel(meta=meta,
                      tags=tags,
                      level=level)
+        d.report = Report
+
+        return d
 
     @staticmethod
     def from_orthanc(meta: Mapping=None, tags: Mapping=None, level: DicomLevel=DicomLevel.STUDIES, file=None):
@@ -119,3 +150,14 @@ class Dixel(Serializable):
     # filename
     def fn(self):
         return self.meta.get('FileName')
+
+    def get_pixels(self):
+        if not self.pixels:
+            raise TypeError
+
+        if self.meta.get('PhotometricInterpretation') == "RGB":
+            pixels = self.pixels.reshape([self.pixels.shape[1], self.pixels.shape[2], 3])
+        else:
+            pixels = self.pixels
+
+        return pixels

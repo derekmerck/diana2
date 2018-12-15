@@ -1,8 +1,8 @@
 import os, logging, json as _json
 import requests
 import attr
-from .exceptions import GatewayConnectionError
-from ..smart_json import SmartJSONEncoder
+from ..exceptions import GatewayConnectionError
+from ...smart_json import SmartJSONEncoder
 
 
 @attr.s
@@ -59,12 +59,14 @@ class Requester(object):
                 requests.exceptions.HTTPError) as e:
             raise GatewayConnectionError(e)
 
-    def _put(self, resource, params=None, headers=None):
+    def _put(self, resource, json=None, data=None, headers=None):
         logger = logging.getLogger(self.name)
         logger.debug("Calling put")
         url = self.make_url(resource)
+        if json:
+            data = _json.dumps(json, cls=SmartJSONEncoder)
         try:
-            result = requests.put(url, params=params, headers=headers, auth=self.auth)
+            result = requests.put(url, data=data, headers=headers, auth=self.auth)
         except requests.exceptions.ConnectionError as e:
             raise GatewayConnectionError(e)
         return self.handle_result(result)
