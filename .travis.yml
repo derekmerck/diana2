@@ -18,7 +18,7 @@ addons:
 install:
 
   - pip install -r requirements.txt
-  - pip install package
+  - pip install -e package
 
 script:
 

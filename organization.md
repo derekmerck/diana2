@@ -53,6 +53,10 @@ package
     - add_handler(ep, event, partial func)
 
   - dixel
+    - Dixel
+    - ShamDixel
+    - MockDixel
+  
     - DicomLevel
     - from_kwargs()
     - from_file()
