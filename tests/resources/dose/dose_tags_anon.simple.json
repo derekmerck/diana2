@@ -1,0 +1,112 @@
+{
+   "AccessionNumber": "",
+   "CompletionFlag": "COMPLETE",
+   "ContentTemplateSequence": [
+      {
+         "MappingResource": "DCMR",
+         "TemplateIdentifier": "10011"
+      }
+   ],
+   "ContinuityOfContent": "SEPARATE",
+   "DateOfLastCalibration": "20180101",
+   "DeviceSerialNumber": "123",
+   "InstanceCreationDateTime": "2018-01-01T22:22:02.111111",
+   "InstanceNumber": "0",
+   "InstitutionAddress": "Institution Address",
+   "InstitutionName": "Institution Name",
+   "InstitutionalDepartmentName": "CT",
+   "Manufacturer": "Manufacturer",
+   "ManufacturerModelName": "Anon",
+   "Modality": "SR",
+   "PatientBirthDate": "19000101",
+   "PatientID": "123",
+   "PatientName": "DOE^JOHN",
+   "PatientSex": "U",
+   "PatientWeight": "200.000",
+   "PerformedProcedureCodeSequence": [],
+   "ReferringPhysicianName": "ATTENDING",
+   "SOPClassUID": "123",
+   "SOPInstanceUID": "123",
+   "SeriesDate": "20180101",
+   "SeriesDateTime": "2018-01-01T22:22:02.111111",
+   "SeriesInstanceUID": "123",
+   "SeriesNumber": "4",
+   "SeriesTime": "22222.111111",
+   "SoftwareVersions": "123",
+   "SpecificCharacterSet": "ISO_IR 100",
+   "StationName": "SCANNER",
+   "StudyDate": "20180101",
+   "StudyDateTime": "2018-01-01T22:22:02.111111",
+   "StudyDescription": "CT Lumbar",
+   "StudyID": "",
+   "StudyInstanceUID": "123",
+   "StudyTime": "22222.111111",
+   "TimeOfLastCalibration": "22222.111111",
+   "TimezoneOffsetFromUTC": "-0400",
+   "ValueType": "CONTAINER",
+   "VerificationFlag": "UNVERIFIED",
+   "X-Ray Radiation Dose Report": {
+      "CT Accumulated Dose Data": {
+         "CT Dose Length Product Total": 700.0,
+         "Total Number of Irradiation Events": 2.0
+      },
+      "CT Acquisition": [
+         {
+            "CT Acquisition Parameters": {
+               "Exposure Time": 10.0,
+               "Nominal Single Collimation Width": 45.0,
+               "Nominal Total Collimation Width": 45.0,
+               "Number of X-Ray Sources": 1.0,
+               "Scanning Length": 200.0
+            },
+            "CT Acquisition Type": "Spiral Acquisition",
+            "CT Dose": {
+               "CTDIw Phantom Type": "Ludlum L-007N PMMA CT dosimetry Phantom, 32 cm",
+               "DLP": 640.0,
+               "Mean CTDIvol": 30.0
+            },
+            "CT X-Ray Source Parameters": {
+               "Exposure Time per Rotation": 2.0,
+               "Identification of the XRay Source": "Source-1",
+               "KVP": 120.0,
+               "Maximum X-Ray Tube Current": 160.0,
+               "X-Ray Tube Current": 160.0
+            },
+            "Irradiation Event UID": "abc",
+            "Target Region": "Lumbar spine"
+         },
+         {
+            "CT Acquisition Parameters": {
+               "Exposure Time": 7.0,
+               "Nominal Single Collimation Width": 45.0,
+               "Nominal Total Collimation Width": 45.0,
+               "Number of X-Ray Sources": 1.0,
+               "Scanning Length": 250.0
+            },
+            "CT Acquisition Type": "Constant Angle Acquisition",
+            "CT Dose": {
+               "CTDIw Phantom Type": "Ludlum L-007N PMMA CT dosimetry Phantom, 32 cm",
+               "DLP": 100.0,
+               "Mean CTDIvol": 3.5
+            },
+            "CT X-Ray Source Parameters": {
+               "Exposure Time per Rotation": 2.0,
+               "Identification of the XRay Source": "Source-1",
+               "KVP": 120.0,
+               "Maximum X-Ray Tube Current": 35.0,
+               "X-Ray Tube Current": 35.0
+            },
+            "Irradiation Event UID": "abc",
+            "Target Region": "Lumbar spine"
+         }
+      ],
+      "ContentDateTime": "2018-06-07T22:22:02.111111",
+      "Device Observer UID": "abc",
+      "End of X-Ray Irradiation": "2018-01-12T00:00:00",
+      "Observer Type": "Device",
+      "Procedure reported": "Computed Tomography XRay",
+      "Scope of Accumulation": "STUDY",
+      "Source of Dose Information": "Automated Data Collection",
+      "Start of X-Ray Irradiation": "2018-01-12T00:00:00"
+   }
+}

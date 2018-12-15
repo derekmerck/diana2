@@ -1,0 +1,1050 @@
+{
+   "AccessionNumber" : "",
+   "CompletionFlag" : "COMPLETE",
+   "ConceptNameCodeSequence" : [
+      {
+         "CodeMeaning" : "X-Ray Radiation Dose Report",
+         "CodeValue" : "113701",
+         "CodingSchemeDesignator" : "DCM"
+      }
+   ],
+   "ContentDate" : "20180607",
+   "ContentSequence" : [
+      {
+         "ConceptCodeSequence" : [
+            {
+               "CodeMeaning" : "Computed Tomography XRay",
+               "CodeValue" : "P5-08000",
+               "CodingSchemeDesignator" : "SRT"
+            }
+         ],
+         "ConceptNameCodeSequence" : [
+            {
+               "CodeMeaning" : "Procedure reported",
+               "CodeValue" : "121058",
+               "CodingSchemeDesignator" : "DCM"
+            }
+         ],
+         "ContentSequence" : [
+            {
+               "ConceptCodeSequence" : [
+                  {
+                     "CodeMeaning" : "Diagnostic Intent",
+                     "CodeValue" : "R-408C3",
+                     "CodingSchemeDesignator" : "SRT"
+                  }
+               ],
+               "ConceptNameCodeSequence" : [
+                  {
+                     "CodeMeaning" : "Has Intent",
+                     "CodeValue" : "G-C0E8",
+                     "CodingSchemeDesignator" : "SRT"
+                  }
+               ],
+               "RelationshipType" : "HAS CONCEPT MOD",
+               "ValueType" : "CODE"
+            }
+         ],
+         "RelationshipType" : "HAS CONCEPT MOD",
+         "ValueType" : "CODE"
+      },
+      {
+         "ConceptCodeSequence" : [
+            {
+               "CodeMeaning" : "Device",
+               "CodeValue" : "121007",
+               "CodingSchemeDesignator" : "DCM"
+            }
+         ],
+         "ConceptNameCodeSequence" : [
+            {
+               "CodeMeaning" : "Observer Type",
+               "CodeValue" : "121005",
+               "CodingSchemeDesignator" : "DCM"
+            }
+         ],
+         "RelationshipType" : "HAS OBS CONTEXT",
+         "ValueType" : "CODE"
+      },
+      {
+         "ConceptNameCodeSequence" : [
+            {
+               "CodeMeaning" : "Device Observer UID",
+               "CodeValue" : "121012",
+               "CodingSchemeDesignator" : "DCM"
+            }
+         ],
+         "RelationshipType" : "HAS OBS CONTEXT",
+         "UID" : "abc",
+         "ValueType" : "UIDREF"
+      },
+      {
+         "ConceptNameCodeSequence" : [
+            {
+               "CodeMeaning" : "Start of X-Ray Irradiation",
+               "CodeValue" : "113809",
+               "CodingSchemeDesignator" : "DCM"
+            }
+         ],
+         "DateTime" : "20180112000000",
+         "RelationshipType" : "HAS OBS CONTEXT",
+         "ValueType" : "DATETIME"
+      },
+      {
+         "ConceptNameCodeSequence" : [
+            {
+               "CodeMeaning" : "End of X-Ray Irradiation",
+               "CodeValue" : "113810",
+               "CodingSchemeDesignator" : "DCM"
+            }
+         ],
+         "DateTime" : "20180112000000",
+         "RelationshipType" : "HAS OBS CONTEXT",
+         "ValueType" : "DATETIME"
+      },
+      {
+         "ConceptCodeSequence" : [
+            {
+               "CodeMeaning" : "STUDY",
+               "CodeValue" : "113014",
+               "CodingSchemeDesignator" : "DCM"
+            }
+         ],
+         "ConceptNameCodeSequence" : [
+            {
+               "CodeMeaning" : "Scope of Accumulation",
+               "CodeValue" : "113705",
+               "CodingSchemeDesignator" : "DCM"
+            }
+         ],
+         "ContentSequence" : [
+            {
+               "ConceptNameCodeSequence" : [
+                  {
+                     "CodeMeaning" : "Study Instance UID",
+                     "CodeValue" : "110180",
+                     "CodingSchemeDesignator" : "DCM"
+                  }
+               ],
+               "RelationshipType" : "HAS OBS CONTEXT",
+               "UID" : "abc",
+               "ValueType" : "UIDREF"
+            }
+         ],
+         "RelationshipType" : "HAS OBS CONTEXT",
+         "ValueType" : "CODE"
+      },
+      {
+         "ConceptNameCodeSequence" : [
+            {
+               "CodeMeaning" : "CT Accumulated Dose Data",
+               "CodeValue" : "113811",
+               "CodingSchemeDesignator" : "DCM"
+            }
+         ],
+         "ContentSequence" : [
+            {
+               "ConceptNameCodeSequence" : [
+                  {
+                     "CodeMeaning" : "Total Number of Irradiation Events",
+                     "CodeValue" : "113812",
+                     "CodingSchemeDesignator" : "DCM"
+                  }
+               ],
+               "MeasuredValueSequence" : [
+                  {
+                     "MeasurementUnitsCodeSequence" : [
+                        {
+                           "CodeMeaning" : "events",
+                           "CodeValue" : "{events}",
+                           "CodingSchemeDesignator" : "UCUM"
+                        }
+                     ],
+                     "NumericValue" : "2"
+                  }
+               ],
+               "RelationshipType" : "CONTAINS",
+               "ValueType" : "NUM"
+            },
+            {
+               "ConceptNameCodeSequence" : [
+                  {
+                     "CodeMeaning" : "CT Dose Length Product Total",
+                     "CodeValue" : "113813",
+                     "CodingSchemeDesignator" : "DCM"
+                  }
+               ],
+               "MeasuredValueSequence" : [
+                  {
+                     "MeasurementUnitsCodeSequence" : [
+                        {
+                           "CodeMeaning" : "mGy.cm",
+                           "CodeValue" : "mGy.cm",
+                           "CodingSchemeDesignator" : "UCUM"
+                        }
+                     ],
+                     "NumericValue" : "700.0000"
+                  }
+               ],
+               "RelationshipType" : "CONTAINS",
+               "ValueType" : "NUM"
+            }
+         ],
+         "ContentTemplateSequence" : [
+            {
+               "MappingResource" : "DCMR",
+               "TemplateIdentifier" : "10012"
+            }
+         ],
+         "ContinuityOfContent" : "SEPARATE",
+         "RelationshipType" : "CONTAINS",
+         "ValueType" : "CONTAINER"
+      },
+      {
+         "ConceptNameCodeSequence" : [
+            {
+               "CodeMeaning" : "CT Acquisition",
+               "CodeValue" : "113819",
+               "CodingSchemeDesignator" : "DCM"
+            }
+         ],
+         "ContentSequence" : [
+            {
+               "ConceptCodeSequence" : [
+                  {
+                     "CodeMeaning" : "Lumbar spine",
+                     "CodeValue" : "T-11503",
+                     "CodingSchemeDesignator" : "SRT"
+                  }
+               ],
+               "ConceptNameCodeSequence" : [
+                  {
+                     "CodeMeaning" : "Target Region",
+                     "CodeValue" : "123014",
+                     "CodingSchemeDesignator" : "DCM"
+                  }
+               ],
+               "RelationshipType" : "CONTAINS",
+               "ValueType" : "CODE"
+            },
+            {
+               "ConceptCodeSequence" : [
+                  {
+                     "CodeMeaning" : "Spiral Acquisition",
+                     "CodeValue" : "P5-08001",
+                     "CodingSchemeDesignator" : "SRT"
+                  }
+               ],
+               "ConceptNameCodeSequence" : [
+                  {
+                     "CodeMeaning" : "CT Acquisition Type",
+                     "CodeValue" : "113820",
+                     "CodingSchemeDesignator" : "DCM"
+                  }
+               ],
+               "RelationshipType" : "CONTAINS",
+               "ValueType" : "CODE"
+            },
+            {
+               "ConceptNameCodeSequence" : [
+                  {
+                     "CodeMeaning" : "Irradiation Event UID",
+                     "CodeValue" : "113769",
+                     "CodingSchemeDesignator" : "DCM"
+                  }
+               ],
+               "RelationshipType" : "CONTAINS",
+               "UID" : "abc",
+               "ValueType" : "UIDREF"
+            },
+            {
+               "ConceptNameCodeSequence" : [
+                  {
+                     "CodeMeaning" : "CT Acquisition Parameters",
+                     "CodeValue" : "113822",
+                     "CodingSchemeDesignator" : "DCM"
+                  }
+               ],
+               "ContentSequence" : [
+                  {
+                     "ConceptNameCodeSequence" : [
+                        {
+                           "CodeMeaning" : "Exposure Time",
+                           "CodeValue" : "113824",
+                           "CodingSchemeDesignator" : "DCM"
+                        }
+                     ],
+                     "MeasuredValueSequence" : [
+                        {
+                           "MeasurementUnitsCodeSequence" : [
+                              {
+                                 "CodeMeaning" : "s",
+                                 "CodeValue" : "s",
+                                 "CodingSchemeDesignator" : "UCUM"
+                              }
+                           ],
+                           "NumericValue" : "10.000"
+                        }
+                     ],
+                     "RelationshipType" : "CONTAINS",
+                     "ValueType" : "NUM"
+                  },
+                  {
+                     "ConceptNameCodeSequence" : [
+                        {
+                           "CodeMeaning" : "Scanning Length",
+                           "CodeValue" : "113825",
+                           "CodingSchemeDesignator" : "DCM"
+                        }
+                     ],
+                     "MeasuredValueSequence" : [
+                        {
+                           "MeasurementUnitsCodeSequence" : [
+                              {
+                                 "CodeMeaning" : "mm",
+                                 "CodeValue" : "mm",
+                                 "CodingSchemeDesignator" : "UCUM"
+                              }
+                           ],
+                           "NumericValue" : "200.0000"
+                        }
+                     ],
+                     "RelationshipType" : "CONTAINS",
+                     "ValueType" : "NUM"
+                  },
+                  {
+                     "ConceptNameCodeSequence" : [
+                        {
+                           "CodeMeaning" : "Nominal Single Collimation Width",
+                           "CodeValue" : "113826",
+                           "CodingSchemeDesignator" : "DCM"
+                        }
+                     ],
+                     "MeasuredValueSequence" : [
+                        {
+                           "MeasurementUnitsCodeSequence" : [
+                              {
+                                 "CodeMeaning" : "mm",
+                                 "CodeValue" : "mm",
+                                 "CodingSchemeDesignator" : "UCUM"
+                              }
+                           ],
+                           "NumericValue" : "45"
+                        }
+                     ],
+                     "RelationshipType" : "CONTAINS",
+                     "ValueType" : "NUM"
+                  },
+                  {
+                     "ConceptNameCodeSequence" : [
+                        {
+                           "CodeMeaning" : "Nominal Total Collimation Width",
+                           "CodeValue" : "113827",
+                           "CodingSchemeDesignator" : "DCM"
+                        }
+                     ],
+                     "MeasuredValueSequence" : [
+                        {
+                           "MeasurementUnitsCodeSequence" : [
+                              {
+                                 "CodeMeaning" : "mm",
+                                 "CodeValue" : "mm",
+                                 "CodingSchemeDesignator" : "UCUM"
+                              }
+                           ],
+                           "NumericValue" : "45"
+                        }
+                     ],
+                     "RelationshipType" : "CONTAINS",
+                     "ValueType" : "NUM"
+                  },
+                  {
+                     "ConceptNameCodeSequence" : [
+                        {
+                           "CodeMeaning" : "Number of X-Ray Sources",
+                           "CodeValue" : "113823",
+                           "CodingSchemeDesignator" : "DCM"
+                        }
+                     ],
+                     "MeasuredValueSequence" : [
+                        {
+                           "MeasurementUnitsCodeSequence" : [
+                              {
+                                 "CodeMeaning" : "X-Ray sources",
+                                 "CodeValue" : "{X-Ray sources}",
+                                 "CodingSchemeDesignator" : "UCUM"
+                              }
+                           ],
+                           "NumericValue" : "1"
+                        }
+                     ],
+                     "RelationshipType" : "CONTAINS",
+                     "ValueType" : "NUM"
+                  }
+               ],
+               "ContinuityOfContent" : "SEPARATE",
+               "RelationshipType" : "CONTAINS",
+               "ValueType" : "CONTAINER"
+            },
+            {
+               "ConceptNameCodeSequence" : [
+                  {
+                     "CodeMeaning" : "CT X-Ray Source Parameters",
+                     "CodeValue" : "113831",
+                     "CodingSchemeDesignator" : "DCM"
+                  }
+               ],
+               "ContentSequence" : [
+                  {
+                     "ConceptNameCodeSequence" : [
+                        {
+                           "CodeMeaning" : "Identification of the XRay Source",
+                           "CodeValue" : "113832",
+                           "CodingSchemeDesignator" : "DCM"
+                        }
+                     ],
+                     "RelationshipType" : "CONTAINS",
+                     "TextValue" : "Source-1",
+                     "ValueType" : "TEXT"
+                  },
+                  {
+                     "ConceptNameCodeSequence" : [
+                        {
+                           "CodeMeaning" : "KVP",
+                           "CodeValue" : "113733",
+                           "CodingSchemeDesignator" : "DCM"
+                        }
+                     ],
+                     "MeasuredValueSequence" : [
+                        {
+                           "MeasurementUnitsCodeSequence" : [
+                              {
+                                 "CodeMeaning" : "kV",
+                                 "CodeValue" : "kV",
+                                 "CodingSchemeDesignator" : "UCUM"
+                              }
+                           ],
+                           "NumericValue" : "120"
+                        }
+                     ],
+                     "RelationshipType" : "CONTAINS",
+                     "ValueType" : "NUM"
+                  },
+                  {
+                     "ConceptNameCodeSequence" : [
+                        {
+                           "CodeMeaning" : "Maximum X-Ray Tube Current",
+                           "CodeValue" : "113833",
+                           "CodingSchemeDesignator" : "DCM"
+                        }
+                     ],
+                     "MeasuredValueSequence" : [
+                        {
+                           "MeasurementUnitsCodeSequence" : [
+                              {
+                                 "CodeMeaning" : "mA",
+                                 "CodeValue" : "mA",
+                                 "CodingSchemeDesignator" : "UCUM"
+                              }
+                           ],
+                           "NumericValue" : "160"
+                        }
+                     ],
+                     "RelationshipType" : "CONTAINS",
+                     "ValueType" : "NUM"
+                  },
+                  {
+                     "ConceptNameCodeSequence" : [
+                        {
+                           "CodeMeaning" : "X-Ray Tube Current",
+                           "CodeValue" : "113734",
+                           "CodingSchemeDesignator" : "DCM"
+                        }
+                     ],
+                     "MeasuredValueSequence" : [
+                        {
+                           "MeasurementUnitsCodeSequence" : [
+                              {
+                                 "CodeMeaning" : "mA",
+                                 "CodeValue" : "mA",
+                                 "CodingSchemeDesignator" : "UCUM"
+                              }
+                           ],
+                           "NumericValue" : "160"
+                        }
+                     ],
+                     "RelationshipType" : "CONTAINS",
+                     "ValueType" : "NUM"
+                  },
+                  {
+                     "ConceptNameCodeSequence" : [
+                        {
+                           "CodeMeaning" : "Exposure Time per Rotation",
+                           "CodeValue" : "113834",
+                           "CodingSchemeDesignator" : "DCM"
+                        }
+                     ],
+                     "MeasuredValueSequence" : [
+                        {
+                           "MeasurementUnitsCodeSequence" : [
+                              {
+                                 "CodeMeaning" : "s",
+                                 "CodeValue" : "s",
+                                 "CodingSchemeDesignator" : "UCUM"
+                              }
+                           ],
+                           "NumericValue" : "2.00"
+                        }
+                     ],
+                     "RelationshipType" : "CONTAINS",
+                     "ValueType" : "NUM"
+                  }
+               ],
+               "ContinuityOfContent" : "SEPARATE",
+               "RelationshipType" : "CONTAINS",
+               "ValueType" : "CONTAINER"
+            },
+            {
+               "ConceptNameCodeSequence" : [
+                  {
+                     "CodeMeaning" : "CT Dose",
+                     "CodeValue" : "113829",
+                     "CodingSchemeDesignator" : "DCM"
+                  }
+               ],
+               "ContentSequence" : [
+                  {
+                     "ConceptNameCodeSequence" : [
+                        {
+                           "CodeMeaning" : "Mean CTDIvol",
+                           "CodeValue" : "113830",
+                           "CodingSchemeDesignator" : "DCM"
+                        }
+                     ],
+                     "MeasuredValueSequence" : [
+                        {
+                           "MeasurementUnitsCodeSequence" : [
+                              {
+                                 "CodeMeaning" : "mGy",
+                                 "CodeValue" : "mGy",
+                                 "CodingSchemeDesignator" : "UCUM"
+                              }
+                           ],
+                           "NumericValue" : "30.00000"
+                        }
+                     ],
+                     "RelationshipType" : "CONTAINS",
+                     "ValueType" : "NUM"
+                  },
+                  {
+                     "ConceptCodeSequence" : [
+                        {
+                           "CodeMeaning" : "Ludlum L-007N PMMA CT dosimetry Phantom, 32 cm",
+                           "CodeValue" : "L-007N32",
+                           "CodingSchemeDesignator" : "AnonGeneric"
+                        }
+                     ],
+                     "ConceptNameCodeSequence" : [
+                        {
+                           "CodeMeaning" : "CTDIw Phantom Type",
+                           "CodeValue" : "113835",
+                           "CodingSchemeDesignator" : "DCM"
+                        }
+                     ],
+                     "RelationshipType" : "CONTAINS",
+                     "ValueType" : "CODE"
+                  },
+                  {
+                     "ConceptNameCodeSequence" : [
+                        {
+                           "CodeMeaning" : "DLP",
+                           "CodeValue" : "113838",
+                           "CodingSchemeDesignator" : "DCM"
+                        }
+                     ],
+                     "MeasuredValueSequence" : [
+                        {
+                           "MeasurementUnitsCodeSequence" : [
+                              {
+                                 "CodeMeaning" : "mGy.cm",
+                                 "CodeValue" : "mGy.cm",
+                                 "CodingSchemeDesignator" : "UCUM"
+                              }
+                           ],
+                           "NumericValue" : "640.0000"
+                        }
+                     ],
+                     "RelationshipType" : "CONTAINS",
+                     "ValueType" : "NUM"
+                  }
+               ],
+               "ContinuityOfContent" : "SEPARATE",
+               "RelationshipType" : "CONTAINS",
+               "ValueType" : "CONTAINER"
+            }
+         ],
+         "ContentTemplateSequence" : [
+            {
+               "MappingResource" : "DCMR",
+               "TemplateIdentifier" : "10013"
+            }
+         ],
+         "ContinuityOfContent" : "SEPARATE",
+         "RelationshipType" : "CONTAINS",
+         "ValueType" : "CONTAINER"
+      },
+      {
+         "ConceptNameCodeSequence" : [
+            {
+               "CodeMeaning" : "CT Acquisition",
+               "CodeValue" : "113819",
+               "CodingSchemeDesignator" : "DCM"
+            }
+         ],
+         "ContentSequence" : [
+            {
+               "ConceptCodeSequence" : [
+                  {
+                     "CodeMeaning" : "Lumbar spine",
+                     "CodeValue" : "T-11503",
+                     "CodingSchemeDesignator" : "SRT"
+                  }
+               ],
+               "ConceptNameCodeSequence" : [
+                  {
+                     "CodeMeaning" : "Target Region",
+                     "CodeValue" : "123014",
+                     "CodingSchemeDesignator" : "DCM"
+                  }
+               ],
+               "RelationshipType" : "CONTAINS",
+               "ValueType" : "CODE"
+            },
+            {
+               "ConceptCodeSequence" : [
+                  {
+                     "CodeMeaning" : "Constant Angle Acquisition",
+                     "CodeValue" : "113805",
+                     "CodingSchemeDesignator" : "DCM"
+                  }
+               ],
+               "ConceptNameCodeSequence" : [
+                  {
+                     "CodeMeaning" : "CT Acquisition Type",
+                     "CodeValue" : "113820",
+                     "CodingSchemeDesignator" : "DCM"
+                  }
+               ],
+               "RelationshipType" : "CONTAINS",
+               "ValueType" : "CODE"
+            },
+            {
+               "ConceptNameCodeSequence" : [
+                  {
+                     "CodeMeaning" : "Irradiation Event UID",
+                     "CodeValue" : "113769",
+                     "CodingSchemeDesignator" : "DCM"
+                  }
+               ],
+               "RelationshipType" : "CONTAINS",
+               "UID" : "abc",
+               "ValueType" : "UIDREF"
+            },
+            {
+               "ConceptNameCodeSequence" : [
+                  {
+                     "CodeMeaning" : "CT Acquisition Parameters",
+                     "CodeValue" : "113822",
+                     "CodingSchemeDesignator" : "DCM"
+                  }
+               ],
+               "ContentSequence" : [
+                  {
+                     "ConceptNameCodeSequence" : [
+                        {
+                           "CodeMeaning" : "Exposure Time",
+                           "CodeValue" : "113824",
+                           "CodingSchemeDesignator" : "DCM"
+                        }
+                     ],
+                     "MeasuredValueSequence" : [
+                        {
+                           "MeasurementUnitsCodeSequence" : [
+                              {
+                                 "CodeMeaning" : "s",
+                                 "CodeValue" : "s",
+                                 "CodingSchemeDesignator" : "UCUM"
+                              }
+                           ],
+                           "NumericValue" : "7.000"
+                        }
+                     ],
+                     "RelationshipType" : "CONTAINS",
+                     "ValueType" : "NUM"
+                  },
+                  {
+                     "ConceptNameCodeSequence" : [
+                        {
+                           "CodeMeaning" : "Scanning Length",
+                           "CodeValue" : "113825",
+                           "CodingSchemeDesignator" : "DCM"
+                        }
+                     ],
+                     "MeasuredValueSequence" : [
+                        {
+                           "MeasurementUnitsCodeSequence" : [
+                              {
+                                 "CodeMeaning" : "mm",
+                                 "CodeValue" : "mm",
+                                 "CodingSchemeDesignator" : "UCUM"
+                              }
+                           ],
+                           "NumericValue" : "250.0000"
+                        }
+                     ],
+                     "RelationshipType" : "CONTAINS",
+                     "ValueType" : "NUM"
+                  },
+                  {
+                     "ConceptNameCodeSequence" : [
+                        {
+                           "CodeMeaning" : "Nominal Single Collimation Width",
+                           "CodeValue" : "113826",
+                           "CodingSchemeDesignator" : "DCM"
+                        }
+                     ],
+                     "MeasuredValueSequence" : [
+                        {
+                           "MeasurementUnitsCodeSequence" : [
+                              {
+                                 "CodeMeaning" : "mm",
+                                 "CodeValue" : "mm",
+                                 "CodingSchemeDesignator" : "UCUM"
+                              }
+                           ],
+                           "NumericValue" : "45"
+                        }
+                     ],
+                     "RelationshipType" : "CONTAINS",
+                     "ValueType" : "NUM"
+                  },
+                  {
+                     "ConceptNameCodeSequence" : [
+                        {
+                           "CodeMeaning" : "Nominal Total Collimation Width",
+                           "CodeValue" : "113827",
+                           "CodingSchemeDesignator" : "DCM"
+                        }
+                     ],
+                     "MeasuredValueSequence" : [
+                        {
+                           "MeasurementUnitsCodeSequence" : [
+                              {
+                                 "CodeMeaning" : "mm",
+                                 "CodeValue" : "mm",
+                                 "CodingSchemeDesignator" : "UCUM"
+                              }
+                           ],
+                           "NumericValue" : "45"
+                        }
+                     ],
+                     "RelationshipType" : "CONTAINS",
+                     "ValueType" : "NUM"
+                  },
+                  {
+                     "ConceptNameCodeSequence" : [
+                        {
+                           "CodeMeaning" : "Number of X-Ray Sources",
+                           "CodeValue" : "113823",
+                           "CodingSchemeDesignator" : "DCM"
+                        }
+                     ],
+                     "MeasuredValueSequence" : [
+                        {
+                           "MeasurementUnitsCodeSequence" : [
+                              {
+                                 "CodeMeaning" : "X-Ray sources",
+                                 "CodeValue" : "{X-Ray sources}",
+                                 "CodingSchemeDesignator" : "UCUM"
+                              }
+                           ],
+                           "NumericValue" : "1"
+                        }
+                     ],
+                     "RelationshipType" : "CONTAINS",
+                     "ValueType" : "NUM"
+                  }
+               ],
+               "ContinuityOfContent" : "SEPARATE",
+               "RelationshipType" : "CONTAINS",
+               "ValueType" : "CONTAINER"
+            },
+            {
+               "ConceptNameCodeSequence" : [
+                  {
+                     "CodeMeaning" : "CT X-Ray Source Parameters",
+                     "CodeValue" : "113831",
+                     "CodingSchemeDesignator" : "DCM"
+                  }
+               ],
+               "ContentSequence" : [
+                  {
+                     "ConceptNameCodeSequence" : [
+                        {
+                           "CodeMeaning" : "Identification of the XRay Source",
+                           "CodeValue" : "113832",
+                           "CodingSchemeDesignator" : "DCM"
+                        }
+                     ],
+                     "RelationshipType" : "CONTAINS",
+                     "TextValue" : "Source-1",
+                     "ValueType" : "TEXT"
+                  },
+                  {
+                     "ConceptNameCodeSequence" : [
+                        {
+                           "CodeMeaning" : "KVP",
+                           "CodeValue" : "113733",
+                           "CodingSchemeDesignator" : "DCM"
+                        }
+                     ],
+                     "MeasuredValueSequence" : [
+                        {
+                           "MeasurementUnitsCodeSequence" : [
+                              {
+                                 "CodeMeaning" : "kV",
+                                 "CodeValue" : "kV",
+                                 "CodingSchemeDesignator" : "UCUM"
+                              }
+                           ],
+                           "NumericValue" : "120"
+                        }
+                     ],
+                     "RelationshipType" : "CONTAINS",
+                     "ValueType" : "NUM"
+                  },
+                  {
+                     "ConceptNameCodeSequence" : [
+                        {
+                           "CodeMeaning" : "Maximum X-Ray Tube Current",
+                           "CodeValue" : "113833",
+                           "CodingSchemeDesignator" : "DCM"
+                        }
+                     ],
+                     "MeasuredValueSequence" : [
+                        {
+                           "MeasurementUnitsCodeSequence" : [
+                              {
+                                 "CodeMeaning" : "mA",
+                                 "CodeValue" : "mA",
+                                 "CodingSchemeDesignator" : "UCUM"
+                              }
+                           ],
+                           "NumericValue" : "35"
+                        }
+                     ],
+                     "RelationshipType" : "CONTAINS",
+                     "ValueType" : "NUM"
+                  },
+                  {
+                     "ConceptNameCodeSequence" : [
+                        {
+                           "CodeMeaning" : "X-Ray Tube Current",
+                           "CodeValue" : "113734",
+                           "CodingSchemeDesignator" : "DCM"
+                        }
+                     ],
+                     "MeasuredValueSequence" : [
+                        {
+                           "MeasurementUnitsCodeSequence" : [
+                              {
+                                 "CodeMeaning" : "mA",
+                                 "CodeValue" : "mA",
+                                 "CodingSchemeDesignator" : "UCUM"
+                              }
+                           ],
+                           "NumericValue" : "35"
+                        }
+                     ],
+                     "RelationshipType" : "CONTAINS",
+                     "ValueType" : "NUM"
+                  },
+                  {
+                     "ConceptNameCodeSequence" : [
+                        {
+                           "CodeMeaning" : "Exposure Time per Rotation",
+                           "CodeValue" : "113834",
+                           "CodingSchemeDesignator" : "DCM"
+                        }
+                     ],
+                     "MeasuredValueSequence" : [
+                        {
+                           "MeasurementUnitsCodeSequence" : [
+                              {
+                                 "CodeMeaning" : "s",
+                                 "CodeValue" : "s",
+                                 "CodingSchemeDesignator" : "UCUM"
+                              }
+                           ],
+                           "NumericValue" : "2.00"
+                        }
+                     ],
+                     "RelationshipType" : "CONTAINS",
+                     "ValueType" : "NUM"
+                  }
+               ],
+               "ContinuityOfContent" : "SEPARATE",
+               "RelationshipType" : "CONTAINS",
+               "ValueType" : "CONTAINER"
+            },
+            {
+               "ConceptNameCodeSequence" : [
+                  {
+                     "CodeMeaning" : "CT Dose",
+                     "CodeValue" : "113829",
+                     "CodingSchemeDesignator" : "DCM"
+                  }
+               ],
+               "ContentSequence" : [
+                  {
+                     "ConceptNameCodeSequence" : [
+                        {
+                           "CodeMeaning" : "Mean CTDIvol",
+                           "CodeValue" : "113830",
+                           "CodingSchemeDesignator" : "DCM"
+                        }
+                     ],
+                     "MeasuredValueSequence" : [
+                        {
+                           "MeasurementUnitsCodeSequence" : [
+                              {
+                                 "CodeMeaning" : "mGy",
+                                 "CodeValue" : "mGy",
+                                 "CodingSchemeDesignator" : "UCUM"
+                              }
+                           ],
+                           "NumericValue" : "3.500000"
+                        }
+                     ],
+                     "RelationshipType" : "CONTAINS",
+                     "ValueType" : "NUM"
+                  },
+                  {
+                     "ConceptCodeSequence" : [
+                        {
+                           "CodeMeaning" : "Ludlum L-007N PMMA CT dosimetry Phantom, 32 cm",
+                           "CodeValue" : "L-007N32",
+                           "CodingSchemeDesignator" : "AnonGeneric"
+                        }
+                     ],
+                     "ConceptNameCodeSequence" : [
+                        {
+                           "CodeMeaning" : "CTDIw Phantom Type",
+                           "CodeValue" : "113835",
+                           "CodingSchemeDesignator" : "DCM"
+                        }
+                     ],
+                     "RelationshipType" : "CONTAINS",
+                     "ValueType" : "CODE"
+                  },
+                  {
+                     "ConceptNameCodeSequence" : [
+                        {
+                           "CodeMeaning" : "DLP",
+                           "CodeValue" : "113838",
+                           "CodingSchemeDesignator" : "DCM"
+                        }
+                     ],
+                     "MeasuredValueSequence" : [
+                        {
+                           "MeasurementUnitsCodeSequence" : [
+                              {
+                                 "CodeMeaning" : "mGy.cm",
+                                 "CodeValue" : "mGy.cm",
+                                 "CodingSchemeDesignator" : "UCUM"
+                              }
+                           ],
+                           "NumericValue" : "100.00000"
+                        }
+                     ],
+                     "RelationshipType" : "CONTAINS",
+                     "ValueType" : "NUM"
+                  }
+               ],
+               "ContinuityOfContent" : "SEPARATE",
+               "RelationshipType" : "CONTAINS",
+               "ValueType" : "CONTAINER"
+            }
+         ],
+         "ContentTemplateSequence" : [
+            {
+               "MappingResource" : "DCMR",
+               "TemplateIdentifier" : "10013"
+            }
+         ],
+         "ContinuityOfContent" : "SEPARATE",
+         "RelationshipType" : "CONTAINS",
+         "ValueType" : "CONTAINER"
+      },
+      {
+         "ConceptCodeSequence" : [
+            {
+               "CodeMeaning" : "Automated Data Collection",
+               "CodeValue" : "113856",
+               "CodingSchemeDesignator" : "DCM"
+            }
+         ],
+         "ConceptNameCodeSequence" : [
+            {
+               "CodeMeaning" : "Source of Dose Information",
+               "CodeValue" : "113854",
+               "CodingSchemeDesignator" : "DCM"
+            }
+         ],
+         "RelationshipType" : "CONTAINS",
+         "ValueType" : "CODE"
+      }
+   ],
+   "ContentTemplateSequence" : [
+      {
+         "MappingResource" : "DCMR",
+         "TemplateIdentifier" : "10011"
+      }
+   ],
+   "ContentTime" : "22222.111111",
+   "ContinuityOfContent" : "SEPARATE",
+   "DateOfLastCalibration" : "20180101",
+   "DeviceSerialNumber" : "123",
+   "InstanceNumber" : "0",
+   "InstitutionAddress" : "Institution Address",
+   "InstitutionName" : "Institution Name",
+   "InstitutionalDepartmentName" : "CT",
+   "Manufacturer" : "Manufacturer",
+   "ManufacturerModelName" : "Anon",
+   "Modality" : "SR",
+   "PatientBirthDate" : "19000101",
+   "PatientID" : "123",
+   "PatientName" : "DOE^JOHN",
+   "PatientSex" : "U",
+   "PatientWeight" : "200.000",
+   "PerformedProcedureCodeSequence" : [],
+   "ReferringPhysicianName" : "ATTENDING",
+   "SOPClassUID" : "123",
+   "SOPInstanceUID" : "123",
+   "SeriesDate" : "20180101",
+   "SeriesInstanceUID" : "123",
+   "SeriesNumber" : "4",
+   "SeriesTime" : "22222.111111",
+   "SoftwareVersions" : "123",
+   "SpecificCharacterSet" : "ISO_IR 100",
+   "StationName" : "SCANNER",
+   "StudyDate" : "20180101",
+   "StudyDescription" : "CT Lumbar",
+   "StudyID" : "",
+   "StudyInstanceUID" : "123",
+   "StudyTime" : "22222.111111",
+   "TimeOfLastCalibration" : "22222.111111",
+   "TimezoneOffsetFromUTC" : "-0400",
+   "ValueType" : "CONTAINER",
+   "VerificationFlag" : "UNVERIFIED"
+}

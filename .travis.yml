@@ -8,6 +8,7 @@ services:
   - docker
 
 env:
+  # enable import for diana-cli without setup
   PYTHONPATH="$TRAVIS_BUILD_DIR/apps/diana-cli"
 
 addons:
@@ -17,8 +18,14 @@ addons:
 
 install:
 
+  # All pip dependencies
   - pip install -r requirements.txt
   - pip install -e package
+
+  # Required docker images for fixtures
+  - docker pull alpine
+  - docker pull redis
+  - docker pull derekmerck/orthanc-confd
 
 script:
 

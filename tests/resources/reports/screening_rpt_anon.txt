@@ -1,0 +1,73 @@
+HISTORY: Solitary pulmonary nodule; Multiple pulmonary nodules, one year follow up
+
+
+
+SMOKING HISTORY: Current smoker. Approximately 4 cigarettes a day.
+
+
+
+TECHNIQUE: Multidetector row CT volumetric acquisition was performed through the chest without IV contrast. A targeted CT protocol using this patient's history and dose modulation techniques based on this patient's anatomy was employed to minimize radiation exposure. Image post processing was performed in the coronal plane.
+
+
+
+COMPARISON: CT chest dated XX/YY/2016
+
+
+
+FINDINGS:
+
+Lungs and Airways: Unchanged 2 mm left upper lobe pulmonary nodule (series 2 image 14), unchanged right upper lobe pulmonary nodule (series 2 image 30), unchanged 4 mm right upper lobe pulmonary nodules (series 2 image 32 and image 34), unchanged right lower lobe 2.0 cm groundglass nodule (series 2 image 76).
+
+Pleura: Normal.
+
+Heart: Mild scattered coronary artery calcifications. Mild aortic valvular calcification. Normal cardiac morphology.
+
+Mediastinum and Hila: Normal.
+
+Chest Wall and Lower Neck: Normal.
+
+Bones: There are multilevel degenerative changes with osteophyte formation and disc space narrowing.. No acute fractures or evidence of acute malalignment involving the visualized thoracolumbar spine.
+
+Mild scattered atherosclerotic calcification throughout the visualized thoracic aorta.
+
+Limited Upper Abdomen: No significant abnormality.
+
+
+
+DOSE: CTDIvol = 2.72 mGy
+
+
+
+IMPRESSION:
+
+Unchanged bilateral pulmonary nodules.
+
+
+
+LUNG SCREENING: Benign in appearance/behavior. Significant other findings. Lung-RADS category 2S.
+
+Management recommendation: Continue annual screening with low-dose CT in 12 months.
+
+
+
+RADCAT3: Important, non urgent finding.  Recommend follow up study in 12 months.
+
+
+
+RADCAT Grade:RADCAT3: Result with recommendation for follow up. RADCAT4: Priority result.
+
+
+
+Reading Resident MD: ABBBB CDDD, MD   Date Read:XX/15/2017 YY:13 PM
+
+
+
+EEFFFF GGHHHH, MD has reviewed the report and all the images related to this patient encounter.
+
+
+
+Signing Doctor: EEFFFF GGHHHH, MD          Date Signed:XX/YY/2017 ZZ:11 AM
+
+Patient MRN:ABCDEFGHIJ          Accession Number:ABCDEDFGIJ
+
+DOS:XX/YY/2017 ZZ:53 AM          Exam:IMG1997 CT CHEST ONLY WO IV CONT - LUNG SCREENING STUDY FOLLOW UP

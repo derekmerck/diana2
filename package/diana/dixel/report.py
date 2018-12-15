@@ -8,7 +8,7 @@ import attr
 
 @attr.s
 class RadiologyReport(object):
-    text = attr.ib()
+    text = attr.ib(converter=str)
 
     def __str__(self):
         return self.text
