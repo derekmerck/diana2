@@ -8,3 +8,4 @@ docker
 pytest
 bs4
 pillow
+python-dateutil

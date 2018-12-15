@@ -1,0 +1,25 @@
+---
+
+orthanc:
+  ctype: Orthanc
+
+orthanc_bad:
+  ctype: Orthanc
+  port: 9999
+
+redis:
+  ctype: Redis
+
+redis_bad:
+  ctype: Redis
+  port: 9999
+
+# persistent redis
+redis_p:
+  ctype: redis
+  port: 6380
+
+#splunk:
+#  ctype: Splunk
+
+

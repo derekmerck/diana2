@@ -11,7 +11,7 @@ def test_cli_svc_check(setup_orthanc, setup_redis):
     result = runner.invoke(app.cli, ["--help"])
     print(result.output)
 
-    services_file = find_resource(".secrets/test_services.yml")
+    services_file = find_resource("test_services.yml")
     result = runner.invoke(app.cli, ["-S", services_file, "check"])
     print(result.output)
 
