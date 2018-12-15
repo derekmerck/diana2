@@ -1,4 +1,4 @@
-attrs
+attrs >= 18.1.0
 requests
 pydicom
 pyyaml
