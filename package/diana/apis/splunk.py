@@ -50,7 +50,7 @@ class Splunk(Endpoint, Serializable):
 
     def find_items(self,
             query: Mapping,
-            time_interval: DatetimeInterval=None):
+            time_interval=None):
 
         results = self.gateway.find_events(query, time_interval)
 
