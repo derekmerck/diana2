@@ -1,12 +1,13 @@
 import click
 from diana.utils import Serializable
-# importing the apis allows them to be immediately deserialized
+# importing all apis allows them to be immediately deserialized
 from diana.apis import *
 
 @click.command()
 @click.argument('endpoints', default=None, nargs=-1)
 @click.pass_context
 def check(ctx, endpoints):
+    """Check status of service ENDPOINTS"""
     services = ctx.obj.get('services')
     click.echo('Checking endpoint status')
     click.echo('------------------------')

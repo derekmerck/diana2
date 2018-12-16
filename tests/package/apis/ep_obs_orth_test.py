@@ -3,7 +3,7 @@ import logging
 from multiprocessing import Process
 from diana.apis import Orthanc, DcmDir
 from diana.apis.observables import ObservableOrthanc
-from diana.utils.dicom import DicomEvent
+from diana.utils.dicom import DicomEventType
 from diana.utils.endpoint import Watcher, Trigger
 from diana.dixel import DixelView
 
@@ -36,7 +36,7 @@ def test_orthanc_watcher(setup_orthanc, capfd):
     watcher = Watcher()
 
     trigger0 = Trigger(
-        evtype=DicomEvent.INSTANCE_ADDED,
+        evtype=DicomEventType.INSTANCE_ADDED,
         source=obs,
         action=obs.say
     )

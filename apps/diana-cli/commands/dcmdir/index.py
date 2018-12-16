@@ -10,7 +10,9 @@ from diana.apis import DcmDir, Redis, Orthanc
 def index(ctx, path, index, orthanc_db):
     """Inventory dicom dir PATH with INDEX service for retrieval"""
     click.echo(index.__doc__)
-    services = ctx.obj['SERVICES']
+    services = ctx.obj.get('services')
+    click.echo('Index by Accession Number')
+    click.echo('------------------------')
 
     spw = 0
     spd = 0
@@ -33,8 +35,10 @@ def index(ctx, path, index, orthanc_db):
 @click.pass_context
 def indexed_pull(ctx, accession_number, path, index, dest, orthanc_db):
     """Pull study by accession number from a PATH with INDEX service and send to DEST"""
-    click.echo(index.__doc__)
-    services = ctx.obj['SERVICES']
+    click.echo(indexed_pull.__doc__)
+    services = ctx.obj.get('services')
+    click.echo('Pull Indexed by Accession Number')
+    click.echo('------------------------')
 
     spw = 0
     spd = 0

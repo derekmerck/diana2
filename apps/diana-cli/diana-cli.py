@@ -20,17 +20,20 @@ def cli(ctx, verbose, services, services_path):
 
     if services_path:
         with open(services_path) as f:
-            services = yaml.load(f)
-            # Runner does not instantiate ctx properly
-            if not ctx.obj:
-                ctx.obj = {}
-            ctx.obj['services'] = services
+            _services = yaml.load(f)
+            services = _services.update(services)
+
+    # Runner does not instantiate ctx properly
+    if not ctx.obj:
+        ctx.obj = {}
+    ctx.obj['services'] = services
 
 
 cli.add_command(commands.check)
 cli.add_command(commands.ofind)
 cli.add_command(commands.index)
 cli.add_command(commands.indexed_pull)
+cli.add_command(commands.mock)
 
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 import json, inspect
-from uuid import uuid4
+from hashlib import sha1
 import attr
 from dateutil import parser as DateTimeParser
 from ..smart_json import SmartJSONEncoder
@@ -7,35 +7,33 @@ from ..smart_json import SmartJSONEncoder
 @attr.s(cmp=False, hash=None)
 class AttrSerializable(object):
 
-    uuid = attr.ib(repr=False)
-    @uuid.default
-    def set_uuid(self):
-        return str(uuid4())
+    @property
+    def epid(self):
+        """endpoint id, equivalent in init attrs"""
+        return self.sha1().hexdigest()
+
+    def sha1(self) -> sha1:
+        return sha1(self.json().encode("UTF-8"))
 
     def __hash__(self):
-        return hash(self.uuid)
+        return hash(self.sha1())
 
-    def __eq__(self, other):
+    def __eq__(self, other: "AttrSerializable"):
         return hash(self) == hash(other)
-
-    def sid(self):
-        """Overload in sub-classes to assign specific id fields for serializers"""
-        return str(self.uuid)
 
     def asdict(self):
         # Remove non-init and default variables
         d = attr.asdict(self,
-                        filter=lambda attr, val: attr.init and val != attr.default)
+                        filter=lambda attr, val: attr.init and (val != attr.default))
         for k, v in d.items():
             if k.startswith("_"):
                 d[k[1:]] = v
                 del d[k]
         d['ctype'] = self.__class__.__name__
-        self.Factory.registry['ctype'] = self.__class__
+        self.Factory.registry[self.__class__.__name__] = self.__class__
         return d
 
     def json(self):
-
         map = self.asdict()
         data = json.dumps(map, cls=SmartJSONEncoder)
         return data
@@ -52,7 +50,7 @@ class AttrSerializable(object):
                 raise TypeError("No ctype, cannot instantiate")
 
             # Anything that has been "asdict" serialized will be registered
-            _cls = cls.registry.get("ctype")
+            _cls = cls.registry.get(ctype)
             if not _cls:
                 # Voodoo for unregistered root objects
                 _cls = inspect.stack()[1][0].f_globals.get(ctype)

@@ -1,7 +1,7 @@
 import attr
 from diana.apis import Orthanc
 from diana.utils.endpoint import Event, ObservableMixin
-from diana.utils.dicom import DicomEvent
+from diana.utils.dicom import DicomEventType
 
 @attr.s
 class ObservableOrthanc(Orthanc, ObservableMixin):
@@ -18,22 +18,22 @@ class ObservableOrthanc(Orthanc, ObservableMixin):
             for change in r['Changes']:
                 if change['ChangeType'] == 'NewInstance':
                     e = Event(
-                        evtype=DicomEvent.INSTANCE_ADDED,
-                        source_id=self.uuid,
+                        evtype=DicomEventType.INSTANCE_ADDED,
+                        source_id=self.epid,
                         data={"oid": change['ID']}
                     )
                     event_queue.append(e)
                 elif change['ChangeType'] == 'StableSeries':
                     e = Event(
-                        evtype=DicomEvent.SERIES_ADDED,
-                        source_id=self.uuid,
+                        evtype=DicomEventType.SERIES_ADDED,
+                        source_id=self.epid,
                         data={"oid": change['ID']}
                     )
                     event_queue.append(e)
                 elif change['ChangeType'] == 'StableStudy':
                     e = Event(
-                        evtype=DicomEvent.STUDY_ADDED,
-                        source_id=self.uuid,
+                        evtype=DicomEventType.STUDY_ADDED,
+                        source_id=self.epid,
                         data={"oid": change['ID']}
                     )
                     event_queue.append(e)

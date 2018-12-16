@@ -1,0 +1,76 @@
+"""
+Usage:
+
+$ diana-cli watch -r move ath:/incoming queue
+$ diana-cli watch -r move_anon queue archive
+$ diana-cli watch -r index_series archive splunk
+
+$ diana-cli watch -r classify_ba archive splunk
+
+$ diana-cli watch -r pindex_studies pacs splunk
+
+$ echo routes.yml
+---
+- source: queue
+  dest: archive
+  handler: mv_anon
+  level: instances
+- source: archive
+  dest: splunk
+  handler: index
+  level: studies
+...
+$ diana-cli watch -R routes.yml
+
+Route Handlers:
+
+- say
+- mv or mv_anon
+- upload
+- index
+
+"""
+
+import click
+import yaml
+from diana.daemons import mk_route
+from diana.utils.endpoint import Watcher
+
+@click.command()
+@click.option('-r', '--route', default=None, nargs="+")
+@click.option('-R', '--routes_path', type=click.Path(exists=True), default=None)
+@click.pass_context
+def watch(ctx, route, routes_path):
+    """Watch sources for events to handle based on TRIGGERS"""
+    click.echo(watch.__doc__)
+    services = ctx.obj.get('services')
+    click.echo('Watcher')
+    click.echo('------------------------')
+
+    routes = []
+
+    if route:
+        r = {"source": route[0],
+             "dest": route[1],
+             "handler": route[2]}
+        routes.append(r)
+
+    if routes_path:
+        with open(routes_path) as f:
+            _routes = yaml.load(f)
+            routes = routes + _routes
+
+    W = Watcher()
+
+    for rt in routes:
+
+        source_desc = services[rt['source']]
+        dest_desc = services[rt['dest']]
+
+        tr = mk_route( rt['handler'],
+                       source=source_desc,
+                       dest=dest_desc)
+
+        W.add_trigger(tr)
+
+    W.run()

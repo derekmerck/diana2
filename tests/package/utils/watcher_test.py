@@ -1,30 +1,7 @@
-from enum import Enum
 import logging
-from datetime import datetime
-import attr
-from diana.utils.endpoint import ObservableMixin, Watcher, Event, Trigger
-
 from interruptingcow import timeout
-
-class MockEventTypes(Enum):
-    THIS = "this"
-    THAT = "that"
-
-@attr.s(cmp=False, hash=None)
-class MockObservable(ObservableMixin):
-
-    def changes(self):
-        logging.debug("Returning changes")
-        return [Event(evtype=MockEventTypes.THIS,
-                      source_id=self.uuid,
-                      data="THIS at {}".format(datetime.now().isoformat())),
-                Event(evtype=MockEventTypes.THAT,
-                      source_id=self.uuid,
-                      data="THAT at {}".format(datetime.now().isoformat()))
-                ]
-
-    def say(self, data):
-        print(data)
+from test_utils import MockObservable, MockEventType
+from diana.utils.endpoint import Watcher, Trigger
 
 
 def test_single_trigger(capsys):
@@ -32,10 +9,10 @@ def test_single_trigger(capsys):
     print("Starting single")
 
     obs = MockObservable()
-    watcher = Watcher()
+    watcher = Watcher(action_interval=0.5)
 
     trigger0 = Trigger(
-        evtype=MockEventTypes.THIS,
+        evtype=MockEventType.THIS,
         source=obs,
         action=obs.say
     )
@@ -43,7 +20,7 @@ def test_single_trigger(capsys):
     watcher.add_trigger(trigger0)
 
     try:
-        with timeout(3):
+        with timeout(5):
             watcher.run()
     except:
         watcher.stop()
@@ -60,16 +37,16 @@ def test_double_trigger(capsys):
     print("Starting double")
 
     obs = MockObservable()
-    watcher = Watcher()
+    watcher = Watcher(action_interval=0.5)
 
     trigger0 = Trigger(
-        evtype=MockEventTypes.THIS,
+        evtype=MockEventType.THIS,
         source=obs,
         action=obs.say
     )
 
     trigger1 = Trigger(
-        evtype=MockEventTypes.THAT,
+        evtype=MockEventType.THAT,
         source=obs,
         action=obs.say
     )
@@ -78,7 +55,7 @@ def test_double_trigger(capsys):
     watcher.add_trigger(trigger1)
 
     try:
-        with timeout(3):
+        with timeout(5):
             watcher.run()
     except:
         watcher.stop()

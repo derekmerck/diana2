@@ -47,7 +47,7 @@ class Redis(Endpoint, Serializable):
         if isinstance(item, Serializable):
             # AttrsSerializable class
             data = item.json()
-            key = item.sid()
+            key = item.epid
             return key, data
 
         if hasattr(item, "__dict__"):
@@ -89,8 +89,8 @@ class Redis(Endpoint, Serializable):
 
         if isinstance(item, str):
             k = item
-        elif isinstance(item, Serializable) or hasattr(item, "sid"):
-            k = item.sid()
+        elif isinstance(item, Serializable) or hasattr(item, "sha1"):
+            k = item.sha1
         else:
             raise ValueError("Item has no sid attribute, so it requires an explicit key")
 

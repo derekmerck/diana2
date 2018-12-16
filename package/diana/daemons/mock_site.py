@@ -1,9 +1,9 @@
-import random
+import random, logging
 from datetime import datetime, timedelta
 import attr
-from ...utils.dicom import DicomLevel
-from ...dixel import MockDixel
-from ...apis import Orthanc
+from diana.utils.dicom import DicomLevel
+from diana.dixel import MockDixel
+from diana.apis import Orthanc
 
 sample_site_desc = """
 ---
@@ -23,7 +23,6 @@ sample_site_desc = """
 class MockDevice(object):
     """Generates studies on a schedule"""
 
-    pacs = attr.ib(type=Orthanc, default=None, repr=False)
     site_name = attr.ib(default="Mock Facility")
     station_name = attr.ib(default="Imaging Service")
     modality = attr.ib(default="CT")
@@ -41,12 +40,13 @@ class MockDevice(object):
                       )
         return s
 
-    def poll(self):
+    def poll(self, pacs: Orthanc=None):
         if datetime.now() > self._next_study:
             study = self.gen_study()
             for d in study.children:
                 d.gen_file()
-                self.pacs.put(d)
+                if pacs:
+                    pacs.put(d)
             delay = 60*60/self.studies_per_hour
             self._next_study = datetime.now() + timedelta(seconds=delay)
 
@@ -54,7 +54,6 @@ class MockDevice(object):
 @attr.s
 class MockService(object):
     """Set of similar modality imaging devices"""
-    pacs = attr.ib(type=Orthanc, default=None)
     site_name = attr.ib(default="Mock Facility")
     name = attr.ib(default="Imaging Service")
     modality = attr.ib(default="CT")
@@ -72,8 +71,7 @@ class MockService(object):
                         self.name.upper().replace(" ","_"),
                         len(devices)+1),
                     modality=self.modality,
-                    studies_per_hour = self.studies_per_hour/self.num_devices,
-                    pacs = self.pacs
+                    studies_per_hour = self.studies_per_hour/self.num_devices
                 )
             devices.append(device)
         return devices
@@ -84,8 +82,6 @@ class MockSite(object):
 
     name = attr.ib(default="Mock Facility")
     services = attr.ib(init=False, factory=list)
-
-    pacs = attr.ib(type=Orthanc, default=None, repr=False)
 
     seed = attr.ib( default=None )
     @seed.validator
@@ -100,9 +96,17 @@ class MockSite(object):
                 modality=modality,
                 num_devices=devices,
                 studies_per_hour=studies_per_hour,
-                site_name=self.name,
-                pacs=self.pacs)
+                site_name=self.name)
         )
+
+    def run(self, pacs):
+        while True:
+            for service in self.services:
+                for device in service.devices:
+                    logging.debug("Collecting study from device")
+                    device.poll(pacs=pacs)
+
+
 
     class Factory(object):
 

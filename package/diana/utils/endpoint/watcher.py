@@ -1,4 +1,5 @@
 import logging, time
+from itertools import count
 from enum import Enum
 from datetime import datetime, timedelta
 from typing import Callable
@@ -7,14 +8,21 @@ from . import ObservableMixin, Event
 
 @attr.s
 class Trigger(object):
+    n_items = count(0)
+    tgid = attr.ib(init=False, factory=n_items.__next__)
     evtype = attr.ib(type=Enum)
     source = attr.ib(type=ObservableMixin)
     action = attr.ib(type=Callable)
 
     @property
     def source_id(self):
-        return self.source.uuid
+        return self.source.epid
 
+    def __str__(self):
+        return "tgid {} : {} : {} : action {}".format(self.tgid,
+                                          self.source_id,
+                                          self.evtype,
+                                          self.action)
 
 @attr.s
 class Watcher(object):
@@ -24,12 +32,15 @@ class Watcher(object):
 
     def add_trigger(self, trigger: Trigger):
         self.sources[trigger.source_id] = trigger.source
-        self.triggers[(trigger.source_id, trigger.evtype)] = trigger.action
+        self.triggers[(trigger.source_id, trigger.evtype, trigger.tgid)] = trigger.action
 
     def fire(self, event: Event):
-        func = self.triggers.get((event.source_id, event.evtype))
-        if func:
-            return func(event.data)
+        matches = {
+            k: v for (k,v) in self.triggers.items() if k[0] == event.source_id and
+                                                       k[1] == event.evtype
+            }
+        for func in matches.values():
+            func(event.data)
 
     def stop(self):
         for source in self.sources.values():

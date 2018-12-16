@@ -12,7 +12,9 @@ from diana.utils.dicom import DicomLevel
 def ofind(ctx, query, source, domain, retrieve):
     """Find studies matching yaml/json QUERY in SOURCE Orthanc service {optionally with proxy DOMAIN}"""
     click.echo(ofind.__doc__)
-    services = ctx.obj['SERVICES']
+    services = ctx.obj.get('services')
+    click.echo('Orthanc Find')
+    click.echo('------------------------')
 
     S = Orthanc(**services.get(source))
     if isinstance(query, str):
@@ -20,7 +22,6 @@ def ofind(ctx, query, source, domain, retrieve):
 
     if domain:
         result = S.rfind(query, domain, DicomLevel.STUDIES, retrieve=retrieve)
-
     else:
         result = S.find(query, DicomLevel.STUDIES)
 

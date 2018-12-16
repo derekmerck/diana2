@@ -1,7 +1,7 @@
 import logging
 from pprint import pformat
 import yaml
-from diana.daemons.mock import MockSite
+from diana.daemons import MockSite
 from diana.dixel import MockDixel
 
 sample_site_desc = """
