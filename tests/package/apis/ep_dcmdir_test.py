@@ -63,4 +63,4 @@ if __name__=="__main__":
 
     logging. basicConfig(level=logging.DEBUG)
     test_exists()
-    test_indexer()
+    test_indexer(None, None)

@@ -1,11 +1,11 @@
 import os
-from typing import Union
+from typing import Union, Mapping
 from ..apis import Orthanc, DcmDir, Splunk, Redis
-from ..dixel import Dixel
+from ..utils import DicomLevel
 from ..utils.endpoint import Endpoint
 
 
-def anonymize_and_send(oid: str, source: Orthanc, dest: Union[Orthanc, str],
+def anonymize_and_send_item(oid: str, source: Orthanc, dest: Union[Orthanc, str],
                        remove_src=True,
                        remove_anon=True):
 
@@ -14,17 +14,20 @@ def anonymize_and_send(oid: str, source: Orthanc, dest: Union[Orthanc, str],
     if remove_anon:
         source.delete(e)
 
-def upload_files(fn: str, source: DcmDir, dest: Orthanc):
+
+def upload_item(fn: str, source: DcmDir, dest: Orthanc):
 
     if os.path.splitext(fn)[1] == "zip":
         worklist = source.get_zipped(fn)
+        for item in worklist:
+            dest.put(item)
     else:
-        worklist = [ source.get(fn, file=True) ]
-
-    for item in worklist:
+        item = source.get(fn, file=True)
         dest.put(item)
 
-def add_to_index(item: str, source: Endpoint, dest: Union[Splunk, Redis], index=None):
 
-    d = source.get(item, view="tags")
+def index_item(item: str, level: DicomLevel, source: Endpoint, dest: Union[Splunk, Redis], index=None):
+
+    d = source.get(item, level=level, view="tags")
     dest.put(d, index=index)
+

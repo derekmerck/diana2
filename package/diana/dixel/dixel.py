@@ -2,6 +2,7 @@ from typing import Mapping
 from dateutil import parser as DatetimeParser
 import attr
 import pydicom
+from .report import RadiologyReport
 from ..utils.dicom import DicomLevel
 from ..utils import Serializable
 from ..utils.gateways import orthanc_id
@@ -70,10 +71,9 @@ class Dixel(Serializable):
             'PhotometricInterpretation': ds[0x0028, 0x0004].value,  # MONOCHROME, RGB etc.
         }
 
-        level = DicomLevel.INSTANCES
         d = Dixel(meta=meta,
                   tags=tags,
-                  level=level)
+                  level=DicomLevel.INSTANCES)
         if file:
             d.file = file
 
@@ -105,16 +105,16 @@ class Dixel(Serializable):
             "ReportText": data["Report Text"]
         }
 
-        level = DicomLevel.STUDIES
         d = Dixel(meta=meta,
-                     tags=tags,
-                     level=level)
-        d.report = Report
+                  tags=tags,
+                  level=DicomLevel.STUDIES)
+        d.report = RadiologyReport(meta['ReportText'])
 
         return d
 
     @staticmethod
-    def from_orthanc(meta: Mapping=None, tags: Mapping=None, level: DicomLevel=DicomLevel.STUDIES, file=None):
+    def from_orthanc(meta: Mapping=None, tags: Mapping=None,
+                     level: DicomLevel=DicomLevel.STUDIES, file=None):
 
         d = Dixel(meta=meta,
                   tags=tags,

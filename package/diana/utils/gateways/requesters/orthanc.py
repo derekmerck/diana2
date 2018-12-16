@@ -23,12 +23,6 @@ def orthanc_id(PatientID: str, StudyInstanceUID: str, SeriesInstanceUID=None, SO
     return '-'.join(d[i:i+8] for i in range(0, len(d), 8))
 
 
-class OrthancView(Enum):
-    TAGS = "tags"
-    INFO = "info"
-    FILE = "file"
-
-
 @attr.s
 class Orthanc(Requester):
 
@@ -79,16 +73,16 @@ class Orthanc(Requester):
         headers = {'content-type': 'application/text'}
         self._post(resource, data=data, headers=headers)
 
-    def get(self, oid: str, level: DicomLevel, view: OrthancView=OrthancView.TAGS):
+    def get(self, oid: str, level: DicomLevel, view: str="tags"):
 
-        if view == OrthancView.TAGS:
+        if view == "tags":
             if level == DicomLevel.INSTANCES:
                 resource = "{!s}/{}/tags?simplify".format(level, oid)
             else:
                 resource = "{!s}/{}/shared-tags?simplify".format(level, oid)
-        elif view == OrthancView.INFO:
+        elif view == "meta":
             resource = "{!s}/{}".format(level, oid)
-        elif view == OrthancView.FILE:
+        elif view == "file":
             if level == DicomLevel.INSTANCES:
                 resource = "{!s}/{}/file".format(level, oid)
             else:

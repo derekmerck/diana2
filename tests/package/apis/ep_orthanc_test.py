@@ -1,6 +1,7 @@
 import logging
 from test_utils import find_resource
 from diana.apis import Orthanc, DcmDir
+from diana.dixel import DixelView
 from diana.utils.dicom import DicomLevel
 
 def test_orthanc_ep(setup_orthanc):
@@ -17,7 +18,7 @@ def test_orthanc_upload(setup_orthanc):
 
     dicom_dir = find_resource("resources/dcm")
     D = DcmDir(path=dicom_dir)
-    d = D.get("IM2263", get_file=True)
+    d = D.get("IM2263", view=DixelView.FILE)
 
     O.put(d)
 
@@ -51,7 +52,7 @@ def test_psend(setup_orthanc, setup_orthanc2):
     dicom_dir = find_resource("resources/dcm")
     D = DcmDir(path=dicom_dir)
 
-    d = D.get("IM2263", get_file=True)
+    d = D.get("IM2263", view=DixelView.FILE)
     O2.put(d)
     O2.psend(d.oid(), O)
 

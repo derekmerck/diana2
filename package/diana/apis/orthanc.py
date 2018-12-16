@@ -1,9 +1,9 @@
 import logging
 from typing import Mapping, Union
 import attr
-from ..dixel import Dixel, ShamDixel
+from ..dixel import Dixel, ShamDixel, DixelView
 from ..utils import Endpoint, Serializable
-from ..utils.gateways import Orthanc as OrthancGateway, OrthancView as View, GatewayConnectionError
+from ..utils.gateways import Orthanc as OrthancGateway, GatewayConnectionError
 from ..utils.dicom import DicomLevel
 
 
@@ -97,14 +97,14 @@ class Orthanc(Endpoint, Serializable):
 
     def get(self, item: Union[Dixel, str],
             level: DicomLevel=DicomLevel.STUDIES,
-            view: View=View.TAGS, **kwargs):
+            view: DixelView=DixelView.TAGS, **kwargs):
         logger = logging.getLogger(self.name)
         logger.debug("Get")
 
         oid, level = self.id_from_item(item, level)
 
         try:
-            r = self.gateway.get(oid, level, view)
+            r = self.gateway.get(oid, level, str(view))
         except GatewayConnectionError as e:
             logger.warning(e)
             r = None
@@ -112,22 +112,22 @@ class Orthanc(Endpoint, Serializable):
         if r:
             if isinstance(item, Dixel):
                 # Want to update with data
-                if view==View.TAGS:
+                if DixelView.TAGS in view:
                     item.tags.update(r)
-                elif view==View.FILE:
+                elif DixelView.FILE in view:
                     item.file = r
-                elif view==View.META:
+                elif DixelView.META in view:
                     item.meta.update(r)
                 return item
             else:
                 # Want a new file
-                if view==View.TAGS:
+                if view==DixelView.TAGS:
                     return Dixel(meta={"ID": oid}, tags=r, level=level)
-                elif view==View.FILE:
+                elif view==DixelView.FILE:
                     d = Dixel(meta={"ID": oid}, level=level)
                     d.file = r
                     return d
-                elif view==View.META:
+                elif view==DixelView.META:
                     return Dixel(meta=r, level=level)
 
         raise FileNotFoundError("Item {} does not exist".format(item))

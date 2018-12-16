@@ -1,7 +1,7 @@
 import os, logging, hashlib
 from typing import Union
 import attr
-from ..dixel import Dixel
+from ..dixel import Dixel, DixelView
 from . import Redis
 from ..utils import Endpoint, Serializable
 from ..utils.dicom import DicomLevel
@@ -37,7 +37,8 @@ class DcmDir(Endpoint, Serializable):
             raise ValueError("Dixel has no file attribute, can only save file data")
         self.gateway.write_file(fn, Dixel.file)
 
-    def get(self, item: Union[str, Dixel], get_pixels=False, get_file=False, **kwargs):
+    def get(self, item: Union[str, Dixel], view=DixelView.TAGS, **kwargs):
+
         logger = logging.getLogger(self.name)
         logger.debug("EP GET")
         if isinstance(item, str):
@@ -50,14 +51,16 @@ class DcmDir(Endpoint, Serializable):
         if not self.exists(fn):
             raise FileNotFoundError
 
+        get_pixels = DixelView.PIXELS in view
+        logger.debug(get_pixels)
         ds = self.gateway.get(fn, get_pixels=get_pixels)
         result = Dixel.from_pydicom(ds, fn)
 
+        get_file = DixelView.FILE in view
         if get_file:
             result.file = self.gateway.read_file(fn)
 
         return result
-
 
     def delete(self, item: Union[str, Dixel], **kwargs):
         logger = logging.getLogger(self.name)
