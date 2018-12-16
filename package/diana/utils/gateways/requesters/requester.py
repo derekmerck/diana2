@@ -88,7 +88,7 @@ class Requester(object):
         logger.debug("Calling delete")
         url = self.make_url(resource)
         try:
-            result = requests.get(url, headers=headers, auth=self.auth)
+            result = requests.delete(url, headers=headers, auth=self.auth)
         except requests.exceptions.ConnectionError as e:
             raise GatewayConnectionError(e)
         return self.handle_result(result)

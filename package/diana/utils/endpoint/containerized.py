@@ -12,6 +12,9 @@ class Containerized(object):
     dkr_image   = attr.ib(default=None)
     dkr_ports   = attr.ib(factory=dict)
     dkr_command = attr.ib(default=None)
+    dkr_env     = attr.ib(factory=dict)
+
+    dkr_remove  = attr.ib(default=True)
 
     dkr_container = attr.ib(init=False, repr=False)
 
@@ -29,8 +32,9 @@ class Containerized(object):
                                                           name=self.dkr_service,
                                                           command=self.dkr_command,
                                                           ports=self.dkr_ports,
+                                                          environment=self.dkr_env,
                                                           detach=True,
-                                                          remove=True)
+                                                          remove=self.dkr_remove)
 
         while svc.status != "running":
             svc.reload()

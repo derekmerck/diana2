@@ -14,8 +14,9 @@ def setup_orthanc():
     S = Containerized(
             dkr_service = "orthanc",
             dkr_image = "derekmerck/orthanc-confd",
-            dkr_ports = {"8042/tcp": 8042}
-        )
+            dkr_ports = {"8042/tcp": 8042},
+            # dkr_env = {"ORTHANC_PASSWORD": "passw0rd"}
+    )
     S.start_service()
 
     client = docker.from_env()
@@ -25,6 +26,31 @@ def setup_orthanc():
     yield S
 
     print("Tearing down orthanc fixture")
+    S.stop_service()
+
+
+@pytest.fixture(scope="module")
+def setup_orthanc2():
+
+    print("Standing up orthanc2 fixture")
+
+    S = Containerized(
+            dkr_service = "orthanc2",
+            dkr_image = "derekmerck/orthanc-confd",
+            dkr_ports = {"8042/tcp": 8043},
+            dkr_env = {"ORTHANC_PEER_0": "orthanc,http://172.17.0.1:8042,orthanc,passw0rd!"},
+            # dkr_remove = False,
+            # dkr_command="tail -f > /dev/null"
+        )
+    S.start_service()
+
+    client = docker.from_env()
+    c = client.containers.get("orthanc2")
+    print("{}: {}".format(S.dkr_service, c.status))
+
+    yield S
+
+    print("Tearing down orthanc2 fixture")
     S.stop_service()
 
 @pytest.fixture(scope="module")
