@@ -1,4 +1,4 @@
-import logging
+import logging, time
 import docker
 import pytest
 from diana.utils.endpoint import Containerized
@@ -18,6 +18,7 @@ def test_containers():
     assert( c.status == "running" )
 
     C.stop_service()
+    time.sleep(1)
 
     with pytest.raises(Exception):
         c = client.containers.get("testing")

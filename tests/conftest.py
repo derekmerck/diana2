@@ -38,7 +38,8 @@ def setup_orthanc2():
             dkr_service = "orthanc2",
             dkr_image = "derekmerck/orthanc-confd",
             dkr_ports = {"8042/tcp": 8043},
-            dkr_env = {"ORTHANC_PEER_0": "orthanc,http://172.17.0.1:8042,orthanc,passw0rd!"},
+            dkr_links = {"orthanc": None},
+            dkr_env = {"ORTHANC_PEER_0": "orthanc,http://orthanc:8042,orthanc,passw0rd!"},
             # dkr_remove = False,
             # dkr_command="tail -f > /dev/null"
         )

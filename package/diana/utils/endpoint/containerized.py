@@ -13,7 +13,7 @@ class Containerized(object):
     dkr_ports   = attr.ib(factory=dict)
     dkr_command = attr.ib(default=None)
     dkr_env     = attr.ib(factory=dict)
-
+    dkr_links   = attr.ib(factory=dict)
     dkr_remove  = attr.ib(default=True)
 
     dkr_container = attr.ib(init=False, repr=False)
@@ -32,6 +32,7 @@ class Containerized(object):
                                                           name=self.dkr_service,
                                                           command=self.dkr_command,
                                                           ports=self.dkr_ports,
+                                                          links=self.dkr_links,
                                                           environment=self.dkr_env,
                                                           detach=True,
                                                           remove=self.dkr_remove)
