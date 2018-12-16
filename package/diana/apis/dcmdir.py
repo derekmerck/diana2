@@ -4,7 +4,8 @@ import attr
 from ..dixel import Dixel
 from . import Redis
 from ..utils import Endpoint, Serializable
-from ..utils.gateways import DcmFileHandler
+from ..utils.dicom import DicomLevel
+from ..utils.gateways import DcmFileHandler, ZipFileHandler
 
 
 @attr.s
@@ -102,4 +103,14 @@ class DcmDir(Endpoint, Serializable):
     def get_indexed_study(self, item: str, R: Redis):
         prefix = hashlib.md5(self.path.encode("UTF-*")).hexdigest()[0:4] + "-"
         result = R.registry_item_data(item, prefix=prefix)
+        return result
+
+    def get_zipped(self, item: str):
+        gateway = ZipFileHandler(path=self.path)
+        files = gateway.unpack(item)
+        result = set()
+        for f in files:
+            d = Dixel(level=DicomLevel.INSTANCES)
+            d.file = f
+            result.add(d)
         return result

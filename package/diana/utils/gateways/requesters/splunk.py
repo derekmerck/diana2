@@ -5,7 +5,7 @@
 
 import time, logging, datetime, json as _json, socket
 from pprint import pformat
-from datetime import timedelta
+from datetime import datetime, timedelta
 # from pprint import pprint
 from collections import OrderedDict
 from typing import Mapping
@@ -104,11 +104,15 @@ class Splunk(Requester):
         logger = logging.getLogger(self.name)
 
         if not timestamp:
-            timestamp = datetime.datetime.now()
+            timestamp = datetime.now()
 
         hec_token = hec_token or self.hec_token
         index = index or self.index
-        hostname = hostname or self.hostname
+
+        if hostname:
+            hostname = "{}@{}".format(hostname, self.hostname)
+        else:
+            hostname = self.hostname
 
         def epoch(dt):
             tt = dt.timetuple()
@@ -132,8 +136,7 @@ class Splunk(Requester):
                 return "{}://{}:{}/services/collector/event". \
                     format(self.hec_protocol, self.host, self.hec_port)
 
-        def hec_post(self, json=None):
-            logger = logging.getLogger(self.name)
+        def hec_post(json=None):
             logger.debug("Calling HEC post")
             url = make_hec_url()
 

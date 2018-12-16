@@ -5,7 +5,6 @@ from ...utils.dicom import DicomLevel
 from ...dixel import MockDixel
 from ...apis import Orthanc
 
-
 sample_site_desc = """
 ---
 - name: Example Hospital

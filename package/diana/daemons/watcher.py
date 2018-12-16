@@ -104,8 +104,8 @@ class DianaWatcher(Watcher):
                         # read the file
                         logging.debug("Uploading {}".format(member))
                         f = z.read(member)
-                        item = Dixel(level=DicomLevel.INSTANCES, file=f)
-                        logging.debug(item)
+                        item = Dixel(level=DicomLevel.INSTANCES)
+                        item.file = f
                         dest.put(item)
             if remove:
                 os.remove(item_fp)
