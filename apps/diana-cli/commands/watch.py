@@ -37,12 +37,11 @@ from diana.daemons import mk_route
 from diana.utils.endpoint import Watcher
 
 @click.command()
-@click.option('-r', '--route', default=None, nargs="+")
+@click.option('-r', '--route', default=None, nargs=3)
 @click.option('-R', '--routes_path', type=click.Path(exists=True), default=None)
 @click.pass_context
 def watch(ctx, route, routes_path):
     """Watch sources for events to handle based on TRIGGERS"""
-    click.echo(watch.__doc__)
     services = ctx.obj.get('services')
     click.echo('Watcher')
     click.echo('------------------------')

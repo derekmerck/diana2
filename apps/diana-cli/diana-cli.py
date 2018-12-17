@@ -6,8 +6,8 @@ import commands
 
 @click.group()
 @click.option('--verbose/--no-verbose', default=False)
-@click.option('-s', '--services', default=None)
-@click.option('-S', '--services_path', type=click.Path(exists=True), default=None)
+@click.option('-s', '--services', type=click.STRING)
+@click.option('-S', '--services_path', type=click.Path(exists=True))
 @click.pass_context
 def cli(ctx, verbose, services, services_path):
     click.echo('DIANA cli')
@@ -18,15 +18,20 @@ def cli(ctx, verbose, services, services_path):
     else:
         logging.basicConfig(level=logging.WARNING)
 
+    if services:
+        _services = yaml.load(services)
+    else:
+        _services = {}
+
     if services_path:
         with open(services_path) as f:
-            _services = yaml.load(f)
-            services = _services.update(services)
+            _servicesp = yaml.load(f)
+        _services.update(_servicesp)
 
     # Runner does not instantiate ctx properly
     if not ctx.obj:
         ctx.obj = {}
-    ctx.obj['services'] = services
+    ctx.obj['services'] = _services
 
 
 cli.add_command(commands.check)

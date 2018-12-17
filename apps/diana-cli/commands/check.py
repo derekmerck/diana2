@@ -4,7 +4,7 @@ from diana.utils import Serializable
 from diana.apis import *
 
 @click.command()
-@click.argument('endpoints', default=None, nargs=-1)
+@click.argument('endpoints', nargs=-1)
 @click.pass_context
 def check(ctx, endpoints):
     """Check status of service ENDPOINTS"""

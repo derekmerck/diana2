@@ -11,7 +11,6 @@ from diana.utils.dicom import DicomLevel
 @click.pass_context
 def ofind(ctx, query, source, domain, retrieve):
     """Find studies matching yaml/json QUERY in SOURCE Orthanc service {optionally with proxy DOMAIN}"""
-    click.echo(ofind.__doc__)
     services = ctx.obj.get('services')
     click.echo('Orthanc Find')
     click.echo('------------------------')
