@@ -10,7 +10,7 @@ class TextFileHandler(FileHandler):
         fp = self.get_path(fn)
         # logger = logging.getLogger(self.name)
 
-        if not os.path.dirname(fp):
+        if not os.path.exists( os.path.dirname(fp) ):
             os.makedirs(os.path.dirname(fp))
 
         with open(fp, 'w') as f:

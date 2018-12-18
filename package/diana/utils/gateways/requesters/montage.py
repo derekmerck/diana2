@@ -35,5 +35,5 @@ class Montage(Requester):
 
         index = index or self.index
 
-        resource = "index/{}/search".format(index)
+        resource = "index/{}/search/".format(index)
         return self._get(resource, params={**query, 'format': 'json'})
