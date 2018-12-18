@@ -4,3 +4,4 @@ from .splunk import Splunk
 from .dcmdir import DcmDir
 from .csvfile import CsvFile
 from .observables import ObservableOrthanc, ObservableDcmDir
+from .montage import Montage

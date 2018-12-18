@@ -3,7 +3,22 @@
 import logging
 from typing import Mapping
 import attr
+from bs4 import BeautifulSoup
 from .requester import Requester
+
+def montage_text_cleaner(text):
+    soup = BeautifulSoup(text, features="html.parser")
+    lines = soup.findAll(text=True)
+
+    # Look at every line, replace blanks and \r with \n
+    for i, item in enumerate(lines):
+        item = item.replace("\r", "\n")
+        if item == ' ':
+             item = "\n"
+        lines[i] = item
+
+    result = "".join(lines)
+    return result
 
 
 @attr.s
