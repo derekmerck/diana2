@@ -1,3 +1,6 @@
-from .requesters import Montage, Splunk, Orthanc, orthanc_id, montage_text_cleaner
-from .file_handlers import DcmFileHandler, TextFileHandler, ImageFileHandler, ZipFileHandler
+from .requesters import Splunk, \
+    Orthanc, orthanc_id, \
+    Montage
+from .file_handlers import DcmFileHandler, TextFileHandler, \
+    ImageFileHandler, ZipFileHandler
 from .exceptions import GatewayConnectionError

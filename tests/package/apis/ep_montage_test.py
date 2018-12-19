@@ -6,7 +6,7 @@ from test_utils import find_resource
 
 def test_montage():
     # TODO: Comment out to run test
-    return True
+    # return True
 
     # TODO: Create Mock for Montage
     services_file = find_resource(".secrets/lifespan_services.yml")

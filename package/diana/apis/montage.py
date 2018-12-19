@@ -8,7 +8,6 @@ from ..utils.gateways import Montage as MontageGateway, GatewayConnectionError
 from ..dixel import Dixel, RadiologyReport
 from ..utils.dicom import DicomLevel
 
-
 @attr.s(hash=False)
 class Montage(Endpoint, Serializable):
 

@@ -1,12 +1,13 @@
 import logging
 from typing import Mapping
+from pprint import pformat
 from dateutil import parser as DatetimeParser
 import attr
 import pydicom
 from .report import RadiologyReport
 from ..utils.dicom import DicomLevel
 from ..utils import Serializable
-from ..utils.gateways import orthanc_id, montage_text_cleaner
+from ..utils.gateways import orthanc_id, Montage
 
 
 def mktime(datestr, timestr):
@@ -116,6 +117,8 @@ class Dixel(Serializable):
     @staticmethod
     def from_montage_json(data: Mapping):
 
+        logging.debug(pformat(data['exam_type']))
+
         tags = {
             "AccessionNumber": data["accession_number"],
             "PatientID": data["patient_mrn"],
@@ -127,13 +130,14 @@ class Dixel(Serializable):
         }
 
         meta = {
+            'BodyPart': None,
             'PatientName': "{}^{}".format(
                 data["patient_last_name"].upper(),
                 data["patient_first_name"].upper()),
             'PatientAge': data['patient_age'],
             "OrderCode": data["exam_type"]["code"],
             "PatientStatus": data["patient_status"],
-            "ReportText": montage_text_cleaner(data['text']),
+            "ReportText": Montage.clean_text(data['text']),
             "ReadingPhysiciansName": data['events'][-1]['provider']['name'],
             'StudyDateTime': DatetimeParser.parse(data['events'][2]['date'])
         }
