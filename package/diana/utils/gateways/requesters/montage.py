@@ -23,7 +23,10 @@ class MontageModality(IntEnum):
     def __str__(self):
         return str(self.value)
 
-MONTAGE_RESULT_LIMIT = 100
+# Max results to review for a given query
+MONTAGE_RESULT_LIMIT = 100000
+# Max results to return _per page_ for a given query
+MONTAGE_RESULT_INCR = 200
 
 # bp_desc_lut = {
 #     "UpperExtremity": ["arm", "shoulder", "elbow", "wrist", "hand", "finger",
@@ -63,24 +66,24 @@ class Montage(Requester):
         index = index or self.index
 
         offset = 0
-        limit = MONTAGE_RESULT_LIMIT
+        incr = MONTAGE_RESULT_INCR
 
         resource = "index/{}/search/".format(index)
         r = self._get(resource, params={**query,
                                         'offset': offset,
-                                        'limit': limit,
+                                        'limit': incr,
                                         'format': 'json'})
 
-        total = r['meta']['total_count']
+        total = min( MONTAGE_RESULT_LIMIT, r['meta']['total_count'] )
         results = r['objects']
 
         logging.debug(r['meta'])
 
-        while total > offset + limit:
-            offset += limit
+        while total > offset + incr:
+            offset += incr
             r = self._get(resource, params={**query,
                                             'offset': offset,
-                                            'limit': limit,
+                                            'limit': incr,
                                             'format': 'json'})
             results += r['objects']
             # logging.debug(r['objects'])
@@ -99,34 +102,46 @@ class Montage(Requester):
     def lookup_body_part(self, montage_cpts):
         results = []
         for mc in montage_cpts:
-            label = self.bp_lut.get(mc)
-            if not label:
-                resource = "cptcode/{}".format(mc)
-                r = self._get(resource)
+            labels = self.bp_lut.get(mc)
+            if not labels:
+
+                labels = []
+
+                cpt_resource = "cptcode/{}".format(mc)
+                r = self._get(cpt_resource)
                 # logging.debug(r)
                 anatomies = r['anatomies']
 
                 for a in anatomies:
 
                     val = a.split('/')[-2]
-                    resource = "anatomy/{}".format(val)
+                    anat_resource = "anatomy/{}".format(val)
 
                     def find_parent(_resource):
                         rr = self._get(_resource)
                         if rr['parent']:
                             val = rr['parent'].split('/')[-2]
-                            resource = "anatomy/{}".format(val)
-                            return self._get(resource)
+                            __resource = "anatomy/{}".format(val)
+                            return find_parent(__resource)
                         else:
-                            # logging.debug(rr)
+                            logging.debug(rr)
                             return rr['label']
 
-                    label = find_parent(resource)
+                    label = find_parent(anat_resource)
+                    if label not in labels:
+                        labels.append(label)
 
-                self.bp_lut[mc] = label
+                self.bp_lut[mc] = labels
 
-            if label not in results:
-                results.append(label)
+                logging.debug(labels)
+
+            # Now we have an array of anatomy labels
+
+            for label in labels:
+                if label not in results:
+                    results.append(label)
+
+        logging.debug(results)
         return results
 
     cpt_lut = {}

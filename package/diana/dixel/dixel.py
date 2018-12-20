@@ -147,7 +147,8 @@ class Dixel(Serializable):
         }
 
         meta = {
-            'BodyPart': None,
+            'BodyParts': None,  # Placeholder for meta
+            'CPTCodes': None,   # Placeholder for meta
             'PatientName': "{}^{}".format(
                 data["patient_last_name"].upper(),
                 data["patient_first_name"].upper()),
