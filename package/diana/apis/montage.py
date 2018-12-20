@@ -5,8 +5,7 @@ from pprint import pformat
 
 from ..utils import Endpoint, Serializable
 from ..utils.gateways import Montage as MontageGateway, GatewayConnectionError
-from ..dixel import Dixel, RadiologyReport
-from ..utils.dicom import DicomLevel
+from ..dixel import Dixel
 
 @attr.s(hash=False)
 class Montage(Endpoint, Serializable):
@@ -26,7 +25,7 @@ class Montage(Endpoint, Serializable):
     @gateway.default
     def setup_gateway(self):
         return MontageGateway(
-            name = "OrthancGateway",
+            name = "MontageGateway",
             protocol = self.protocol,
             host = self.host,
             port = self.port,
@@ -38,9 +37,25 @@ class Montage(Endpoint, Serializable):
     def find(self, query: Mapping, index="rad", **kwargs):
         r = self.gateway.find(query=query, index=index)
         ret = set()
-        for item in r["objects"]:
-            ret.add(Dixel.from_montage_json(item))
+        for item in r:
+            try:
+                d = Dixel.from_montage_json(item)
+                d = self.get_meta(d)
+                ret.add(d)
+            except Exception as e:
+                logger = logging.getLogger(self.name)
+                logger.warning("Failed to dixelize an item")
+                raise e
         return ret
+
+
+    def get_meta(self, item: Dixel):
+        cpts = self.gateway.lookup_cpts(item.meta["MontageCPTCodes"])
+        body_part = self.gateway.lookup_body_part(item.meta["MontageCPTCodes"])
+
+        item.meta['CPTCodes'] = cpts
+        item.meta['BodyParts'] = body_part
+        return item
 
 
     def check(self):

@@ -14,7 +14,7 @@ class CsvFile(Endpoint, Serializable):
     fieldnames = attr.ib(init=False, factory=list)
 
     def read(self, fp: str=None):
-        logger = logging.getLogger(self.name)
+        # logger = logging.getLogger(self.name)
 
         fp = fp or self.fp
         if not fp:

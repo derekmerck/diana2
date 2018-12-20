@@ -85,7 +85,7 @@ class Dixel(Serializable):
         return d
 
     @staticmethod
-    def from_montage(data: Mapping):
+    def from_montage_csv(data: Mapping):
 
         tags = {
             "AccessionNumber": data["Accession Number"],
@@ -104,7 +104,7 @@ class Dixel(Serializable):
             'PatientAge': data['Patient Age'],
             "OrderCode": data["Exam Code"],
             "PatientStatus": data["Patient Status"],
-            "ReportText": data["Report Text"]
+            "ReportText": data["Report Text"],
         }
 
         d = Dixel(meta=meta,
@@ -116,14 +116,31 @@ class Dixel(Serializable):
 
     @staticmethod
     def from_montage_json(data: Mapping):
+        """Tracks Montage-mappedd CPT codes, to dereference them to
+        real CPT codes and body parts, call Montage().get_meta(dixel)"""
 
-        logging.debug(pformat(data['exam_type']))
+        # logging.debug(pformat(data['exam_type']))
+
+        referring_physician = data['events'][0].get('provider')
+        if referring_physician:
+            referring_physician = referring_physician.get('name')
+
+        study_datetime = None
+        if len(data['events']) > 2:
+            study_datetime = DatetimeParser.parse(data['events'][2]['date'])
+
+        montage_cpts = []
+        for resource in data["exam_type"]["cpts"]:
+            code = resource.split("/")[-2]
+            montage_cpts.append(code)
+
+        # TODO: Check event flags for various event types to get ordering and reading
 
         tags = {
             "AccessionNumber": data["accession_number"],
             "PatientID": data["patient_mrn"],
             'StudyDescription': data['exam_type']['description'],
-            'ReferringPhysicianName': data['events'][0]['provider']['name'],
+            'ReferringPhysicianName': referring_physician,
             'PatientSex': data['patient_sex'],
             'Organization': data['organization']['label'],
             "Modality": data['exam_type']['modality']['label']
@@ -139,7 +156,8 @@ class Dixel(Serializable):
             "PatientStatus": data["patient_status"],
             "ReportText": Montage.clean_text(data['text']),
             "ReadingPhysiciansName": data['events'][-1]['provider']['name'],
-            'StudyDateTime': DatetimeParser.parse(data['events'][2]['date'])
+            'StudyDateTime': study_datetime,
+            "MontageCPTCodes": montage_cpts
         }
 
         d = Dixel(meta=meta,

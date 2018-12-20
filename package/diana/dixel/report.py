@@ -14,7 +14,7 @@ class RadiologyReport(object):
         return self.text
 
     # Based on Lifespan/RIMI report template
-    PHI_RE = re.compile(r'^.* MD.*$|^.*MRN.*$|^.*DOS.*$|^(?:.* )Dr.*$|^.* NP.*$|^.* RN.*$|^.* RA.*$|^.* PA.*$|^Report created.*$|^.*Signing Doctor.*$|^.*has reviewed.*$',re.M)
+    PHI_RE = re.compile(r'^.* MD.*$|^.*MRN.*$|^.*DOS.*$|^(?:.* )Dr.*$|^.* NP.*$|^.* RN.*$|^.* RA.*$|^.* PA.*$|^Report created.*$|^Reading date.*$|^.*Signing Doctor.*$|^.*Signature.*$|^.*Reviewing Doctor.*$|^.*Distribution:.*$|^.*has reviewed.*$|^.*Acc#.*$|^.*CPT:.*$|^.*Corp ID.*$',re.M)
     FINDINGS_RE = re.compile(r'^.*discussed.*$|^.*nurse practitioner.*$|^.*physician assistant.*$|^.*virtual rad.*$', re.M | re.I)
     RADCAT_RE = re.compile(r'^.*RADCAT.*$', re.M)
     # https://stackoverflow.com/questions/16699007/regular-expression-to-match-standard-10-digit-phone-number
