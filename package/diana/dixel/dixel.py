@@ -1,6 +1,4 @@
-import logging
 from typing import Mapping
-from pprint import pformat
 from dateutil import parser as DatetimeParser
 import attr
 import pydicom
@@ -181,9 +179,7 @@ class Dixel(Serializable):
     # orthanc id
     def oid(self):
         if not self.meta.get('ID'):
-            if self.level == DicomLevel.PATIENTS:
-                self.meta['ID'] = orthanc_id(self.tags.get('PatientID'))
-            elif self.level == DicomLevel.STUDIES:
+            if self.level == DicomLevel.STUDIES:
                 self.meta['ID'] = orthanc_id(self.tags.get('PatientID'),
                                              self.tags.get('StudyInstanceUID'))
             elif self.level == DicomLevel.SERIES:

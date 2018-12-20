@@ -5,6 +5,9 @@ from ..exceptions import GatewayConnectionError
 from ...smart_json import SmartJSONEncoder
 
 
+def supress_urllib_debug():
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
+
 @attr.s
 class Requester(object):
 

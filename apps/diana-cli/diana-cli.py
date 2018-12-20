@@ -2,6 +2,7 @@ import click
 import yaml
 import logging
 import commands
+from diana.utils.gateways import supress_urllib_debug
 
 
 @click.group()
@@ -15,8 +16,10 @@ def cli(ctx, verbose, services, services_path):
 
     if verbose:
         logging.basicConfig(level=logging.DEBUG)
+        supress_urllib_debug()
     else:
         logging.basicConfig(level=logging.WARNING)
+        supress_urllib_debug()
 
     if services:
         _services = yaml.load(services)

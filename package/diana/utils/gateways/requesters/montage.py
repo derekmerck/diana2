@@ -5,8 +5,7 @@
 # body part and cpt code.
 
 from enum import IntEnum
-import logging, csv, re
-from pathlib import Path
+import logging
 from typing import Mapping
 import attr
 from bs4 import BeautifulSoup
@@ -24,32 +23,9 @@ class MontageModality(IntEnum):
         return str(self.value)
 
 # Max results to review for a given query
-MONTAGE_RESULT_LIMIT = 100000
+MONTAGE_RESULT_LIMIT = 1000000
 # Max results to return _per page_ for a given query
 MONTAGE_RESULT_INCR = 200
-
-# bp_desc_lut = {
-#     "UpperExtremity": ["arm", "shoulder", "elbow", "wrist", "hand", "finger",
-#                        "clavicle", "radius", "humerus", "ulna", "ac jt", "bone age"],
-#     "LowerExtremity": ["leg", "hip", "knee", "ankle", "foot", "toe",
-#                        "femur", "tibia", "fibula", "bone length"],
-#     "Head":  ["head", "eye", "skull", "nose", "brain", "panorex"],
-#     "Chest": ["chest", "rib", "lung", "scapula"],
-#     "Abdomen": ["abdomen", "abd"],
-#     "Pelvis": ["pelvis"],
-#     "Spine":  ["spine", "neck", "flexion", "scoliosis", "sacrum"],
-#     "Full Body": ["single film", "panscan"],
-#     "Foreign Body": ["foreign body"]
-# }
-# body_part = cls.bp_lut.get(code)
-# if body_part:
-#     return body_part
-# desc = desc.lower()
-# for body_part, v in bp_desc_lut.items():
-#     for label in v:
-#         if label in desc:
-#             cls.bp_lut[code] = body_part
-#             return body_part
 
 @attr.s
 class Montage(Requester):
@@ -124,7 +100,7 @@ class Montage(Requester):
                             __resource = "anatomy/{}".format(val)
                             return find_parent(__resource)
                         else:
-                            logging.debug(rr)
+                            # logging.debug(rr)
                             return rr['label']
 
                     label = find_parent(anat_resource)
@@ -133,7 +109,7 @@ class Montage(Requester):
 
                 self.bp_lut[mc] = labels
 
-                logging.debug(labels)
+                # logging.debug(labels)
 
             # Now we have an array of anatomy labels
 
@@ -141,7 +117,6 @@ class Montage(Requester):
                 if label not in results:
                     results.append(label)
 
-        logging.debug(results)
         return results
 
     cpt_lut = {}
