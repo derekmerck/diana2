@@ -1,19 +1,3 @@
-"""
-Derek Merck, Summer 2018
-
-Method to summarize collections of Osimis-style ROI metadata and
-monkey-patch for diana.apis.Orthanc
-
-Considered implementing this as an annotation "view" for Orthanc.get,
-but it did not need to return a dixel as I was using it. So monkey-patching
-seemed easier for a one-off application.
-
->>> from diana.apis import Orthanc, osimis_extras
->>> o = Orthanc()
->>> a = o.get_annotations(my_study)
-
-"""
-
 import logging
 from typing import Union
 from . import Orthanc
@@ -22,6 +6,19 @@ from ..utils.dicom import DicomLevel
 
 
 def get_annotation(source: Orthanc, study: Dixel) -> Union[dict, None]:
+    """
+    Method to summarize collections of Osimis-style ROI metadata and
+    monkey-patch for diana.apis.Orthanc
+
+    Considered implementing this as an annotation "view" for Orthanc.get,
+    but it did not need to return a dixel as I was using it. So monkey-patching
+    seemed easier for a one-off application.
+
+    >>> from diana.apis import Orthanc, osimis_extras
+    >>> o = Orthanc()
+    >>> a = o.get_annotation(my_study)
+
+    """
 
     try:
         resource = "studies/{}/attachments/9999/data".format(study.oid())

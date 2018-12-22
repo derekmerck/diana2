@@ -3,11 +3,16 @@ import yaml
 import click
 import commands
 from diana.utils.gateways import supress_urllib_debug
+from diana import __version__ as vers
 
 @click.group(name="diana-cli")
 @click.option('--verbose/--no-verbose', default=False)
-@click.option('-s', '--services', type=click.STRING)
-@click.option('-S', '--services_path', type=click.Path(exists=True))
+@click.version_option(version=vers,
+                      prog_name="diana-cli.py, python-diana")
+@click.option('-s', '--services', type=click.STRING,
+              help="Diana service desc as yaml format string")
+@click.option('-S', '--services_path', type=click.Path(exists=True),
+              help="Diana service desc as a yaml format file or directory of files")
 @click.pass_context
 def cli(ctx, verbose, services, services_path):
     """Run diana packages using a command-line interface."""
@@ -40,7 +45,9 @@ cli.add_command(commands.check)
 cli.add_command(commands.ofind)
 cli.add_command(commands.index)
 cli.add_command(commands.indexed_pull)
+cli.add_command(commands.dcm2im)
 cli.add_command(commands.mock)
+cli.add_command(commands.watch)
 
 
 if __name__ == '__main__':

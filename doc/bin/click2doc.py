@@ -2,19 +2,8 @@ from click.testing import CliRunner
 import click
 
 header = """
-`diana-cli`
+Diana CLI
 ==================
-
-Derek Merck  
-<derek_merck@brown.edu>  
-Rhode Island Hospital and Brown University  
-Providence, RI  
-
-[![Build Status](https://travis-ci.org/derekmerck/diana2.svg?branch=master)](https://travis-ci.org/derekmerck/diana2)
-[![codecov](https://codecov.io/gh/derekmerck/diana2/branch/master/graph/badge.svg)](https://codecov.io/gh/derekmerck/diana2)
-
-Source: <https://www.github.com/derekmerck/diana2>  
-Documentation: <https://diana.readthedocs.io>
 
 """
 
@@ -55,7 +44,7 @@ def run_cli_help(app, cmd=None):
 @click.argument("path", default="diana-cli", type=click.STRING)
 def cli(path):
 
-    cmds = ["check", "index", "indexed-pull", "mock", "ofind"]
+    cmds = ["check", "index", "indexed-pull", "dcm2im", "mock", "ofind", "watch"]
 
     app = __import__(path)
 

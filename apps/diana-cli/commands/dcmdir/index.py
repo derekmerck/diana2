@@ -1,11 +1,10 @@
-
 import click
 from diana.apis import DcmDir, Redis, Orthanc
 
 @click.command()
 @click.argument('path')
 @click.argument('index')
-@click.option('--orthanc_db', default=False, help="Use subpath width/depth = 2", is_flag=True)
+@click.option('--orthanc_db', default=False, help="Use subpath width/depth=2", is_flag=True)
 @click.pass_context
 def index(ctx, path, index, orthanc_db):
     """Inventory dicom dir PATH with INDEX service for retrieval"""
@@ -28,7 +27,7 @@ def index(ctx, path, index, orthanc_db):
 @click.argument('path')
 @click.argument('index')
 @click.argument('dest')
-@click.option('--orthanc_db', default=False, help="Use subpath width/depth = 2", is_flag=True)
+@click.option('--orthanc_db', default=False, help="Use subpath width/depth=2", is_flag=True)
 @click.pass_context
 def indexed_pull(ctx, accession_number, path, index, dest, orthanc_db):
     """Pull study by accession number from a PATH with INDEX service and send to DEST"""

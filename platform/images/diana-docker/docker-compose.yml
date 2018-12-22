@@ -2,23 +2,56 @@ version: '3'
 
 services:
 
+  # ----------------------
+  # Base-images need not be recreated all the time
+  # ----------------------
+
+  diana2-base-amd64:
+    build:
+      context: .
+      dockerfile: Dockerfile-python
+    image: diana2-base-amd64
+
+  diana2-base-arm32v7:
+    build:
+      context: .
+      dockerfile: Dockerfile-python
+      args:
+        RESIN_ARCH:   armv7hf
+        DOCKER_ARCH:  arm32v7
+    image: diana2-base-arm32v7
+
+  diana2-base-arm64v8:
+    build:
+      context: .
+      dockerfile: Dockerfile-python
+      args:
+        RESIN_ARCH:   aarch64
+        DOCKER_ARCH:  arm64v8
+    image: diana2-base-arm64v8
+
+  # ----------------------
+  # Should be updated when code is updated
+  # ----------------------
+
   diana2-amd64:
     build:
       context: .
+      dockerfile: Dockerfile-diana
     image: diana2-amd64
 
   diana2-arm32v7:
     build:
       context: .
+      dockerfile: Dockerfile-diana
       args:
-        RESIN_ARCH:   armv7hf
         DOCKER_ARCH:  arm32v7
     image: diana2-arm32v7
 
   diana2-arm64v8:
     build:
       context: .
+      dockerfile: Dockerfile-diana
       args:
-        RESIN_ARCH:   aarch64
         DOCKER_ARCH:  arm64v8
     image: diana2-arm64v8

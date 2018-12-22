@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath('../package'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'DIANA'
+project = 'Diana'
 copyright = '2018, Derek Merck'
 author = 'Derek Merck'
 

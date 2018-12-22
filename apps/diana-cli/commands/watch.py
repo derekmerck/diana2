@@ -1,35 +1,4 @@
-"""
-Usage:
 
-$ diana-cli watch -r move ath:/incoming queue
-$ diana-cli watch -r move_anon queue archive
-$ diana-cli watch -r index_series archive splunk
-
-$ diana-cli watch -r classify_ba archive splunk
-
-$ diana-cli watch -r pindex_studies pacs splunk
-
-$ echo routes.yml
----
-- source: queue
-  dest: archive
-  handler: mv_anon
-  level: instances
-- source: archive
-  dest: splunk
-  handler: index
-  level: studies
-...
-$ diana-cli watch -R routes.yml
-
-Route Handlers:
-
-- say
-- mv or mv_anon
-- upload
-- index
-
-"""
 
 import click
 import yaml
@@ -41,7 +10,41 @@ from diana.utils.endpoint import Watcher
 @click.option('-R', '--routes_path', type=click.Path(exists=True), default=None)
 @click.pass_context
 def watch(ctx, route, routes_path):
-    """Watch sources for events to handle based on TRIGGERS"""
+    """
+    Watch sources for events to handle based on ROUTES
+
+    Usage:
+
+    $ diana-cli watch -r move ath:/incoming queue
+    $ diana-cli watch -r move_anon queue archive
+    $ diana-cli watch -r index_series archive splunk
+
+    $ diana-cli watch -r classify_ba archive splunk
+
+    $ diana-cli watch -r pindex_studies pacs splunk
+
+    $ echo routes.yml
+    ---
+    - source: queue
+      dest: archive
+      handler: mv_anon
+      level: instances
+    - source: archive
+      dest: splunk
+      handler: index
+      level: studies
+    ...
+    $ diana-cli watch -R routes.yml
+
+    Route Handlers (Triggers):
+
+    - say
+    - mv or mv_anon
+    - upload
+    - index
+
+    """
+
     services = ctx.obj.get('services')
     click.echo('Watcher')
     click.echo('------------------------')

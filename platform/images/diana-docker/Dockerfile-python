@@ -1,5 +1,5 @@
-# xArch Diana2 Image
-# Derek Merck, Summer 2018
+# xArch Diana Base Image
+# Derek Merck, Winter 2019
 
 ARG RESIN_ARCH="amd64"
 #ARG RESIN_ARCH="armv7hf"
@@ -13,7 +13,7 @@ ARG DOCKER_ARCH="amd64"
 
 LABEL maintainer="Derek Merck"
 LABEL email="derek_merck@brown.edu"
-LABEL description="X-Arch DIANA"
+LABEL description="X-Arch Diana Base"
 LABEL vendor="Rhode Island Hospital"
 LABEL architecture="$DOCKER_ARCH"
 LABEL os="linux"
@@ -46,14 +46,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt -y install --no-install-recommends \
     libgdcm-tools \
     libffi-dev \
   && apt clean && rm -rf /var/lib/apt/lists/*
-
-RUN mkdir /opt/diana \
-    && git clone https://github.com/derekmerck/diana2 /opt/diana
-
 RUN pip3 install -U pip
-RUN pip3 install -r /opt/diana/requirements.txt
-RUN pip3 install -e /opt/diana/package
 
+RUN mkdir /opt/diana
 WORKDIR /opt/diana
 
 # Leave entrypoint alone for resin-init
@@ -62,3 +57,5 @@ CMD ["tail", "-f", "/dev/null"]
 ENV TZ=America/New_York
 # Disable resin.io's systemd init system
 ENV INITSYSTEM off
+
+

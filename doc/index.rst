@@ -1,7 +1,7 @@
 .. DIANA documentation master file, created by
    sphinx-quickstart on Fri Aug 17 19:51:42 2018.
 
-DICOM Analytics and Archive (DIANA)
+DICOM Analytics and Archive
 ====================================
 
 .. important:: Documentation is in an inconsistent state and is being caught up.
@@ -21,7 +21,7 @@ Components
    source/package
    library_api
    source/diana-cli
-   source/diana-xarch
+   source/diana-docker
    source/tests
 
 

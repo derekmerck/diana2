@@ -1,5 +1,5 @@
-DIANA2 xArch Docker Image
-=========================
+Diana Docker
+============
 
 | Derek Merck
 | derek_merck@brown.edu

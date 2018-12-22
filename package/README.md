@@ -1,4 +1,4 @@
-`python-diana`
+Python-Diana
 ==================
 
 Derek Merck  

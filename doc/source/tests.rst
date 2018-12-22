@@ -1,15 +1,9 @@
 Diana Tests
 ===========
 
-| Derek Merck
-| derek_merck@brown.edu
-| Rhode Island Hospital and Brown University
-| Providence, RI
-
 |Build Status| |codecov|
 
-| Source: https://www.github.com/derekmerck/diana2
-| Documentation: https://diana.readthedocs.io
+Source: https://www.github.com/derekmerck/diana2
 
 Manually run pytest with coverage and upload to codecov:
 
