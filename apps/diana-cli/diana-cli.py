@@ -1,22 +1,21 @@
-import click
-import yaml
 import logging
+import yaml
+import click
 import commands
 from diana.utils.gateways import supress_urllib_debug
 
-
-@click.group()
+@click.group(name="diana-cli")
 @click.option('--verbose/--no-verbose', default=False)
 @click.option('-s', '--services', type=click.STRING)
 @click.option('-S', '--services_path', type=click.Path(exists=True))
 @click.pass_context
 def cli(ctx, verbose, services, services_path):
-    click.echo('DIANA cli')
-    click.echo('Verbose mode is %s' % ('on' if verbose else 'off'))
+    """Run diana packages using a command-line interface."""
 
     if verbose:
         logging.basicConfig(level=logging.DEBUG)
         supress_urllib_debug()
+        click.echo('Verbose mode is %s' % ('on' if verbose else 'off'))
     else:
         logging.basicConfig(level=logging.WARNING)
         supress_urllib_debug()

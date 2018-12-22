@@ -1,10 +1,3 @@
-"""
-Minting reproducible UIDs is important for anticipating the OIDs of anonymized
-studies and for ensuring studies are linked by StudyUID even when individual series
-are anonymized with different conditions.
-"""
-
-
 import attr
 import hashlib
 
@@ -19,13 +12,19 @@ def hash_str(s, digits=2):
 
 @attr.s
 class DicomUIDMint(object):
-    # RIH 3d Lab prefix within the medicalconnections.co.uk namespace
+    """
+    Minting reproducible UIDs is important for anticipating the OIDs of anonymized
+    studies and for ensuring studies are linked by StudyUID even when individual series
+    are anonymized with different conditions.
+    """
+
     prefix = "1.2.826.0.1.3680043.10.43"
     """
-    1 - iso
-    2 - ansi
-    840 - us
-    0.1.3680043.10.43 - sub-organization within medicalconnections.co.uk
+    Prefix parts:
+      - 1 - iso
+      - 2 - ansi
+      - 840 - us
+      - 0.1.3680043.10.43 - sub-organization within medicalconnections.co.uk
 
     A 25 character prefix leaves 39 digits and stops available (64 chars max)
     """
@@ -36,7 +35,6 @@ class DicomUIDMint(object):
                             StudyInstanceUID: str,
                             SeriesInstanceUID=None,
                             SOPInstanceUID=None):
-
         """
         A hierarchical asset uid has the form:
 
@@ -48,6 +46,7 @@ class DicomUIDMint(object):
           - pt, study = stop + 12 digits each          26 = 54
           - series, instance = stop + 4 digits each (optional)
                                                        10 = 64
+
         Total length is 64
         """
 

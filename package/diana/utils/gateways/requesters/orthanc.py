@@ -1,5 +1,3 @@
-# Diana-agnostic API and helpers for Orthanc, with no endpoint or dixel dependencies
-
 from hashlib import sha1
 from enum import Enum
 import attr
@@ -25,6 +23,7 @@ def orthanc_id(PatientID: str, StudyInstanceUID: str, SeriesInstanceUID=None, SO
 
 @attr.s
 class Orthanc(Requester):
+    """Diana-agnostic API and helpers for Orthanc, with no endpoint or dixel dependencies."""
 
     name = attr.ib(default="OrthancGateway")
     port = attr.ib(default=8042)

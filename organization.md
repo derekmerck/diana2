@@ -1,6 +1,26 @@
 DIANA Overview
 =============
 
+
+Components
+---------------
+
+### `python-diana` Package
+
+- Python library
+
+### Apps
+
+- `diana-cli`, a command-line interface for common actions
+
+### Diana Platform
+
+- Cross-architecture Docker images for diana and orthanc
+- Example Docker-swarm stack implementations
+
+### Unit Tests
+
+
 platform
 -------------
 

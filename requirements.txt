@@ -1,4 +1,5 @@
 # PKG REQS
+# -----------------
 attrs >= 18.1.0
 requests
 pydicom
@@ -10,9 +11,17 @@ pillow
 python-dateutil
 
 # APP REQS
+# -----------------
 click
 
 # TESTING REQS
+# -----------------
 pytest >= 4.0
 pytest-cov
 interruptingcow
+
+# SPHINX REQS
+# -----------------
+recommonmark
+pypandoc
+sphinx

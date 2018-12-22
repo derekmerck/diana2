@@ -1,4 +1,4 @@
-DIANA2 xArch Docker Image
+Diana Docker
 ==========================
 
 Derek Merck  

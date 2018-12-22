@@ -16,17 +16,25 @@ def mktime(datestr, timestr):
 
 @attr.s(cmp=False, hash=None)
 class Dixel(Serializable):
+    """
+    "Dixels" are DICOM-elements (following pixels, voxels, and texels).  They
+    have metadata, tags, and a DicomLevel (study, series, or instance).
 
-    meta = attr.ib(factory=dict)
-    tags = attr.ib(factory=dict)
-    level = attr.ib(default=DicomLevel.STUDIES, converter=DicomLevel)
+    DIANA endpoints handle and store dixel instances.  Some functions may
+    take a dixel identifier and return the dixel instance.
+    """
+
+    meta = attr.ib(factory=dict)  #: Metadata dict
+    tags = attr.ib(factory=dict)  #: Dicom tag dict
+    level = attr.ib(default=DicomLevel.STUDIES,
+                    converter=DicomLevel) #: Study, series, instance
 
     # Making this init=False removes it from the serializer
     # Use a "from" constructor or add "file" manually after creation
-    file = attr.ib(default=None, repr=False, init=False)
-    pixels = attr.ib(default=None, repr=False, init=False)
-    report = attr.ib(default=None, repr=False, init=False)
-    children = attr.ib(init=False, factory=list)
+    file = attr.ib(default=None, repr=False, init=False)   #: Stores binary file representation
+    pixels = attr.ib(default=None, repr=False, init=False) #: Stores pixel array representation
+    report = attr.ib(default=None, repr=False, init=False) #: Stores study report as RadiologyReport
+    children = attr.ib(init=False, factory=list) #: Stores information about sub-dixels (series for study, instances for series)
 
     def __attrs_post_init__(self):
         self.update_meta()
@@ -42,6 +50,7 @@ class Dixel(Serializable):
 
     @staticmethod
     def from_pydicom(ds: pydicom.Dataset, fn: str, file=None):
+        """Generate a dixel from a pydicom dataset"""
 
         meta = {
             'FileName': fn,
@@ -84,6 +93,7 @@ class Dixel(Serializable):
 
     @staticmethod
     def from_montage_csv(data: Mapping):
+        """Generate a dixel from a line in a Montage csv download"""
 
         tags = {
             "AccessionNumber": data["Accession Number"],
@@ -114,8 +124,13 @@ class Dixel(Serializable):
 
     @staticmethod
     def from_montage_json(data: Mapping):
-        """Tracks Montage-mappedd CPT codes, to dereference them to
-        real CPT codes and body parts, call Montage().get_meta(dixel)"""
+        """
+        Generate a dixel from a Montage JSON result (as returned by
+        the Montage Endpoint.
+
+        Metadata includes Montage-mappedd CPT codes; to dereference them
+        to real CPT codes and body parts, call Montage().get_meta(dixel)
+        """
 
         # logging.debug(pformat(data['exam_type']))
 
@@ -169,6 +184,7 @@ class Dixel(Serializable):
     @staticmethod
     def from_orthanc(meta: Mapping=None, tags: Mapping=None,
                      level: DicomLevel=DicomLevel.STUDIES, file=None):
+        """Generate a dixel from an Orthanc json tag dictionary"""
 
         d = Dixel(meta=meta,
                   tags=tags,
@@ -176,8 +192,8 @@ class Dixel(Serializable):
         if file:
             d.file = file
 
-    # orthanc id
     def oid(self):
+        """Compute Orthanc ID"""
         if not self.meta.get('ID'):
             if self.level == DicomLevel.STUDIES:
                 self.meta['ID'] = orthanc_id(self.tags.get('PatientID'),
@@ -195,12 +211,12 @@ class Dixel(Serializable):
                 raise ValueError("Unknown DicomLevel for oid")
         return self.meta.get('ID')
 
-    # serializer id
     def sid(self):
+        """Serializer id alias for meta['AccessionNumber']"""
         return self.tags.get('AccessionNumber')
 
-    # filename
     def fn(self):
+        """Filename alias for meta['Filename']"""
         return self.meta.get('FileName')
 
     def get_pixels(self):

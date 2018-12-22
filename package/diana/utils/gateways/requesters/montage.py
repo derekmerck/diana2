@@ -1,9 +1,3 @@
-# Diana-agnostic API for Montage, with no endpoint or dixel dependencies
-
-# There is no montage-sdk for Python afaik; this gateway provides a minimal
-# functionality to 'find' events and collect some additional metadata about
-# body part and cpt code.
-
 from enum import IntEnum
 import logging
 from typing import Mapping
@@ -29,13 +23,20 @@ MONTAGE_RESULT_INCR = 200
 
 @attr.s
 class Montage(Requester):
+    """
+    Diana-agnostic API for Montage, with no endpoint or dixel dependencies
+
+    There is no montage-sdk for Python afaik; this gateway provides a minimal
+    functionality to 'find' events and collect some additional metadata about
+    body part and cpt code.
+    """
 
     name = attr.ib(default="MontageGateway")
     user = attr.ib(default="montage")
     path = attr.ib( default="apis/v1")
     index = attr.ib( default="rad" )
 
-    def find(self, query: Mapping, index: str=None):
+    def find(self, query: Mapping, index: str=None) -> list:
         logger = logging.getLogger(self.name)
         logger.debug("Searching montage")
 
@@ -72,13 +73,12 @@ class Montage(Requester):
     # Metadata functions
     # ----------------
 
-    # Build up cached lookup tables for body part and cpt code from exam code.
-
-    bp_lut = {}
-    def lookup_body_part(self, montage_cpts):
+    _bp_lut = {}
+    def lookup_body_part(self, montage_cpts: list) -> list:
+        """Build up cached lookup tables for body part from exam code."""
         results = []
         for mc in montage_cpts:
-            labels = self.bp_lut.get(mc)
+            labels = self._bp_lut.get(mc)
             if not labels:
 
                 labels = []
@@ -107,7 +107,7 @@ class Montage(Requester):
                     if label not in labels:
                         labels.append(label)
 
-                self.bp_lut[mc] = labels
+                self._bp_lut[mc] = labels
 
                 # logging.debug(labels)
 
@@ -119,24 +119,26 @@ class Montage(Requester):
 
         return results
 
-    cpt_lut = {}
-    def lookup_cpts(self, montage_cpts):
+    _cpt_lut = {}
+    def lookup_cpts(self, montage_cpts: list) -> list:
+        """Build up cached lookup table for cpt codes from exam code."""
+
         results = []
         for mc in montage_cpts:
-            label = self.cpt_lut.get(mc)
+            label = self._cpt_lut.get(mc)
             if not label:
                 resource = "cptcode/{}".format(mc)
                 r = self._get(resource)
                 # logging.debug(r)
                 label = r['code']
-                self.cpt_lut[mc] = label
+                self._cpt_lut[mc] = label
             results.append(label)
         return results
 
     @classmethod
     def clean_text(cls, text):
         """Clean up text from the RIH report templates.
-        Recent variants are returned with \r indicators, older variants are
+        Recent variants are returned with \\r indicators, older variants are
         not, so we insert newlines based on whether the next line is a
         continuation or an obviously new section."""
         soup = BeautifulSoup(text, features="html.parser")

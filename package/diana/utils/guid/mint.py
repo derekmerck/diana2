@@ -9,9 +9,9 @@ import base64
 from pathlib import Path
 from dateutil import parser as DateTimeParser
 
-# New dob is within 3 months
+#: New dob is within 3 months
 DOB_DISTANCE = timedelta(days=90)
-# New study date/time is within 6 months and 60 minutes time of day
+#: New study date/time is within 6 months and 60 minutes time of day
 TIME_DISTANCE = timedelta(days=90,seconds=60*60)
 
 class GUIDGender(Enum):
