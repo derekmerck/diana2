@@ -19,10 +19,10 @@ Components
    :caption: Contents:
 
    source/package
-   library_api
+   ./library_api
    source/diana-cli
    source/diana-docker
-   source/tests
+   ./unit_tests
 
 
 Indices and tables

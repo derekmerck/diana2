@@ -3,12 +3,14 @@ import yaml
 import click
 import commands
 from diana.utils.gateways import supress_urllib_debug
-from diana import __version__ as vers
+from diana import __version__ as diana_version
+
+__version__ = "0.2.0"
 
 @click.group(name="diana-cli")
 @click.option('--verbose/--no-verbose', default=False)
-@click.version_option(version=vers,
-                      prog_name="diana-cli.py, python-diana")
+@click.version_option(version=(__version__, diana_version),
+                      prog_name=("diana-cli.py", "python-diana"))
 @click.option('-s', '--services', type=click.STRING,
               help="Diana service desc as yaml format string")
 @click.option('-S', '--services_path', type=click.Path(exists=True),

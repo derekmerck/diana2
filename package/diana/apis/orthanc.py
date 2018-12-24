@@ -147,7 +147,7 @@ class Orthanc(Endpoint, Serializable):
               query: Mapping,
               domain: str,
               level=DicomLevel.STUDIES,
-              retrieve=False):
+              retrieve=False) -> list:
         logger = logging.getLogger(self.name)
         logger.debug("Remote Find")
 

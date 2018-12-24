@@ -13,13 +13,14 @@ import sys
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath('../package'))
+sys.path.insert(0, os.path.abspath('../tests'))
 
 # At top on conf.py (with other import statements)
 # from recommonmark.transform import AutoStructify
 
 # -- Project information -----------------------------------------------------
 
-project = 'Diana'
+project = 'DIANA'
 copyright = '2018, Derek Merck'
 author = 'Derek Merck'
 

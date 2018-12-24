@@ -178,10 +178,10 @@ def dicom_simplify(tags):
     """
     Simplify a DICOM tag set:
 
-    - Standardize dates and times as Python datetime objects
-    - Identify a sensible creation datetime
-    - Flatten and simplify ContentSequences in the manner of Orthanc's 'simplify' parameter
-    - Add sensible defaults for missing station names and ctdi_vols in dose reports
+      - Standardize dates and times as Python datetime objects
+      - Identify a sensible creation datetime
+      - Flatten and simplify ContentSequences in the manner of Orthanc's 'simplify' parameter
+      - Add sensible defaults for missing station names and ctdi_vols in dose reports
     """
 
     # Flatten content sequences

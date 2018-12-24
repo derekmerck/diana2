@@ -26,7 +26,11 @@ class Event(object):
                                           self.data)
 
 @attr.s(cmp=False, hash=None)
-class ObservableMixin(Serializable):
+class ObservableMixin(object):
+    """
+    API for event polling and changes methods.  Useful for extending the generic
+    CRUD endpoint so that it can be attended by the watcher class.
+    """
 
     event_queue = attr.ib( init=False, factory=Queue )
     polling_interval = attr.ib(default=1.0)

@@ -1,2 +1,3 @@
 from .observable_dcmdir import ObservableDcmDir
 from .observable_orthanc import ObservableOrthanc
+from .observable_proxied_dicom import ObservableProxiedDicom

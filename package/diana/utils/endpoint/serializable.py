@@ -6,6 +6,10 @@ from ..smart_json import SmartJSONEncoder
 
 @attr.s(cmp=False, hash=None)
 class AttrSerializable(object):
+    """
+    Provides id, hashing, and serializing funcs via "attrs".  Useful for extending
+    the generic CRUD endpoint.
+    """
 
     @property
     def epid(self):

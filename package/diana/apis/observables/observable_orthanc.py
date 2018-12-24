@@ -5,7 +5,11 @@ from diana.utils.dicom import DicomEventType
 
 @attr.s
 class ObservableOrthanc(Orthanc, ObservableMixin):
+    """
+    Orthanc service that implements a DicomEvents "changes" function for polling.
+    """
 
+    name = attr.ib(default="ObsOrthanc")
     current_change = attr.ib(init=False, default=0)
 
     def changes(self, **kwargs):

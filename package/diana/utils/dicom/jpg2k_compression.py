@@ -7,6 +7,9 @@ def ok_to_compress( data ):
 
 
 def compress_dicom( data ):
+    """
+    Uses gdcm to compress a DICOM file and return the results.
+    """
 
     if not ok_to_compress( data ):
         return

@@ -1,9 +1,10 @@
 attrs >= 18.1.0
-requests
+bs4
+docker
 pydicom
 pyyaml
-redis
-docker
-bs4
 pillow
 python-dateutil
+redis
+requests
+watchdog

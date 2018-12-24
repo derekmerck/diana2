@@ -26,6 +26,14 @@ class Trigger(object):
 
 @attr.s
 class Watcher(object):
+    """
+    Generic event handler.  Setup is through Trigger objects that map sources and
+    event types to a partial function call.  Events then arrive via event_queues
+    from Observable sources.
+
+    Any endpoint that implements "Observable" is an eligible source.
+    """
+
     sources = attr.ib( factory=dict, init=False )
     triggers = attr.ib( factory=dict, init=False  )
     action_interval = attr.ib( default=1.0 )

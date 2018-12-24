@@ -1,7 +1,11 @@
-from .orthanc import Orthanc, sham_map
-from .redis import Redis
-from .splunk import Splunk
-from .dcmdir import DcmDir
 from .csvfile import CsvFile
-from .observables import ObservableOrthanc, ObservableDcmDir
+from .redis import Redis
+
+from .dcmdir import DcmDir
 from .montage import Montage
+from .orthanc import Orthanc, sham_map
+from .splunk import Splunk
+
+from .proxied_dicom import ProxiedDicom
+
+from .observables import ObservableOrthanc, ObservableDcmDir, ObservableProxiedDicom

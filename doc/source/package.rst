@@ -1,5 +1,5 @@
-Python-Diana
-============
+``python-diana``
+================
 
 | Derek Merck
 | derek_merck@brown.edu

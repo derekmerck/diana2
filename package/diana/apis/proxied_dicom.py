@@ -9,11 +9,11 @@ class ProxiedDicom(Endpoint, Serializable):
 
     name = attr.ib( default="ProxiedDicom" )
     proxy_desc = attr.ib( type=dict )
-    gateway = attr.ib( init=False )
+    proxy = attr.ib( init=False )
 
-    @gateway.default
+    @proxy.default
     def setup_gateway(self):
         return Orthanc(**self.proxy_desc)
 
     def find(self, query: Mapping, level=DicomLevel.STUDIES, retrieve: bool=False, **kwargs):
-        return self.gateway.rfind(query, level, self.name, retrieve=retrieve)
+        return self.proxy.rfind(query, level, self.name, retrieve=retrieve)

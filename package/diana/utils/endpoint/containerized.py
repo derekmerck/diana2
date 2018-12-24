@@ -5,6 +5,11 @@ import docker
 
 @attr.s
 class Containerized(object):
+    """
+    Many test fixtures create disposable Docker services to mock Diana platform
+    connectivity.  These are managed through the Containerized class.  This class
+    can be easily mixed into any endpoint, as demonstrated in the unit test suite.
+    """
 
     dkr_client = None
 
@@ -19,6 +24,9 @@ class Containerized(object):
     dkr_container = attr.ib(init=False, repr=False)
 
     def start_service(self):
+        """
+        Run the dkr_image with appropriate configuration
+        """
         logger = logging.getLogger(self.dkr_service)
         logger.info("Starting up service")
 
@@ -44,6 +52,10 @@ class Containerized(object):
         self.dkr_container = svc
 
     def stop_service(self):
+        """
+        Stop the running container associated with this service.
+        """
+
         logger = logging.getLogger(self.dkr_service)
         logger.info("Tearing down service")
 

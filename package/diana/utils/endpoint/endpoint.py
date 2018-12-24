@@ -14,6 +14,9 @@ Query = NewType('Query', Mapping)
 
 @attr.s
 class Endpoint(ABC):
+    """
+    Generic CRUD endpoint API.
+    """
 
     name = attr.ib(type=str, default="Endpoint")
 
