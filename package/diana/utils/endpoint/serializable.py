@@ -13,7 +13,7 @@ class AttrSerializable(object):
 
     @property
     def epid(self):
-        """endpoint id, equivalent in init attrs"""
+        """endpoint id"""
         return self.sha1().hexdigest()
 
     def sha1(self) -> sha1:

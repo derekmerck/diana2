@@ -18,7 +18,7 @@ sample_observations = [
 ]
 
 @attr.s(cmp=False, hash=None)
-class MockObservable(ObservableMixin):
+class MockObservable(Serializable, ObservableMixin):
 
     observations = attr.ib(init=False, type=list, default=sample_observations, repr=False)
     start_time = attr.ib(init=False, factory=datetime.now)
