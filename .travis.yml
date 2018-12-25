@@ -55,4 +55,4 @@ after_success:
   - cd platform/images/diana
   - docker-compose build diana2-amd64 diana2-arm32v7 diana2-arm64v8
   # Retag image and push
-  - docker -m docker-manifest -d ${DOCKER_USERNAME} diana2
+  - python -m docker-manifest -d ${DOCKER_USERNAME} diana2
