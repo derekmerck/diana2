@@ -50,22 +50,27 @@ This supports builds for `amd64`, `armhf`/`arm32v7`, and `aarch64`/`arm64v8` arc
 To build all images:
 
 1. Register the Docker QEMU cross-compilers
-2. Call `docker-compose` to build the vanilla `diana` images
+2. Call `docker-compose` to build the `diana-base` images
 4. Get [docker-manifest][] from Github
 5. Put Docker into "experimental mode" for manifest creation
-6. Call `docker-manifest.py` with an appropriate domain to manifest and push the images
+6. Call `docker-manifest.py` with an appropriate domain to retag (and push) the base images
+7. Call `docker-compose` to build the `diana-base` images
+8. Call `docker-manifest.py` with an appropriate domain to retag (and push) the base images
 
 [docker-manifest]: https://github.com/derekmerck/docker-manifest
 
 ```bash
 $ docker run --rm --privileged multiarch/qemu-user-static:register --reset
-$ docker-compose build diana2-amd64 diana2-arm32v7 diana2-arm64v8
+$ docker-compose build diana2-base-amd64 diana2-base-arm32v7 diana2-base-arm64v8
 $ pip install git+https://github.com/derekmerck/docker-manifest
 $ mkdir -p $HOME/.docker && echo '{"experimental":"enabled"}' > "$HOME/.docker/config.json"
+$ python3 docker-manifest.py --d $DOCKER_USERNAME diana2-base
+$ docker-compose build diana2-amd64 diana2-arm32v7 diana2-arm64v8
 $ python3 docker-manifest.py --d $DOCKER_USERNAME diana2
 ```
 
-A [Travis][] automation pipeline for git-push-triggered image regeneration and tagging is demonstrated in the `.travis.yml` script.  However, these cross-compiling jobs exceed Travis' 50-minute timeout window, so builds are currently done by hand using cloud infrastructure.
+Because the base image rarely changes, but the latest Diana build is still fluid, the 
+ [Travis][] automation pipeline for git-push-triggered image creation only automates only steps 7 and 8.
 
 [Travis]: http://travis-ci.org
 

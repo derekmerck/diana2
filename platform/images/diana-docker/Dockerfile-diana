@@ -5,7 +5,7 @@ ARG DOCKER_ARCH="amd64"
 # ARG DOCKER_ARCH="arm32v7"
 # ARG DOCKER_ARCH="arm64v8"
 
-FROM derekmerck/diana2-base:$latest-{DOCKER_ARCH}
+FROM derekmerck/diana2-base:$latest-${DOCKER_ARCH}
 
 LABEL description="X-Arch Diana"
 
