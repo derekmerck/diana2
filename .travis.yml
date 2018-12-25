@@ -16,6 +16,18 @@ addons:
     packages:
       - docker-ce
 
+before_install:
+
+  # Put docker into "experimental" for manifest function
+  - mkdir -p $HOME/.docker
+  - echo '{"experimental":"enabled"}' > "$HOME/.docker/config.json"
+
+  # Git the docker-manifest package
+  - pip install pyyaml git+https://github.com/derekmerck/docker-manifest
+
+  # Register qemu as cross-compiler
+  - docker run --rm --privileged multiarch/qemu-user-static:register --reset
+
 install:
 
   # All pip dependencies
@@ -33,8 +45,16 @@ script:
   - pytest --cov
 
 after_success:
+
+  # Put testing coverage data on code cov
   - codecov
 
+  # Still might not work bc "gevent" needs to compile from source on arm
+
+#  # Login to docker for push
+#  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+#  # Update diana image
 #  - cd platform/images/diana
-#  - docker-compose build diana2-amd64
-#  - docker tag diana2-amd64 diana2:amd64-latest
+#  - docker-compose build diana2-amd64 diana2-arm32v7 diana2-arm64v8
+#  # Retag image and push
+#  - docker -m docker-manifest -d ${DOCKER_USERNAME} diana2

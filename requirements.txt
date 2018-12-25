@@ -26,4 +26,6 @@ interruptingcow
 recommonmark
 pypandoc
 sphinx
+# This stalls on non-amd64 architectures and is only req'd for
+# sphinx to read the package for some reason.
 websocket>=0.2.1
