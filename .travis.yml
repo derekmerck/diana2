@@ -49,12 +49,10 @@ after_success:
   # Put testing coverage data on code cov
   - codecov
 
-  # Still might not work bc "gevent" needs to compile from source on arm
-
-#  # Login to docker for push
-#  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-#  # Update diana image
-#  - cd platform/images/diana
-#  - docker-compose build diana2-amd64 diana2-arm32v7 diana2-arm64v8
-#  # Retag image and push
-#  - docker -m docker-manifest -d ${DOCKER_USERNAME} diana2
+  # Login to docker for push
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  # Update diana image
+  - cd platform/images/diana
+  - docker-compose build diana2-amd64 diana2-arm32v7 diana2-arm64v8
+  # Retag image and push
+  - docker -m docker-manifest -d ${DOCKER_USERNAME} diana2

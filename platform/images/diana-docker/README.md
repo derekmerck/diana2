@@ -45,7 +45,7 @@ This supports builds for `amd64`, `armhf`/`arm32v7`, and `aarch64`/`arm64v8` arc
 [Pine64]: https://www.pine64.org
 [NVIDIA Jetson]: https://developer.nvidia.com/embedded/buy/jetson-tx2
 
-`docker-compose.yml` contains build recipes for each architecture for a simple `diana` image.
+`docker-compose.yml` contains build recipes for each architecture for a simple `diana` image with all requirements pre-installed.
 
 To build all images:
 
@@ -53,14 +53,15 @@ To build all images:
 2. Call `docker-compose` to build the `diana-base` images
 4. Get [docker-manifest][] from Github
 5. Put Docker into "experimental mode" for manifest creation
-6. Call `docker-manifest.py` with an appropriate domain to retag (and push) the base images
+6. Call `docker-manifest.py` with an appropriate domain to retag and push the base images
 7. Call `docker-compose` to build the `diana-base` images
-8. Call `docker-manifest.py` with an appropriate domain to retag (and push) the base images
+8. Call `docker-manifest.py` with an appropriate domain to retag and push the completed images
 
 [docker-manifest]: https://github.com/derekmerck/docker-manifest
 
 ```bash
 $ docker run --rm --privileged multiarch/qemu-user-static:register --reset
+$ cd diana2/platform/images/diana-docker
 $ docker-compose build diana2-base-amd64 diana2-base-arm32v7 diana2-base-arm64v8
 $ pip install git+https://github.com/derekmerck/docker-manifest
 $ mkdir -p $HOME/.docker && echo '{"experimental":"enabled"}' > "$HOME/.docker/config.json"
@@ -75,8 +76,8 @@ Because the base image rarely changes, but the latest Diana build is still fluid
 [Travis]: http://travis-ci.org
 
 ```bash
-$ docker run -it diana-amd64 python3 -c "import diana; print(diana.__version__)"
-2.0.1
+$ docker run -it diana2-amd64 python3 -c "import diana; print(diana.__version__)"
+2.0.2
 ```
 
 ### DIANA on ARM
@@ -96,10 +97,7 @@ $ sh get-docker.sh
 $ docker run hello-world
 $ apt install git python-pip
 $ pip install docker-compose
-$ git clone http://github.com/derekmerck/diana2
-$ cd diana2/platform/images/diana
-$ docker-compose build diana2-arm64v8
-$ python3 manifest-it.py diana-xarch.manifest.yml
+$ git clone http://github.com/derekmerck/diana2 ... continue as above
 ```
 
 Although [Resin uses Packet ARM servers to compile arm32 images][resin-on-packet], the available ThunderX does not implement the arm32 instruction set, so it [cannot compile natively for the Raspberry Pi][no-arm32].
