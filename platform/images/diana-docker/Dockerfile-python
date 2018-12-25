@@ -45,11 +45,11 @@ RUN DEBIAN_FRONTEND=noninteractive apt -y install --no-install-recommends \
     zlib1g-dev \
     libgdcm-tools \
     libffi-dev \
-  && apt clean && rm -rf /var/lib/apt/lists/*
+ && apt clean && rm -rf /var/lib/apt/lists/*
 RUN pip3 install -U pip
 
-RUN mkdir /opt/diana
-WORKDIR /opt/diana
+# Pillow has a longish-compile-time on ARM, pre-install on base
+RUN pip3 install pillow
 
 # Leave entrypoint alone for resin-init
 CMD ["tail", "-f", "/dev/null"]
