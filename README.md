@@ -8,7 +8,8 @@ Providence, RI
 
 [![Build Status](https://travis-ci.org/derekmerck/diana2.svg?branch=master)](https://travis-ci.org/derekmerck/diana2)
 [![Coverage Status](https://codecov.io/gh/derekmerck/diana2/branch/master/graph/badge.svg)](https://codecov.io/gh/derekmerck/diana2)
-[![Doc Status](https://diana.readthedocs.io/en/latest/?badge=latest)](https://diana.readthedocs.io)
+[![Doc Status](https://readthedocs.org/projects/diana/badge/?version=latest)](https://diana.readthedocs.io/en/latest/?badge=latest)
+
 
 Source: <https://www.github.com/derekmerck/diana2>  
 Documentation: <https://diana.readthedocs.io>
