@@ -3,12 +3,7 @@ RADCATr - RADCAT Review Interface
 Merck, Winter 2018
 """
 
-import sys
-import os
-import logging
-import csv
-import re
-import argparse
+import os, logging, csv, argparse
 from tkinter import *
 import tkinter.ttk as ttk
 
@@ -20,7 +15,7 @@ __desc__ = """
 Open a CSV dump from Montage and audit entries with a Tkinter GUI.
 Results are saved as they are generated as `source+audit.csv`.
 """
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 __prog__ = "RADCATr"
 
 root = Tk()
