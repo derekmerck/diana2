@@ -8,7 +8,7 @@ services:
   - docker
 
 env:
-  # enable import for diana-cli without setup
+  # Enable import for diana-cli
   PYTHONPATH="$TRAVIS_BUILD_DIR/apps/diana-cli"
 
 addons:
@@ -34,8 +34,8 @@ install:
 
   # All pip dependencies
   - pip3 install -r requirements.txt
-  - pip3 install -e package
   - pip3 install codecov
+  - pip3 install -e package
 
   # Required docker images for fixtures
   - docker pull alpine
@@ -51,7 +51,7 @@ after_success:
   # Put testing coverage data on code cov
   - codecov
 
-  - DIANA_VERSION=$(python -c "import diana; print(diana.__version__)")
+  - DIANA_VERSION=$(python3 -c "import diana; print(diana.__version__)")
 
   # Login to docker for push
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
@@ -62,3 +62,4 @@ after_success:
   - python3 -m docker-manifest -d ${DOCKER_USERNAME} diana2
   # Retag image ${DIANA_VERSION} and push
   - python3 -m docker-manifest -d ${DOCKER_USERNAME} -t ${DIANA_VERSION} diana2
+py
