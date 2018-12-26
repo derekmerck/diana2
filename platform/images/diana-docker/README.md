@@ -12,6 +12,7 @@ Providence, RI
 
 Source: <https://www.github.com/derekmerck/diana2>  
 Documentation: <https://diana.readthedocs.io>
+Image:  <https://cloud.docker.com/repository/docker/derekmerck/diana2>
 
 Build multi-architecture Docker images for embedded systems.
 

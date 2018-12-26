@@ -31,10 +31,27 @@ class Dixel(Serializable):
 
     # Making this init=False removes it from the serializer
     # Use a "from" constructor or add "file" manually after creation
-    file = attr.ib(default=None, repr=False, init=False)   #: Stores binary file representation
+    file   = attr.ib(default=None, repr=False, init=False)   #: Stores binary file representation
     pixels = attr.ib(default=None, repr=False, init=False) #: Stores pixel array representation
     report = attr.ib(default=None, repr=False, init=False) #: Stores study report as RadiologyReport
-    children = attr.ib(init=False, factory=list) #: Stores information about sub-dixels (series for study, instances for series)
+
+    #: Stores information about sub-dixels (series for study, instances for series)
+    children = attr.ib(init=False, factory=list, repr=False)
+    #: Stores reference to parent dixel (study for series, series for instances)
+    parent = attr.ib(default=None, repr=False)
+
+    def instances(self):
+        if self.level == DicomLevel.INSTANCES:
+            yield self
+        elif self.level == DicomLevel.SERIES:
+            for inst in self.children:
+                yield inst
+        elif self.level == DicomLevel.STUDIES:
+            for ser in self.children:
+                for inst in ser.children:
+                    yield inst
+        else:
+            raise TypeError
 
     def __attrs_post_init__(self):
         self.update_meta()
@@ -229,3 +246,4 @@ class Dixel(Serializable):
             pixels = self.pixels
 
         return pixels
+

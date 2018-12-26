@@ -1,8 +1,7 @@
 import random, logging
 from datetime import datetime, timedelta
 import attr
-from diana.utils.dicom import DicomLevel
-from diana.dixel import MockDixel
+from diana.dixel import MockStudy
 from diana.apis import Orthanc
 
 sample_site_desc = """
@@ -24,26 +23,25 @@ class MockDevice(object):
     """Generates studies on a schedule"""
 
     site_name = attr.ib(default="Mock Facility")
-    station_name = attr.ib(default="Imaging Service")
+    station_name = attr.ib(default="Imaging Device")
     modality = attr.ib(default="CT")
     studies_per_hour = attr.ib(default=6)
 
     _next_study = attr.ib(init=False, factory=datetime.now)
 
     def gen_study(self):
-        s = MockDixel(study_datetime=datetime.now(),
+        s = MockStudy(study_datetime=datetime.now(),
                       site_name = self.site_name,
                       station_name = self.station_name,
-                      modality=self.modality,
-                      study_description="Indicated Exam",
-                      level=DicomLevel.STUDIES
+                      modality=self.modality
                       )
         return s
 
     def poll(self, pacs: Orthanc=None):
         if datetime.now() > self._next_study:
             study = self.gen_study()
-            for d in study.children:
+            for d in study.instances():
+                # TODO: Wait until instance time arrives
                 d.gen_file()
                 if pacs:
                     pacs.put(d)

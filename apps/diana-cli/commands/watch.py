@@ -15,7 +15,7 @@ def watch(ctx, route, routes_path):
 
     Usage:
 
-    $ diana-cli watch -r move ath:/incoming queue
+    $ diana-cli watch -r move path:/incoming queue
     $ diana-cli watch -r move_anon queue archive
     $ diana-cli watch -r index_series archive splunk
 

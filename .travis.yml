@@ -24,9 +24,6 @@ before_install:
 
   # Git the docker-manifest package
   - pip3 install pyyaml git+https://github.com/derekmerck/docker-manifest
-
-  - python3 -m docker-manifest --help
-
   # Register qemu as cross-compiler
   - docker run --rm --privileged multiarch/qemu-user-static:register --reset
 
@@ -42,9 +39,9 @@ install:
   - docker pull redis
   - docker pull derekmerck/orthanc-confd
 
-script: skip
+script: # skip
 
-#  - pytest --cov
+  - pytest --cov
 
 after_success:
 
@@ -62,4 +59,3 @@ after_success:
   - python3 -m docker-manifest -d ${DOCKER_USERNAME} diana2
   # Retag image ${DIANA_VERSION} and push
   - python3 -m docker-manifest -d ${DOCKER_USERNAME} -t ${DIANA_VERSION} diana2
-py
