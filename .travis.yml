@@ -23,7 +23,7 @@ before_install:
   - echo '{"experimental":"enabled"}' > "$HOME/.docker/config.json"
 
   # Git the docker-manifest package
-  - pip install pyyaml git+https://github.com/derekmerck/docker-manifest
+  - pip3 install pyyaml git+https://github.com/derekmerck/docker-manifest
 
   - python3 -m docker-manifest --help
 
@@ -33,9 +33,9 @@ before_install:
 install:
 
   # All pip dependencies
-  - pip install -r requirements.txt
-  - pip install -e package
-  - pip install codecov
+  - pip3 install -r requirements.txt
+  - pip3 install -e package
+  - pip3 install codecov
 
   # Required docker images for fixtures
   - docker pull alpine
