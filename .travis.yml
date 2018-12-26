@@ -55,8 +55,8 @@ after_success:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   # Update diana image
   - cd platform/images/diana-docker
-  - docker-compose build diana2-amd64 diana2-arm32v7 diana2-arm64v8
+  - docker-compose build diana2-amd64 # diana2-arm32v7 diana2-arm64v8
   # Retag image "latest" and push
-  - python -m docker-manifest -d ${DOCKER_USERNAME} diana2
+  - python3 -m docker-manifest -d ${DOCKER_USERNAME} diana2
   # Retag image ${DIANA_VERSION} and push
-  - python -m docker-manifest -d ${DOCKER_USERNAME} -t ${DIANA_VERSION} diana2
+  - python3 -m docker-manifest -d ${DOCKER_USERNAME} -t ${DIANA_VERSION} diana2
