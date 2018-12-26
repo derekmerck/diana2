@@ -49,10 +49,14 @@ after_success:
   # Put testing coverage data on code cov
   - codecov
 
+  - DIANA_VERSION=$(python -c "import diana; print(diana.__version__)")
+
   # Login to docker for push
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   # Update diana image
   - cd platform/images/diana
   - docker-compose build diana2-amd64 diana2-arm32v7 diana2-arm64v8
-  # Retag image and push
+  # Retag image "latest" and push
   - python -m docker-manifest -d ${DOCKER_USERNAME} diana2
+  # Retag image ${DIANA_VERSION} and push
+  - python -m docker-manifest -d ${DOCKER_USERNAME} -t ${DIANA_VERSION} diana2

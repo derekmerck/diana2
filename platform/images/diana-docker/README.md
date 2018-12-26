@@ -77,7 +77,7 @@ Because the base image rarely changes, but the latest Diana build is still fluid
 
 ```bash
 $ docker run -it diana2-amd64 python3 -c "import diana; print(diana.__version__)"
-2.0.2
+2.0.3
 ```
 
 ### DIANA on ARM

@@ -6,7 +6,7 @@ DIANA Docker Image
 | Rhode Island Hospital and Brown University
 | Providence, RI
 
-|Build Status| |codecov|
+|Build Status| |Coverage Status| |Doc Status|
 
 | Source: https://www.github.com/derekmerck/diana2
 | Documentation: https://diana.readthedocs.io
@@ -51,37 +51,41 @@ NUC <https://www.intel.com/content/www/us/en/products/boards-kits/nuc.html>`__
 are ``amd64`` devices.
 
 ``docker-compose.yml`` contains build recipes for each architecture for
-a simple ``diana`` image.
+a simple ``diana`` image with all requirements pre-installed.
 
 To build all images:
 
 1. Register the Docker QEMU cross-compilers
-2. Call ``docker-compose`` to build the vanilla ``diana`` images
+2. Call ``docker-compose`` to build the ``diana-base`` images
 3. Get
    `docker-manifest <https://github.com/derekmerck/docker-manifest>`__
    from Github
 4. Put Docker into “experimental mode” for manifest creation
-5. Call ``docker-manifest.py`` with an appropriate domain to manifest
-   and push the images
+5. Call ``docker-manifest.py`` with an appropriate domain to retag and
+   push the base images
+6. Call ``docker-compose`` to build the ``diana-base`` images
+7. Call ``docker-manifest.py`` with an appropriate domain to retag and
+   push the completed images
 
 .. code:: bash
 
     $ docker run --rm --privileged multiarch/qemu-user-static:register --reset
-    $ docker-compose build diana2-amd64 diana2-arm32v7 diana2-arm64v8
+    $ cd diana2/platform/images/diana-docker
+    $ docker-compose build diana2-base-amd64 diana2-base-arm32v7 diana2-base-arm64v8
     $ pip install git+https://github.com/derekmerck/docker-manifest
     $ mkdir -p $HOME/.docker && echo '{"experimental":"enabled"}' > "$HOME/.docker/config.json"
+    $ python3 docker-manifest.py --d $DOCKER_USERNAME diana2-base
+    $ docker-compose build diana2-amd64 diana2-arm32v7 diana2-arm64v8
     $ python3 docker-manifest.py --d $DOCKER_USERNAME diana2
 
-A `Travis <http://travis-ci.org>`__ automation pipeline for
-git-push-triggered image regeneration and tagging is demonstrated in the
-``.travis.yml`` script. However, these cross-compiling jobs exceed
-Travis’ 50-minute timeout window, so builds are currently done by hand
-using cloud infrastructure.
+Because the base image rarely changes, but the latest Diana build is
+still fluid, the `Travis <http://travis-ci.org>`__ automation pipeline
+for git-push-triggered image creation only automates only steps 7 and 8.
 
 .. code:: bash
 
-    $ docker run -it diana-amd64 python3 -c "import diana; print(diana.__version__)"
-    2.0.1
+    $ docker run -it diana2-amd64 python3 -c "import diana; print(diana.__version__)"
+    2.0.3
 
 DIANA on ARM
 ~~~~~~~~~~~~
@@ -105,10 +109,7 @@ a brief tenancy on a bare-metal Cavium ThunderX ARMv8 server.
     $ docker run hello-world
     $ apt install git python-pip
     $ pip install docker-compose
-    $ git clone http://github.com/derekmerck/diana2
-    $ cd diana2/platform/images/diana
-    $ docker-compose build diana2-arm64v8
-    $ python3 manifest-it.py diana-xarch.manifest.yml
+    $ git clone http://github.com/derekmerck/diana2 ... continue as above
 
 Although `Resin uses Packet ARM servers to compile arm32
 images <https://resin.io/blog/docker-builds-on-arm-servers-youre-not-crazy-your-builds-really-are-5x-faster/>`__,
@@ -141,5 +142,7 @@ MIT
 
 .. |Build Status| image:: https://travis-ci.org/derekmerck/diana2.svg?branch=master
    :target: https://travis-ci.org/derekmerck/diana2
-.. |codecov| image:: https://codecov.io/gh/derekmerck/diana2/branch/master/graph/badge.svg
+.. |Coverage Status| image:: https://codecov.io/gh/derekmerck/diana2/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/derekmerck/diana2
+.. |Doc Status| image:: https://readthedocs.org/projects/diana/badge/?version=latest
+   :target: https://diana.readthedocs.io/en/latest/?badge=latest

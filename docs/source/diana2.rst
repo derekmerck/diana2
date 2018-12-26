@@ -36,5 +36,5 @@ MIT
    :target: https://travis-ci.org/derekmerck/diana2
 .. |Coverage Status| image:: https://codecov.io/gh/derekmerck/diana2/branch/master/graph/badge.svg
    :target: https://codecov.io/gh/derekmerck/diana2
-.. |Doc Status| image:: https://diana.readthedocs.io/en/latest/?badge=latest
-   :target: https://diana.readthedocs.io
+.. |Doc Status| image:: https://readthedocs.org/projects/diana/badge/?version=latest
+   :target: https://diana.readthedocs.io/en/latest/?badge=latest
