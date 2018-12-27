@@ -26,7 +26,6 @@ services:
       ORTHANC_MOD_0:         watcher,DIANA,diana-watcher,4242
       TZ:                    "America/New_York"
     deploy:
-      replicas: 1
       labels:
         - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8042"
@@ -34,14 +33,12 @@ services:
 
   diana-mock:
     image:                   derekmerck/diana2:latest
-    command:                 python3 /opt/diana/apps/cli/diana-mock.py mock -p MockPacs
+    # command:                 python3 /opt/diana/apps/diana-cli/diana-cli.py mock -p MockPacs
     environment:
       DIANA_SERVICES: >
         ["MockPacs": {
             "ctype": "Orthanc",
             "host":  "orthanc-mock",
-            "password": "${ORTHANC_PASSWORD"
+            "password": "${ORTHANC_PASSWORD}"
         }]
       TZ:                   "America/New_York"
-    deploy:
-      replicas: 1

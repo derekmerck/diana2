@@ -37,7 +37,6 @@ services:
     environment:
       TZ: "America/New_York"
     deploy:
-      replicas: 1
       placement:
         constraints:
           - node.role==manager
@@ -62,4 +61,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       TZ: "America/New_York"
+    deploy:
+      placement:
+        constraints:
+          - node.role==manager
 

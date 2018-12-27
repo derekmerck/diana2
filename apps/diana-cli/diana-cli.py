@@ -28,7 +28,9 @@ def cli(ctx, verbose, services, services_path):
         supress_urllib_debug()
 
     if services:
+        click.echo("Found services")
         _services = yaml.load(services)
+        click.echo(_services)
     else:
         _services = {}
 
@@ -53,4 +55,4 @@ cli.add_command(commands.watch)
 
 
 if __name__ == '__main__':
-    cli(obj={})
+    cli(auto_envvar_prefix='DIANA', obj={})
