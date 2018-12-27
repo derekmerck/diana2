@@ -1,7 +1,8 @@
+# import logging
 from datetime import datetime, timedelta
 from tempfile import NamedTemporaryFile
 from hashlib import md5
-from itertools import count
+# from itertools import count
 import random
 import attr
 import pydicom
@@ -9,9 +10,11 @@ from diana.dixel import Dixel
 from diana.utils.dicom import DicomLevel, dicom_date, dicom_time, dicom_name, DicomUIDMint
 from diana.utils.guid import GUIDMint
 
-
+_R = random.Random()
+def reset_mock_seed():
+    """Reset the mock seed and mock id for testing"""
+    _R.seed("diana-mock")
 dcm_mint = DicomUIDMint("diana-mock")
-
 
 @attr.s(hash=False)
 class MockInstance(Dixel):
@@ -33,7 +36,7 @@ class MockInstance(Dixel):
             ref_time = self.parent.children[-1].inst_datetime
         else:
             ref_time = self.parent.series_datetime
-        secs_delta = random.randint(1,2)
+        secs_delta = _R.randint(1,2)
         return ref_time + timedelta(seconds=secs_delta)
 
     level = attr.ib( init=False, default=DicomLevel.INSTANCES )
@@ -157,7 +160,7 @@ class MockSeries(Dixel):
             ref_time = self.parent.children[-1].children[-1].inst_datetime
         else:
             ref_time = self.parent.study_datetime
-        secs_delta = random.randint(20,100)
+        secs_delta = _R.randint(20,100)
         return ref_time + timedelta(seconds=secs_delta)
 
     seruid = attr.ib(init=False)
@@ -192,29 +195,24 @@ class MockSeries(Dixel):
 @attr.s
 class MockStudy(Dixel):
     """This is a study-level root dixel"""
-    n_dixels = count(0)
-    dxid = attr.ib(init=False, factory=n_dixels.__next__)
+    # n_dixels = count(0)
+    # dxid = attr.ib(init=False, factory=n_dixels.__next__)
 
     study_datetime=attr.ib(factory=datetime.now, type=datetime)
     site_name=attr.ib(default="Mock Site", type=str)
     station_name=attr.ib(default="Scanner", type=str)
     modality=attr.ib(default="CT", type=str)
 
-    gender = attr.ib(init=False)
-    @gender.default
-    def setup_gender(self):
-        return random.choice(["M", "F"])
-
     study_description=attr.ib(init=False)
     @study_description.default
     def set_study_description(self):
-        anatomy = random.choice(["HEAD",
-                                 "NECK",
-                                 "EXTREMITY",
-                                 "PELVIS",
-                                 "CHEST",
-                                 "ABDOMEN"])
-        contrast = random.choice(["NC", "WIVC", "WWOIVC"])
+        anatomy = _R.choice(["HEAD",
+                             "NECK",
+                             "EXTREMITY",
+                             "PELVIS",
+                             "CHEST",
+                             "ABDOMEN"])
+        contrast = _R.choice(["NC", "WIVC", "WWOIVC"])
         code = 0
         for c in self.modality + anatomy + contrast:
             code += ord(c)
@@ -224,14 +222,21 @@ class MockStudy(Dixel):
 
     # Need patient id to mock accession num
     stuid = attr.ib(init=False)
-
     level = attr.ib(init=False, default=DicomLevel.STUDIES)
 
     def __attrs_post_init__(self):
+
+        name_seed = _R.random()
+        gender = _R.choice(["M", "F"])
+        age = _R.randint(18, 85)
+        # logging.debug(name_seed)
+        # logging.debug(gender)
+        # logging.debug(age)
+
         patient_info = GUIDMint.get_sham_id(
-                name=self.dxid,
-                age=random.randint(18, 85),
-                gender=self.gender,
+                name=name_seed,
+                age=age,
+                gender=gender,
                 reference_date=self.study_datetime
             )
         hash_str = patient_info["ID"] + self.study_datetime.isoformat()
@@ -246,7 +251,7 @@ class MockStudy(Dixel):
             "AccessionNumber": accession_num,
             "PatientName": dicom_name(patient_info["Name"]),
             "PatientID": patient_info["ID"],
-            "PatientSex": str(self.gender).upper(),
+            "PatientSex": gender,
             "PatientBirthDate": dicom_date(patient_info["BirthDate"]),
             "StudyInstanceUID": self.stuid,
             "StudyDescription": self.study_description,
@@ -285,12 +290,12 @@ class MockStudy(Dixel):
         for s in series_defs:
 
             if s[0] == 0:
-                if random.random < s[5]:
+                if _R.random() < s[5]:
                     num_series_this_type = 1
                 else:
                     num_series_this_type = 0
             else:
-                num_series_this_type = random.randint(s[1], s[2])
+                num_series_this_type = _R.randint(s[1], s[2])
 
             for i in range(1,num_series_this_type+1):
 
@@ -301,7 +306,7 @@ class MockStudy(Dixel):
                 else:
                     ser_desc = s[0]
 
-                n_instances = random.randint( s[3], s[4] )
+                n_instances = _R.randint( s[3], s[4] )
 
                 S = MockSeries( parent=self,
                                 ser_num=ser_num,

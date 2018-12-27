@@ -1,0 +1,47 @@
+# Provides a mock PACS service available as DICOM node: "MOCKPACS@orthanc-mock:4242"
+
+version: '3.3'
+
+
+networks:
+
+  admin_proxy_network:
+    external: true   # Created by admin-stack
+
+
+services:
+
+  orthanc-mock:
+    image: derekmerck/orthanc-confd:latest-amd64
+    networks:
+      - default
+      - admin_proxy_network
+    ports:
+      - "2424:4242"
+    environment:
+      ORTHANC_NAME:          Mock PACS
+      ORTHANC_AET:           MOCKPACS
+      ORTHANC_MAX_PATIENTS:  50
+      ORTHANC_PASSWORD:      ${ORTHANC_PASSWORD}
+      ORTHANC_MOD_0:         watcher,DIANA,diana-watcher,4242
+      TZ:                    "America/New_York"
+    deploy:
+      replicas: 1
+      labels:
+        - "traefik.docker.network=admin_proxy_network"
+        - "traefik.port=8042"
+        - "traefik.frontend.rule=PathPrefixStrip:/orthanc-mock/"
+
+  diana-mock:
+    image:                   derekmerck/diana2:latest
+    command:                 python3 /opt/diana/apps/cli/diana-mock.py mock -p MockPacs
+    environment:
+      DIANA_SERVICES: >
+        ["MockPacs": {
+            "ctype": "Orthanc",
+            "host":  "orthanc-mock",
+            "password": "${ORTHANC_PASSWORD"
+        }]
+      TZ:                   "America/New_York"
+    deploy:
+      replicas: 1

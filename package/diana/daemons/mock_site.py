@@ -47,7 +47,8 @@ class MockDevice(object):
                 if dest:
                     dest.put(d)
             delay = 60*60/self.studies_per_hour
-            delay = random.randint(int(0.5*delay), int(1.5*delay))
+            R = random.Random()
+            delay = R.randint(int(0.5*delay), int(1.5*delay))
             self._next_study = datetime.now() + timedelta(seconds=delay)
         else:
             logging.debug("No study, next at {}".format(self._next_study))

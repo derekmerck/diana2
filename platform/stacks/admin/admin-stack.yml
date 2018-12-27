@@ -1,0 +1,65 @@
+# Provides Portainer and Traefik services and networks
+
+version: '3.3'
+
+networks:
+  proxy_network:
+    driver: overlay
+    attachable: true
+
+  agent_network:
+    driver: overlay
+    attachable: true
+
+
+services:
+
+  portainer-agent:
+    image: portainer/agent
+    environment:
+      AGENT_CLUSTER_ADDR: tasks.portainer-agent
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/volumes:/var/lib/docker/volumes
+    networks:
+      - agent_network
+    deploy:
+      mode: global
+
+  portainer:
+    image: portainer/portainer
+    command: -H tcp://tasks.portainer-agent:9001 --tlsskipverify --admin-password ${PORTAINER_PASSWORD}
+    ports:
+      - "9000:9000"
+    networks:
+      - proxy_network
+      - agent_network
+    environment:
+      TZ: "America/New_York"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role==manager
+      labels:
+        - "traefik.docker.network=cirr_proxy_network"
+        - "traefik.port=9000"
+        - "traefik.frontend.rule=PathPrefixStrip:/portainer/"
+
+  traefik:
+    image: traefik
+    command:
+      - --api
+      - --docker
+      - --docker.swarmmode
+    ports:
+      - "80:80"
+      - "433:433"
+      - "8080:8080"
+    networks:
+      - proxy_network
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      TZ: "America/New_York"
+
