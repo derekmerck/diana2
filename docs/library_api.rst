@@ -135,6 +135,10 @@ Diana-CLI provides a shortcut for defining and running a mock service.
    :members:
    :undoc-members:
 
+.. automodule:: diana.dixel.mock_dixel
+   :members:
+   :undoc-members:
+
 
 DICOM Utilities
 ------------------------------------
@@ -174,6 +178,13 @@ Montage
 ...................
 
 .. autoclass:: diana.utils.gateways.Montage
+   :members:
+   :undoc-members:
+
+Splunk
+...................
+
+.. autoclass:: diana.utils.gateways.Splunk
    :members:
    :undoc-members:
 

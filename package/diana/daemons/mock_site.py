@@ -29,22 +29,23 @@ class MockDevice(object):
 
     _next_study = attr.ib(init=False, factory=datetime.now)
 
-    def gen_study(self):
-        s = MockStudy(study_datetime=datetime.now(),
+    def gen_study(self, study_datetime=None):
+        # Can force a study datetime for testing
+        s = MockStudy(study_datetime=study_datetime or datetime.now(),
                       site_name = self.site_name,
                       station_name = self.station_name,
                       modality=self.modality
                       )
         return s
 
-    def poll(self, pacs: Orthanc=None):
+    def poll(self, dest: Orthanc=None):
         if datetime.now() > self._next_study:
             study = self.gen_study()
             for d in study.instances():
                 # TODO: Wait until instance time arrives
                 d.gen_file()
-                if pacs:
-                    pacs.put(d)
+                if dest:
+                    dest.put(d)
             delay = 60*60/self.studies_per_hour
             self._next_study = datetime.now() + timedelta(seconds=delay)
 
@@ -97,12 +98,16 @@ class MockSite(object):
                 site_name=self.name)
         )
 
+    def devices(self):
+        for service in self.services:
+            for device in service.devices:
+                yield device
+
     def run(self, pacs):
         while True:
-            for service in self.services:
-                for device in service.devices:
-                    logging.debug("Collecting study from device")
-                    device.poll(pacs=pacs)
+            for device in self.devices():
+                logging.debug("Collecting study from device")
+                device.poll(dest=pacs)
 
 
 

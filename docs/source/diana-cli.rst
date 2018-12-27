@@ -9,7 +9,8 @@
 |Build Status| |codecov|
 
 | Source: https://www.github.com/derekmerck/diana2
-| Documentation: https://diana.readthedocs.io
+| Documentation: https://diana.readthedocs.io Image:
+  https://cloud.docker.com/repository/docker/derekmerck/diana2
 
 ::
 
@@ -138,8 +139,8 @@ watch
 
       Usage:
 
-      $ diana-cli watch -r move ath:/incoming queue $ diana-cli watch -r move_anon
-      queue archive $ diana-cli watch -r index_series archive splunk
+      $ diana-cli watch -r move path:/incoming queue $ diana-cli watch -r
+      move_anon queue archive $ diana-cli watch -r index_series archive splunk
 
       $ diana-cli watch -r classify_ba archive splunk
 

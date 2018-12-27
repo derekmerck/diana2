@@ -48,7 +48,6 @@ def test_mock_dixel():
 
     assert( ds.AccessionNumber == ref_inst_tags["AccessionNumber"] )
 
-
     e = MockStudy(study_datetime=ref_dt, modality="US")
     for item in e.instances():
         logging.debug("{!s}".format(item))
