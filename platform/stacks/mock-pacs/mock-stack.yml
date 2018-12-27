@@ -36,9 +36,9 @@ services:
     # command:                 python3 /opt/diana/apps/diana-cli/diana-cli.py mock -p MockPacs
     environment:
       DIANA_SERVICES: >
-        ["MockPacs": {
+        {"MockPacs": {
             "ctype": "Orthanc",
             "host":  "orthanc-mock",
             "password": "${ORTHANC_PASSWORD}"
-        }]
+        }}
       TZ:                   "America/New_York"

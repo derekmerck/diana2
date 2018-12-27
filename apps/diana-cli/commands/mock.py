@@ -22,7 +22,10 @@ def mock(ctx, desc, dest):
 
     O = None
     if dest:
-        O = Orthanc(**services[dest])
+        _desc = services[dest]
+        if _desc.get("ctype"):
+            _desc.pop("ctype")
+        O = Orthanc(**_desc)
 
     for h in H:
         h.run(pacs=O)
