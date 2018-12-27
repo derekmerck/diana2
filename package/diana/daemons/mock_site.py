@@ -1,4 +1,4 @@
-import random, logging
+import random, logging, time
 from datetime import datetime, timedelta
 import attr
 from diana.dixel import MockStudy
@@ -40,14 +40,17 @@ class MockDevice(object):
 
     def poll(self, dest: Orthanc=None):
         if datetime.now() > self._next_study:
+            logging.debug("Study ready to push")
             study = self.gen_study()
             for d in study.instances():
-                # TODO: Wait until instance time arrives
                 d.gen_file()
                 if dest:
                     dest.put(d)
             delay = 60*60/self.studies_per_hour
+            delay = random.randint(int(0.5*delay), int(1.5*delay))
             self._next_study = datetime.now() + timedelta(seconds=delay)
+        else:
+            logging.debug("No study, next at {}".format(self._next_study))
 
 
 @attr.s
@@ -106,8 +109,9 @@ class MockSite(object):
     def run(self, pacs):
         while True:
             for device in self.devices():
-                logging.debug("Collecting study from device")
+                logging.debug("Checking device for studies")
                 device.poll(dest=pacs)
+                time.sleep(1)
 
 
 

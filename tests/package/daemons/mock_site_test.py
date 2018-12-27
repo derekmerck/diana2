@@ -2,8 +2,11 @@ import logging, random
 from datetime import datetime
 from pprint import pformat
 import yaml
+from diana.apis import Orthanc
 from diana.daemons import MockSite
-from diana.dixel import MockStudy
+
+from interruptingcow import timeout
+
 
 sample_site_desc = """
 - name: Example Hospital
@@ -11,11 +14,11 @@ sample_site_desc = """
   - name: Main CT
     modality: CT
     devices: 3
-    studies_per_hour: 15
+    studies_per_hour: 30
   - name: Main MR
     modality: MR
     devices: 2
-    studies_per_hour: 4
+    studies_per_hour: 10
 """
 
 def test_mock_site():
@@ -47,7 +50,34 @@ def test_mock_site():
         s = device.gen_study(study_datetime=ref_dt)
         assert( "{!s}".format( next(s.instances()) ) in expected )
 
+def test_site_submission(setup_orthanc):
+        O = Orthanc()
+
+        assert( O.check() )
+
+        n_instances_init = O.gateway.statistics()["CountInstances"]
+
+        logging.debug( O.gateway.statistics() )
+
+        site_desc = yaml.load(sample_site_desc)
+
+        H = MockSite.Factory.create(desc=site_desc)[0]
+
+        try:
+            with timeout(15):
+                print("Starting mock site")
+                H.run(pacs=O)
+        except:
+            print("Stopping mock site")
+
+        n_instances = O.gateway.statistics()["CountInstances"]
+        assert( n_instances > n_instances_init + 500 )
 
 if __name__=="__main__":
-    logging.basicConfig(level=logging.WARNING)
+    logging.basicConfig(level=logging.DEBUG)
     test_mock_site()
+
+    from conftest import setup_orthanc
+
+    for i in setup_orthanc():
+        test_site_submission(None)
