@@ -109,7 +109,7 @@ class MockInstance(Dixel):
         ds.is_little_endian = True
         ds.is_implicit_VR = True
 
-        ds.Status = 0
+        # ds.Status = 0
 
         return ds
 
