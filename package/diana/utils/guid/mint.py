@@ -22,6 +22,10 @@ class GUIDGender(Enum):
 
 
 class GUIDMint(object):
+    """
+    Mint for generating reproducible pseudo-identities, random is isolated
+    and should not affect other calls to the PRNG
+    """
 
     @classmethod
     def get_hash(cls,
@@ -81,8 +85,9 @@ class GUIDMint(object):
     def get_new_dob(cls, id: str, dob: date):
         logger = logging.getLogger("GUIDMint")
 
-        random.seed(id)
-        days = random.randint(-DOB_DISTANCE.days, DOB_DISTANCE.days)
+        R = random.Random()
+        R.seed(id)
+        days = R.randint(-DOB_DISTANCE.days, DOB_DISTANCE.days)
         offset = timedelta(days=days)
         new_dob = dob + offset
         logger.debug(new_dob.isoformat())
@@ -93,9 +98,10 @@ class GUIDMint(object):
     def get_time_offset(cls, id: str):
         logger = logging.getLogger("GUIDMint")
 
-        random.seed(id)
-        days = random.randint(-TIME_DISTANCE.days, TIME_DISTANCE.days)
-        seconds = random.randint(-TIME_DISTANCE.seconds, TIME_DISTANCE.seconds)
+        R = random.Random()
+        R.seed(id)
+        days = R.randint(-TIME_DISTANCE.days, TIME_DISTANCE.days)
+        seconds = R.randint(-TIME_DISTANCE.seconds, TIME_DISTANCE.seconds)
         offset = timedelta(days=days, seconds=seconds)
         logger.debug(offset)
 
@@ -107,7 +113,8 @@ class GUIDMint(object):
     def get_name(cls, id: str, gender=GUIDGender.UNKNOWN) -> list:
         logger = logging.getLogger("GUIDMint")
 
-        random.seed(id)
+        R = random.Random()
+        R.seed(id)
         def init_name_banks():
             here = Path(__file__).parent
 
@@ -136,7 +143,7 @@ class GUIDMint(object):
         initial = id[0]
         candidates = cls.names["last"]
         candidates = list(filter(lambda n: n.startswith(initial), candidates))
-        last = random.choice(candidates)
+        last = R.choice(candidates)
         logger.debug(last)
 
         initial = id[1]
@@ -146,7 +153,7 @@ class GUIDMint(object):
             candidates = cls.names["male"]
 
         candidates = list(filter(lambda n: n.startswith(initial), candidates))
-        first = random.choice(candidates)
+        first = R.choice(candidates)
 
         logger.debug(first)
 

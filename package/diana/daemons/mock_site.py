@@ -85,11 +85,11 @@ class MockSite(object):
     name = attr.ib(default="Mock Facility")
     services = attr.ib(init=False, factory=list)
 
-    seed = attr.ib( default=None )
-    @seed.validator
-    def set_seed(self, attribute, value):
-        if value:
-            random.seed(value)
+    # seed = attr.ib( default=None )
+    # @seed.validator
+    # def set_seed(self, attribute, value):
+    #     if value:
+    #         random.seed(value)
 
     def add_service(self, name, modality, devices, studies_per_hour):
         self.services.append(

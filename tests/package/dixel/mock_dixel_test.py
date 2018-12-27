@@ -12,9 +12,9 @@ def test_mock_dixel():
     ref_dt = datetime(year=2018, month=1, day=1)
     d = MockStudy(study_datetime=ref_dt)
 
-    ref_inst_tags = {'AccessionNumber': '72fa1bdc4cecf4aca0540fbbb2398e80', 'PatientName': 'IRETON^OTHA^L', 'PatientID': 'IOLRVX62SA4IENBRAHKQTDXPM7AKFYC7', 'PatientSex': 'F', 'PatientBirthDate': '20000109', 'StudyInstanceUID': '1.2.826.0.1.3680043.10.43.55.347931617183.363541089775', 'StudyDescription': 'IMG1011 CT EXTREMITY NC', 'StationName': 'Scanner', 'Manufacturer': 'Device Manufacturer', 'ManufacturerModelName': 'Device Model Name', 'Institution': 'Mock Site', 'Modality': 'CT', 'StudyDate': '20180101', 'StudyTime': '000000', 'SeriesDescription': 'Dose Report', 'SeriesNumber': 6, 'SeriesInstanceUID': '1.2.826.0.1.3680043.10.43.55.347931617183.363541089775.5128', 'SeriesDate': '20180101', 'SeriesTime': '001259', 'InstanceNumber': 1, 'SOPInstanceUID': '1.2.826.0.1.3680043.10.43.55.347931617183.363541089775.5128.9883', 'InstanceCreationDate': '20180101', 'InstanceCreationTime': '001301'}
+    ref_inst_tags = {'AccessionNumber': '72fa1bdc4cecf4aca0540fbbb2398e80', 'PatientName': 'IRETON^OTHA^L', 'PatientID': 'IOLRVX62SA4IENBRAHKQTDXPM7AKFYC7', 'PatientSex': 'F', 'PatientBirthDate': '20000109', 'StudyInstanceUID': '1.2.826.0.1.3680043.10.43.55.347931617183.363541089775', 'StudyDescription': 'IMG1011 CT EXTREMITY NC', 'StationName': 'Scanner', 'Manufacturer': 'Device Manufacturer', 'ManufacturerModelName': 'Device Model Name', 'Institution': 'Mock Site', 'Modality': 'CT', 'StudyDate': '20180101', 'StudyTime': '000000', 'SeriesDescription': 'Dose Report', 'SeriesNumber': 6, 'SeriesInstanceUID': '1.2.826.0.1.3680043.10.43.55.347931617183.363541089775.5128', 'SeriesDate': '20180101', 'SeriesTime': '001318', 'InstanceNumber': 1, 'SOPInstanceUID': '1.2.826.0.1.3680043.10.43.55.347931617183.363541089775.5128.9883', 'InstanceCreationDate': '20180101', 'InstanceCreationTime': '001319'}
 
-    ref_n_instances = 251
+    ref_n_instances = 283
 
     for item in d.instances():
         logging.debug("{!s}".format(item))
