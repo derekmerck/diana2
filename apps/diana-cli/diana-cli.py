@@ -5,7 +5,7 @@ import commands
 from diana.utils.gateways import supress_urllib_debug
 from diana import __version__ as diana_version
 
-__version__ = "0.2.0"
+__version__ = "2.0.1"
 
 @click.group(name="diana-cli")
 @click.option('--verbose/--no-verbose', default=False)
