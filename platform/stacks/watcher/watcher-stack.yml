@@ -33,18 +33,18 @@ services:
 
   diana-watcher:
     image:                   derekmerck/diana2:latest
-    command:                 python3 apps/diana-cli/diana-cli.py watch
+    # command:                 python3 apps/diana-cli/diana-cli.py watch
     environment:
       DIANA_SERVICES: >
         {
-        	"Remote": {
-        		"ctype": "ObservableProxiedDicom",
-        		"proxy": {
-        			"host": "orthanc-bridge",
-        			"password": "${ORTHANC_PASSWORD}"
-        		},
-        		"proxy_domain": "mock"
-        	}
+          "Remote": {
+            "ctype": "ObservableProxiedDicom",
+            "proxy": {
+              "host": "orthanc-bridge",
+              "password": "${ORTHANC_PASSWORD}"
+            },
+            "proxy_domain": "mock"
+          }
         }
       DIANA_ROUTES: >
         say_studies Remote

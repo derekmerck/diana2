@@ -54,7 +54,7 @@ def watch(ctx, route, routes_path):
     if route:
         r = {"handler": route[0],
              "source": route[1],
-             "dest": route[1] if len(route) > 2 else None
+             "dest": route[2]
              }
 
         routes.append(r)
@@ -69,7 +69,7 @@ def watch(ctx, route, routes_path):
     for rt in routes:
 
         source_desc = services[rt['source']]
-        if rt['dest']:
+        if rt['dest'].lower() != "none":
             dest_desc = services[rt['dest']]
         else:
             dest_desc = None
