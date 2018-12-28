@@ -4,6 +4,7 @@ import click
 import yaml
 from diana.daemons import mk_route
 from diana.utils.endpoint import Watcher
+from diana.apis import *  # Register classes for instantiation
 
 @click.command()
 @click.option('-r', '--route', default=None, nargs=3)
