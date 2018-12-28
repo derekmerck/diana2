@@ -34,8 +34,11 @@ services:
         - "traefik.frontend.rule=PathPrefixStrip:/orthanc-mock/"
 
   diana-mock:
-    image:                   derekmerck/diana2:latest
-    command:                 git pull && python3 apps/diana-cli/diana-cli.py mock --dest MockPacs
+#    image:                   derekmerck/diana2:latest
+#    command: >
+#      sh -c "git pull && python3 -u apps/diana-cli/diana-cli.py mock --dest MockPacs"
+    image:                   diana2-amd64
+    command:                 python3 -u apps/diana-cli/diana-cli.py mock --dest MockPacs
     environment:
       DIANA_SERVICES: >
         {"MockPacs": {

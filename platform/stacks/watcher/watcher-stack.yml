@@ -32,8 +32,11 @@ services:
         - "traefik.frontend.rule=PathPrefixStrip:/orthanc-bridge/"
 
   diana-watcher:
-    image:                   derekmerck/diana2:latest
-    command:                 git pull && python3 apps/diana-cli/diana-cli.py watch
+    image:                   diana2-amd64
+    command:                 python3 -u apps/diana-cli/diana-cli.py watch
+#    image:                   derekmerck/diana2:latest
+#    command: >
+#      sh -c "git pull && python3 -u apps/diana-cli/diana-cli.py watch"
     environment:
       DIANA_SERVICES: >
         {
@@ -46,6 +49,6 @@ services:
             "proxy_domain": "mock"
           }
         }
-      DIANA_ROUTE: >
+      DIANA_WATCH_ROUTE: >
         say_studies Remote -
       TZ:                   "America/New_York"

@@ -1,4 +1,4 @@
-import logging
+import logging, sys
 import yaml
 from multiprocessing import Process
 from diana.apis import Orthanc, ObservableProxiedDicom
@@ -56,10 +56,13 @@ def test_mock_watcher(setup_orthanc, setup_orthanc2, capfd):
     except:
         print("Stopping watcher")
 
+    # Force p to flush stdout
+    sys.stdout.flush()
     p.terminate()
 
     if capfd:
         captured = capfd.readouterr()
+        print(captured.out)
         assert "AccessionNumber" in captured.out
         assert "SeriesInstanceUID" not in captured.out
 
