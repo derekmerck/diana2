@@ -71,5 +71,5 @@ if __name__=="__main__":
         test_orthanc_ep(None)
         test_orthanc_upload(None)
         test_psend(None, None)
-        i.stop_service()
-        j.stop_service()
+        i.stop_container()
+        j.stop_container()

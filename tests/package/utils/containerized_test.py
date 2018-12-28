@@ -6,18 +6,18 @@ from diana.utils.endpoint import Containerized
 def test_containers():
 
     C = Containerized(
-        dkr_service="testing",
+        dkr_name="testing",
         dkr_image="alpine",
         dkr_command="tail -f > /dev/null"
     )
 
-    C.start_service()
+    C.start_container()
 
     client = docker.from_env()
     c = client.containers.get("testing")
     assert( c.status == "running" )
 
-    C.stop_service()
+    C.stop_container()
     time.sleep(1)
 
     with pytest.raises(Exception):

@@ -9,11 +9,11 @@ class Containerized(object):
     Many test fixtures create disposable Docker services to mock Diana platform
     connectivity.  These are managed through the Containerized class.  This class
     can be easily mixed into any endpoint, as demonstrated in the unit test suite.
+
+    Includes methods for starting containers and swarm services.
     """
 
-    dkr_client = None
-
-    dkr_service = attr.ib(default="service")
+    dkr_name    = attr.ib(default="Endpoint")
     dkr_image   = attr.ib(default=None)
     dkr_ports   = attr.ib(factory=dict)
     dkr_command = attr.ib(default=None)
@@ -22,22 +22,20 @@ class Containerized(object):
     dkr_remove  = attr.ib(default=True)
 
     dkr_container = attr.ib(init=False, repr=False)
+    dkr_service = attr.ib(init=False, repr=False)
 
-    def start_service(self):
+    def start_container(self):
         """
-        Run the dkr_image with appropriate configuration
+        Run the dkr_image as a container with appropriate configuration
         """
-        logger = logging.getLogger(self.dkr_service)
-        logger.info("Starting up service")
-
-        if not Containerized.dkr_client:
-            Containerized.dkr_client = docker.from_env()
+        logger = logging.getLogger(self.dkr_name)
+        logger.info("Starting up container")
 
         try:
-            svc = Containerized.dkr_client.containers.get(self.dkr_service)
+            svc = self.docker_client().containers.get(self.dkr_name)
         except Exception:
-            svc = Containerized.dkr_client.containers.run(image=self.dkr_image,
-                                                          name=self.dkr_service,
+            svc = self.docker_client().containers.run(image=self.dkr_image,
+                                                          name=self.dkr_name,
                                                           command=self.dkr_command,
                                                           ports=self.dkr_ports,
                                                           links=self.dkr_links,
@@ -51,16 +49,90 @@ class Containerized(object):
 
         self.dkr_container = svc
 
-    def stop_service(self):
+    def stop_container(self):
         """
-        Stop the running container associated with this service.
+        Stop the running container associated with this endpoint.
         """
 
-        logger = logging.getLogger(self.dkr_service)
-        logger.info("Tearing down service")
+        logger = logging.getLogger(self.dkr_name)
+        logger.info("Tearing down container")
 
         try:
             self.dkr_container.stop()
         except:
-            logging.warning("Failed to stop service {}".format(self.dkr_service))
+            logging.warning("Failed to stop service {}".format(self.dkr_name))
             pass
+
+
+    def start_service(self):
+        """
+        Run the dkr_image as a swarm service with appropriate configuration
+        """
+        logger = logging.getLogger(self.dkr_name)
+        logger.info("Starting up service")
+
+        self.start_swarm()
+
+        container_spec = docker.types.ContainerSpec(
+            image=self.dkr_image,
+            command=self.dkr_command,
+            env=self.dkr_env
+        )
+        task_tmpl = docker.types.TaskTemplate(container_spec)
+        svc = self.api_client().create_service(
+            name=self.dkr_name,
+            task_template=task_tmpl)
+
+        self.dkr_service = svc
+
+    def stop_service(self):
+        """
+        Stop the running swarm service associated with this endpoint.
+        """
+
+        logger = logging.getLogger(self.dkr_name)
+        logger.info("Tearing down service")
+
+        try:
+            self.dkr_service.remove()
+        except:
+            logging.warning("Failed to stop service {}".format(self.dkr_name))
+            pass
+
+    _docker_client = None
+    @classmethod
+    def docker_client(cls):
+        if not cls._docker_client:
+            logging.info("Getting Docker client")
+            cls._docker_client = docker.from_env()
+        return cls._docker_client
+
+    _api_client = None
+    @classmethod
+    def api_client(cls):
+        if not cls._api_client:
+            logging.info("Getting Docker API client")
+            cls._api_client = docker.APIClient()
+        return cls._api_client
+
+    _swarm_started = False
+    @classmethod
+    def start_swarm(cls):
+        if not cls._swarm_started:
+            try:
+                logging.info("Currently in swarm")
+                info = cls.api_client().inspect_swarm()
+                logging.debug(info)
+            except docker.errors.APIError:
+                logging.info("Starting new swarm")
+                info = cls.api_client().init_swarm()
+                logging.debug(info)
+        cls._swarm_started = True
+
+    @classmethod
+    def clean_swarm(cls):
+        for item in cls.api_client().services():
+            cls.api_client().remove_service(item['ID'])
+
+
+

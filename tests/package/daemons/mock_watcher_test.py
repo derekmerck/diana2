@@ -73,6 +73,6 @@ if __name__ == "__main__":
 
     for (i,j) in zip(setup_orthanc(), setup_orthanc2()):
         test_mock_watcher(None, None, None)
-        i.stop_service()
-        j.stop_service()
+        i.stop_container()
+        j.stop_container()
 
