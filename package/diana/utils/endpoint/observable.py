@@ -33,7 +33,7 @@ class ObservableMixin(object):
     """
 
     event_queue = attr.ib( init=False, factory=Queue )
-    polling_interval = attr.ib(default=1.0)
+    polling_interval = attr.ib(default=1.0, converter=int)
     proc = attr.ib( init=False, type=Process, default=None )
 
     # Returns iterable of Event objects

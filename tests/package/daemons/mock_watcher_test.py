@@ -23,6 +23,7 @@ site_desc = """
 """
 
 def mock_runner():
+    """Generates a single CR study and sends to the mock pacs"""
 
     reset_mock_seed()
     print("Starting mock site")
@@ -33,7 +34,7 @@ def mock_runner():
     print("Stopping mock site")
 
 
-def test_mock_watcher(setup_orthanc, setup_orthanc2, capsys):
+def test_mock_watcher(setup_orthanc, setup_orthanc2, capfd):
 
     obs = ObservableProxiedDicom(proxy_desc={"port": 8043})
     watcher = Watcher()
@@ -57,8 +58,8 @@ def test_mock_watcher(setup_orthanc, setup_orthanc2, capsys):
 
     p.terminate()
 
-    if capsys:
-        captured = capsys.readouterr()
+    if capfd:
+        captured = capfd.readouterr()
         assert "AccessionNumber" in captured.out
         assert "SeriesInstanceUID" not in captured.out
 

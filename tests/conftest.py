@@ -1,8 +1,7 @@
-import logging
-from diana.utils.endpoint import Containerized
+import sys
 import pytest
 import docker
-import sys
+from diana.utils.endpoint import Containerized
 
 sys.path.append('test_utils')
 
@@ -15,9 +14,7 @@ def setup_orthanc():
             dkr_service = "orthanc",
             dkr_image = "derekmerck/orthanc-confd",
             dkr_ports = {"8042/tcp": 8042, "4242/tcp": 4242},
-            # dkr_env = {"ORTHANC_PASSWORD": "passw0rd"}
-            dkr_env={"ORTHANC_MOD_0": "remote,ORTHANC,localhost,4243"},
-
+            dkr_env={"ORTHANC_MOD_0": "remote,ORTHANC,localhost,4243"}
     )
     S.start_service()
 

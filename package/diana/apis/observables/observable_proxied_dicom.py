@@ -20,7 +20,7 @@ class ObservableProxiedDicom(ProxiedDicom, ObservableMixin):
     """
 
     name = attr.ib(default="ObsPrxDcm")
-    polling_interval = attr.ib( default=180.0 )  #: Poll every 3 mins by default
+    polling_interval = attr.ib( default=180.0, converter=int )  #: Poll every 3 mins by default
     query = attr.ib()
     @query.default
     def setup_query(self):
@@ -30,9 +30,9 @@ class ObservableProxiedDicom(ProxiedDicom, ObservableMixin):
                  "PatientID": "",
                  "PatientBirthDate": ""}
     qlevel = attr.ib(default=DicomLevel.STUDIES)
-    qperiod = attr.ib( default=600, convert=int)  #: Check last 10 mins by default
+    qperiod = attr.ib( default=600, converter=int)  #: Check last 10 mins by default
 
-    history_len = attr.ib(default=200)            #: Set to at least 10 mins of studies
+    history_len = attr.ib(default=200)              #: Set to at least 10 mins of studies
     history = attr.ib(init=False)
     @history.default
     def setup_history(self):
