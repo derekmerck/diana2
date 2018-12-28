@@ -11,44 +11,41 @@ networks:
 
 services:
 
-  orthanc-mock:
+  orthanc-bridge:
     image: derekmerck/orthanc-confd:latest-amd64
     networks:
       - default
       - admin_proxy_network
     ports:
-      - "2424:4242"
+      - "4242:4242"
     environment:
-      ORTHANC_NAME:          Mock PACS
-      ORTHANC_AET:           MOCKPACS
+      ORTHANC_NAME:          DIANA Bridge
+      ORTHANC_AET:           BRIDGE
       ORTHANC_MAX_PATIENTS:  50
       ORTHANC_PASSWORD:      ${ORTHANC_PASSWORD}
-      ORTHANC_MOD_0:         watcher,DIANA,diana-watcher,4242
+      ORTHANC_MOD_0:         mock,MOCK,orthanc-mock,2424
       TZ:                    "America/New_York"
     deploy:
       labels:
         - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8042"
-        - "traefik.frontend.rule=PathPrefixStrip:/orthanc-mock/"
+        - "traefik.frontend.rule=PathPrefixStrip:/orthanc-bridge/"
 
   diana-watcher:
     image:                   derekmerck/diana2:latest
     command:                 python3 apps/diana-cli/diana-cli.py watch
     environment:
       DIANA_SERVICES: >
-        {"Remote": {
-            "ctype":     "ObservableProxiedDicom",
-            "proxy":     "Proxy"},
-        "Proxy": {
-            "ctype":     "Orthanc",
-            "host":      "orthanc-proxy",
-            "password":  "${ORTHANC_PASSWORD}"
-          },
-        "Splunk": {
-            "ctype":     "Splunk",
-            "host":      "splunk",
-            "hec_token": "${SPLUNK_TOKEN}"
+        {
+        	"Remote": {
+        		"ctype": "ObservableProxiedDicom",
+        		"proxy": {
+        			"host": "orthanc-bridge",
+        			"password": "${ORTHANC_PASSWORD}"
+        		},
+        		"proxy_domain": "mock"
+        	}
         }
       DIANA_ROUTES: >
-        [("Remote", "Splunk", "index_studies")]
+        say_studies Remote
       TZ:                   "America/New_York"

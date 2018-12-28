@@ -19,11 +19,11 @@ services:
     ports:
       - "2424:4242"
     environment:
-      ORTHANC_NAME:          Mock PACS
-      ORTHANC_AET:           MOCKPACS
+      ORTHANC_NAME:          DIANA Mock PACS
+      ORTHANC_AET:           MOCK
       ORTHANC_MAX_PATIENTS:  50
       ORTHANC_PASSWORD:      ${ORTHANC_PASSWORD}
-      ORTHANC_MOD_0:         watcher,DIANA,diana-watcher,4242
+      ORTHANC_MOD_0:         bridge,BRIDGE,orthanc-bridge,4242
       TZ:                    "America/New_York"
     deploy:
       labels:
@@ -33,7 +33,7 @@ services:
 
   diana-mock:
     image:                   derekmerck/diana2:latest
-    command:                 python3 apps/diana-cli/diana-cli.py mock --dest MockPacs
+#    command:                 python3 apps/diana-cli/diana-cli.py mock --dest MockPacs
     environment:
       DIANA_SERVICES: >
         {"MockPacs": {

@@ -9,7 +9,7 @@ class ProxiedDicom(Endpoint, Serializable):
 
     name = attr.ib( default="ProxiedDicom" )
     proxy_desc = attr.ib( factory=dict )
-    domain = attr.ib( type=str, default="remote" )
+    proxy_domain = attr.ib( type=str, default="remote" )
 
     proxy = attr.ib( init=False )
     @proxy.default
@@ -21,5 +21,5 @@ class ProxiedDicom(Endpoint, Serializable):
     def find(self, query: Mapping, level=DicomLevel.STUDIES, retrieve: bool=False, **kwargs):
         return self.proxy.rfind(query=query,
                                 level=level,
-                                domain=self.domain,
+                                domain=self.proxy_domain,
                                 retrieve=retrieve)

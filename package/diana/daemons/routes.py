@@ -80,6 +80,8 @@ def say(item: str, suffix: str=None):
 
 def mk_route(hname, source_desc=None, dest_desc=None, **kwargs):
 
+    print("Adding route {}".format(hname))
+
     source = Serializable.Factory.create(**source_desc)
 
     dest = None
@@ -101,6 +103,14 @@ def mk_route(hname, source_desc=None, dest_desc=None, **kwargs):
 
     elif hname == "say_hello_series":
         evtype = DicomEventType.SERIES_ADDED
+        func = partial(say, suffix=" says hello")
+
+    elif hname == "say_studies":
+        evtype = DicomEventType.STUDY_ADDED
+        func = partial(say)
+
+    elif hname == "say_hello_studies":
+        evtype = DicomEventType.STUDY_ADDED
         func = partial(say, suffix=" says hello")
 
     # HANDLERS

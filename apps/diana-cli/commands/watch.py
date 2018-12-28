@@ -52,9 +52,11 @@ def watch(ctx, route, routes_path):
     routes = []
 
     if route:
-        r = {"source": route[0],
-             "dest": route[1],
-             "handler": route[2]}
+        r = {"handler": route[0],
+             "source": route[1],
+             "dest": route[1] if len(route) > 2 else None
+             }
+
         routes.append(r)
 
     if routes_path:
@@ -67,7 +69,10 @@ def watch(ctx, route, routes_path):
     for rt in routes:
 
         source_desc = services[rt['source']]
-        dest_desc = services[rt['dest']]
+        if rt['dest']:
+            dest_desc = services[rt['dest']]
+        else:
+            dest_desc = None
 
         tr = mk_route( rt['handler'],
                        source=source_desc,
