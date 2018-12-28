@@ -23,7 +23,7 @@ services:
       ORTHANC_AET:           BRIDGE
       ORTHANC_MAX_PATIENTS:  50
       ORTHANC_PASSWORD:      ${ORTHANC_PASSWORD}
-      ORTHANC_MOD_0:         mock,MOCK,orthanc-mock,2424
+      ORTHANC_MOD_0:         mock,MOCK,orthanc-mock,4242  # Private port at swarm addr
       TZ:                    "America/New_York"
     deploy:
       labels:
@@ -39,7 +39,7 @@ services:
         {
           "Remote": {
             "ctype": "ObservableProxiedDicom",
-            "proxy": {
+            "proxy_desc": {
               "host": "orthanc-bridge",
               "password": "${ORTHANC_PASSWORD}"
             },
