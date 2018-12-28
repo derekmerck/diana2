@@ -19,7 +19,7 @@ def test_cli_help():
 
 def test_cli_svc_check(setup_orthanc, setup_redis):
     runner = CliRunner()
-    services_file = find_resource("test_services.yml")
+    services_file = find_resource("resources/test_services.yml")
     result = runner.invoke(app.cli, [
         "-s", "{redis_bad2: {ctype: Redis, port: 9999}}",
         "-S", services_file, "check"])
