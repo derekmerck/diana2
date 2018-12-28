@@ -1,7 +1,7 @@
 import attr
-from diana.apis import Orthanc
-from diana.utils.endpoint import Event, ObservableMixin
-from diana.utils.dicom import DicomEventType
+from .. import Orthanc
+from ...utils.endpoint import Event, ObservableMixin
+from ...utils.dicom import DicomEventType
 
 @attr.s
 class ObservableOrthanc(Orthanc, ObservableMixin):

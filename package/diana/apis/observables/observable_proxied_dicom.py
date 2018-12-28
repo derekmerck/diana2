@@ -2,9 +2,9 @@ import logging
 from datetime import datetime, timedelta
 from collections import deque
 import attr
-from diana.apis import ProxiedDicom
-from diana.utils.endpoint import Event, ObservableMixin
-from diana.utils.dicom import DicomEventType, DicomLevel, dicom_date, dicom_time
+from .. import ProxiedDicom
+from ...utils.endpoint import Event, ObservableMixin
+from ...utils.dicom import DicomEventType, DicomLevel, dicom_date, dicom_time
 
 @attr.s
 class ObservableProxiedDicom(ProxiedDicom, ObservableMixin):

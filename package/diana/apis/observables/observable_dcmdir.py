@@ -3,9 +3,9 @@ import time
 import attr
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler, FileSystemEvent
-from diana.apis import DcmDir
-from diana.utils.dicom import DicomEventType
-from diana.utils.endpoint import Event, ObservableMixin
+from .. import DcmDir
+from ...utils.dicom import DicomEventType
+from ...utils.endpoint import Event, ObservableMixin
 
 @attr.s
 class ObservableDcmDir(DcmDir, ObservableMixin):
