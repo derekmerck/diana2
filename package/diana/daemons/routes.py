@@ -78,7 +78,7 @@ def say(item: str, suffix: str=None):
     print(item)
 
 
-def mk_route(hname, source_desc=None, dest_desc=None):
+def mk_route(hname, source_desc, dest_desc=None):
 
     print("Adding route {}".format(hname))
 

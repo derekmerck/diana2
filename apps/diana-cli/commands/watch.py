@@ -75,8 +75,8 @@ def watch(ctx, route, routes_path):
             dest_desc = None
 
         tr = mk_route( rt['handler'],
-                       source=source_desc,
-                       dest=dest_desc)
+                       source_desc=source_desc,
+                       dest_desc=dest_desc)
 
         W.add_trigger(tr)
 
