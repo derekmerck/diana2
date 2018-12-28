@@ -1,4 +1,5 @@
 import os
+from pprint import pprint
 from typing import Union, Mapping
 from functools import partial
 from ..dixel import Dixel, DixelView
@@ -75,7 +76,7 @@ def query_and_index(query: Mapping, level: DicomLevel, source: Orthanc, domain: 
 def say(item: str, suffix: str=None):
     if suffix:
         item = item + suffix
-    print(item)
+    pprint(item)
 
 
 def mk_route(hname, source_desc, dest_desc=None):
