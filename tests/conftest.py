@@ -5,7 +5,7 @@ from diana.utils.endpoint import Containerized
 
 sys.path.append('test_utils')
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def setup_orthanc():
 
     print("Standing up orthanc fixture")
@@ -13,6 +13,7 @@ def setup_orthanc():
     S = Containerized(
             dkr_service = "orthanc",
             dkr_image = "derekmerck/orthanc-confd",
+            dkr_ports = {"8042/tcp": 8042, "4242/tcp": 4242},
             dkr_env={"ORTHANC_MOD_0": "remote,ORTHANC,localhost,4243"}
     )
     S.start_service()
@@ -27,7 +28,7 @@ def setup_orthanc():
     S.stop_service()
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def setup_orthanc2():
 
     print("Standing up orthanc2 fixture")
@@ -35,6 +36,7 @@ def setup_orthanc2():
     S = Containerized(
             dkr_service = "orthanc2",
             dkr_image = "derekmerck/orthanc-confd",
+            dkr_ports = {"8042/tcp": 8043, "4242/tcp": 4243},
             dkr_links = {"orthanc": None},
             dkr_env = {"ORTHANC_PEER_0": "orthanc,http://orthanc:8042,orthanc,passw0rd!",
                        "ORTHANC_MOD_0":  "remote,ORTHANC,orthanc,4242"},
@@ -52,7 +54,7 @@ def setup_orthanc2():
     print("Tearing down orthanc2 fixture")
     S.stop_service()
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def setup_redis():
 
     print("Standing up redis fixture")
