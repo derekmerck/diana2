@@ -51,23 +51,29 @@ class Watcher(object):
             func(event.data)
 
     def stop(self):
-        for source in self.sources.values():
-            source.proc.terminate()
+        if self.sources:
+            for source in self.sources.values():
+                source.proc.terminate()
 
     def run(self):
 
-        for source in self.sources.values():
-            source.poll_events()
+        logger = logging.getLogger("Watcher")
+        logger.debug("Running")
+
+        if self.sources:
+            for source in self.sources.values():
+                source.poll_events()
 
         while True:
-            # self.logger.debug("Checking queues")
+            logger.debug("Checking queues")
 
             tic = datetime.now()
 
-            for source in self.sources.values():
-                while not source.event_queue.empty():
-                    event = source.event_queue.get()
-                    self.fire(event)
+            if self.sources:
+                for source in self.sources.values():
+                    while not source.event_queue.empty():
+                        event = source.event_queue.get()
+                        self.fire(event)
 
             toc = datetime.now()
             if toc - tic < timedelta(seconds=self.action_interval):

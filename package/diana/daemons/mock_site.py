@@ -26,6 +26,7 @@ class MockDevice(object):
     station_name = attr.ib(default="Imaging Device")
     modality = attr.ib(default="CT")
     studies_per_hour = attr.ib(default=6)
+    action_interval = attr.ib(default=5.0)
 
     _next_study = attr.ib(init=False, factory=datetime.now)
 
@@ -52,6 +53,7 @@ class MockDevice(object):
             self._next_study = datetime.now() + timedelta(seconds=delay)
         else:
             logging.debug("No study, next at {}".format(self._next_study))
+            time.sleep(self.action_interval)
 
 
 @attr.s

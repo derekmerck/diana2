@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timedelta
 from collections import deque
 import attr
@@ -19,36 +20,49 @@ class ObservableProxiedDicom(ProxiedDicom, ObservableMixin):
     """
 
     name = attr.ib(default="ObsPrxDcm")
-    query = attr.ib(factory=dict)
+    polling_interval = attr.ib( default=180.0 )  #: Poll every 3 mins by default
+    query = attr.ib()
+    @query.default
+    def setup_query(self):
+        return { "AccessionNumber": "",
+                 "StudyInstanceUID": "",
+                 "PatientName": "",
+                 "PatientID": "",
+                 "PatientBirthDate": ""}
     qlevel = attr.ib(default=DicomLevel.STUDIES)
-    qperiod = attr.ib( default=300, convert=int)
+    qperiod = attr.ib( default=600, convert=int)  #: Check last 10 mins by default
 
+    history_len = attr.ib(default=200)            #: Set to at least 10 mins of studies
     history = attr.ib(init=False)
-    history_len = attr.ib(default=200)
     @history.default
     def setup_history(self):
         return deque(maxlen=self.history_len)
 
     def changes(self, **kwargs):
+        logger = logging.getLogger(self.name)
 
         def mk_recent_query():
 
-            begin = datetime.now()
-            d0 = dicom_date(begin)
-            t0 = dicom_time(begin)
+            latest = datetime.now()
+            dl = dicom_date(latest)
+            tl = dicom_time(latest)
 
-            end = begin - timedelta(seconds=self.qperiod)
-            d1 = dicom_date(end)
-            t1 = dicom_time(end)
+            earliest = latest - timedelta(seconds=self.qperiod)
+            de = dicom_date(earliest)
+            te = dicom_time(earliest)
 
             q = {}
             q.update(self.query)
-            q['StudyDate'] = d0 if d0==d1 else "{}-{}".format(d0, d1)
-            q['StudyTime'] = "{}-{}".format(t0, t1)
+            q['StudyDate'] = de if de==dl else "{}-{}".format(de, dl)
+            q['StudyTime'] = "{}-{}".format(te, tl)
 
             return q
 
-        ret = self.find(query=mk_recent_query(), level=self.qlevel)
+        q = mk_recent_query()
+        logger.debug(q)
+        ret = self.find(query=q, level=self.qlevel)
+        if not ret:
+            return
 
         event_queue = []
         for item in ret:
@@ -65,7 +79,7 @@ class ObservableProxiedDicom(ProxiedDicom, ObservableMixin):
             if match_key in self.history:
                 continue
             else:
-                self.history.push(match_key)
+                self.history.append(match_key)
                 e = Event(
                     evtype=evtype,
                     source_id=self.epid,

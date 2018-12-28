@@ -58,3 +58,11 @@ class ObservableMixin(object):
 
         self.proc = Process(target=poll)
         self.proc.start()
+
+    def __del__(self):
+        if self.proc:
+            self.proc.terminate()
+
+    def say(self, item):
+        """Testing callback"""
+        print(item)

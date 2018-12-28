@@ -31,14 +31,24 @@ services:
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/orthanc-mock/"
 
-  diana-mock:
+  diana-watcher:
     image:                   derekmerck/diana2:latest
-    command:                 python3 apps/diana-cli/diana-cli.py mock --dest MockPacs
+    command:                 python3 apps/diana-cli/diana-cli.py watch
     environment:
       DIANA_SERVICES: >
-        {"MockPacs": {
-            "ctype": "Orthanc",
-            "host":  "orthanc-mock",
-            "password": "${ORTHANC_PASSWORD}"
-        }}
+        {"Remote": {
+            "ctype":     "ObservableProxiedDicom",
+            "proxy":     "Proxy"},
+        "Proxy": {
+            "ctype":     "Orthanc",
+            "host":      "orthanc-proxy",
+            "password":  "${ORTHANC_PASSWORD}"
+          },
+        "Splunk": {
+            "ctype":     "Splunk",
+            "host":      "splunk",
+            "hec_token": "${SPLUNK_TOKEN}"
+        }
+      DIANA_ROUTES: >
+        [("Remote", "Splunk", "index_studies")]
       TZ:                   "America/New_York"

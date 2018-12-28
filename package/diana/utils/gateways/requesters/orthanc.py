@@ -1,3 +1,4 @@
+import logging
 from hashlib import sha1
 from enum import Enum
 import attr

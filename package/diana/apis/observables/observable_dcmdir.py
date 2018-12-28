@@ -71,3 +71,5 @@ class ObservableDcmDir(DcmDir, ObservableMixin):
 
         observer.schedule(receiver, self.path, recursive=True)
         observer.start()
+
+        self.proc = observer  # For kill on __del__
