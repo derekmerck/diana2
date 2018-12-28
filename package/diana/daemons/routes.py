@@ -78,11 +78,14 @@ def say(item: str, suffix: str=None):
     print(item)
 
 
-def mk_route(hname, source_desc=None, dest_desc=None, **kwargs):
+def mk_route(hname, source_desc=None, dest_desc=None):
 
     print("Adding route {}".format(hname))
 
-    source = Serializable.Factory.create(**source_desc)
+    if source_desc:
+        source = Serializable.Factory.create(**source_desc)
+    else:
+        raise ValueError("Must include a source")
 
     dest = None
     if dest_desc:
