@@ -27,14 +27,16 @@ before_install:
   # Register qemu as cross-compiler
   - docker run --rm --privileged multiarch/qemu-user-static:register --reset
 
-  - pushd platform/images/diana-docker
-  - docker-compose build diana2-amd64
-  - popd
-  - sed -i "s$derekmerck/diana2$diana2-amd64$g" platform/stacks/mock-pacs/mock-stack.yml
-  - sed -i "s$derekmerck/diana2$diana2-amd64$g" platform/stacks/watcher/watcher-stack.yml
+  # Create new diana amd64 images and point docker-compose files at them
+  - sed -i "s#derekmerck/diana2#diana2-amd64#g" platform/stacks/mock-pacs/mock-stack.yml
+  - sed -i "s#derekmerck/diana2#diana2-amd64#g" platform/stacks/watcher/watcher-stack.yml
 
   - cat platform/stacks/mock-pacs/mock-stack.yml
   - cat platform/stacks/watcher/watcher-stack.yml
+
+  - pushd platform/images/diana-docker
+  - docker-compose build diana2-amd64
+  - popd
 
 install:
 
@@ -47,7 +49,6 @@ install:
   - docker pull alpine
   - docker pull redis
   - docker pull derekmerck/orthanc-confd
-#  - docker pull derekmerck/diana2
 
 script: # skip
 
