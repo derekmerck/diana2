@@ -1,16 +1,18 @@
 import logging
-import docker
+from pprint import pformat
+from distutils.version import LooseVersion
 from diana.utils.endpoint import Containerized
-
-
-
-
 
 def test_swarm():
     client = Containerized.api_client()
     logging.debug(client.services())
     Containerized.clean_swarm()
     logging.debug(client.services())
+
+    logging.debug(pformat(client.version()))
+
+    api_vers = client.version()["ApiVersion"]
+    logging.debug(api_vers)
 
     assert( len(client.services()) == 0 )
 
@@ -26,6 +28,8 @@ def test_swarm():
     logging.debug(client.services())
 
     assert( "testing" in client.services()[0]["Spec"]["Name"] )
+
+    C.stop_service()
 
 
 if __name__ == "__main__":
