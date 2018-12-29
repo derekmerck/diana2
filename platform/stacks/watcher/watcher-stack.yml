@@ -32,7 +32,7 @@ services:
         - "traefik.frontend.rule=PathPrefixStrip:/orthanc-bridge/"
 
   diana-watcher:
-    image:                   diana2-amd64
+    image:                   derekmerck/diana2
     command:                 python3 -u apps/diana-cli/diana-cli.py watch
 #    image:                   derekmerck/diana2:latest
 #    command: >

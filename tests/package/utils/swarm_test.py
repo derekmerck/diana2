@@ -4,6 +4,8 @@ from distutils.version import LooseVersion
 from diana.utils.endpoint import Containerized
 
 def test_swarm():
+    Containerized.start_swarm()
+
     client = Containerized.api_client()
     logging.debug(client.services())
     Containerized.clean_swarm()
