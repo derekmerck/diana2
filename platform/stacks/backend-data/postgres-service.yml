@@ -1,0 +1,23 @@
+version: '3.3'
+
+volumes:
+  postgres_data:
+    driver_opts:
+        type: none
+        device: ${DATA_DIR}/postgres
+        o: bind
+
+services:
+  postgres:
+    image: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER:            postgres
+      POSTGRES_PASSWORD:        ${POSTGRES_PASSWORD}
+      TZ: "America/New_York"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.storage==true

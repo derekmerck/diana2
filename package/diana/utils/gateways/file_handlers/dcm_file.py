@@ -39,9 +39,4 @@ class DcmFileHandler(FileHandler):
 
     def put(self, fn: str, data):
         # Convert data into a file
-        logger = logging.getLogger(self.name)
-        logger.warning("Do not know how to create a file from data!")
-        raise NotImplementedError
-
-        fdata = None
-        self.write_file(fn, fdata)
+        self.write_file(fn, data)

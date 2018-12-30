@@ -30,10 +30,6 @@ before_install:
   # Create new diana amd64 images and point docker-compose files at them
   - sed -i "s#derekmerck/diana2#diana2-amd64#g" platform/stacks/mock-pacs/mock-stack.yml
   - sed -i "s#derekmerck/diana2#diana2-amd64#g" platform/stacks/watcher/watcher-stack.yml
-
-  - cat platform/stacks/mock-pacs/mock-stack.yml
-  - cat platform/stacks/watcher/watcher-stack.yml
-
   - pushd platform/images/diana-docker
   - docker-compose build diana2-amd64
   - popd

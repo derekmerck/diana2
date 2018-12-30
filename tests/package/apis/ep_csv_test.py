@@ -46,6 +46,10 @@ def test_csv(tmp_path):
         ep2.dixels.add( ShamDixel.from_dixel(d) )
 
     ep2.write()
+
+    ep2.fieldnames = "ALL"
+    ep2.write()
+
     os.remove(fp)
 
 

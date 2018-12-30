@@ -11,12 +11,12 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('./package'))
+sys.path.insert(0, os.path.abspath('./tests'))
 sys.path.insert(0, os.path.abspath('..'))
 sys.path.insert(0, os.path.abspath('../package'))
 sys.path.insert(0, os.path.abspath('../tests'))
 
-# At top on conf.py (with other import statements)
-# from recommonmark.transform import AutoStructify
 
 # -- Project information -----------------------------------------------------
 
@@ -25,9 +25,9 @@ copyright = '2018, Derek Merck'
 author = 'Derek Merck'
 
 # The short X.Y version
-version = ''
+version = '2.0.6'
 # The full version, including alpha/beta/rc tags
-release = '2.0.1'
+release = '2.0.6'
 
 
 # -- General configuration ---------------------------------------------------
@@ -40,7 +40,7 @@ release = '2.0.1'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.mathjax',
+    # 'sphinx.ext.mathjax',
     'sphinx.ext.autodoc'
 ]
 
@@ -108,7 +108,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'DIANAdoc'
+htmlhelp_basename = 'DIANA-doc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -165,11 +165,4 @@ texinfo_documents = [
 # -- Extension configuration -------------------------------------------------
 
 # At the bottom of conf.py
-github_doc_root="https://github.com/derekmerck/DIANA"
-
-# def setup(app):
-#     app.add_config_value('recommonmark_config', {
-#             'url_resolver': lambda url: github_doc_root + url,
-#             'auto_toc_tree_section': 'Contents',
-#             }, True)
-#     app.add_transform(AutoStructify)
+github_doc_root="https://github.com/derekmerck/diana2"

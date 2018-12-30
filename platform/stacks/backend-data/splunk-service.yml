@@ -1,0 +1,38 @@
+version: '3.3'
+
+networks:
+  admin_proxy_network:
+    external: true   # Created by admin-stack
+
+volumes:
+  splunk_data:
+    driver_opts:
+        type: none
+        device: ${DATA_DIR}/splunk
+        o: bind
+
+services:
+  splunk:
+    image: splunk/splunk
+    ports:
+      - "8000:8000"
+      - "8088:8088"
+      - "8089:8089"
+    networks:
+      - admin_proxy_network
+    volumes:
+      - splunk_data:/opt/splunk/etc
+    environment:
+      SPLUNK_START_ARGS: "--accept-license"
+      SPLUNK_PASSWORD:  ${SPLUNK_PASSWORD}
+      SPLUNK_HEC_TOKEN: ${SPLUNK_HEC_TOKEN}
+      TZ: "America/New_York"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.storage==true
+      labels:
+        - "traefik.docker.network=cirr_proxy_network"
+        - "traefik.port=8000"
+        - "traefik.frontend.rule=PathPrefixStrip:/splunk/"

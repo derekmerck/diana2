@@ -121,7 +121,7 @@ class Redis(Endpoint, Serializable):
         self.gateway.delete(item)
 
 
-    def register(self, item: Dixel, prefix: str=None):
+    def register(self, item: Dixel, prefix: str=""):
 
         fn = item.meta["FileName"]
         rid = prefix + item.tags["AccessionNumber"]
@@ -134,7 +134,7 @@ class Redis(Endpoint, Serializable):
         logger.info("Registering {} under {}".format(fn, rid))
         self.gateway.sadd(rid, fn)
 
-    def registry_items(self, prefix: str=None):
+    def registry_items(self, prefix: str=""):
         keys = self.gateway.keys(prefix+"*")
         result = []
         l = len(prefix)
@@ -142,7 +142,7 @@ class Redis(Endpoint, Serializable):
             result.append( k[l:].decode("UTF-8") )
         return result
 
-    def registry_item_data(self, item: str, prefix: str=None):
+    def registry_item_data(self, item: str, prefix: str=""):
         rid = prefix + item
         logger = logging.getLogger(self.name)
         logger.info("Collecting {}".format(rid))

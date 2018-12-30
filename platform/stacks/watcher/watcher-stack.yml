@@ -33,10 +33,9 @@ services:
 
   diana-watcher:
     image:                   derekmerck/diana2
-    command:                 python3 -u apps/diana-cli/diana-cli.py watch
-#    image:                   derekmerck/diana2:latest
 #    command: >
 #      sh -c "git pull && python3 -u apps/diana-cli/diana-cli.py watch"
+    command:                 python3 -u apps/diana-cli/diana-cli.py watch
     environment:
       DIANA_SERVICES: >
         {

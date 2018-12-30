@@ -20,8 +20,8 @@ def sham_map(d: ShamDixel):
             "PatientID": d.meta["ShamID"],
             "PatientBirthDate": d.meta["ShamBirthDate"],
             "AccessionNumber": d.meta["ShamAccessionNumber"],
-            "StudyDate": d.ShamStudyDate,
-            "StudyTime": d.ShamStudyTime,
+            "StudyDate": d.ShamStudyDate(),
+            "StudyTime": d.ShamStudyTime(),
             },
         "Keep": [
             "PatientSex",
