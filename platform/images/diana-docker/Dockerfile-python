@@ -35,6 +35,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt -y install --no-install-recommends \
     python3-setuptools \
     python3-openssl \
     python3-wheel \
+    python3-numpy \
+    python3-sklearn \
+    python3-pillow \
     software-properties-common \
     libfreetype6-dev \
     pkg-config \
@@ -49,7 +52,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt -y install --no-install-recommends \
 RUN pip3 install -U pip
 
 # Pillow has a longish-compile-time on ARM, pre-install on base
-RUN pip3 install pillow
+#RUN pip3 install pillow numpy scikit-learn
 
 # Leave entrypoint alone for resin-init
 CMD ["tail", "-f", "/dev/null"]

@@ -10,6 +10,8 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 def MeasureScout(dixel: Dixel):
     """Measure AP and Lateral dimensions from DICOM localizer images for SSDE calculations"""
 
+    # TODO: add a tag check for "LOCALIZER"
+
     pixel_spacing = dixel.pixel_spacing
 
     def measured_dimension(dixel):
@@ -63,4 +65,5 @@ def MeasureScout(dixel: Dixel):
 
     return (measured_dim, d_avg)
 
-
+# Monkey patch
+Dixel.MeasureScout = MeasureScout

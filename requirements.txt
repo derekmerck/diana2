@@ -15,6 +15,11 @@ watchdog
 # -----------------
 click
 
+# PIXEL-HANDLING REQS
+# -----------------
+numpy
+scikit-learn
+
 # TESTING REQS
 # -----------------
 pytest >= 4.0

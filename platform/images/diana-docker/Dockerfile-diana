@@ -15,5 +15,6 @@ WORKDIR /opt/diana
 RUN git clone https://github.com/derekmerck/diana2 /opt/diana \
  && pip3 install -r /opt/diana/package/requirements.txt \
  && pip3 install -r /opt/diana/apps/diana-cli/requirements.txt \
+ && pip3 install -r /opt/diana/apps/diana-plus/requirements.txt \
  && pip3 install -e /opt/diana/package
 
