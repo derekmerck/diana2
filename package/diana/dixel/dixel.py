@@ -89,11 +89,15 @@ class Dixel(Serializable):
             'SeriesDescription': ds.SeriesDescription,
             'SeriesNumber': ds.SeriesNumber,
             'SeriesInstanceUID': ds.SeriesInstanceUID,
-            'SeriesDate': ds.SeriesDate,
-            'SeriesTime': ds.SeriesTime,
+            'SeriesDate': ds.get("SeriesDate"),
+            'SeriesTime': ds.get("SeriesTime"),
             'SOPInstanceUID': ds.SOPInstanceUID,
-            'InstanceCreationDate': ds.InstanceCreationDate,
-            'InstanceCreationTime': ds.InstanceCreationTime,
+            'InstanceCreationDate': ds.get("InstanceCreationDate"),
+            'InstanceCreationTime': ds.get("InstanceCreationTime"),
+
+            'PixelSpacing': ds.get("PixelSpacing"),
+            'ImageOrientationPatient': ds.get("ImageOrientationPatient"),
+
             'PhotometricInterpretation': ds[0x0028, 0x0004].value,  # MONOCHROME, RGB etc.
         }
 
@@ -237,7 +241,7 @@ class Dixel(Serializable):
         return self.meta.get('FileName')
 
     def get_pixels(self):
-        if not self.pixels:
+        if self.pixels is None:
             raise TypeError
 
         if self.meta.get('PhotometricInterpretation') == "RGB":
@@ -246,4 +250,9 @@ class Dixel(Serializable):
             pixels = self.pixels
 
         return pixels
+
+    @property
+    def pixel_spacing(self):
+        # Return spacing values as floats (in mm)
+        return (float(self.tags["PixelSpacing"][0]), float(self.tags["PixelSpacing"][1]))
 
