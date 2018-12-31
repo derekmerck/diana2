@@ -9,7 +9,7 @@ services:
 
 env:
   # Enable import for diana-cli
-  PYTHONPATH="$TRAVIS_BUILD_DIR/apps/diana-cli"
+  PYTHONPATH="$TRAVIS_BUILD_DIR/apps/diana-cli:$TRAVIS_BUILD_DIR/apps/diana-plus"
 
 addons:
   apt:
