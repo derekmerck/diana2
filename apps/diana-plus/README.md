@@ -44,3 +44,8 @@ Detect Head Bleed
 Estimates probability that a CT brain scan shows a bleed using Pan's classifier.
 
 
+Findings Priority
+--------------
+
+Estimates a priority level and follow up requirement for report text using Zhang's classifier.
+
