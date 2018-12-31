@@ -79,7 +79,7 @@ class Dixel(Serializable):
         # Most relevant tags for indexing
         tags = {
             'AccessionNumber': ds.AccessionNumber,
-            'PatientName': str(ds.PatientName),  # Odd unserializing type
+            'PatientName': str(ds.PatientName),  # Odd serializing type
             'PatientID': ds.PatientID,
             'PatientBirthDate': ds.PatientBirthDate,
             'StudyInstanceUID': ds.StudyInstanceUID,
@@ -95,8 +95,8 @@ class Dixel(Serializable):
             'InstanceCreationDate': ds.get("InstanceCreationDate"),
             'InstanceCreationTime': ds.get("InstanceCreationTime"),
 
-            'PixelSpacing': ds.get("PixelSpacing"),
-            'ImageOrientationPatient': ds.get("ImageOrientationPatient"),
+            'PixelSpacing': [float(x) for x in ds.get("PixelSpacing")],  # Odd serializing types
+            'ImageOrientationPatient': [float(x) for x in ds.get("ImageOrientationPatient") ] ,
 
             'PhotometricInterpretation': ds[0x0028, 0x0004].value,  # MONOCHROME, RGB etc.
         }
