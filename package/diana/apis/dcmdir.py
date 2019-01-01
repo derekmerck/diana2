@@ -24,7 +24,7 @@ class DcmDir(Endpoint, Serializable):
                               subpath_depth = self.subpath_depth)
 
     recurse_style = attr.ib(default="UNSTRUCTURED")
-    _gen = attr.ib(init=False)
+    _gen = attr.ib(init=False, repr=False, default=None)
 
     def put(self, item: Dixel, **kwargs):
         logger = logging.getLogger(self.name)

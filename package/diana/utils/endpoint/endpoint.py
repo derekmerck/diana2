@@ -19,6 +19,7 @@ class Endpoint(ABC):
     """
 
     name = attr.ib(type=str, default="Endpoint")
+    ctype = attr.ib(default=None, repr=False)
 
     def check(self) -> bool:
         """Check endpoint health"""
