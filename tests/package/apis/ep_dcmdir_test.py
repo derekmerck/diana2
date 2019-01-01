@@ -1,10 +1,8 @@
-import logging, os, json
-
-from conftest import *
-from test_utils import find_resource
-
+import logging, json
 from diana.apis import DcmDir
 from diana.utils import Serializable
+
+from test_utils import find_resource
 
 
 def test_exists():
@@ -35,32 +33,32 @@ def test_exists():
 
     assert( d == e )
 
-def test_indexer(setup_redis, setup_orthanc):
-    return
 
-    from diana.apis import Redis, Orthanc
-    R = Redis()
-    O = Orthanc()
+def test_subdirs():
 
-    path = "/Users/derek/data/dicom/christianson"
-    D = DcmDir(path=path, subpath_depth=2, subpath_width=2)
-    # D.index_to(R)
+    D = DcmDir(recurse_style="ORTHANC")
 
-    studies = D.indexed_studies(R)
-    print(studies)
+    # for fp in D.recurse():
+    #     logging.debug(fp)
 
-    for s in studies:
-        worklist = D.get_indexed_study(s, R)
-        print(worklist)
+    subdirs = list( D.subdirs() )
 
-        for fn in worklist:
-            d = D.get(fn, get_file=True)
-            print(d)
-            O.put(d)
+    assert( len( subdirs )  == 256*256 )
+    assert( "./ff/ff" in subdirs )
+    assert( "./00/00" in subdirs )
+
+    p = find_resource("resources")
+    D = DcmDir(path=p)
+
+    subdirs = list( D.subdirs() )
+    logging.debug(subdirs)
+
+    assert( len(subdirs) >= 8 )
+
 
 
 if __name__=="__main__":
 
     logging. basicConfig(level=logging.DEBUG)
     test_exists()
-    test_indexer(None, None)
+    test_subdirs()

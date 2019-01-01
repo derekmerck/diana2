@@ -253,6 +253,13 @@ class Dixel(Serializable):
 
     @property
     def pixel_spacing(self):
+        if not self.tags.get("PixelSpacing"):
+            raise ValueError("No pixel spacing info available")
         # Return spacing values as floats (in mm)
-        return (float(self.tags["PixelSpacing"][0]), float(self.tags["PixelSpacing"][1]))
+        return [float(x) for x in self.tags.get("PixelSpacing")]
 
+    @property
+    def image_orientation_patient(self):
+        if not self.tags.get("ImageOrientationPatient"):
+            raise ValueError("No patient orientation info available")
+        return [float(x) for x in self.tags.get("ImageOrientationPatient")]

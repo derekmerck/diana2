@@ -23,6 +23,9 @@ class DcmDir(Endpoint, Serializable):
                               subpath_width = self.subpath_width,
                               subpath_depth = self.subpath_depth)
 
+    recurse_style = attr.ib(default="UNSTRUCTURED")
+    _gen = attr.ib(init=False)
+
     def put(self, item: Dixel, **kwargs):
         logger = logging.getLogger(self.name)
         logger.debug("EP PUT")
@@ -117,3 +120,52 @@ class DcmDir(Endpoint, Serializable):
             d.file = f
             result.add(d)
         return result
+
+    def subdirs(self):
+        """Generator for nested sub-directories.
+
+        Performed lazily because this can be expensive for UNSTRUCTURED directories."""
+        if self.recurse_style == "UNSTRUCTURED":
+            self._gen = DcmDir.unstructured_subdirs(base_dir=self.path)
+        elif self.recurse_style == "ORTHANC":
+            self._gen = DcmDir.orthanc_subdirs(base_dir=self.path)
+        else:
+            raise ValueError("Unknown generator requested")
+
+        for item in self._gen:
+            yield item
+
+
+    class orthanc_subdirs(object):
+        """Generates 1024 Orthanc-style nested subdirs"""
+
+        def __init__(self, base_dir=None, low=0, high=256 * 256 - 1):
+            self.base_dir = base_dir
+            self.current = low
+            self.high = high
+
+        def __iter__(self):
+            return self
+
+        def __next__(self):
+            if self.current > self.high:
+                raise StopIteration
+            else:
+                self.current += 1
+                hex = '{:04X}'.format(self.current - 1).lower()
+                orthanc_dir = os.path.join(self.base_dir, hex[0:2], hex[2:4])
+                return orthanc_dir
+
+    class unstructured_subdirs(object):
+        """Generates subdirs with os.walk, this remains _very_ slow for large datasets!"""
+
+        def __init__(self, base_dir):
+            self.base_dir = base_dir
+            self.generator = os.walk(base_dir)
+
+        def __iter__(self):
+            return self
+
+        def __next__(self):
+            return self.generator.__next__()[0]
+

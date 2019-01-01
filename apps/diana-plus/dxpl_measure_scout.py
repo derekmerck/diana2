@@ -23,7 +23,7 @@ def MeasureScout(dixel: Dixel):
           - 0,180 its an AP scout -> lateral dimension
         """
 
-        orientation = dixel.tags["ImageOrientationPatient"]
+        orientation = dixel.image_orientation_patient
 
         if orientation[0] * orientation[0] > 0.2:
             # This is a PA scout, which gives the lateral measurement
@@ -43,7 +43,7 @@ def MeasureScout(dixel: Dixel):
 
     # Determine weighted threshold separating tissue/non-tissue attenuations
     # using a Gaussian Mixture Model
-    thresh = np.mean(dcm_px[dcm_px>0])
+    # thresh = np.mean(dcm_px[dcm_px>0])
 
     gmm = GMM(2).fit(dcm_px[dcm_px>0].reshape(-1,1))
     thresh = np.sum(gmm.weights_[::-1]*gmm.means_.ravel())

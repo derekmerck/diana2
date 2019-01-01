@@ -6,6 +6,8 @@ from dxpl import MeasureScout  # Monkey patches Dixel
 
 from test_utils import find_resource
 
+# TODO: Need to test after pulling directly from orthanc rather than reading from disk
+
 
 def test_measurement():
 
