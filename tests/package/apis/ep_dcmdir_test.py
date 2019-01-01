@@ -31,7 +31,7 @@ def test_exists():
     logging.debug(d)
     logging.debug(e)
 
-    assert( d == e )
+    assert( d.tags == e.tags )
 
 
 def test_subdirs():
