@@ -172,6 +172,9 @@ class Orthanc(Endpoint, Serializable):
         oid, level = self.id_from_item(item, level)
         r = self.gateway.delete(oid, level)
 
+    def clear(self):
+        for item in self.patients():
+            self.gateway.delete(item, DicomLevel.PATIENTS)
 
     def anonymize(self, item: Union[str, Dixel],
                   level=DicomLevel.STUDIES,

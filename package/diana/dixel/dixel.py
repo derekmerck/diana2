@@ -1,3 +1,4 @@
+import logging
 from typing import Mapping
 from dateutil import parser as DatetimeParser
 import attr
@@ -9,7 +10,12 @@ from ..utils.gateways import orthanc_id, Montage
 
 
 def mktime(datestr, timestr):
+    if not datestr or not timestr:
+        return
+    # Parser does not like fractional seconds
+    timestr = timestr.split(".")[0]
     dt_str = datestr + timestr
+    # logging.debug(dt_str)
     dt = DatetimeParser.parse(dt_str)
     return dt
 
@@ -76,18 +82,18 @@ class Dixel(Serializable):
             'MediaStorage': str(ds.file_meta.MediaStorageSOPClassUID),
         }
 
-        # Most relevant tags for indexing
+        # Most relevant tags for indexing, hard stop on missing a/n, mrn, or uuids
         tags = {
             'AccessionNumber': ds.AccessionNumber,
-            'PatientName': str(ds.PatientName),  # Odd serializing type
+            'PatientName': str(ds.get("PatientName")),  # Odd serializing type
             'PatientID': ds.PatientID,
-            'PatientBirthDate': ds.PatientBirthDate,
+            'PatientBirthDate': ds.get("PatientBirthDate"),
             'StudyInstanceUID': ds.StudyInstanceUID,
-            'StudyDescription': ds.StudyDescription,
-            'StudyDate': ds.StudyDate,
-            'StudyTime': ds.StudyTime,
-            'SeriesDescription': ds.SeriesDescription,
-            'SeriesNumber': ds.SeriesNumber,
+            'StudyDescription': ds.get("StudyDescription"),
+            'StudyDate': ds.get("StudyDate"),
+            'StudyTime': ds.get("StudyTime"),
+            'SeriesDescription': ds.get("SeriesDescription"),
+            'SeriesNumber': ds.get("SeriesNumber"),
             'SeriesInstanceUID': ds.SeriesInstanceUID,
             'SeriesDate': ds.get("SeriesDate"),
             'SeriesTime': ds.get("SeriesTime"),
@@ -95,10 +101,11 @@ class Dixel(Serializable):
             'InstanceCreationDate': ds.get("InstanceCreationDate"),
             'InstanceCreationTime': ds.get("InstanceCreationTime"),
 
-            'PixelSpacing': [float(x) for x in ds.get("PixelSpacing")],  # Odd serializing types
-            'ImageOrientationPatient': [float(x) for x in ds.get("ImageOrientationPatient") ] ,
+            'PixelSpacing': [float(x) for x in ds.get("PixelSpacing", [])],  # Odd serializing types
+            'ImageOrientationPatient': [float(x) for x in ds.get("ImageOrientationPatient", []) ] ,
 
-            'PhotometricInterpretation': ds[0x0028, 0x0004].value,  # MONOCHROME, RGB etc.
+            # MONOCHROME, RGB etc.
+            'PhotometricInterpretation': ds[0x0028, 0x0004].value if (0x0028, 0x0004) in ds else None,
         }
 
         d = Dixel(meta=meta,

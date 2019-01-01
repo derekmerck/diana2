@@ -111,7 +111,7 @@ class Orthanc(Requester):
         return self._put(resource, data=data)
 
     def inventory(self, level = DicomLevel.STUDIES):
-        resource = "{!r}".format(level)
+        resource = "{!s}".format(level)
         return self._get(resource)
 
     def statistics(self):

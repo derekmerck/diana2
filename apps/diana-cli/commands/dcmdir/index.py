@@ -1,51 +1,61 @@
 import click
 from diana.apis import DcmDir, Redis, Orthanc
+from diana.daemons import FileIndexer
 
 @click.command()
 @click.argument('path')
-@click.argument('index')
+@click.argument('registry', help="Redis index for registering collections")
 @click.option('--orthanc_db', default=False, help="Use subpath width/depth=2", is_flag=True)
+@click.option('--pool_size', default=10, help="Worker threads")
 @click.pass_context
-def index(ctx, path, index, orthanc_db):
-    """Inventory dicom dir PATH with INDEX service for retrieval"""
+def index(ctx, path, registry, orthanc_db, pool_size):
+    """Inventory collections of files by accession number with a PATH REGISTRY for retrieval"""
     services = ctx.obj.get('services')
-    click.echo('Index by Accession Number')
+    click.echo('Register Files by Accession Number')
     click.echo('------------------------')
 
-    spw = spd = 0
-    if orthanc_db:
-        spw = spd = 2
+    file_indexer = FileIndexer(pool_size=pool_size)
+    R = Redis(**services[registry])
 
-    D = DcmDir(path=path, subpath_width=spw, subpath_depth=spd)
-    R = Redis(**services[index])
+    result = file_indexer.index_path(
+        path,
+        registry=R,
+        recurse_style="UNSTRUCTURED" if not orthanc_db else "ORTHANC"
+    )
 
-    result = D.index_to(R)
     click.echo(result)
 
 @click.command()
-@click.argument('accession_number')
+@click.argument('collection')
 @click.argument('path')
-@click.argument('index')
+@click.argument('registry', help="Redis registry")
 @click.argument('dest')
-@click.option('--orthanc_db', default=False, help="Use subpath width/depth=2", is_flag=True)
+@click.option('--pool_size', default=10, help="Worker threads")
 @click.pass_context
-def indexed_pull(ctx, accession_number, path, index, dest, orthanc_db):
-    """Pull study by accession number from a PATH with INDEX service and send to DEST"""
+def indexed_pull(ctx, collection, path, index, dest, pool_size):
+    """Pull study by COLLECTION (accession number) from a PATH REGISTRY and send to DEST"""
     services = ctx.obj.get('services')
-    click.echo('Pull Indexed by Accession Number')
+    click.echo('Upload Registered Files by Accession Number')
     click.echo('------------------------')
 
-    spw = 0
-    spd = 0
-    if orthanc_db:
-        spw = 2
-        spd = 2
-
-    D = DcmDir(path=path, subpath_width=spw, subpath_depth=spd)
+    file_indexer = FileIndexer(pool_size=pool_size)
     R = Redis(**services[index])
     O = Orthanc(**services[dest])
 
-    worklist = D.get_indexed_study(accession_number, R)
-    for item in worklist:
-        d = D.get(item, get_file=True)
-        O.put(d)
+    if collection != "ALL":
+
+        result = file_indexer.upload_collection(
+            collection=collection,
+            basepath=path,
+            registry=R,
+            dest=O
+        )
+
+    else:
+        result = file_indexer.upload_path(
+            basepath=path,
+            registry=R,
+            dest=O
+        )
+
+    click.echo(result)

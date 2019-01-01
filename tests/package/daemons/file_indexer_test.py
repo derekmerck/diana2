@@ -16,15 +16,18 @@ path = "/Users/derek/data/DICOM/Christianson"
 def test_index(setup_redis):
 
     R = Redis()
+    R.clear()
 
-    dcmfdx = FileIndexer(basepath=path,
-                         recurse_style="ORTHANC",
-                         registry=R,
-                         pool_size=10)
+    dcmfdx = FileIndexer(pool_size=10)
 
     tic = datetime.now()
 
-    dcmfdx.run_indexer(rex="*")
+    dcmfdx.index_path(
+        basepath=path,
+        registry=R,
+        rex="*",
+        recurse_style="ORTHANC"
+    )
 
     toc = datetime.now()
     tictoc = (toc-tic).seconds
@@ -32,7 +35,8 @@ def test_index(setup_redis):
     print("Indexing elapsed: {}".format( tictoc ))
 
     """
-    No MT, debug: 465 seconds
+    10x workers, debug: 180 seconds for 12k indexed, 24k checked
+    10x workers, debug: 120 seconds for 12k indexed, 24k checked - skipped reading tags
     """
 
 @pytest.mark.skip(reason="Needs large dataset for uploading")
@@ -40,16 +44,17 @@ def test_upload(setup_redis, setup_orthanc):
 
     R = Redis()
     O = Orthanc()
+    O.clear()
 
-    dcmfdx = FileIndexer(basepath=path,
-                         recurse_style="ORTHANC",
-                         registry=R,
-                         dest=O,
-                         pool_size=10)
+    dcmfdx = FileIndexer(pool_size=10)
 
     tic = datetime.now()
 
-    dcmfdx.run_uploader()
+    dcmfdx.upload_path(
+        basepath=path,
+        registry=R,
+        dest=O
+    )
 
     toc = datetime.now()
     tictoc = (toc-tic).seconds
@@ -59,15 +64,13 @@ def test_upload(setup_redis, setup_orthanc):
     pprint(O.gateway.statistics())
 
     """
-    59 secs to upload 5800 instances (100/sec!)
+    10x workers ~120 secs to upload 12k instances (100/sec!)
     """
-
-
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
 
     for (i,j) in zip(setup_orthanc(), setup_redis()):
-        # test_index(None)
+        #test_index(None)
         test_upload(None, None)

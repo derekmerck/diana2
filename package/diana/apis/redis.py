@@ -1,4 +1,4 @@
-import logging, hashlib, json
+import logging, hashlib, json, os
 from typing import Any, Union, Mapping
 from redis import Redis as RedisGateway, exceptions as RedisExceptions
 import attr
@@ -121,20 +121,33 @@ class Redis(Endpoint, Serializable):
         self.gateway.delete(item)
 
 
-    def register(self, item: Dixel, prefix: str=""):
-
-        fn = item.meta["FileName"]
-        rid = prefix + item.tags["AccessionNumber"]
-
-        # Store the dixel by fn
-        # self.update(prefix+fn, item)
-
-        # Register the dixel as a study member:
+    def clear(self):
         logger = logging.getLogger(self.name)
-        logger.info("Registering {} under {}".format(fn, rid))
-        self.gateway.sadd(rid, fn)
+        logger.debug("EP CLEAR")
 
-    def registry_items(self, prefix: str=""):
+        self.gateway.flushdb()
+
+
+
+    def add_to_collection(self, item: Dixel, prefix: str="",
+                                 collection_key: str = "AccessionNumber",
+                                 item_key: str = "FilePath",
+                                 path=None ):
+
+        if item_key == "FilePath" and path:
+            value = os.path.join(path, item.meta.get("FileName"))
+        else:
+            value = item.tags.get(item_key)
+
+        key = prefix + item.tags.get(collection_key)
+
+        logger = logging.getLogger(self.name)
+        logger.info("Registering {} under {}".format(value, key))
+
+        self.gateway.sadd(key, value)
+
+
+    def collections(self, prefix: str=""):
         keys = self.gateway.keys(prefix+"*")
         result = []
         l = len(prefix)
@@ -142,11 +155,12 @@ class Redis(Endpoint, Serializable):
             result.append( k[l:].decode("UTF-8") )
         return result
 
-    def registry_item_data(self, item: str, prefix: str=""):
-        rid = prefix + item
+
+    def collected_items(self, collection: str, prefix: str=""):
+        key = prefix + collection
         logger = logging.getLogger(self.name)
-        logger.info("Collecting {}".format(rid))
-        data = self.gateway.smembers(rid)
+        logger.info("Collecting {}".format(key))
+        data = self.gateway.smembers(key)
         result = []
         for d in data:
             result.append( d.decode("UTF-8") )

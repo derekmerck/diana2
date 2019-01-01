@@ -1,4 +1,5 @@
 import logging, os
+from glob import glob
 import attr
 
 @attr.s
@@ -18,6 +19,10 @@ class FileHandler(object):
             fp = os.path.join(fp, segment)
         fp = os.path.join(fp, fn)
         return fp
+
+    def get_files(self, rex="*"):
+        fp = self.get_path(rex)
+        return [os.path.basename(x) for x in glob(fp)]
 
     def write_file(self, fn: str, fdata):
         """Write binary file data"""

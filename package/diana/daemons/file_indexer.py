@@ -1,45 +1,47 @@
-import glob, os, logging
-from multiprocessing import Pool
+import logging, hashlib
+from datetime import datetime
+from multiprocessing import Pool, Value
 from functools import partial
 import attr
 from ..apis import Redis, DcmDir, Orthanc
 from ..dixel import DixelView
+from ..utils.dicom import DicomFormatError
+
+checked = Value('i', 0)
+registered = Value('i', 0)
+uploaded = Value('i', 0)
 
 
-def index_file(fn, dcm=None, reg=None, prefix=None):
+def index_file(fn, path=None, reg=None, prefix=None, counter0: Value=checked, counter1: Value=registered):
 
-    if not isinstance(dcm, DcmDir):
-        dcm = DcmDir(**dcm)
+    counter0.value += 1
     if not isinstance(reg, Redis):
         reg = Redis(**reg)
     try:
-        d = dcm.get(fn, view=DixelView.TAGS)
-        reg.register(d, prefix=prefix)
-    except:
+        d = DcmDir(path=path).get(fn, view=DixelView.TAGS)
+        reg.add_to_collection(d, path=path, prefix=prefix)
+        logging.info("Registered DICOM file {}".format(fn))
+        counter1.value+=1
+    except DicomFormatError:
         logging.warning("Skipping non-DICOM file {}".format(fn))
+        pass
+    except FileExistsError:
+        logging.error("Skipping improperly requested file")
         pass
 
 
-def put_inst(fn, dcm, dest):
+def put_inst(fn, dest, counter: Value=uploaded):
 
-    if not isinstance(dcm, DcmDir):
-        dcm = DcmDir(**dcm)
+    d = DcmDir().get(fn, view=DixelView.FILE)  # Don't need pydicom data
     if not isinstance(dest, Orthanc):
         dest = Orthanc(**dest)
-    d = dcm.get(fn, view=DixelView.FILE)
     dest.put(d)
+    counter.value+=1
 
 
 @attr.s
 class FileIndexer(object):
     """Create a registry for all files in a DICOM directory and subdirs"""
-
-    prefix = attr.ib( default="dcmfdx")
-    basepath = attr.ib( default="." )
-    recurse_style = attr.ib( default="UNSTRUCTURED" )
-
-    registry = attr.ib( type=Redis, default=None, repr=False )
-    dest = attr.ib( type=Orthanc, default=None, repr=False )
 
     pool_size = attr.ib( default=0 )
     pool = attr.ib( init=False, repr=False )
@@ -48,52 +50,68 @@ class FileIndexer(object):
         if self.pool_size > 0:
             return Pool(self.pool_size)
 
-    def run_indexer(self, rex="*.dcm"):
-        # TODO: need to store subdirectory from base path as well!
+    def index_path(self,
+                   basepath,
+                   registry,
+                   rex="*.dcm",
+                   recurse_style="UNSTRUCTURED"):
 
-        def index_dir(path="."):
+        checked.value = 0
+        registered.value = 0
+        tic = datetime.now()
 
-            fg = os.path.join(path, rex)
-            files = [os.path.basename(x) for x in glob.glob(fg)]
-            D = DcmDir(path=path)
+        reg_prefix = hashlib.md5(basepath.encode("UTF-*")).hexdigest()[0:4] + "-"
+        D = DcmDir(path=basepath, recurse_style=recurse_style)
+        for path in D.subdirs():
+            files = DcmDir(path=path).files(rex=rex)
 
             if self.pool_size == 0:
                 for fn in files:
-                    index_file(fn, D, self.registry, self.prefix)
+                    index_file(fn,
+                               path=path,
+                               reg=registry,
+                               prefix=reg_prefix)
             else:
                 p = partial(index_file,
-                            dcm=D.asdict(),
-                            reg=self.registry.asdict(),
-                            prefix=self.prefix )
+                            path=path,
+                            reg=registry.asdict(),
+                            prefix=reg_prefix )
                 self.pool.map(p, files)
 
-        D = DcmDir(path=self.basepath, recurse_style=self.recurse_style)
-        for subdir in D.subdirs():
-            index_dir(subdir)
+        toc = datetime.now()
+        ellapsed_time = (tic-toc).seconds
+        handling_rate = ellapsed_time / checked.value
+
+        print("Indexed {} objects of {} checked".format(registered.value, checked.value))
+        print("Handling rate: {} files per second".format(handling_rate))
 
 
-    def run_uploader(self, dest: Orthanc=None):
+    def upload_path(self, basepath, registry: Redis, dest: Orthanc):
 
-        def put_accession(accession_number):
-            """Can spawn this as a separate process"""
+        tic = datetime.now()
+        uploaded.value = 0
 
-            files = self.registry.registry_item_data(accession_number, prefix=self.prefix)
-            logging.debug(files)
+        reg_prefix = hashlib.md5(basepath.encode("UTF-*")).hexdigest()[0:4] + "-"
+        for collection in registry.collections(prefix=reg_prefix):
+            self.upload_collection(collection, basepath, registry, dest)
 
-            if self.pool_size == 0:
-                for fn in files:
-                    put_inst(fn, D, dest)
-            else:
-                p = partial(put_inst,
-                            dcm=D.asdict(),
-                            dest=dest.asdict() )
-                self.pool.map( p, files )
+        toc = datetime.now()
+        ellapsed_time = (tic - toc).seconds
+        handling_rate = ellapsed_time / uploaded.value
 
-        dest = dest or self.dest
-        if not dest:
-            raise ValueError("No upload destination provided")
-        # TODO: Only for orthanc style
-        D = DcmDir(path=self.basepath, subpath_depth=2, subpath_width=2)
+        print("Uploaded {} objects".format(uploaded.value))
+        print("Handling rate: {} files per second".format(handling_rate))
 
-        for item in self.registry.registry_items(prefix=self.prefix):
-            put_accession(item)
+    def upload_collection(self, collection, basepath, registry, dest):
+        reg_prefix = hashlib.md5(basepath.encode("UTF-*")).hexdigest()[0:4] + "-"
+        files = registry.collected_items(collection, prefix=reg_prefix)
+        # logging.debug(files)
+
+        if self.pool_size == 0:
+            for fn in files:
+                put_inst(fn, dest)
+        else:
+            p = partial(put_inst,
+                        dest=dest.asdict() )
+            self.pool.map( p, files )
+

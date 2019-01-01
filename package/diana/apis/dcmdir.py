@@ -2,7 +2,6 @@ import os, logging, hashlib
 from typing import Union
 import attr
 from ..dixel import Dixel, DixelView
-from . import Redis
 from ..utils import Endpoint, Serializable
 from ..utils.dicom import DicomLevel
 from ..utils.gateways import DcmFileHandler, ZipFileHandler
@@ -55,9 +54,14 @@ class DcmDir(Endpoint, Serializable):
             raise FileNotFoundError
 
         get_pixels = DixelView.PIXELS in view
-        logger.debug(get_pixels)
-        ds = self.gateway.get(fn, get_pixels=get_pixels)
-        result = Dixel.from_pydicom(ds, fn)
+        # logger.debug("Pixels: {}".format(get_pixels))
+
+        if DixelView.TAGS in view or DixelView.PIXELS in view:
+            ds = self.gateway.get(fn, get_pixels=get_pixels)
+            # logging.debug(ds)
+            result = Dixel.from_pydicom(ds, fn)
+        else:
+            result = Dixel(level=DicomLevel.INSTANCES, meta={"FileName": fn})
 
         get_file = DixelView.FILE in view
         if get_file:
@@ -86,31 +90,6 @@ class DcmDir(Endpoint, Serializable):
         logger.debug("EP CHECK")
         return os.path.exists(self.path)
 
-    def index_to(self, R: Redis):
-        """If indexing Orthanc dir, use subpath width/depth = 2"""
-
-        prefix = hashlib.md5(self.path.encode("UTF-*")).hexdigest()[0:4] + "-"
-
-        for root, dirs, fns in os.walk(self.path, topdown = False):
-            for fn in fns:
-                try:
-                    ds = self.gateway.get(fn=fn)
-                    d = Dixel.from_pydicom(ds, fn)
-                    R.register(d, prefix=prefix)
-                except:
-                    # logging.warning("Failed to read file {}".format(fn))
-                    pass
-
-    def indexed_studies(self, R: Redis):
-        prefix = hashlib.md5(self.path.encode("UTF-*")).hexdigest()[0:4] + "-"
-        result = R.registry_items(prefix)
-        return result
-
-    def get_indexed_study(self, item: str, R: Redis):
-        prefix = hashlib.md5(self.path.encode("UTF-*")).hexdigest()[0:4] + "-"
-        result = R.registry_item_data(item, prefix=prefix)
-        return result
-
     def get_zipped(self, item: str):
         gateway = ZipFileHandler(path=self.path)
         files = gateway.unpack(item)
@@ -130,11 +109,10 @@ class DcmDir(Endpoint, Serializable):
         elif self.recurse_style == "ORTHANC":
             self._gen = DcmDir.orthanc_subdirs(base_dir=self.path)
         else:
-            raise ValueError("Unknown generator requested")
+            raise ValueError("Unknown subdir structure requested ({})".format(self.recurse_style))
 
         for item in self._gen:
             yield item
-
 
     class orthanc_subdirs(object):
         """Generates 1024 Orthanc-style nested subdirs"""
@@ -168,4 +146,7 @@ class DcmDir(Endpoint, Serializable):
 
         def __next__(self):
             return self.generator.__next__()[0]
+
+    def files(self, rex="*.dcm"):
+        return self.gateway.get_files(rex=rex)
 
