@@ -5,6 +5,8 @@ services:
 
   diana-indexer:
     image:                  derekmerck/diana2
+#    command: >
+#      sh -c "git pull && python3 -u apps/diana-cli/diana-cli.py findex /research2/orthanc/db Redis -o -r '*'"
     volumes:
       - ${DATA_DIR}:${DATA_DIR}
     environment:

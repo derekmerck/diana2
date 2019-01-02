@@ -69,6 +69,7 @@ class FileIndexer(object):
         reg_prefix = hashlib.md5(basepath.encode("UTF-*")).hexdigest()[0:4] + "-"
         D = DcmDir(path=basepath, recurse_style=recurse_style)
         for path in D.subdirs():
+            print("Working on path: {}".format(path))
             files = DcmDir(path=path).files(rex=rex)
 
             if self.pool_size == 0:

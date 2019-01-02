@@ -5,9 +5,9 @@ from diana.daemons import FileIndexer
 @click.command()
 @click.argument('path')
 @click.argument('registry')
-@click.option('--orthanc_db', default=False, help="Use subpath width/depth=2", is_flag=True)
-@click.option('-r', '--regex', default="*.dcm", help="Glob regular expression")
-@click.option('--pool_size', default=10, help="Worker threads")
+@click.option('-o', '--orthanc_db', default=False,   help="Use subpath width/depth=2", is_flag=True)
+@click.option('-r', '--regex',      default="*.dcm", help="Glob regular expression")
+@click.option('-p', '--pool_size',  default=10,      help="Worker threads")
 @click.pass_context
 def findex(ctx, path, registry, orthanc_db, regex, pool_size):
     """Inventory collections of files by accession number with a PATH REGISTRY for retrieval"""
@@ -32,7 +32,7 @@ def findex(ctx, path, registry, orthanc_db, regex, pool_size):
 @click.argument('path')
 @click.argument('registry')
 @click.argument('dest')
-@click.option('--pool_size', default=10, help="Worker threads")
+@click.option('-p', '--pool_size', default=10, help="Worker threads")
 @click.pass_context
 def fiup(ctx, collection, path, index, dest, pool_size):
     """Pull study by COLLECTION (accession number) from a PATH REGISTRY and send to DEST"""
