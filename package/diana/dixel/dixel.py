@@ -167,8 +167,16 @@ class Dixel(Serializable):
             referring_physician = referring_physician.get('name')
 
         study_datetime = None
-        if len(data['events']) > 2:
-            study_datetime = DatetimeParser.parse(data['events'][2]['date'])
+        if len(data['events']) > 1:
+            # Last event is usually read I think, take event _before_ last one
+            study_event = data['events'][-2]
+            if study_event.get('date'):
+                study_datetime = DatetimeParser.parse(study_event['date'])
+        else:
+            # Otherwise just take whatever is last
+            study_event = data['events'][-1]
+            if study_event.get('date'):
+                study_datetime = DatetimeParser.parse(study_event['date'])
 
         montage_cpts = []
         for resource in data["exam_type"]["cpts"]:
