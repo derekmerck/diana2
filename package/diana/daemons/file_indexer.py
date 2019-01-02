@@ -83,7 +83,7 @@ class FileIndexer(object):
                 self.pool.map(p, files)
 
         toc = datetime.now()
-        elapsed_time = (toc-tic).seconds
+        elapsed_time = (toc-tic).seconds or 1
         checking_rate =  checked.value / elapsed_time
         handling_rate =  registered.value / elapsed_time
 
@@ -102,7 +102,7 @@ class FileIndexer(object):
             self.upload_collection(collection, basepath, registry, dest)
 
         toc = datetime.now()
-        elapsed_time = (toc - tic).seconds
+        elapsed_time = (toc - tic).seconds or 1
         handling_rate =  uploaded.value / elapsed_time
 
         print("Uploaded {} objects in {} seconds".format(uploaded.value, elapsed_time))
