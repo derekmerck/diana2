@@ -25,7 +25,7 @@ def index_file(fn, path=None, reg=None, prefix=None, counter0: Value=checked, co
         logging.info("Registered DICOM file {}".format(fn))
         counter1.value+=1
     except DicomFormatError:
-        logging.debug("Skipping non-DICOM file {}".format(fn))
+        logging.debug("Skipping non-DICOM or poorly formatted file {}".format(fn))
         pass
     except FileNotFoundError:
         logging.warning("Skipping improperly requested file")

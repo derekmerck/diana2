@@ -3,6 +3,7 @@ from typing import Any, Union, Mapping
 from redis import Redis as RedisGateway, exceptions as RedisExceptions
 import attr
 from ..dixel import Dixel
+from ..utils.dicom import DicomFormatError
 from ..utils.endpoint import Endpoint, Serializable
 from ..utils import SmartJSONEncoder
 
@@ -149,7 +150,7 @@ class Redis(Endpoint, Serializable):
         elif item.meta.get(collection_key):
             suffix =item.meta[collection_key]
         else:
-            raise ValueError("No collection key found")
+            raise DicomFormatError("No collection key found")
 
         key = prefix + suffix
 
