@@ -124,6 +124,13 @@ Dixel routes are instantiated with (source, dest, handler) tuples and attached t
    :members:
    :undoc-members:
 
+File Indexer
+....................
+
+.. automodule:: diana.daemons.file_indexer
+   :members:
+   :undoc-members:
+
 Mock Data Generation
 ....................
 

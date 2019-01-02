@@ -4,7 +4,7 @@ from diana.daemons import FileIndexer
 
 @click.command()
 @click.argument('path')
-@click.argument('registry', help="Redis index for registering collections")
+@click.argument('registry')
 @click.option('--orthanc_db', default=False, help="Use subpath width/depth=2", is_flag=True)
 @click.option('--pool_size', default=10, help="Worker threads")
 @click.pass_context
@@ -28,7 +28,7 @@ def index(ctx, path, registry, orthanc_db, pool_size):
 @click.command()
 @click.argument('collection')
 @click.argument('path')
-@click.argument('registry', help="Redis registry")
+@click.argument('registry')
 @click.argument('dest')
 @click.option('--pool_size', default=10, help="Worker threads")
 @click.pass_context
