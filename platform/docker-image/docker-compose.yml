@@ -8,13 +8,13 @@ services:
 
   diana2-base-amd64:
     build:
-      context: .
+      context: ""
       dockerfile: Dockerfile-python
     image: diana2-base-amd64
 
   diana2-base-arm32v7:
     build:
-      context: .
+      context: ""
       dockerfile: Dockerfile-python
       args:
         RESIN_ARCH:   armv7hf
@@ -23,7 +23,7 @@ services:
 
   diana2-base-arm64v8:
     build:
-      context: .
+      context: ""
       dockerfile: Dockerfile-python
       args:
         RESIN_ARCH:   aarch64
@@ -36,13 +36,13 @@ services:
 
   diana2-amd64:
     build:
-      context: .
+      context: ""
       dockerfile: Dockerfile-diana
     image: diana2-amd64
 
   diana2-arm32v7:
     build:
-      context: .
+      context: ""
       dockerfile: Dockerfile-diana
       args:
         DOCKER_ARCH:  arm32v7
@@ -50,7 +50,7 @@ services:
 
   diana2-arm64v8:
     build:
-      context: .
+      context: ""
       dockerfile: Dockerfile-diana
       args:
         DOCKER_ARCH:  arm64v8

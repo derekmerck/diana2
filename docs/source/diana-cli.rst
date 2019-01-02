@@ -27,13 +27,15 @@
       --help                    Show this message and exit.
 
     Commands:
-      check         Check status of service ENDPOINTS
-      dcm2im        Convert a DICOM format file or directory INPATH into pixels...
-      index         Inventory dicom dir PATH with INDEX service for retrieval
-      indexed-pull  Pull study by accession number from a PATH with INDEX service...
-      mock          Create a mock site from DESC and send data to DEST service.
-      ofind         Find studies matching yaml/json QUERY in SOURCE Orthanc...
-      watch         Watch sources for events to handle based on ROUTES Usage: $...
+      check   Check status of service ENDPOINTS
+      dcm2im  Convert a DICOM format file or directory INPATH into pixels and
+              save...
+      findex  Inventory collections of files by accession number with a PATH...
+      fiup    Pull study by COLLECTION (accession number) from a PATH REGISTRY
+              and...
+      mock    Create a mock site from DESC and send data to DEST service.
+      ofind   Find studies matching yaml/json QUERY in SOURCE Orthanc service...
+      watch   Watch sources for events to handle based on ROUTES Usage: $...
 
 Requires platform service endpoint description in yaml format.
 
@@ -65,27 +67,20 @@ index
 
 ::
 
-    Usage: diana-cli index [OPTIONS] PATH INDEX
+    Usage: diana-cli [OPTIONS] COMMAND [ARGS]...
+    Try "diana-cli --help" for help.
 
-      Inventory dicom dir PATH with INDEX service for retrieval
-
-    Options:
-      --orthanc_db  Use subpath width/depth=2
-      --help        Show this message and exit.
+    Error: No such command "index".
 
 indexed-pull
 ------------
 
 ::
 
-    Usage: diana-cli indexed-pull [OPTIONS] ACCESSION_NUMBER PATH INDEX DEST
+    Usage: diana-cli [OPTIONS] COMMAND [ARGS]...
+    Try "diana-cli --help" for help.
 
-      Pull study by accession number from a PATH with INDEX service and send to
-      DEST
-
-    Options:
-      --orthanc_db  Use subpath width/depth=2
-      --help        Show this message and exit.
+    Error: No such command "indexed-pull".
 
 dcm2im
 ------

@@ -1,7 +1,6 @@
 import logging
 from typing import Mapping
 import attr
-from pprint import pformat
 
 from ..utils import Endpoint, Serializable
 from ..utils.gateways import Montage as MontageGateway, GatewayConnectionError

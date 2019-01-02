@@ -12,7 +12,7 @@ def test_mock_svcs():
 
     c = C.api_client()
 
-    admin_stack = find_resource("platform/stacks/admin/admin-stack.yml")
+    admin_stack = find_resource("platform/docker-stacks/admin/admin-stack.yml")
     cmd = ["docker", "stack", "deploy", "-c", admin_stack, "admin"]
     subprocess.run(cmd)
 
@@ -21,7 +21,7 @@ def test_mock_svcs():
     assert( "admin_portainer" in service_names )
     assert( "admin_traefik" in service_names )
 
-    mock_stack = find_resource("platform/stacks/mock-pacs/mock-stack.yml")
+    mock_stack = find_resource("platform/docker-stacks/diana-workers/mock-stack.yml")
     cmd = ["docker", "stack", "deploy", "-c", mock_stack, "mock"]
 
     # Don't forget to set the password, or docker-compose will

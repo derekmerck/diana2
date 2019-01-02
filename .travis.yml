@@ -28,11 +28,12 @@ before_install:
   - docker run --rm --privileged multiarch/qemu-user-static:register --reset
 
   # Create new diana amd64 images and point docker-compose files at them
-  - sed -i "s#derekmerck/diana2#diana2-amd64#g" platform/stacks/mock-pacs/mock-stack.yml
-  - sed -i "s#derekmerck/diana2#diana2-amd64#g" platform/stacks/watcher/watcher-stack.yml
-  - pushd platform/images/diana-docker
+  - pushd platform/docker-image
+  - docker pull derekmerck/diana2-base
   - docker-compose build diana2-amd64
   - popd
+  - sed -i "s#derekmerck/diana2#diana2-amd64#g" platform/docker-stacks/diana-workers/mock-stack.yml
+  - sed -i "s#derekmerck/diana2#diana2-amd64#g" platform/docker-stacks/diana-workers/watcher-stack.yml
 
 install:
 
@@ -60,8 +61,8 @@ after_success:
   # Login to docker for push
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   # Update diana image
-  - cd platform/images/diana-docker
-  - docker-compose build diana2-amd64 diana2-arm32v7 diana2-arm64v8
+  - cd platform/docker-image
+  - docker-compose build diana2-arm32v7 diana2-arm64v8
   # Retag image "latest" and push
   - python3 -m docker-manifest -d ${DOCKER_USERNAME} diana2
   # Retag image ${DIANA_VERSION} and push
