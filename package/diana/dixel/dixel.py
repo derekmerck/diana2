@@ -63,6 +63,8 @@ class Dixel(Serializable):
         self.update_meta()
 
     def update_meta(self):
+        # Carry real date-time objects for computation and processing
+
         if self.tags.get("StudyDate"):
             self.meta["StudyDateTime"] = mktime(self.tags.get("StudyDate"), self.tags.get("StudyTime"))
         if self.tags.get("SeriesDate") and self.level >= DicomLevel.SERIES:
@@ -156,11 +158,13 @@ class Dixel(Serializable):
         Generate a dixel from a Montage JSON result (as returned by
         the Montage Endpoint.
 
-        Metadata includes Montage-mappedd CPT codes; to dereference them
+        Metadata includes Montage-mapped CPT codes; to dereference them
         to real CPT codes and body parts, call Montage().get_meta(dixel)
         """
 
         # logging.debug(pformat(data['exam_type']))
+
+        # TODO: Check event flags for various event types to get ordering, study, and reading
 
         referring_physician = data['events'][0].get('provider')
         if referring_physician:
@@ -182,8 +186,6 @@ class Dixel(Serializable):
         for resource in data["exam_type"]["cpts"]:
             code = resource.split("/")[-2]
             montage_cpts.append(code)
-
-        # TODO: Check event flags for various event types to get ordering and reading
 
         tags = {
             "AccessionNumber": data["accession_number"],

@@ -34,7 +34,7 @@ class Montage(Endpoint, Serializable):
             password = self.password
         )
 
-    def find(self, query: Mapping, index="rad", **kwargs):
+    def find(self, query: Mapping, index="rad", ignore_errs=True):
         r = self.gateway.find(query=query, index=index)
         ret = set()
         for item in r:
@@ -45,7 +45,8 @@ class Montage(Endpoint, Serializable):
             except Exception as e:
                 logger = logging.getLogger(self.name)
                 logger.warning("Failed to dixelize an item")
-                raise e
+                if not ignore_errs:
+                    raise e
         return ret
 
 
