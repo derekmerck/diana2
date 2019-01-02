@@ -5,6 +5,6 @@ services:
     image: redis
     ports:
       - "6379:6379"
-    command: ["redis-server", "--requirepass {{ REDIS_PASSWORD }}"]
+    command: ["redis-server", "--requirepass ${REDIS_PASSWORD}"]
     environment:
       TZ: "America/New_York"
