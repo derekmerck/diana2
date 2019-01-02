@@ -1,6 +1,5 @@
 import logging
 from pprint import pprint
-from datetime import datetime
 
 from diana.daemons import FileIndexer
 from diana.apis import Orthanc, Redis
@@ -9,46 +8,44 @@ import pytest
 from conftest import setup_orthanc, setup_redis
 
 
-path = "/Users/derek/data/DICOM/Christianson"
+# path = "/Users/derek/data/DICOM/Christianson"
+# recursion_style = "ORTHANC"
+
+path = "/Users/derek/data/Protect3D/Protect3"
+recursion_style = "UNSTRUCTURED"
 
 
 @pytest.mark.skip(reason="Needs large dataset for indexing")
 def test_index(setup_redis):
 
+    print("Testing indexing speed")
+
     R = Redis()
     R.clear()
 
-    dcmfdx = FileIndexer(pool_size=10)
-
-    tic = datetime.now()
+    dcmfdx = FileIndexer(pool_size=15)
 
     dcmfdx.index_path(
         basepath=path,
         registry=R,
         rex="*",
-        recurse_style="ORTHANC"
+        recurse_style=recursion_style
     )
 
-    toc = datetime.now()
-    tictoc = (toc-tic).seconds
-
-    print("Indexing elapsed: {}".format( tictoc ))
-
     """
-    10x workers, debug: 180 seconds for 12k indexed, 24k checked
-    10x workers, debug: 120 seconds for 12k indexed, 24k checked - skipped reading tags
+    240 fps checking over 24k | 120 fps registration over 12k (Christianson)
     """
 
 @pytest.mark.skip(reason="Needs large dataset for uploading")
 def test_upload(setup_redis, setup_orthanc):
 
+    print("Testing upload speed")
+
     R = Redis()
     O = Orthanc()
     O.clear()
 
-    dcmfdx = FileIndexer(pool_size=10)
-
-    tic = datetime.now()
+    dcmfdx = FileIndexer(pool_size=15)
 
     dcmfdx.upload_path(
         basepath=path,
@@ -56,21 +53,22 @@ def test_upload(setup_redis, setup_orthanc):
         dest=O
     )
 
-    toc = datetime.now()
-    tictoc = (toc-tic).seconds
-
-    print("Upload elapsed: {}".format( tictoc ))
-
     pprint(O.gateway.statistics())
 
     """
-    10x workers ~120 secs to upload 12k instances (100/sec!)
+    130 fps uploaded over 24k
     """
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.WARNING)
 
     for (i,j) in zip(setup_orthanc(), setup_redis()):
-        #test_index(None)
-        test_upload(None, None)
+        test_index(None)
+        #test_upload(None, None)
+
+"""
+Overall fps about 120 for each part
+
+40,000,000 files / 120 files ps = 300k seconds = 90 hours = 4 days
+"""

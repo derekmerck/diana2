@@ -45,11 +45,17 @@ class FileHandler(object):
             fdata = f.read()
         return fdata
 
+    def isdir(self, fn: str):
+        fp = self.get_path(fn)
+        logger = logging.getLogger(self.name)
+        logger.debug("Checking is dir {}".format(fp))
+        return os.path.isdir(fp)
+
     def exists(self, fn: str):
         fp = self.get_path(fn)
         logger = logging.getLogger(self.name)
         logger.debug("Checking exists {}".format(fp))
-        return os.path.exists(fp)
+        return os.path.exists(fp)  # Better than exists
 
     def delete(self, fn: str):
         fp = self.get_path(fn)

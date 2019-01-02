@@ -15,6 +15,8 @@ uploaded = Value('i', 0)
 def index_file(fn, path=None, reg=None, prefix=None, counter0: Value=checked, counter1: Value=registered):
 
     counter0.value += 1
+    if counter0.value % 1000 == 0:
+        print("Indexing - {} checked".format(counter0.value))
     if not isinstance(reg, Redis):
         reg = Redis(**reg)
     try:
@@ -23,10 +25,10 @@ def index_file(fn, path=None, reg=None, prefix=None, counter0: Value=checked, co
         logging.info("Registered DICOM file {}".format(fn))
         counter1.value+=1
     except DicomFormatError:
-        logging.warning("Skipping non-DICOM file {}".format(fn))
+        logging.debug("Skipping non-DICOM file {}".format(fn))
         pass
-    except FileExistsError:
-        logging.error("Skipping improperly requested file")
+    except FileNotFoundError:
+        logging.warning("Skipping improperly requested file")
         pass
 
 
@@ -37,6 +39,8 @@ def put_inst(fn, dest, counter: Value=uploaded):
         dest = Orthanc(**dest)
     dest.put(d)
     counter.value+=1
+    if counter.value % 1000 == 0:
+        print("Uploading - {} handled".format(counter.value))
 
 
 @attr.s
@@ -79,11 +83,13 @@ class FileIndexer(object):
                 self.pool.map(p, files)
 
         toc = datetime.now()
-        ellapsed_time = (tic-toc).seconds
-        handling_rate = ellapsed_time / checked.value
+        elapsed_time = (toc-tic).seconds
+        checking_rate =  checked.value / elapsed_time
+        handling_rate =  registered.value / elapsed_time
 
-        print("Indexed {} objects of {} checked".format(registered.value, checked.value))
-        print("Handling rate: {} files per second".format(handling_rate))
+        print("Indexed {} objects of {} checked in {} seconds".format(registered.value, checked.value, elapsed_time))
+        print("Checking rate: {} files per second".format(round(checking_rate,1)))
+        print("Handling rate: {} files per second".format(round(handling_rate,1)))
 
 
     def upload_path(self, basepath, registry: Redis, dest: Orthanc):
@@ -96,11 +102,11 @@ class FileIndexer(object):
             self.upload_collection(collection, basepath, registry, dest)
 
         toc = datetime.now()
-        ellapsed_time = (tic - toc).seconds
-        handling_rate = ellapsed_time / uploaded.value
+        elapsed_time = (toc - tic).seconds
+        handling_rate =  uploaded.value / elapsed_time
 
-        print("Uploaded {} objects".format(uploaded.value))
-        print("Handling rate: {} files per second".format(handling_rate))
+        print("Uploaded {} objects in {} seconds".format(uploaded.value, elapsed_time))
+        print("Handling rate: {} files per second".format(round(handling_rate,1)))
 
     def upload_collection(self, collection, basepath, registry, dest):
         reg_prefix = hashlib.md5(basepath.encode("UTF-*")).hexdigest()[0:4] + "-"

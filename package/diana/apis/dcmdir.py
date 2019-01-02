@@ -83,6 +83,8 @@ class DcmDir(Endpoint, Serializable):
     def exists(self, fn: str):
         logger = logging.getLogger(self.name)
         logger.debug("EP EXISTS")
+        # if self.gateway.isdir(fn):
+        #     return False
         return self.gateway.exists(fn)
 
     def check(self):
@@ -145,7 +147,8 @@ class DcmDir(Endpoint, Serializable):
             return self
 
         def __next__(self):
-            return self.generator.__next__()[0]
+            item = self.generator.__next__()
+            return item[0]
 
     def files(self, rex="*.dcm"):
         return self.gateway.get_files(rex=rex)
