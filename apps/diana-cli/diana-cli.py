@@ -46,11 +46,11 @@ def cli(ctx, verbose, services, services_path):
 
 
 cli.add_command(commands.check)
-cli.add_command(commands.ofind)
-cli.add_command(commands.index)
-cli.add_command(commands.indexed_pull)
 cli.add_command(commands.dcm2im)
+cli.add_command(commands.findex)
+cli.add_command(commands.fiup)
 cli.add_command(commands.mock)
+cli.add_command(commands.ofind)
 cli.add_command(commands.watch)
 
 

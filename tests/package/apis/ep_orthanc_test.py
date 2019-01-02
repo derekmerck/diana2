@@ -18,7 +18,7 @@ def test_orthanc_upload(setup_orthanc):
 
     dicom_dir = find_resource("resources/dcm")
     D = DcmDir(path=dicom_dir)
-    d = D.get("IM2263", view=DixelView.FILE)
+    d = D.get("IM2263", view=DixelView.TAGS_FILE)
 
     O.put(d)
 
@@ -42,7 +42,7 @@ def test_anon(setup_orthanc):
     O = Orthanc()
     dicom_dir = find_resource("resources/dcm")
     D = DcmDir(path=dicom_dir)
-    d = D.get("IM2263", view=DixelView.FILE)
+    d = D.get("IM2263", view=DixelView.TAGS_FILE)
     O.put(d)
 
     d.tags["AccessionNumber"] = "123456"
@@ -70,7 +70,7 @@ def test_psend(setup_orthanc, setup_orthanc2):
     dicom_dir = find_resource("resources/dcm")
     D = DcmDir(path=dicom_dir)
 
-    d = D.get("IM2263", view=DixelView.FILE)
+    d = D.get("IM2263", view=DixelView.TAGS_FILE)
     O2.put(d)
     O2.psend(d.oid(), O)
 

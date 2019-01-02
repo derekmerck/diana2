@@ -12,5 +12,7 @@ class DixelView(Flag):
     FILE = auto()   #: In Orthanc, this is the data from /<level>/<oid>/file
     PIXELS = auto() #: Optional for pydicom readers
 
+    TAGS_FILE = TAGS | FILE
+
     def __str__(self):
         return self.name.lower()

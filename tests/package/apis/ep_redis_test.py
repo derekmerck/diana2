@@ -66,12 +66,12 @@ def test_redis_index(setup_redis):
     d = Dixel(meta={"FileName": "my_file"},
               tags={"AccessionNumber": "100"})
 
-    R.register(d)
-    logging.debug( R.registry_items() )
-    assert("100" in R.registry_items())
+    R.add_to_collection(d, item_key="FileName")
+    logging.debug( R.collections() )
+    assert("100" in R.collections() )
 
-    logging.debug( R.registry_item_data("100") )
-    assert("my_file" in R.registry_item_data("100") )
+    logging.debug( R.collected_items("100") )
+    assert("my_file" in R.collected_items("100") )
 
 
 if __name__=="__main__":

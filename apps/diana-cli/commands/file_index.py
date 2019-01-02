@@ -8,7 +8,7 @@ from diana.daemons import FileIndexer
 @click.option('--orthanc_db', default=False, help="Use subpath width/depth=2", is_flag=True)
 @click.option('--pool_size', default=10, help="Worker threads")
 @click.pass_context
-def index(ctx, path, registry, orthanc_db, pool_size):
+def findex(ctx, path, registry, orthanc_db, pool_size):
     """Inventory collections of files by accession number with a PATH REGISTRY for retrieval"""
     services = ctx.obj.get('services')
     click.echo('Register Files by Accession Number')
@@ -32,7 +32,7 @@ def index(ctx, path, registry, orthanc_db, pool_size):
 @click.argument('dest')
 @click.option('--pool_size', default=10, help="Worker threads")
 @click.pass_context
-def indexed_pull(ctx, collection, path, index, dest, pool_size):
+def fiup(ctx, collection, path, index, dest, pool_size):
     """Pull study by COLLECTION (accession number) from a PATH REGISTRY and send to DEST"""
     services = ctx.obj.get('services')
     click.echo('Upload Registered Files by Accession Number')

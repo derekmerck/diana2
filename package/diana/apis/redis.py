@@ -136,10 +136,21 @@ class Redis(Endpoint, Serializable):
 
         if item_key == "FilePath" and path:
             value = os.path.join(path, item.meta.get("FileName"))
+        elif item.tags.get(item_key):
+            value = item.tags[item_key]
+        elif item.meta.get(item_key):
+            value = item.meta[item_key]
         else:
-            value = item.tags.get(item_key)
+            raise ValueError("No item key found")
 
-        key = prefix + item.tags.get(collection_key)
+        if item.tags.get(collection_key):
+            suffix = item.tags[collection_key]
+        elif item.meta.get(collection_key):
+            suffix =item.meta[collection_key]
+        else:
+            raise ValueError("No collection key found")
+
+        key = prefix + suffix
 
         logger = logging.getLogger(self.name)
         logger.info("Registering {} under {}".format(value, key))
