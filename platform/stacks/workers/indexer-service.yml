@@ -1,0 +1,16 @@
+version: '3.0'
+
+
+services:
+
+  diana-indexer:
+    image:                  derekmerck/diana2
+    environment:
+      DIANA_SERVICES: >
+        {
+          "Redis": {
+            "ctype": "Redis"
+            "password": "${REDIS_PASSWORD}"
+          }
+        }
+      TZ:                   "America/New_York"
