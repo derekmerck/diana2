@@ -9,7 +9,8 @@ services:
       DIANA_SERVICES: >
         {
           "Redis": {
-            "ctype": "Redis"
+            "ctype": "Redis",
+            "host": "redis",
             "password": "${REDIS_PASSWORD}"
           }
         }
