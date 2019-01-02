@@ -5,6 +5,8 @@ services:
 
   diana-indexer:
     image:                  derekmerck/diana2
+    volumes:
+      - ${DATA_DIR}:${DATA_DIR}
     environment:
       DIANA_SERVICES: >
         {
