@@ -23,6 +23,7 @@ class Redis(Endpoint, Serializable):
     def set_gateway(self):
         return RedisGateway(host=self.host,
                             port=self.port,
+                            password=self.password,
                             db=self.db)
 
     def check(self):
