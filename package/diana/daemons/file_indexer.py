@@ -64,6 +64,8 @@ class FileIndexer(object):
         registered.value = 0
         tic = datetime.now()
 
+        print("Indexing path: {}".format(basepath))
+
         reg_prefix = hashlib.md5(basepath.encode("UTF-*")).hexdigest()[0:4] + "-"
         D = DcmDir(path=basepath, recurse_style=recurse_style)
         for path in D.subdirs():
@@ -96,6 +98,8 @@ class FileIndexer(object):
 
         tic = datetime.now()
         uploaded.value = 0
+
+        print("Uploading path: {}".format(basepath))
 
         reg_prefix = hashlib.md5(basepath.encode("UTF-*")).hexdigest()[0:4] + "-"
         for collection in registry.collections(prefix=reg_prefix):

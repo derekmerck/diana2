@@ -6,9 +6,10 @@ from diana.daemons import FileIndexer
 @click.argument('path')
 @click.argument('registry')
 @click.option('--orthanc_db', default=False, help="Use subpath width/depth=2", is_flag=True)
+@click.option('-r', '--regex', default="*.dcm", help="Glob regular expression")
 @click.option('--pool_size', default=10, help="Worker threads")
 @click.pass_context
-def findex(ctx, path, registry, orthanc_db, pool_size):
+def findex(ctx, path, registry, orthanc_db, regex, pool_size):
     """Inventory collections of files by accession number with a PATH REGISTRY for retrieval"""
     services = ctx.obj.get('services')
     click.echo('Register Files by Accession Number')
@@ -20,6 +21,7 @@ def findex(ctx, path, registry, orthanc_db, pool_size):
     result = file_indexer.index_path(
         path,
         registry=R,
+        rex=regex,
         recurse_style="UNSTRUCTURED" if not orthanc_db else "ORTHANC"
     )
 
