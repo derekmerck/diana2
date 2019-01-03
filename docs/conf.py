@@ -25,9 +25,9 @@ copyright = '2018, Derek Merck'
 author = 'Derek Merck'
 
 # The short X.Y version
-version = '2.0.6'
+version = '2.0.9'
 # The full version, including alpha/beta/rc tags
-release = '2.0.6'
+release = '2.0.9'
 
 
 # -- General configuration ---------------------------------------------------
