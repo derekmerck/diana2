@@ -29,21 +29,6 @@ MIT
 
 """
 
-services = """
-Requires platform service endpoint description in yaml format.
-
-```yaml
----
-orthanc:
-  ctype: Orthanc
-  port: 8042
-  name: my_orthanc
-
-redis:
-  ctype: Redis
-```
-"""
-
 def run_cli_help(app, cmd=None):
     runner = CliRunner()
     if cmd:
@@ -57,14 +42,12 @@ def run_cli_help(app, cmd=None):
 @click.argument("path", default="diana-cli", type=click.STRING)
 def cli(path):
 
-    cmds = ["check", "index", "indexed-pull", "dcm2im", "mock", "ofind", "watch"]
+    cmds = ["check", "dcm2im", "findex", "fiup", "mock", "ofind", "watch"]
 
     app = __import__(path)
 
     text = header
     text += "```\n" + run_cli_help(app) + "```\n"
-
-    text += services
 
     for cmd in cmds:
         text += "## {}\n\n".format(cmd)

@@ -29,84 +29,106 @@ Options:
   --help                    Show this message and exit.
 
 Commands:
-  check   Check status of service ENDPOINTS
-  dcm2im  Convert a DICOM format file or directory INPATH into pixels and
-          save...
-  findex  Inventory collections of files by accession number with a PATH...
-  fiup    Pull study by COLLECTION (accession number) from a PATH REGISTRY
-          and...
-  mock    Create a mock site from DESC and send data to DEST service.
-  ofind   Find studies matching yaml/json QUERY in SOURCE Orthanc service...
-  watch   Watch sources for events to handle based on ROUTES Usage: $...
-```
+  check   Check endpoint status
+  dcm2im  Convert DICOM to image
+  findex  Create a persistent DICOM file index
+  fiup    Upload indexed DICOM files
+  mock    Generate mock DICOM traffic
+  ofind   Find in Orthanc node
+  watch   Watch sources and route events
 
-Requires platform service endpoint description in yaml format.
+  SERVICES is a required platform endpoint description in yaml format.
 
-```yaml
----
-orthanc:
-  ctype: Orthanc
-  port: 8042
-  name: my_orthanc
-
-redis:
-  ctype: Redis
+  ---
+  orthanc:
+    ctype: Orthanc
+    port: 8042
+    host: my_orthanc
+  redis:
+    ctype: Redis
+  ...
 ```
 ## check
 
 ```
 Usage: diana-cli check [OPTIONS] [ENDPOINTS]...
 
-  Check status of service ENDPOINTS
+  Survey status of service ENDPOINTS
 
 Options:
   --help  Show this message and exit.
-```
-## index
-
-```
-Usage: diana-cli [OPTIONS] COMMAND [ARGS]...
-Try "diana-cli --help" for help.
-
-Error: No such command "index".
-```
-## indexed-pull
-
-```
-Usage: diana-cli [OPTIONS] COMMAND [ARGS]...
-Try "diana-cli --help" for help.
-
-Error: No such command "indexed-pull".
 ```
 ## dcm2im
 
 ```
 Usage: diana-cli dcm2im [OPTIONS] INPATH [OUTPATH]
 
-  Convert a DICOM format file or directory INPATH into pixels and save in a
-  standard image format (png, jpg) to OUTPATH.
+  Convert a DICOM file or directory of files at INPATH into pixels and save
+  result in a standard image format (png, jpg) at OUTPATH.
 
 Options:
   --help  Show this message and exit.
+```
+## findex
+
+```
+Usage: diana-cli findex [OPTIONS] PATH REGISTRY
+
+  Inventory collections of files by accession number with a PATH REGISTRY for
+  retrieval
+
+Options:
+  -o, --orthanc_db         Use subpath width/depth=2
+  -r, --regex TEXT         Glob regular expression
+  -p, --pool_size INTEGER  Worker threads
+  --help                   Show this message and exit.
+```
+## fiup
+
+```
+Usage: diana-cli fiup [OPTIONS] COLLECTION PATH REGISTRY DEST
+
+  Collect files in a study by COLLECTION (accession number) using a PATH
+  REGISTRY, and send to DEST.
+
+Options:
+  -p, --pool_size INTEGER  Worker threads
+  --help                   Show this message and exit.
 ```
 ## mock
 
 ```
 Usage: diana-cli mock [OPTIONS] [DESC]
 
-  Create a mock site from DESC and send data to DEST service.
+  Generate synthetic studies on a schedule according to a site description
+  DESC.  Studies are optionally forwarded to an endpoint DEST.
 
 Options:
-  --dest TEXT  Destination service
+  --dest TEXT  Destination DICOM service
   --help       Show this message and exit.
+
+  DESC must be a mock-site description in yaml format.
+
+  ---
+  - name: Example Hospital
+    services:
+    - name: Main CT
+      modality: CT
+      devices: 3
+      studies_per_hour: 15
+    - name: Main MR
+      modality: MR
+      devices: 2
+      studies_per_hour: 4
+  ...
 ```
 ## ofind
 
 ```
 Usage: diana-cli ofind [OPTIONS] QUERY SOURCE
 
-  Find studies matching yaml/json QUERY in SOURCE Orthanc service {optionally
-  with proxy DOMAIN}
+  Find studies matching yaml/json QUERY in SOURCE Orthanc service.  The
+  optional proxy DOMAIN issues a remote-find to a proxied DICOM endpoint.
 
 Options:
   --domain TEXT   Domain for proxied query
@@ -120,27 +142,39 @@ Usage: diana-cli watch [OPTIONS]
 
   Watch sources for events to handle based on ROUTES
 
-  Usage:
-
-  $ diana-cli watch -r move path:/incoming queue $ diana-cli watch -r
-  move_anon queue archive $ diana-cli watch -r index_series archive splunk
-
-  $ diana-cli watch -r classify_ba archive splunk
-
-  $ diana-cli watch -r pindex_studies pacs splunk
-
-  $ echo routes.yml --- - source: queue   dest: archive   handler: mv_anon
-  level: instances - source: archive   dest: splunk   handler: index   level:
-  studies ... $ diana-cli watch -R routes.yml
-
-  Route Handlers (Triggers):
-
-  - say - mv or mv_anon - upload - index
-
 Options:
   -r, --route TEXT...
   -R, --routes_path PATH
   --help                  Show this message and exit.
+
+  Examples:
+
+  $ diana-cli watch -r upload_files path:/incoming queue
+  $ diana-cli watch -r anon_and_send_instances queue archive
+  $ diana-cli watch -r index_studies pacs splunk
+  $ diana-cli watch -r classify_ba archive splunk
+  $ diana-cli watch -R routes.yml
+
+  Multiple ROUTES file format:
+
+  ---
+  - handler: upload_files
+    source: "path:/incoming"
+    dest: queue
+  - handler: anon_and_send_instances
+    source: queue
+    dest: archive
+  - handler: index_studies
+    source: pacs
+    dest: splunk
+  ...
+
+  Provided route handlers:
+
+  - say_dlvl
+  - send_dlvl or anon_and_send_dlvl
+  - upload_files
+  - index_dlvl
 ```
 
 

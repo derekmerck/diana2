@@ -5,9 +5,23 @@ import commands
 from diana.utils.gateways import supress_urllib_debug
 from diana import __version__ as diana_version
 
-__version__ = "2.0.1"
+__version__ = "2.0.2"
 
-@click.group(name="diana-cli")
+epilog = """
+SERVICES is a required platform endpoint description in yaml format.
+
+\b
+---
+orthanc:
+  ctype: Orthanc
+  port: 8042
+  host: my_orthanc
+redis:
+  ctype: Redis
+...
+"""
+
+@click.group(name="diana-cli", epilog=epilog)
 @click.option('--verbose/--no-verbose', default=False)
 @click.version_option(version=(__version__, diana_version),
                       prog_name=("diana-cli.py", "python-diana"))

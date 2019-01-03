@@ -3,14 +3,16 @@ import click
 from diana.apis import Orthanc
 from diana.utils.dicom import DicomLevel
 
-@click.command()
+@click.command(short_help="Find in Orthanc node")
 @click.argument('query')
 @click.argument('source')
 @click.option('--domain', help="Domain for proxied query", default=None)
 @click.option('-r', '--retrieve', default=False, is_flag=True)
 @click.pass_context
 def ofind(ctx, query, source, domain, retrieve):
-    """Find studies matching yaml/json QUERY in SOURCE Orthanc service {optionally with proxy DOMAIN}"""
+    """Find studies matching yaml/json QUERY in SOURCE Orthanc service.  The optional
+    proxy DOMAIN issues a remote-find to a proxied DICOM endpoint."""
+
     services = ctx.obj.get('services')
     click.echo('Orthanc Find')
     click.echo('------------------------')

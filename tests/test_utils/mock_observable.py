@@ -8,6 +8,7 @@ class MockEventType(Enum):
     THIS = "this"
     THAT = "that"
 
+#: Observation format is (delay, event type, data payload)
 sample_observations = [
     (1, MockEventType.THIS, "first event (THIS)"),
     (1, MockEventType.THAT, "second event (THAT)"),
@@ -19,6 +20,7 @@ sample_observations = [
 
 @attr.s(cmp=False, hash=None)
 class MockObservable(Serializable, ObservableMixin):
+    """A minimal implementation of the Observable Mixin that can be scripted for testing."""
 
     observations = attr.ib(init=False, type=list, default=sample_observations, repr=False)
     start_time = attr.ib(init=False, factory=datetime.now)

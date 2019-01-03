@@ -3,45 +3,46 @@ import yaml
 from diana.daemons import mk_route
 from diana.utils.endpoint import Watcher
 
-@click.command()
+epilog="""
+Examples:
+
+\b
+$ diana-cli watch -r upload_files path:/incoming queue
+$ diana-cli watch -r anon_and_send_instances queue archive
+$ diana-cli watch -r index_studies pacs splunk
+$ diana-cli watch -r classify_ba archive splunk
+$ diana-cli watch -R routes.yml
+
+Multiple ROUTES file format:
+
+\b
+---
+- handler: upload_files
+  source: "path:/incoming"
+  dest: queue
+- handler: anon_and_send_instances
+  source: queue
+  dest: archive
+- handler: index_studies
+  source: pacs
+  dest: splunk
+...
+
+Provided route handlers:
+
+\b
+- say_dlvl
+- send_dlvl or anon_and_send_dlvl
+- upload_files
+- index_dlvl
+"""
+
+@click.command(short_help="Watch sources and route events", epilog=epilog)
 @click.option('-r', '--route', default=None, nargs=3)
 @click.option('-R', '--routes_path', type=click.Path(exists=True), default=None)
 @click.pass_context
 def watch(ctx, route, routes_path):
-    """
-    Watch sources for events to handle based on ROUTES
-
-    Usage:
-
-    $ diana-cli watch -r move path:/incoming queue
-    $ diana-cli watch -r move_anon queue archive
-    $ diana-cli watch -r index_series archive splunk
-
-    $ diana-cli watch -r classify_ba archive splunk
-
-    $ diana-cli watch -r pindex_studies pacs splunk
-
-    $ echo routes.yml
-    ---
-    - source: queue
-      dest: archive
-      handler: mv_anon
-      level: instances
-    - source: archive
-      dest: splunk
-      handler: index
-      level: studies
-    ...
-    $ diana-cli watch -R routes.yml
-
-    Route Handlers (Triggers):
-
-    - say
-    - mv or mv_anon
-    - upload
-    - index
-
-    """
+    """Watch sources for events to handle based on ROUTES"""
 
     services = ctx.obj.get('services')
     click.echo('Watcher')

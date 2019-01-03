@@ -3,13 +3,14 @@ import click
 from diana.apis import DcmDir
 from diana.utils.gateways import ImageFileHandler, DcmFileHandler
 
-@click.command()
+@click.command(short_help="Convert DICOM to image")
 @click.argument('inpath', type=click.Path(exists=True))
 @click.argument('outpath', default=".", type=click.Path())
 @click.pass_context
 def dcm2im(ctx, inpath, outpath):
-    """Convert a DICOM format file or directory INPATH into pixels and save
-    in a standard image format (png, jpg) to OUTPATH. """
+    """Convert a DICOM file or directory of files at INPATH into
+    pixels and save result in a standard image format (png, jpg)
+    at OUTPATH."""
 
     services = ctx.obj.get('services')
     click.echo('Covert DICOM to Image')
