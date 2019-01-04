@@ -16,7 +16,7 @@ redis_bad:
 
 # persistent redis
 redis_p:
-  ctype: redis
+  ctype: Redis
   port: 6380
 
 #splunk:

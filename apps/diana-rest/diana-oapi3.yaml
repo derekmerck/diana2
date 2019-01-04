@@ -1,0 +1,275 @@
+openapi: "3.0.0"
+
+info:
+  description: "[DIANA](https://github.com/derekmerck/diana2) API spec."
+  version: "1.0.0"
+  title: "DIANA"
+  contact:
+    email: "Derek_Merck@brown.edu"
+
+tags:
+  - name: "endpoint"
+    description: "Direct control of services"
+  - name: "daemon"
+    description: "Manage processing pipelines"
+  - name: "guid"
+    description: "Create sham patient ids"
+
+servers:
+  - url: /v1.0
+    description: DIANA API version 1.0
+
+paths:
+  /endpoint:
+    get:
+      tags:
+        - "endpoint"
+      summary:  "List service keys and status"
+      operationId: "diana-server.endpoints"
+      responses:
+        "200":
+          description: "Successful operation"
+
+  /endpoint/{service_key}/dixel:
+    get:
+      tags:
+        - "endpoint"
+      summary: "Retrieve a dixel by id"
+      operationId: "diana-server.get"
+      parameters:
+        - name: "service_key"
+          in: "path"
+          description: "service key"
+          required: true
+          schema:
+            type: "string"
+        - name: "id"
+          in: "query"
+          description: "dixel id"
+          required: true
+          schema:
+            $ref: "#/components/schemas/Dixel/properties/id"
+        - name: "level"
+          in: "query"
+          description: "dixel level"
+          required: false
+          schema:
+            $ref: "#/components/schemas/Dixel/properties/level"
+      responses:
+        "200":
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dixel"
+        "400":
+          description: "Service endpoint failed to respond"
+        "405":
+          description: "Invalid service endpoint key"
+
+    delete:
+      tags:
+        - endpoint
+      summary: "Delete a dixel"
+      operationId: "diana-server.delete"
+      parameters:
+        - name: "service_key"
+          in: "path"
+          description: "service key"
+          required: true
+          schema:
+            type: "string"
+        - name: "id"
+          in: "query"
+          description: "dixel id"
+          required: true
+          schema:
+            $ref: "#/components/schemas/Dixel/properties/id"
+        - name: "level"
+          in: "query"
+          description: "dixel level"
+          required: false
+          schema:
+            $ref: "#/components/schemas/Dixel/properties/level"
+      responses:
+        "200":
+          description: "Successful operation"
+        "400":
+          description: "Service endpoint failed to respond"
+        "405":
+          description: "Invalid service endpoint key"
+
+    post:
+      tags:
+        - "endpoint"
+      summary: "Find a dixel"
+      operationId: "diana-server.find"
+      parameters:
+        - name: "service_key"
+          in: "path"
+          description: "service key"
+          required: true
+          schema:
+            type: "string"
+        - name: "domain"
+          in: "query"
+          description: "proxy domain"
+          required: false
+          schema:
+            type: "string"
+      requestBody:
+        description: Dictionary of query tags to match
+        content:
+          'application/json':
+            schema:
+              type: "object"
+      responses:
+        "200":
+          description: "successful operation"
+        "400":
+          description: "service failed to respond"
+        "405":
+          description: "invalid service key"
+
+
+  /daemons/fiup:
+    post:
+      tags:
+        - "daemon"
+      summary: "Upload an indexed accession number"
+      operationId: "diana-server.fiup"
+      requestBody:
+        description: File index upload parameters
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                registry:
+                  description: Redis service key
+                  type: "string"
+                  example: my_redis
+                path:
+                  description: Base path for registry
+                  type: "string"
+                  example: "/data/my_dicom"
+                accession_number:
+                  description: Accession number to pull
+                  type: "string"
+                  example: "123456789"
+                dest_key:
+                  description: Orthanc destination
+                  type: "string"
+                  example: my_orthanc
+      responses:
+        "200":
+          description: "Successful operation"
+        "400":
+          description: "Service endpoint failed to respond"
+        "405":
+          description: "Invalid service endpoint key"
+
+
+  /guid:
+    get:
+      tags:
+        - "guid"
+      summary: "Generate a GUID"
+      description: "Generate a reproducible sham ID from input patient PHI"
+      operationId: "diana-server.mint_guid"
+      parameters:
+        - name: "name"
+          in: "query"
+          description: "Name of patient to sham"
+          required: true
+          schema:
+            type: "string"
+          example: "John Doe"
+        - name: "birth_date"
+          in: "query"
+          description: "Birth date of patient to sham"
+          required: false
+          schema:
+            type: "string"
+            format: "date"
+          example: "01/01/2000"
+        - name: "age"
+          in: "query"
+          description: "Age of patient to sham (if no birthday)"
+          required: false
+          schema:
+            type: "string"
+            format: int32
+        - name: "reference_date"
+          in: "query"
+          description: "Reference date for age (guid is not reproducible with age alone)"
+          required: false
+          schema:
+            type: "string"
+            format: "date"
+        - name: "sex"
+          in: "query"
+          description: "Sex of patient to sham"
+          schema:
+            type: "string"
+            enum:
+              - "M"
+              - "F"
+              - "U"
+            default: "U"
+            example: "M"
+          required: false
+      responses:
+        "200":
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  patient_id:
+                    type: "string"
+                    description: "Sham patient ID"
+                    example: "ALYTELUDPN6JXZWSB6OELK6OA2G4AIQS"
+                  patient_name:
+                    type: "string"
+                    description: "Sham patient name"
+                    example: "ALMETER^LINCOLN^Y"
+                  patient_birthdate:
+                    type: "string"
+                    format: "date"
+                    description: "Sham patient DoB"
+                    example: "19991218"
+                  time_offset:
+                    type: "string"
+                    format: "date-time"
+                    description: "Time offset for shamming study times"
+                    example: "-15 days, 23:40:18"
+        "400":
+          description: "Invalid input values"
+
+
+components:
+  schemas:
+    Dixel:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          description: "Dixel id (fn, oid, uid, etc.)"
+        level:
+          type: "string"
+          description: "Dixel level"
+          enum:
+            - "studies"
+            - "series"
+            - "instances"
+          default: "studies"
+        tags:
+          type: "object"
+          description: "Dictionary of DICOM tags"
+
+
+externalDocs:
+  description: "DIANA documentation"
+  url: "https://diana.readthedocs.com"
