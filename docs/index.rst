@@ -21,6 +21,7 @@ Components
    source/package
    ./library_api
    source/diana-cli
+   source/diana-plus
    source/docker-image
    ./unit_tests
 

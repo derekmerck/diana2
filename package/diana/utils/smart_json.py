@@ -1,4 +1,5 @@
 import json
+from datetime import timedelta
 
 # Add any serializing functions here
 def stringify(obj):
@@ -9,9 +10,13 @@ def stringify(obj):
     if hasattr(obj, "isoformat"):
         return obj.isoformat()
 
+    if isinstance(obj, timedelta):
+        return obj.__str__()
+
     # Handle hashes
     if hasattr(obj, 'hexdigest'):
         return obj.hexdigest()
+
 
 
 class SmartJSONEncoder(json.JSONEncoder):
