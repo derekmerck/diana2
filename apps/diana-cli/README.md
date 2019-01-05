@@ -34,6 +34,7 @@ Commands:
   dcm2im   Convert DICOM to image
   findex   Create a persistent DICOM file index
   fiup     Upload indexed DICOM files
+  guid     Generate a GUID
   mock     Generate mock DICOM traffic
   ofind    Find in Orthanc node
   watch    Watch sources and route events
@@ -55,6 +56,17 @@ Commands:
 Usage: diana-cli check [OPTIONS] [ENDPOINTS]...
 
   Survey status of service ENDPOINTS
+
+Options:
+  --help  Show this message and exit.
+```
+## collect
+
+```
+Usage: diana-cli collect [OPTIONS] PROJECT DATA_PATH SOURCE DEST
+
+  Create a PROJECT key at DATA_PATH, then pull data from SOURCE and send to
+  DEST.
 
 Options:
   --help  Show this message and exit.
@@ -95,6 +107,29 @@ Usage: diana-cli fiup [OPTIONS] COLLECTION PATH REGISTRY DEST
 Options:
   -p, --pool_size INTEGER  Worker threads
   --help                   Show this message and exit.
+```
+## guid
+
+```
+Usage: diana-cli guid [OPTIONS] NAME [[%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d
+                      %H:%M:%S]] [GENDER]
+
+  Generate a globally unique sham ID from NAME, DOB, and GENDER.
+
+Options:
+  --age INTEGER                   Substitute age and ref date for DOB
+  --reference_date [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
+                                  Reference date for AGE
+  --help                          Show this message and exit.
+
+  $ python3 diana-cli.py guid "MERCK^DEREK^L" --age 30
+  Generating GUID
+  ------------------------
+  WARNING:GUIDMint:Creating non-reproducible GUID using current date
+  {'BirthDate': datetime.date(1988, 11, 20),
+   'ID': 'VXNQHHN523ZQNJFIY3TXJM4YXABTL6SL',
+   'Name': ['VANWASSENHOVE', 'XAVIER', 'N'],
+   'TimeOffset': datetime.timedelta(-47, 82822)}
 ```
 ## mock
 

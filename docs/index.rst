@@ -23,6 +23,7 @@ Components
    source/diana-cli
    source/diana-plus
    source/diana-rest
+   source/guid
    source/docker-image
    source/docker-stacks
    source/rih-cirr

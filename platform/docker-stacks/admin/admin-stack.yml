@@ -1,6 +1,6 @@
 # Provides Portainer and Traefik services and networks
 
-version: '3.3'
+version: '3.0'
 
 networks:
   proxy_network:

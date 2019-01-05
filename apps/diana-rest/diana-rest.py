@@ -2,7 +2,7 @@ import os
 import connexion
 import yaml
 from diana.apis import *
-from diana.daemons import FileIndexer
+from diana.daemons import FileIndexer, Collector
 from diana.utils.endpoint import Serializable
 from diana.utils.guid import GUIDMint
 from diana.utils.dicom import dicom_name, dicom_date
@@ -54,6 +54,13 @@ def fiup(registry_key, path, accession_number, dest_key):
         registry=R,
         dest=O
     )
+
+def collect(source_key, domain, dest_key, studies):
+    source = Orthanc(**services[source_key])
+    dest = Orthanc(**services[dest_key])
+
+    # TODO: Need to create a tmp data dir?
+    Collector().run(_,_,source, domain, dest)
 
 def mint_guid(name,
               birth_date=None,

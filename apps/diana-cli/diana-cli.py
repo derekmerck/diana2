@@ -64,6 +64,7 @@ coms = [
     commands.dcm2im,
     commands.findex,
     commands.fiup,
+    commands.guid,
     commands.mock,
     commands.ofind,
     commands.watch

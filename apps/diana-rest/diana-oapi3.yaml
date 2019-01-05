@@ -25,7 +25,7 @@ paths:
       tags:
         - "endpoint"
       summary:  "List service keys and status"
-      operationId: "diana-server.endpoints"
+      operationId: "diana-rest.endpoints"
       responses:
         "200":
           description: "Successful operation"
@@ -35,7 +35,7 @@ paths:
       tags:
         - "endpoint"
       summary: "Retrieve a dixel by id"
-      operationId: "diana-server.get"
+      operationId: "diana-rest.get"
       parameters:
         - name: "service_key"
           in: "path"
@@ -71,7 +71,7 @@ paths:
       tags:
         - endpoint
       summary: "Delete a dixel"
-      operationId: "diana-server.delete"
+      operationId: "diana-rest.delete"
       parameters:
         - name: "service_key"
           in: "path"
@@ -103,7 +103,7 @@ paths:
       tags:
         - "endpoint"
       summary: "Find a dixel"
-      operationId: "diana-server.find"
+      operationId: "diana-rest.find"
       parameters:
         - name: "service_key"
           in: "path"
@@ -137,7 +137,7 @@ paths:
       tags:
         - "daemon"
       summary: "Upload an indexed accession number"
-      operationId: "diana-server.fiup"
+      operationId: "diana-rest.fiup"
       requestBody:
         description: File index upload parameters
         content:
@@ -169,6 +169,45 @@ paths:
         "405":
           description: "Invalid service endpoint key"
 
+  /daemons/collect:
+    post:
+      tags:
+        - "daemon"
+      summary: "Pull a list of studies from source and send to a destination"
+      operationId: "diana-rest.collect"
+      requestBody:
+        description: Study collection parameters
+        content:
+          'application/json':
+            schema:
+              type: object
+              properties:
+                source:
+                  description: Orthanc source service key
+                  type: "string"
+                  example: orthanc-source
+                domain:
+                  description: Proxy domain for rfind
+                  type: "string"
+                  example: "pacs"
+                dest:
+                  description: Orthanc destination service key
+                  type: "string"
+                  example: orthanc-dest
+                studies:
+                  description: Accession numbers to pull
+                  type: "array"
+                  items:
+                    type: string
+                  example: ["123456789", "223456789"]
+      responses:
+        "200":
+          description: "Successful operation"
+        "400":
+          description: "Service endpoint failed to respond"
+        "405":
+          description: "Invalid service endpoint key"
+
 
   /guid:
     get:
@@ -176,7 +215,7 @@ paths:
         - "guid"
       summary: "Generate a GUID"
       description: "Generate a reproducible sham ID from input patient PHI"
-      operationId: "diana-server.mint_guid"
+      operationId: "diana-rest.mint_guid"
       parameters:
         - name: "name"
           in: "query"

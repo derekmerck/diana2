@@ -2,7 +2,7 @@
 #   - Swarm:    MOCK@orthanc-mock:4242
 #   - External: MOCK@host:2424
 
-version: '3.3'
+version: '3.0'
 
 
 networks:

@@ -124,6 +124,15 @@ Dixel routes are instantiated with (source, dest, handler) tuples and attached t
    :members:
    :undoc-members:
 
+Collector
+....................
+
+A collector is similar to a Watcher, but it processes historical data based on an input list of studies.
+
+.. automodule:: diana.daemons.collector
+   :members:
+   :undoc-members:
+
 File Indexer
 ....................
 

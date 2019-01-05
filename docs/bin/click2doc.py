@@ -42,7 +42,7 @@ def run_cli_help(app, cmd=None):
 @click.argument("path", default="diana-cli", type=click.STRING)
 def cli(path):
 
-    cmds = ["check", "dcm2im", "findex", "fiup", "mock", "ofind", "watch"]
+    cmds = ["check", "collect", "dcm2im", "findex", "fiup", "guid", "mock", "ofind", "watch"]
 
     app = __import__(path)
 
@@ -52,9 +52,6 @@ def cli(path):
     for cmd in cmds:
         text += "## {}\n\n".format(cmd)
         text += "```\n" + run_cli_help(app, cmd) + "```\n"
-
-        # if hasattr(app.cli, "example"):
-        #     text += app.cli.example
 
     text += footer
 
