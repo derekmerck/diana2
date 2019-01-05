@@ -19,7 +19,7 @@ def cli(path, outdir, recurse):
         if fp.name == "README.md":
             name = fp.parent.name + ".rst"
         else:
-            name = fp.name
+            name = fp.name[:-3] + ".rst"
         ofp = _outdir / name
         click.echo("Converting {} to {}".format(fp, ofp))
         return ofp
