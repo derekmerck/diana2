@@ -8,6 +8,14 @@ Setup the Swarm
 
 ::
 
+::
+
+::
+
+::
+
+::
+
     $ docker swarm init --advertise-addr <ip_addr>
     $ ssh host2
     > docker swarm join ... etc
@@ -22,6 +30,14 @@ Tag unique nodes for the scheduler
   by specific IP address.)
 
 .. code:: bash
+
+::
+
+::
+
+::
+
+::
 
 ::
 

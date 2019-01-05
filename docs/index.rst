@@ -22,7 +22,10 @@ Components
    ./library_api
    source/diana-cli
    source/diana-plus
+   source/diana-rest
    source/docker-image
+   source/docker-stacks
+   source/rih-cirr
    ./unit_tests
 
 

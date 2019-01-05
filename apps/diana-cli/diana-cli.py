@@ -58,14 +58,19 @@ def cli(ctx, verbose, services, services_path):
         ctx.obj = {}
     ctx.obj['services'] = _services
 
+coms = [
+    commands.check,
+    commands.collect,
+    commands.dcm2im,
+    commands.findex,
+    commands.fiup,
+    commands.mock,
+    commands.ofind,
+    commands.watch
+]
 
-cli.add_command(commands.check)
-cli.add_command(commands.dcm2im)
-cli.add_command(commands.findex)
-cli.add_command(commands.fiup)
-cli.add_command(commands.mock)
-cli.add_command(commands.ofind)
-cli.add_command(commands.watch)
+for c in coms:
+    cli.add_command(c)
 
 
 if __name__ == '__main__':

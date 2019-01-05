@@ -27,13 +27,14 @@
       --help                    Show this message and exit.
 
     Commands:
-      check   Check endpoint status
-      dcm2im  Convert DICOM to image
-      findex  Create a persistent DICOM file index
-      fiup    Upload indexed DICOM files
-      mock    Generate mock DICOM traffic
-      ofind   Find in Orthanc node
-      watch   Watch sources and route events
+      check    Check endpoint status
+      collect  Collect and handle studies
+      dcm2im   Convert DICOM to image
+      findex   Create a persistent DICOM file index
+      fiup     Upload indexed DICOM files
+      mock     Generate mock DICOM traffic
+      ofind    Find in Orthanc node
+      watch    Watch sources and route events
 
       SERVICES is a required platform endpoint description in yaml format.
 

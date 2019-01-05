@@ -14,7 +14,7 @@ def test_cli_help():
     result = runner.invoke(app.cli, ["--help"])
     print(result.output)
 
-    assert("Check status of service ENDPOINTS" in result.output)
+    assert("Check endpoint status" in result.output)
 
 
 def test_cli_svc_check(setup_orthanc, setup_redis):
