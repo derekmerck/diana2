@@ -50,8 +50,8 @@ class DcmDir(Endpoint, Serializable):
         else:
             raise ValueError("Item has no fn attribute, so it requires an explicit filename")
 
-        if not self.exists(fn):
-            raise FileNotFoundError
+        if not self.gateway.exists(fn):
+            raise FileNotFoundError(fn)
 
         get_pixels = DixelView.PIXELS in view
         # logger.debug("Pixels: {}".format(get_pixels))

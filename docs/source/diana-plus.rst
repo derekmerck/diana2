@@ -30,7 +30,10 @@ AAPM-published tables.
 
 .. code:: python
 
-    >>> from dxpl import MeasureScout
+    >>> from packages.dxpl import MeasureScout
+        >>> d = DcmDir("my_dir").get("scout.dcm")
+        >>> d.MeasureScout()
+        ("AP", 29.2)
     >>> d = DcmDir("my_dir").get("scout.dcm")
     >>> d.MeasureScout()
     ("AP", 29.2)
@@ -45,7 +48,10 @@ Returns estimated age in in years and months.
 
 .. code:: python
 
-    >>> from dxpl import BoneAge
+    >>> from packages.dxpl import BoneAge
+        >>> d = DcmDir("my_dir").get("ba.dcm")
+        >>> d.BoneAge()
+        (7, 10)
     >>> d = DcmDir("my_dir").get("ba.dcm")
     >>> d.BoneAge()
     (7, 10)

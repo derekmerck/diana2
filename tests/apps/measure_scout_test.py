@@ -2,7 +2,6 @@ import logging
 
 from diana.dixel import DixelView
 from diana.apis import DcmDir
-from dxpl import MeasureScout  # Monkey patches Dixel
 
 from test_utils import find_resource
 

@@ -21,15 +21,17 @@ Routines for pixel-based image post-processing that require numpy, scikit-learn,
 Measure Scout
 --------------
 
-Estimates patient dimensions from CT localizer images for size-specific dose estimation.  Basic algorithm is to use a 2-element Guassian mixture model to find a threshold that separates air from tissue across bredth of the image.  Known to fail when patients do not fit in the scout field of view.
+Estimates patient dimensions from CT localizer images for size-specific dose estimation.  Basic algorithm is to use a 2-element Guassian mixture model to find a threshold that separates air from tissue across breadth of the image.  Known to fail when patients do not fit in the scout field of view.
 
 Returns image orientation and estimated distance in centimeters.  These measurements can be converted into equivalent water volumes using AAPM-published tables.
 
-```python
->>> from dxpl import MeasureScout
->>> d = DcmDir("my_dir").get("scout.dcm")
->>> d.MeasureScout()
-("AP", 29.2)
+```text
+$ python3 diana-plus.py ssde ../../tests/resources/scouts \
+                             ct_scout_01.dcm ct_scout_02.dcm
+Measuring scout images
+------------------------
+ct_scout_01.dcm (AP): 28.0cm
+ct_scout_02.dcm (LATERAL): 43.0cm
 ```
 
 Estimate Bone Age

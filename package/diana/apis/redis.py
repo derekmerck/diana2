@@ -135,6 +135,16 @@ class Redis(Endpoint, Serializable):
                                  collection_key: str = "AccessionNumber",
                                  item_key: str = "FilePath",
                                  path=None ):
+        """
+        It is non-obvious how to check the total number of objects across all sets.
+        This works and its fast for even large data sets.
+
+        > EVAL "local total = 0 for _, key in ipairs(redis.call('keys', ARGV[1])) do total = total + redis.call('scard', key) end return total" 0 prefix-*
+
+        See <https://stackoverflow.com/questions/34563144/redis-multiple-key-set-counts>
+        """
+
+
 
         if item_key == "FilePath" and path:
             value = os.path.join(path, item.meta.get("FileName"))

@@ -1,2 +1,6 @@
+cython
 numpy
+scipy
+tensorflow
+keras
 scikit-learn

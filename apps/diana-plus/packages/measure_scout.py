@@ -6,7 +6,7 @@ from diana.dixel import Dixel
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-def MeasureScout(dixel: Dixel):
+def measure_scout(dixel: Dixel):
     """Measure AP and Lateral dimensions from DICOM localizer images for SSDE calculations"""
 
     # TODO: add a tag check for "LOCALIZER"
@@ -65,4 +65,4 @@ def MeasureScout(dixel: Dixel):
     return (measured_dim, d_avg)
 
 # Monkey patch
-Dixel.MeasureScout = MeasureScout
+Dixel.measure_scout = measure_scout
