@@ -86,22 +86,28 @@ def mint_guid(name,
 
     return resp
 
-def init():
 
-    services_path = os.environ.get("DIANA_SERVICES_PATH")
-    print( services_path )
 
-    if services_path:
+def init_app():
+
+    def load_services(services_path):
         with open(services_path) as f:
             _services = yaml.load(f)
         services.update(_services)
 
+    services_path = os.environ.get("DIANA_SERVICES_PATH")
+    if services_path:
+        load_services(services_path)
+    app = connexion.App(__name__, specification_dir='.')
+    app.add_api('diana-oapi3.yaml')
+    app.app.json_encoder = SmartJSONEncoder
 
+    setattr(app.app, "load_services", load_services)
 
-init()
+    return app
 
-app = connexion.App(__name__, specification_dir='.')
-app.add_api('diana-oapi3.yaml')
-app.app.json_encoder = SmartJSONEncoder
-app.run(port=8080)
+app = init_app()
+
+if __name__ == "__main__":
+    app.run(port=8080)
 

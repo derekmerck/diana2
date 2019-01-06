@@ -6,7 +6,6 @@ from diana.dixel import Dixel
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-
 def MeasureScout(dixel: Dixel):
     """Measure AP and Lateral dimensions from DICOM localizer images for SSDE calculations"""
 

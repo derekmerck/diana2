@@ -74,3 +74,4 @@ def setup_redis():
 
     print("Tearing down redis fixture")
     S.stop_container()
+
