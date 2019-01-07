@@ -1,7 +1,7 @@
 import click
 from diana.apis import DcmDir
 from diana.dixel import DixelView
-import packages.measure_scout  # monkey patches Dixel
+import dxplus.measure_scout  # monkey patches Dixel
 
 @click.command(short_help="Patient size from localizer")
 @click.argument('path', type=click.Path(exists=True))

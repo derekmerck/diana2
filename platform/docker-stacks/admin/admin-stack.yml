@@ -39,7 +39,7 @@ services:
         constraints:
           - node.role==manager
       labels:
-        - "traefik.docker.network=cirr_proxy_network"
+        - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=9000"
         - "traefik.frontend.rule=PathPrefixStrip:/portainer/"
 

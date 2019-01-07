@@ -2,6 +2,7 @@ import logging
 
 from diana.dixel import DixelView
 from diana.apis import DcmDir
+import dxplus.measure_scout
 
 from test_utils import find_resource
 
@@ -14,16 +15,16 @@ def test_measurement():
     D = DcmDir(path=path)
 
     fn_s1 = "ct_scout_01.dcm"
-    d_s1 = D.get(fn_s1, view=DixelView.TAGS|DixelView.PIXELS)
-    ret = d_s1.MeasureScout()
+    d_s1 = D.get(fn_s1, view=DixelView.PIXELS)
+    ret = d_s1.measure_scout()
     logging.debug(ret)
 
     assert( ret[0] == 'AP' and
             round(ret[1]) == 28 )
 
     fn_s2 = "ct_scout_02.dcm"
-    d_s2 = D.get(fn_s2, view=DixelView.TAGS|DixelView.PIXELS)
-    ret = d_s2.MeasureScout()
+    d_s2 = D.get(fn_s2, view=DixelView.PIXELS)
+    ret = d_s2.measure_scout()
     logging.debug(ret)
 
     assert( ret[0] == 'LATERAL' and

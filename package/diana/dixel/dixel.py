@@ -266,6 +266,14 @@ class Dixel(Serializable):
         else:
             pixels = self.pixels
 
+        # This is irrelevant if values are normalized anyway
+        if "RescaleSlope" in self.tags.keys() and \
+           "RescaleIntercept" in self.tags.keys():
+            pixels *= int(self.tags.get("RescaleSlope"))
+            pixels += int(self.tags.get("RescaleIntercept"))
+        else:
+            logging.debug("No rescale slope/intercept in DICOM header")
+
         return pixels
 
     @property

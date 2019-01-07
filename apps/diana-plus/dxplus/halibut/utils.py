@@ -1,8 +1,8 @@
 import numpy as np
-import pydicom
-
 from scipy.ndimage.interpolation import zoom
 from scipy.ndimage.filters import gaussian_filter
+
+from diana.dixel import Dixel
 
 def resize_image(img, size, smooth=None, verbose=True):
     """
@@ -31,23 +31,19 @@ def resize_image(img, size, smooth=None, verbose=True):
     assert size == resized_img.shape[0] == resized_img.shape[1]
     return resized_img.astype("uint8")
 
+def get_pixels(dixel: Dixel, imsize=224):
 
-def get_image_from_dicom(dicom_file, imsize=224):
-    dcm = pydicom.read_file(dicom_file)
-    array = dcm.pixel_array
-    try:
-        array *= int(dcm.RescaleSlope)
-        array += int(dcm.RescaleIntercept)
-    except:
-        print("No rescale slope/intercept in DICOM header")
-    if dcm.PhotometricInterpretation == "MONOCHROME1":
-        array = np.invert(array.astype("uint16"))
-    array = array.astype("float32")
-    array -= np.min(array)
-    array /= np.max(array)
-    array *= 255.
-    array = resize_image(array, imsize, verbose=False)
-    return array
+    pixels = dixel.get_pixels()
+
+    if dixel.meta.get("PhotometricInterpretation") == "MONOCHROME1":
+        pixels = np.invert(pixels.astype("uint16"))
+
+    pixels = pixels.astype("float32")
+    pixels -= np.min(pixels)
+    pixels /= np.max(pixels)
+    pixels *= 255.
+    pixels = resize_image(pixels, imsize, verbose=False)
+    return pixels
 
 
 from .MobileNetGray import MobileNet
@@ -81,6 +77,8 @@ def get_mobilenet(layer, lr=1e-3, input_shape=(224,224,1), dropout=None,
     return model
 
 
-def get_prediction( model, image ):
-    return model.predict(np.expand_dims(np.expand_dims(image, axis=2), axis=0))[0][0]
+def get_prediction( dixel: Dixel, model ):
+    pixels = get_pixels(dixel)
+    return model.predict(np.expand_dims(np.expand_dims(pixels, axis=2), axis=0))[0][0]
 
+Dixel.get_prediction = get_prediction

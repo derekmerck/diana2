@@ -23,7 +23,7 @@ def cli(verbose):
 
 coms = [
     commands.ssde,
-    # commands.classify,
+    commands.classify,
 ]
 
 for c in coms:

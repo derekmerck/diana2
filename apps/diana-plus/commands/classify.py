@@ -5,42 +5,43 @@ Ian Pan, Summer 2018
 
 Wrapper command-line tool for Halibut MobileNetGray classification.
 
-$ python3 classify-it.py -m pose_weights.h5 -d CR00.dcm -p frontal -n lateral
+$ python3 diana-plus.py classify ../../resources/models/view_classifier.h5 ../../tests/resources/dcm IM2263
 
 """
 
-import argparse, os, logging
-from packages.halibut import get_mobilenet, get_image_from_dicom, get_prediction
+import os
+import click
+from diana.apis import DcmDir
+from diana.dixel import DixelView
+from dxplus.halibut import get_mobilenet, get_pixels, get_prediction
 
+@click.command(short_help="Classify DICOM files")
+@click.argument('model', type=click.File())
+@click.argument('path', type=click.Path(exists=True))
+@click.argument('images', nargs=-1)
+@click.option("--positive", "-p", help="Positive class", default="positive")
+@click.option("--negative", "-n", help="Negative class", default="negative")
 
-def parse_args():
+def classify(model, path, images, positive, negative):
+    """Apply a classification MODEL to PATH with IMAGES"""
 
-    parser = argparse.ArgumentParser(prog="Halibut",
-                                     description="Binary DICOM image classification with MobileNetGray")
-    parser.add_argument("--model", "-m", type=str,
-                        help="Path to model weights")
-    parser.add_argument("--dicom", "-d", type=str,
-                        help="Path DICOM file")
-    parser.add_argument("--positive", "-p", help="Positive class", default="positive")
-    parser.add_argument("--negative", "-n", help="Negative class", default="negative")
-    return parser.parse_args()
-
-
-if __name__ == "__main__":
+    click.echo('Classifying images')
+    click.echo('------------------------')
 
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-    logging.basicConfig(level=logging.DEBUG)
 
-    opts = parse_args()
+    _model = get_mobilenet(0, weights=None)
+    _model.load_weights(model.name)
 
-    model = get_mobilenet(0, weights=None)
-    model.load_weights(opts.model)
-    # model = get_mobilenet(0, weights=args.model)
-    image = get_image_from_dicom(opts.dicom)
+    D = DcmDir(path=path)
 
-    prediction = get_prediction( model, image )
+    for image in images:
+        d = D.get(image, view=DixelView.PIXELS)
+        prediction = d.get_prediction(_model)
 
-    if prediction >= 0.5:
-        logging.info("Predicted: {} ({})<<".format( opts.positive, round(prediction, 2) ))
-    else:
-        logging.info("Predicted: {} ({})<<".format( opts.negative, round(1.0-prediction, 2) ))
+        # prediction = get_prediction( model, image )
+
+        if prediction >= 0.5:
+            click.echo("Predicted: {} ({})".format( positive, round(prediction, 2) ))
+        else:
+            click.echo("Predicted: {} ({})".format( negative, round(1.0-prediction, 2) ))

@@ -134,6 +134,10 @@ $ docker node update --label-add storage=true host1   # mounts mass storage
 $ docker node update --label-add bridge=true host2    # registered IP address for DICOM receipt
 ```
 
+### Open the Firewall
+
+If the firewall stops workers from joining see <https://www.digitalocean.com/community/tutorials/how-to-configure-the-linux-firewall-for-docker-swarm-on-centos-7>
+
 
 License
 -------------

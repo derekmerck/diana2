@@ -15,7 +15,7 @@ Documentation: <https://diana.readthedocs.io>
 Image:  <https://cloud.docker.com/repository/docker/derekmerck/diana2>
 
 
-Routines for pixel-based image post-processing that require numpy, scikit-learn, or pytorch.
+Routines for pixel-based image post-processing that require numpy, scipy, scikit-learn, keras, and pytorch.
 
 
 Measure Scout
