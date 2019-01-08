@@ -23,19 +23,16 @@ The RIH Clinical Imaging Research Repository (CIRR) was the initial development 
 
 ### Overview
 
-The RIH CIRR stack deploys multiple services to the Swarm cluster.
+The RIH CIRR stack provides multiple services:
 
-- A [Traefik][] reverse proxy
-- A [Portainer][] agent network
 - A [Postgres][] database with bind-mounted storage
 - A [Splunk][] data aggregator with bind-mounted storage
 - An [Orthanc][] DICOM archive
 - An Orthanc instance configured as a simple DICOM ingress multiplexer to the archive and 3D workstations
 - An Orthanc instance configured as a DICOM Q/R bridge to the PACS for external data pulls
+- An Orthanc "MockPacs"
 
 The bridge service can be manipulated using DIANA watcher scripts to monitor and index the clinical PACS, and to exfiltrate and anonymize large data collections.
-
-
 
 
 ### Usage

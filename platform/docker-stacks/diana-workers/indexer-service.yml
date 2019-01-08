@@ -3,12 +3,15 @@ version: '3.0'
 
 services:
 
-  diana-indexer:
+  diana-indexer1:
     image:                  derekmerck/diana2
+#    command: >
+#      sh -c "git pull && python3 -u apps/diana-cli/diana-cli.py findex /research2/orthanc/db Redis -o -r '*'"
     command: >
-      sh -c "git pull && python3 -u apps/diana-cli/diana-cli.py findex /research2/orthanc/db Redis -o -r '*'"
+      sh -c "git pull && python3 -u apps/diana-cli/diana-cli.py findex /research/orthanc-archive/db Redis -o -r '*'"
     volumes:
-      - ${DATA_DIR}:${DATA_DIR}
+      - /research:/research
+      - /research2:/research2
     environment:
       DIANA_SERVICES: >
         {
