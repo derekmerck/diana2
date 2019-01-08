@@ -10,8 +10,8 @@ services:
     command: >
       sh -c "git pull && python3 -u apps/diana-cli/diana-cli.py findex /research/orthanc-archive/db Redis -o -r '*'"
     volumes:
-      - /research:/research
-      - /research2:/research2
+      - /research/:/research/
+      - /research2/:/research2/
     environment:
       DIANA_SERVICES: >
         {
