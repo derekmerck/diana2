@@ -1,0 +1,49 @@
+version: '3.0'
+
+volumes:
+  postgres_data:
+    driver_opts:
+        type: none
+        device: ${DATA_DIR}/postgres2
+        o: bind
+
+services:
+  postgres:
+    image: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER:            postgres
+      POSTGRES_PASSWORD:        ${POSTGRES_PASSWORD}
+      TZ: "America/New_York"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.storage==true
+
+  orthanc-archive:
+    image: derekmerck/orthanc-confd:latest-amd64
+    ports:
+      - 14242:4242
+    networks:
+      - admin_proxy_network
+    environment:
+      ORTHANC_NAME:             CIRR Archive v2
+      ORTHANC_AET:              CIRR_V2
+      ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
+      ORTHANC_STORE_COMPRESSED: "true"
+      ORTHANC_PG_ENABLED:       "true"
+      ORTHANC_PG_STORE_DICOM:   "true"
+      ORTHANC_PG_DATABASE:      ${ORTHANC_PG_DATABASE}
+      ORTHANC_PG_HOST:          postgres
+      ORTHANC_PG_USER:          orthanc
+      ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
+      ORTHANC_VERBOSE:          "true"
+      TZ:                       "America/New_York"
+    deploy:
+      replicas: 2  # Multiple nodes, PG provides data persistence
+      labels:
+        - "traefik.docker.network=admin_proxy_network"
+        - "traefik.port=8042"
+        - "traefik.frontend.rule=PathPrefixStrip:/archive/"
