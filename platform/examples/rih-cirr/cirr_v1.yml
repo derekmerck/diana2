@@ -21,10 +21,9 @@ volumes:
 
 services:
   postgres:
-    image: postgres
+    image: postgres:10
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    user: "999:999"
     environment:
       POSTGRES_USER:            orthanc
       POSTGRES_PASSWORD:        ${POSTGRES_PASSWORD}
@@ -50,7 +49,7 @@ services:
       ORTHANC_PG_ENABLED:       "true"
       ORTHANC_PG_DATABASE:      ${POSTGRES_DATABASE}
       ORTHANC_PG_HOST:          postgres
-      ORTHANC_PG_USER:          orthanc
+      ORTHANC_PG_USER:          postgres
       ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
       ORTHANC_VERBOSE:          "true"
       TZ:                       "America/New_York"
