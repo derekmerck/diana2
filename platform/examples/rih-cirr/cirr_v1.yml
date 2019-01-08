@@ -14,16 +14,16 @@ volumes:
         device: ${DATA_DIR}/${POSTGRES_DATA_DIR_V1}
         o: bind
 
-  orthanc_data:
-    driver_opts:
-      type: none
-      device: ${DATA_DIR}/${ORTHANC_DATA_DIR_V1}
+#  orthanc_data:
+#    driver_opts:
+#      type: none
+#      device: ${DATA_DIR}/${ORTHANC_DATA_DIR_V1}
 
 services:
   postgres:
     image: postgres:10
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - cirr1_postgres_data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER:            orthanc
       POSTGRES_PASSWORD:        ${POSTGRES_PASSWORD}
@@ -33,28 +33,28 @@ services:
       placement:
         constraints:
           - node.labels.storage==true
-
-  orthanc-archive:
-    image: derekmerck/orthanc-confd:latest-amd64
-    volumes:
-      - orthanc_data:/var/lib/orthanc/db
-    ports:
-      - 14242:4242
-    networks:
-      - admin_proxy_network
-    environment:
-      ORTHANC_NAME:             CIRR Archive v1
-      ORTHANC_AET:              CIRRV1
-      ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
-      ORTHANC_PG_ENABLED:       "true"
-      ORTHANC_PG_DATABASE:      ${POSTGRES_DATABASE}
-      ORTHANC_PG_HOST:          postgres
-      ORTHANC_PG_USER:          postgres
-      ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
-      ORTHANC_VERBOSE:          "true"
-      TZ:                       "America/New_York"
-    deploy:
-      labels:
-        - "traefik.docker.network=admin_proxy_network"
-        - "traefik.port=8042"
-        - "traefik.frontend.rule=PathPrefixStrip:/archive-old/"
+#
+#  orthanc-archive:
+#    image: derekmerck/orthanc-confd:latest-amd64
+#    volumes:
+#      - orthanc_data:/var/lib/orthanc/db
+#    ports:
+#      - 14242:4242
+#    networks:
+#      - admin_proxy_network
+#    environment:
+#      ORTHANC_NAME:             CIRR Archive v1
+#      ORTHANC_AET:              CIRRV1
+#      ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
+#      ORTHANC_PG_ENABLED:       "true"
+#      ORTHANC_PG_DATABASE:      ${POSTGRES_DATABASE}
+#      ORTHANC_PG_HOST:          postgres
+#      ORTHANC_PG_USER:          postgres
+#      ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
+#      ORTHANC_VERBOSE:          "true"
+#      TZ:                       "America/New_York"
+#    deploy:
+#      labels:
+#        - "traefik.docker.network=admin_proxy_network"
+#        - "traefik.port=8042"
+#        - "traefik.frontend.rule=PathPrefixStrip:/archive-old/"
