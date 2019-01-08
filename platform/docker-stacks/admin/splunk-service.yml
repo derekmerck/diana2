@@ -4,6 +4,12 @@ networks:
   admin_proxy_network:
     external: true   # Created by admin-stack
 
+  cirr1_default:
+    external: true
+
+  cirr2_default:
+    external: true
+
 volumes:
   splunk_data:
     driver_opts:
@@ -20,7 +26,8 @@ services:
       - "8089:8089"
     networks:
       - admin_proxy_network
-      - default
+      - cirr1_default
+      - cirr2_default
     volumes:
       - splunk_data:/opt/splunk/etc
     environment:
