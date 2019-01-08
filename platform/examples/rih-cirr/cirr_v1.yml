@@ -49,7 +49,7 @@ services:
     environment:
       ORTHANC_NAME:             CIRR Archive v1
       ORTHANC_AET:              CIRRV1
-      ORTHANC_MOD_0:            riha,RIHA,10.229.156.43,4006
+      ORTHANC_MOD_0:            ${RIH_MOD_RIHA}
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_PG_ENABLED:       "true"
       ORTHANC_PG_DATABASE:      ${POSTGRES_DATABASE}
