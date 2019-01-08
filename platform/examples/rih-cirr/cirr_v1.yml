@@ -11,13 +11,13 @@ volumes:
   postgres_data:
     driver_opts:
         type: none
-        device: ${DATA_DIR}/{POSTGRES_DATA_DIR_V1}
+        device: ${DATA_DIR}/${POSTGRES_DATA_DIR_V1}
         o: bind
 
   orthanc_data:
     driver_opts:
       type: none
-      device: ${DATA_DIR}/{ORTHANC_DATA_DIR_V1}
+      device: ${DATA_DIR}/${ORTHANC_DATA_DIR_V1}
 
 services:
   postgres:
