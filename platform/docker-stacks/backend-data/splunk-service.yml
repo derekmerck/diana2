@@ -20,6 +20,7 @@ services:
       - "8089:8089"
     networks:
       - admin_proxy_network
+      - default
     volumes:
       - splunk_data:/opt/splunk/etc
     environment:

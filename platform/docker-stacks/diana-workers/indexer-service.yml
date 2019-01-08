@@ -22,3 +22,8 @@ services:
           }
         }
       TZ:                   "America/New_York"
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.storage==true
