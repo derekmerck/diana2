@@ -25,12 +25,12 @@ services:
   orthanc-archive:
     image: derekmerck/orthanc-confd:latest-amd64
     ports:
-      - 14242:4242
+      - 4242:4242
     networks:
       - admin_proxy_network
     environment:
       ORTHANC_NAME:             CIRR Archive v2
-      ORTHANC_AET:              CIRR_V2
+      ORTHANC_AET:              CIRR
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_STORE_COMPRESSED: "true"
       ORTHANC_PG_ENABLED:       "true"

@@ -39,7 +39,7 @@ services:
     volumes:
       - orthanc_data:/var/lib/orthanc/db
     ports:
-      - 4242:4242
+      - 14242:4242
     networks:
       - admin_proxy_network
     environment:
@@ -47,7 +47,7 @@ services:
       ORTHANC_AET:              CIRRV1
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_PG_ENABLED:       "true"
-      ORTHANC_PG_DATABASE:      ${POSTGRES_DATABASE_V1}
+      ORTHANC_PG_DATABASE:      ${POSTGRES_DATABASE}
       ORTHANC_PG_HOST:          postgres
       ORTHANC_PG_USER:          orthanc
       ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
