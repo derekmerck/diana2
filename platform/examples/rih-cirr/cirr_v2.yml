@@ -1,5 +1,12 @@
 version: '3.0'
 
+
+networks:
+
+  admin_proxy_network:
+    external: true   # Created by admin-stack
+
+
 volumes:
   postgres_data:
     driver_opts:
@@ -7,13 +14,14 @@ volumes:
         device: ${DATA_DIR}/${POSTGRES_DATA_DIR_V2}
         o: bind
 
+
 services:
   postgres:
     image: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-\      POSTGRES_PASSWORD:        ${POSTGRES_PASSWORD}
+      POSTGRES_PASSWORD:        ${POSTGRES_PASSWORD}
       TZ: "America/New_York"
     deploy:
       replicas: 1
@@ -27,6 +35,7 @@ services:
       - 4242:4242
     networks:
       - admin_proxy_network
+      - default
     environment:
       ORTHANC_NAME:             CIRR Archive v2
       ORTHANC_AET:              CIRR
