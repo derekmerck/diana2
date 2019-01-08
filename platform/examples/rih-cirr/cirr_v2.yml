@@ -4,7 +4,7 @@ volumes:
   postgres_data:
     driver_opts:
         type: none
-        device: ${DATA_DIR}/postgres2
+        device: ${DATA_DIR}/${POSTGRES_DATA_DIR_V2}
         o: bind
 
 services:
@@ -13,8 +13,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER:            postgres
-      POSTGRES_PASSWORD:        ${POSTGRES_PASSWORD}
+\      POSTGRES_PASSWORD:        ${POSTGRES_PASSWORD}
       TZ: "America/New_York"
     deploy:
       replicas: 1
