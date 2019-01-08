@@ -25,6 +25,8 @@ services:
     image: postgres:10
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - default
     environment:
       POSTGRES_USER:            orthanc
       POSTGRES_PASSWORD:        ${POSTGRES_PASSWORD}
@@ -43,6 +45,7 @@ services:
       - 14242:4242
     networks:
       - admin_proxy_network
+      - default
     environment:
       ORTHANC_NAME:             CIRR Archive v1
       ORTHANC_AET:              CIRRV1
