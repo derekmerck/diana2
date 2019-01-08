@@ -24,6 +24,7 @@ services:
     image: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    user: orthanc
     environment:
       POSTGRES_USER:            orthanc
       POSTGRES_PASSWORD:        ${POSTGRES_PASSWORD}
