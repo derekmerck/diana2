@@ -18,6 +18,7 @@ volumes:
     driver_opts:
       type: none
       device: ${DATA_DIR}/${ORTHANC_DATA_DIR_V1}
+      o: bind
 
 services:
   postgres:
