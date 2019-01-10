@@ -8,7 +8,7 @@ from ..utils.dicom import dicom_date, dicom_name, dicom_datetime, DicomLevel, Di
 
 # TODO: Minor reformat to handle pre-shammed Dixels, ie, don't assume sham_info must be created
 
-@attr.s(cmp=False)
+@attr.s(cmp=False, hash=False)
 class ShamDixel(Dixel):
 
     REFERENCE_DATE = None

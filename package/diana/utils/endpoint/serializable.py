@@ -4,7 +4,7 @@ import attr
 from dateutil import parser as DateTimeParser
 from ..smart_json import SmartJSONEncoder
 
-@attr.s(cmp=False, hash=None)
+@attr.s(cmp=False, hash=False)
 class AttrSerializable(object):
     """
     Provides id, hashing, and serializing funcs via "attrs".  Useful for extending
@@ -20,7 +20,7 @@ class AttrSerializable(object):
         return sha1(self.json().encode("UTF-8"))
 
     def __hash__(self):
-        return hash(self.sha1())
+        return hash(self.sha1().digest())
 
     def __eq__(self, other: "AttrSerializable"):
         return hash(self) == hash(other)

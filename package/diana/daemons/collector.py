@@ -30,25 +30,34 @@ class Collector(object):
         if self.pool_size > 0:
             return Pool(self.pool_size)
 
-    def run(self, project: str, data_path: Path,
-            source: Orthanc, domain: str, dest: Union[Orthanc, DcmDir]):
+    def run(self,
+            project: str,
+            data_path: Path,
+            source: Orthanc, domain: str,
+            dest: Union[Orthanc, DcmDir]):
 
-        studies_path = data_path / "{}.studies.csv".format(project)
-        key_path = data_path / "{}.key.csv".format(project)
+        logging.getLogger("GUIDMint").setLevel(level=logging.WARNING)
+
+        studies_path = data_path / Path("{}.studies.txt".format(project))
+        key_path = data_path / Path("{}.key.csv".format(project))
         if not os.path.isfile(key_path):
             # Need to create a key from studies
             with open(studies_path) as f:
                 study_ids = f.read().splitlines()
+                print("Created study id set")
                 worklist = self.make_key(study_ids, source, domain)
                 C = CsvFile(fp=key_path, level=DicomLevel.STUDIES)
                 C.dixels = worklist
                 C.write(fieldnames="ALL")
         else:
             C = CsvFile(fp=key_path, level=DicomLevel.STUDIES)
-            worklist = C.read().dixels
+            C.read()
+            worklist = C.dixels
         self.handle_worklist(worklist, source, domain, dest)
 
     def make_key(self, ids, source: Orthanc, domain: str) -> set:
+
+        print("Making key")
 
         # Minimal data for oid and sham plus study and series desc
         def mkq(accession_num):
@@ -67,7 +76,14 @@ class Collector(object):
 
             q = mkq(id)
             # logging.debug(pformat(q))
-            r = source.rfind(q, domain, level=DicomLevel.STUDIES)
+            try:
+                r = source.rfind(q, domain, level=DicomLevel.STUDIES)
+            except:
+                r = None
+
+            if not r:
+                print("Failed to collect an id")
+                continue
 
             tags = {
                 "PatientName": r[0]["PatientName"],
@@ -81,13 +97,29 @@ class Collector(object):
 
             d = Dixel(tags=tags)
             e = ShamDixel.from_dixel(d)
+
+            # print(hash(d))
+            # print(hash(e))
+            #
+            # print(d.json().encode("UTF-8"))
+            # print(e.json().encode("UTF-8"))
+            #
+            # from hashlib import sha1
+            #
+            # print(hash(d.json().encode("UTF-8")))
+            # print(hash(e.json().encode("UTF-8")))
+
             items.add(e)
+            print(len(items))
+
             logging.debug(e)
 
         return items
 
     # TODO: Could replace Orthanc + domain with a ProxiedDICOM source
     def handle_worklist(self, items: Iterable, source: Orthanc, domain: str, dest: Union[Orthanc, DcmDir]):
+
+        print("Handling worklist")
 
         if isinstance(source, Orthanc) and isinstance(dest, Orthanc):
             self.pull_and_send(items, source, domain, dest)
@@ -106,9 +138,15 @@ class Collector(object):
 
         for d in items:
 
-            d_fn = "{}-{}.zip".format(
-                d.meta["ShamAccessionNumber"][0:6],
-                d.meta["ShamSeriesDescription"])
+            working_level = DicomLevel.STUDIES
+
+            if working_level == DicomLevel.SERIES:
+                d_fn = "{}-{}.zip".format(
+                    d.meta["ShamAccessionNumber"][0:6],
+                    d.meta["ShamSeriesDescription"])
+            else:
+                d_fn = "{}.zip".format(
+                    d.meta["ShamAccessionNumber"][0:16])
 
             if dest.exists(d_fn):
                 logging.debug("SKIPPING {}".format(d.tags["PatientName"]))
@@ -117,7 +155,7 @@ class Collector(object):
             if not source.exists(d):
                 source.rfind(mkq(d),
                         domain,
-                        level=DicomLevel.STUDIES,
+                        level=working_level,
                         retrieve=True)
             else:
                 logging.debug("SKIPPING PULL for {}".format(d.tags["PatientName"]))
@@ -125,7 +163,7 @@ class Collector(object):
             replacement_map = ShamDixel.orthanc_sham_map(d)
             anon_id = source.anonymize(d, replacement_map=replacement_map)
 
-            e = source.get(anon_id, level=DicomLevel.SERIES, view=DixelView.TAGS)
+            e = source.get(anon_id, level=working_level, view=DixelView.TAGS_FILE)
             e.meta["FileName"] = d_fn
             logging.debug(e)
 

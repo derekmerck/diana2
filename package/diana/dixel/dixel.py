@@ -20,7 +20,7 @@ def mktime(datestr, timestr):
     return dt
 
 
-@attr.s(cmp=False, hash=None)
+@attr.s(cmp=False, hash=False)
 class Dixel(Serializable):
     """
     "Dixels" are DICOM-elements (following pixels, voxels, and texels).  They
