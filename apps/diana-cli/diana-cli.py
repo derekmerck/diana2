@@ -35,7 +35,7 @@ def cli(ctx, verbose, services, services_path):
 
     if verbose:
         logging.basicConfig(level=logging.DEBUG)
-        supress_urllib_debug()
+        # supress_urllib_debug()
         click.echo('Verbose mode is %s' % ('on' if verbose else 'off'))
     else:
         logging.basicConfig(level=logging.WARNING)

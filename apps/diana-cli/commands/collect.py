@@ -5,7 +5,7 @@ from diana.daemons import Collector
 
 """
 
-$ python3 diana-cli.py --verbose -S ../../.secrets/lifespan_services.yml collect all_cr /Users/derek/data/DICOM/all_cr bridge pacs
+$ python3 diana-cli.py --verbose -S ../../.secrets/lifespan_services.yml collect -b 2 all_cr /Users/derek/data/DICOM/all_cr bridge pacs
 
 $ python3 diana-cli.py --verbose -S ../../.secrets/lifespan_services.yml collect mam_mr+bx /Users/derek/data/DICOM/mam_mr+bx bridge pacs review01
 
@@ -17,8 +17,9 @@ $ python3 diana-cli.py --verbose -S ../../.secrets/lifespan_services.yml collect
 @click.argument('source', type=click.STRING)
 @click.argument('domain', type=click.STRING)
 @click.argument('dest', type=click.STRING, required=False, default=None)
+@click.option('-b', '--subpath_depth', type=int, default=0, help="Number of sub-directories to use")
 @click.pass_context
-def collect(ctx, project, data_path, source, domain, dest):
+def collect(ctx, project, data_path, source, domain, dest, subpath_depth):
     """Create a PROJECT key at DATA_PATH, then pull data from
     SOURCE and send to DEST."""
 
@@ -33,10 +34,10 @@ def collect(ctx, project, data_path, source, domain, dest):
 
     if not dest:
         path = data_path / Path("data")
-        dest_inst = DcmDir(path=path, subpath_width=2, subpath_depth=2)
+        dest_inst = DcmDir(path=path, subpath_width=2, subpath_depth=subpath_depth)
     elif dest.startswith("path:"):
         path = dest.split(":")[-1]
-        dest_inst = DcmDir(path=path, subpath_width=2, subpath_depth=2)
+        dest_inst = DcmDir(path=path, subpath_width=2, subpath_depth=subpath_depth)
     else:
         _dest = services[dest]
         dest_inst = Orthanc(**_dest)

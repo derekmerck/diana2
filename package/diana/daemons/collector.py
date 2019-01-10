@@ -43,8 +43,8 @@ class Collector(object):
         if not os.path.isfile(key_path):
             # Need to create a key from studies
             with open(studies_path) as f:
-                study_ids = f.read().splitlines()
-                print("Created study id set")
+                study_ids = f.read().splitlines()[:10]
+                print("Created study id set ({})".format(len(study_ids)))
                 worklist = self.make_key(study_ids, source, domain)
                 C = CsvFile(fp=key_path, level=DicomLevel.STUDIES)
                 C.dixels = worklist
@@ -68,14 +68,16 @@ class Collector(object):
                 "PatientSex": "",
                 "AccessionNumber": accession_num,
                 "StudyDescription": "",
-                "StudyInstanceUID": ""
+                "StudyInstanceUID": "",
+                "StudyDate": "",
+                "StudyTime": "",
             }
 
         items = set()
         for id in ids:
 
             q = mkq(id)
-            # logging.debug(pformat(q))
+
             try:
                 r = source.rfind(q, domain, level=DicomLevel.STUDIES)
             except:
@@ -92,25 +94,16 @@ class Collector(object):
                 "PatientSex": r[0]["PatientSex"],
                 "AccessionNumber": r[0]["AccessionNumber"],
                 "StudyDescription": r[0]["StudyDescription"],
-                "StudyInstanceUID": r[0]["StudyInstanceUID"]
+                "StudyInstanceUID": r[0]["StudyInstanceUID"],
+                "StudyDate": r[0]["StudyDate"],
+                "StudyTime": r[0]["StudyTime"]
             }
 
             d = Dixel(tags=tags)
             e = ShamDixel.from_dixel(d)
 
-            # print(hash(d))
-            # print(hash(e))
-            #
-            # print(d.json().encode("UTF-8"))
-            # print(e.json().encode("UTF-8"))
-            #
-            # from hashlib import sha1
-            #
-            # print(hash(d.json().encode("UTF-8")))
-            # print(hash(e.json().encode("UTF-8")))
-
             items.add(e)
-            print(len(items))
+            print("Found {} items".format(len(items)))
 
             logging.debug(e)
 
@@ -163,7 +156,7 @@ class Collector(object):
             replacement_map = ShamDixel.orthanc_sham_map(d)
             anon_id = source.anonymize(d, replacement_map=replacement_map)
 
-            e = source.get(anon_id, level=working_level, view=DixelView.TAGS_FILE)
+            e = source.get(anon_id, level=working_level, view=DixelView.FILE)
             e.meta["FileName"] = d_fn
             logging.debug(e)
 

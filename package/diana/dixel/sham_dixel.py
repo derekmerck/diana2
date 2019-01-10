@@ -1,10 +1,22 @@
 import logging
 import hashlib
+from datetime import datetime
+from dateutil import parser as DatetimeParser
 import attr
 from . import Dixel
 from ..utils.gateways import orthanc_id
 from ..utils.guid import GUIDMint
 from ..utils.dicom import dicom_date, dicom_name, dicom_datetime, DicomLevel, DicomUIDMint
+
+def mktime(datestr, timestr=""):
+    if not datestr and not timestr:
+        return
+    # Parser does not like fractional seconds
+    timestr = timestr.split(".")[0]
+    dt_str = datestr + timestr
+    # logging.debug(dt_str)
+    dt = DatetimeParser.parse(dt_str)
+    return dt
 
 # TODO: Minor reformat to handle pre-shammed Dixels, ie, don't assume sham_info must be created
 
@@ -76,7 +88,7 @@ class ShamDixel(Dixel):
 
         if self.level >= DicomLevel.SERIES and \
                 self.meta.get("SeriesDatetime"):
-            self.meta["ShamSeriesDateTime"] = self.meta.get("SeriesDatetime") + self.sham_info['TimeOffset']
+            self.meta["ShamSeriesDateTime"] = self.meta.get("SeriesDateTime") + self.sham_info['TimeOffset']
 
         if self.level >= DicomLevel.INSTANCES and \
                 self.tags.get("InstanceDateTime"):
@@ -84,11 +96,21 @@ class ShamDixel(Dixel):
                                                         self.sham_info['TimeOffset']
     def ShamStudyDate(self):
         if self.meta.get("ShamStudyDateTime"):
-            return dicom_datetime(self.meta["ShamStudyDateTime"])[0]
+            ssdt = self.meta.get("ShamStudyDateTime")
+            # print(ssdt)
+            if not isinstance(ssdt, datetime):
+                ssdt = mktime(ssdt)
+            # print(ssdt)
+            return dicom_datetime(ssdt)[0]
 
     def ShamStudyTime(self):
         if self.meta.get("ShamStudyDateTime"):
-            return dicom_datetime(self.meta["ShamStudyDateTime"])[1]
+            ssdt = self.meta.get("ShamStudyDateTime")
+            # print(ssdt)
+            if not isinstance(ssdt, datetime):
+                ssdt = mktime(ssdt)
+            # print(ssdt)
+            return dicom_datetime(ssdt)[1]
 
     def ShamSeriesDate(self):
         if self.meta.get("ShamSeriesDateTime"):
