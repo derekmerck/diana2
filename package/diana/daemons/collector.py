@@ -43,7 +43,7 @@ class Collector(object):
         if not os.path.isfile(key_path):
             # Need to create a key from studies
             with open(studies_path) as f:
-                study_ids = f.read().splitlines()[:10]
+                study_ids = f.read().splitlines()
                 print("Created study id set ({})".format(len(study_ids)))
                 worklist = self.make_key(study_ids, source, domain)
                 C = CsvFile(fp=key_path, level=DicomLevel.STUDIES)
