@@ -1,4 +1,3 @@
-#! python3
 """
 halibut.py
 Ian Pan, Summer 2018
@@ -13,7 +12,8 @@ import os
 import click
 from diana.apis import DcmDir
 from diana.dixel import DixelView
-from dxplus.halibut import get_mobilenet, get_pixels, get_prediction
+from plus.halibut import get_mobilenet
+
 
 @click.command(short_help="Classify DICOM files")
 @click.argument('model', type=click.File())
@@ -21,7 +21,6 @@ from dxplus.halibut import get_mobilenet, get_pixels, get_prediction
 @click.argument('images', nargs=-1)
 @click.option("--positive", "-p", help="Positive class", default="positive")
 @click.option("--negative", "-n", help="Negative class", default="negative")
-
 def classify(model, path, images, positive, negative):
     """Apply a classification MODEL to PATH with IMAGES"""
 

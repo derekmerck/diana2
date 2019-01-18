@@ -8,8 +8,8 @@ services:
   - docker
 
 env:
-  # Enable import for diana-cli
-  PYTHONPATH="$TRAVIS_BUILD_DIR/apps/diana-cli:$TRAVIS_BUILD_DIR/apps/diana-plus/packages"
+  # Enable import from diana-cli/diana-plus
+  PYTHONPATH="$TRAVIS_BUILD_DIR/apps/diana-cli:$TRAVIS_BUILD_DIR/apps/diana-plus"
 
 addons:
   apt:
@@ -38,9 +38,10 @@ before_install:
 install:
 
   # All pip dependencies
-  - pip3 install -r requirements.txt
   - pip3 install codecov
   - pip3 install -e package
+  - pip3 install -e apps/diana-cli
+  - pip3 install -e apps/diana-plus
 
   # Required docker images for fixtures
   - docker pull alpine

@@ -7,7 +7,8 @@ from click.testing import CliRunner
 python diana-cli.py -s "{redis: {ctype: Redis}}" check
 """
 
-app = __import__('diana-cli')
+import diana_cli as app
+# app = __import__('diana-cli')
 
 def test_cli_help():
     runner = CliRunner()

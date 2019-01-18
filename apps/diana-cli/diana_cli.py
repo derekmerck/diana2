@@ -1,7 +1,7 @@
 import logging
 import yaml
 import click
-import commands
+import cli_commands
 from diana.utils.gateways import supress_urllib_debug
 from diana import __version__ as diana_version
 
@@ -59,15 +59,15 @@ def cli(ctx, verbose, services, services_path):
     ctx.obj['services'] = _services
 
 coms = [
-    commands.check,
-    commands.collect,
-    commands.dcm2im,
-    commands.findex,
-    commands.fiup,
-    commands.guid,
-    commands.mock,
-    commands.ofind,
-    commands.watch
+    cli_commands.check,
+    cli_commands.collect,
+    cli_commands.dcm2im,
+    cli_commands.findex,
+    cli_commands.fiup,
+    cli_commands.guid,
+    cli_commands.mock,
+    cli_commands.ofind,
+    cli_commands.watch
 ]
 
 for c in coms:

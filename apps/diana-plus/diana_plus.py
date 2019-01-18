@@ -1,10 +1,11 @@
 import logging
 import click
-import commands
+import plus_commands
 from diana.utils.gateways import supress_urllib_debug
 from diana import __version__ as diana_version
 
 __version__ = "2.0.1"
+
 
 @click.group(name="diana-plus")
 @click.option('--verbose/--no-verbose', default=False)
@@ -22,8 +23,8 @@ def cli(verbose):
         supress_urllib_debug()
 
 coms = [
-    commands.ssde,
-    commands.classify,
+    plus_commands.ssde,
+    plus_commands.classify,
 ]
 
 for c in coms:
@@ -31,4 +32,4 @@ for c in coms:
 
 
 if __name__ == '__main__':
-    cli(auto_envvar_prefix='DXPLS', obj={})
+    cli(auto_envvar_prefix='DIANA', obj={})
