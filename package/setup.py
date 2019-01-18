@@ -6,6 +6,9 @@ with open("README.md") as f:
 with open("requirements.txt") as f:
     reqs = f.read().splitlines()
 
+with open("plus_requirements.txt") as f:
+    plus_reqs = f.read().splitlines()
+
 with open("diana/__init__.py") as f:
     content = f.read()
     match = re.findall(r"__([a-z0-9_]+)__\s*=\s*\"([^\"]+)\"", content)
@@ -29,5 +32,9 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ),
     license='MIT',
-    install_requires=reqs
+    install_requires=reqs,
+    extras_require={
+        # 'sci': ['numpy', 'scikit-learn'],
+        'plus': plus_reqs
+    }
 )

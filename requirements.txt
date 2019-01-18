@@ -15,10 +15,15 @@ watchdog
 # -----------------
 click
 connexion[swagger-ui]
+pyyaml
 
 # PIXEL-HANDLING REQS
 # -----------------
+cython
 numpy
+scipy
+tensorflow
+keras
 scikit-learn
 
 # TESTING REQS

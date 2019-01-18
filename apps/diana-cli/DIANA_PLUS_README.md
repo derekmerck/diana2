@@ -26,7 +26,7 @@ Estimates patient dimensions from CT localizer images for size-specific dose est
 Returns image orientation and estimated distance in centimeters.  These measurements can be converted into equivalent water volumes using AAPM-published tables.
 
 ```text
-$ python3 diana-plus.py ssde ../../tests/resources/scouts \
+$ diana-plus ssde ../../tests/resources/scouts \
                              ct_scout_01.dcm ct_scout_02.dcm
 Measuring scout images
 ------------------------

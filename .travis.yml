@@ -23,7 +23,7 @@ before_install:
   - echo '{"experimental":"enabled"}' > "$HOME/.docker/config.json"
 
   # Git the docker-manifest package
-  - pip3 install pyyaml git+https://github.com/derekmerck/docker-manifest
+  - pip3 install git+https://github.com/derekmerck/docker-manifest
   # Register qemu as cross-compiler
   - docker run --rm --privileged multiarch/qemu-user-static:register --reset
 
@@ -39,7 +39,7 @@ install:
 
   # All pip dependencies
   - pip3 install codecov
-  - pip3 install -e package
+  - pip3 install -e package[plus]
   - pip3 install -e apps/diana-cli
   - pip3 install -e apps/diana-plus
 
@@ -65,6 +65,6 @@ after_success:
   - cd platform/docker-image
   - docker-compose build diana2-arm32v7 diana2-arm64v8
   # Retag image "latest" and push
-  - python3 -m docker-manifest -d ${DOCKER_USERNAME} diana2
+  - docker-manifest -d ${DOCKER_USERNAME} diana2
   # Retag image ${DIANA_VERSION} and push
-  - python3 -m docker-manifest -d ${DOCKER_USERNAME} -t ${DIANA_VERSION} diana2
+  - docker-manifest -d ${DOCKER_USERNAME} -t ${DIANA_VERSION} diana2

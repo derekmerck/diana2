@@ -22,7 +22,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/derekmerck/diana2",
-    pymodules="cli",
+    pymodules=["diana_cli", "diana_plus"],
     packages=setuptools.find_packages(),
     classifiers=(
         'Development Status :: 3 - Alpha',
@@ -32,8 +32,12 @@ setuptools.setup(
     ),
     license='MIT',
     install_requires=reqs,
+    extras_require={
+        'plus': 'python-diana[plus]'
+    },
     entry_points='''
         [console_scripts]
         diana-cli=diana_cli:cli
+        diana-plus=diana_plus:cli [plus]
     ''',
 )

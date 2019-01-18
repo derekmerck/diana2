@@ -12,7 +12,7 @@ import os
 import click
 from diana.apis import DcmDir
 from diana.dixel import DixelView
-from plus.halibut import get_mobilenet
+from diana.plus.halibut import get_mobilenet
 
 
 @click.command(short_help="Classify DICOM files")

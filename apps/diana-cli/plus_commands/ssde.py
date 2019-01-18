@@ -1,7 +1,7 @@
 import click
 from diana.apis import DcmDir
 from diana.dixel import DixelView
-import plus.measure_scout  # monkey patches Dixel
+from diana.plus import measure_scout  # monkey patches Dixel
 
 
 @click.command(short_help="Patient size from localizer")

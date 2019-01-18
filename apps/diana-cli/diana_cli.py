@@ -5,7 +5,7 @@ import cli_commands
 from diana.utils.gateways import supress_urllib_debug
 from diana import __version__ as diana_version
 
-__version__ = "2.0.2"
+__version__ = "2.1.0"
 
 epilog = """
 SERVICES is a required platform endpoint description in yaml format.
@@ -20,6 +20,7 @@ redis:
   ctype: Redis
 ...
 """
+
 
 @click.group(name="diana-cli", epilog=epilog)
 @click.option('--verbose/--no-verbose', default=False)
