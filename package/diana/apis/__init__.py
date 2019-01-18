@@ -1,7 +1,7 @@
 from .csvfile import CsvFile
 from .redis import Redis
 
-from .dcmdir import DcmDir
+from .dcmdir import DcmDir, ImageDir
 from .montage import Montage
 from .orthanc import Orthanc, sham_map
 from .splunk import Splunk

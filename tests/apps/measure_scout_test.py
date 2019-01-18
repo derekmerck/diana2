@@ -2,7 +2,7 @@ import logging
 
 from diana.dixel import DixelView
 from diana.apis import DcmDir
-import dxplus.measure_scout
+import plus.measure_scout
 
 from test_utils import find_resource
 

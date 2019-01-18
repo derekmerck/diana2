@@ -100,6 +100,7 @@ class Dixel(Serializable):
             'SeriesDate': ds.get("SeriesDate"),
             'SeriesTime': ds.get("SeriesTime"),
             'SOPInstanceUID': ds.SOPInstanceUID,
+            'InstanceNumber': ds.get("InstanceNumber"),
             'InstanceCreationDate': ds.get("InstanceCreationDate"),
             'InstanceCreationTime': ds.get("InstanceCreationTime"),
 
@@ -253,9 +254,17 @@ class Dixel(Serializable):
         """Serializer id alias for meta['AccessionNumber']"""
         return self.tags.get('AccessionNumber')
 
+    @property
     def fn(self):
         """Filename alias for meta['Filename']"""
         return self.meta.get('FileName')
+
+    @property
+    def image_base_fn(self):
+        """Filename for image instance"""
+        return "{acc}-{ser:04}-{ins:04}".format(acc=self.tags['AccessionNumber'] or self.tags['StudyInstanceUID'],
+                                                ser=self.tags["SeriesNumber"],
+                                                ins=self.tags["InstanceNumber"])
 
     def get_pixels(self):
         if self.pixels is None:

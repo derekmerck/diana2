@@ -48,7 +48,9 @@ class GUIDMint(object):
 
         def handle_dob(dob: date=None, age: int=None, reference_date: date=None) -> date:
             if not dob and not age:
-                raise KeyError("Minting a GUID requires either a date or an age")
+                logger.warning("Minting a reproducible GUID requires either a date or an age")
+                # raise KeyError("Minting a reproducible GUID requires either a date or an age")
+                age = random.randint(18,75)
             if not dob:
                 if not reference_date:
                     reference_date = date.today()
@@ -169,7 +171,7 @@ class GUIDMint(object):
                     reference_date: Union[date,str]=None,
                     gender="U"):
 
-        if isinstance(dob, str):
+        if isinstance(dob, str) and dob:
             dob = DateTimeParser.parse(dob).date()
 
         if isinstance(reference_date, str):

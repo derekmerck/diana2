@@ -14,6 +14,7 @@ watchdog
 # APP REQS
 # -----------------
 click
+connexion[swagger-ui]
 
 # PIXEL-HANDLING REQS
 # -----------------

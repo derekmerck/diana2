@@ -1,10 +1,14 @@
-import os, logging, hashlib
+import os, logging
 from typing import Union
 import attr
-from ..dixel import Dixel, DixelView
+from ..dixel import Dixel, DixelView, ShamDixel
 from ..utils import Endpoint, Serializable
 from ..utils.dicom import DicomLevel
-from ..utils.gateways import DcmFileHandler, ZipFileHandler
+from ..utils.gateways import DcmFileHandler, ZipFileHandler, ImageFileHandler, ImageFileFormat
+
+
+
+import pydicom
 
 
 @attr.s
@@ -22,6 +26,7 @@ class DcmDir(Endpoint, Serializable):
                               subpath_width = self.subpath_width,
                               subpath_depth = self.subpath_depth)
 
+    anonymizing = attr.ib(default=False)
     recurse_style = attr.ib(default="UNSTRUCTURED")
     _gen = attr.ib(init=False, repr=False, default=None)
 
@@ -30,7 +35,7 @@ class DcmDir(Endpoint, Serializable):
         logger.debug("EP PUT")
         if not item.file:
             raise ValueError("Dixel has no file attribute, can only save file data")
-        self.gateway.write_file(item.fn(), item.file)
+        self.gateway.write_file(item.fn, item.file)
 
     def update(self, fn: str, item: Dixel, **kwargs):
         logger = logging.getLogger(self.name)
@@ -46,7 +51,7 @@ class DcmDir(Endpoint, Serializable):
         if isinstance(item, str):
             fn = item
         elif isinstance(item, Dixel) or hasattr(item, 'fn'):
-            fn = item.fn()
+            fn = item.fn
         else:
             raise ValueError("Item has no fn attribute, so it requires an explicit filename")
 
@@ -75,7 +80,7 @@ class DcmDir(Endpoint, Serializable):
         if isinstance(item, str):
             fn = item
         elif isinstance(item, Dixel) or hasattr(item, 'fn'):
-            fn = item.fn()
+            fn = item.fn
         else:
             raise ValueError("Item has no fn attribute, so it requires an explicit filename")
         return self.gateway.delete(fn)
@@ -153,3 +158,40 @@ class DcmDir(Endpoint, Serializable):
     def files(self, rex="*.dcm"):
         return self.gateway.get_files(rex=rex)
 
+
+@attr.s
+class ImageDir(DcmDir):
+
+    name = attr.ib(default="ImageDir")
+    format = attr.ib(default=ImageFileFormat.PNG)
+
+    gateway = attr.ib(init=False, repr=False)
+    @gateway.default
+    def setup_gateway(self):
+        return ImageFileHandler(path=self.path,
+                                subpath_width = self.subpath_width,
+                                subpath_depth = self.subpath_depth)
+
+    # TODO: handle pulling an image instance format directly from Orthanc (im_file attr?)
+    def put(self, item: Dixel, **kwargs):
+        logger = logging.getLogger(self.name)
+        logger.debug("EP PUT")
+
+        if item.pixels is None:
+            raise ValueError("Dixel has no pixels attribute, can only save pixel data")
+
+        if self.anonymizing:
+            item = ShamDixel.from_dixel(item)
+
+        fn = "{}.{}".format(item.image_base_fn, self.format.value)
+        self.gateway.put(fn, item.pixels)
+
+    def put_zipped(self, item: str):
+
+        gateway = ZipFileHandler(path=self.path)
+        files = gateway.unpack(item)
+        for f in files:
+            # TODO: cast f to streamIO
+            ds = pydicom.dcmread(f, stop_before_pixels=False)
+            d = Dixel.from_pydicom(ds)
+            self.put(d)

@@ -39,6 +39,8 @@ class ShamDixel(Dixel):
         )
         if dixel.file:
             sh.file = dixel.file
+        if dixel.pixels is not None:
+            sh.pixels = dixel.pixels
         return sh
 
 
@@ -76,12 +78,12 @@ class ShamDixel(Dixel):
         self.meta["ShamName"] = dicom_name(self.sham_info["Name"])
         self.meta["ShamBirthDate"] = dicom_date(self.sham_info["BirthDate"])
 
-        if self.tags.get("AccessionNumber"):
-            anum = self.tags.get("AccessionNumber")
-            if self.salt:
-                anum = "{}+{}".format(anum, self.salt)
-            self.meta["ShamAccessionNumber"] = \
-                hashlib.md5(anum.encode("UTF-8")).hexdigest()
+        # if self.tags.get("AccessionNumber"):
+        anum = self.tags.get("AccessionNumber") or self.tags.get("StudyInstanceUID")
+        if self.salt:
+            anum = "{}+{}".format(anum, self.salt)
+        self.meta["ShamAccessionNumber"] = \
+            hashlib.md5(anum.encode("UTF-8")).hexdigest()
 
         if self.meta.get("StudyDateTime"):
            self.meta["ShamStudyDateTime"] = self.meta.get("StudyDateTime") + self.sham_info['TimeOffset']
@@ -204,4 +206,12 @@ class ShamDixel(Dixel):
             "Keep": keep,
             "Force": True
         }
+
+    @property
+    def image_base_fn(self):
+        """Filename for shammed image instance"""
+        return "{acc}-{ser:04}-{ins:04}".format(acc=self.meta['ShamAccessionNumber'],
+                                                ser=self.tags["SeriesNumber"],
+                                                ins=self.tags["InstanceNumber"])
+
 

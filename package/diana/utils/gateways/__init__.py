@@ -3,5 +3,5 @@ from .requesters import Splunk, \
     Montage, MontageModality, \
     supress_urllib_debug
 from .file_handlers import DcmFileHandler, TextFileHandler, \
-    ImageFileHandler, ZipFileHandler
+    ImageFileHandler, ImageFileFormat, ZipFileHandler
 from .exceptions import GatewayConnectionError
