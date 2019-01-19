@@ -15,6 +15,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt -y install --no-install-recommends \
     python3-h5py \
     python3-protobuf \
     python3-numpy-dev \
+    python3-sklearn \
     python3-cffi \
     cython3 \
     libhdf5-dev \

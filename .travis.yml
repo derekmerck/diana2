@@ -21,7 +21,7 @@ addons:
       - python3-wheel
       - python3-pillow
       - python3-numpy
-      - python3-sklearn
+      - python-sklearn
       - python3-scipy
 
 before_install:
