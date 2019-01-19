@@ -73,6 +73,6 @@ after_success:
   - cd platform/docker-image
   - docker-compose build diana2-arm32v7 diana2-arm64v8
   # Retag image "latest" and push
-  - docker-manifest -d ${DOCKER_USERNAME} -s diana2
+  - docker-manifest ${DOCKER_USERNAME} -s diana2
   # Retag image ${DIANA_VERSION} and push
-  - docker-manifest -d ${DOCKER_USERNAME} -t ${DIANA_VERSION} -s diana2
+  - docker-manifest ${DOCKER_USERNAME} -t ${DIANA_VERSION} -s diana2

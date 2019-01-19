@@ -1,1 +1,1 @@
-utils/guid/us_census/*.txt
+diana/utils/guid/us_census/*.txt
