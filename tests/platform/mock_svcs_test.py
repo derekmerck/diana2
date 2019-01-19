@@ -6,7 +6,7 @@ from test_utils import find_resource
 import pytest
 
 
-@pytest.mark.skip(reason="Need to rebuild diana image")
+# @pytest.mark.skip(reason="Need to rebuild diana image")
 def test_mock_svcs():
 
     C.start_swarm()

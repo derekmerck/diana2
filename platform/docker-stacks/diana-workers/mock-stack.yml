@@ -35,9 +35,9 @@ services:
 
   diana-mock:
     image:                   derekmerck/diana2
-    command: >
-      sh -c "git pull && diana-cli mock --dest MockPacs"
-#    command:                 diana-cli mock --dest MockPacs
+#    command: >
+#      sh -c "git pull && pip3 install -e apps/diana-cli && python3 -u apps/diana-cli/diana_cli.py mock --dest MockPacs"
+    command:  python3 -u apps/diana-cli/diana_cli.py mock --dest MockPacs
     environment:
       DIANA_SERVICES: >
         {"MockPacs": {
