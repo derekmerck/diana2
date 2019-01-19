@@ -184,7 +184,7 @@ class ImageDir(DcmDir):
             item = ShamDixel.from_dixel(item)
 
         fn = "{}.{}".format(item.image_base_fn, self.format.value)
-        self.gateway.put(fn, item.get_pixels(normalize=True))
+        self.gateway.put(fn, item.get_pixels())
 
     def put_zipped(self, item: str):
 

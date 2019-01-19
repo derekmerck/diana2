@@ -3,6 +3,7 @@ from typing import Mapping
 from dateutil import parser as DatetimeParser
 import attr
 import pydicom
+import numpy as np
 from .report import RadiologyReport
 from ..utils.dicom import DicomLevel
 from ..utils import Serializable
@@ -268,7 +269,7 @@ class Dixel(Serializable):
                                                 ser=self.tags["SeriesNumber"],
                                                 ins=self.tags["InstanceNumber"])
 
-    def get_pixels(self, normalize=False):
+    def get_pixels(self):
         if self.pixels is None:
             raise TypeError
 
@@ -279,6 +280,8 @@ class Dixel(Serializable):
 
         if self.tags.get("RescaleSlope") and \
            self.tags.get("RescaleIntercept"):
+            if pixels.dtype == "uint16":
+                pixels = np.int16(pixels)
             pixels *= int(self.tags.get("RescaleSlope"))
             pixels += int(self.tags.get("RescaleIntercept"))
         else:

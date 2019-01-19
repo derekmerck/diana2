@@ -44,7 +44,7 @@ def measure_scout(dixel: Dixel):
     # using a Gaussian Mixture Model
     # thresh = np.mean(dcm_px[dcm_px>0])
 
-    gmm = GMM(2).fit(dcm_px[dcm_px>0].reshape(-1,1))
+    gmm = GMM(2).fit(dcm_px[dcm_px>-1024].reshape(-1, 1))
     thresh = np.sum(gmm.weights_[::-1]*gmm.means_.ravel())
 
     # logging.debug(gmm.weights_[::-1])
@@ -55,7 +55,7 @@ def measure_scout(dixel: Dixel):
     # Compute avg width based on unmasked pixels
     mask = dcm_px > thresh
 
-    px_counts = np.sum(mask,axis=1)
+    px_counts = np.sum(mask, axis=1)
     avg_px_count = np.mean(px_counts[px_counts>0])
     # Across image spacing is 2nd component (axis 1)
     d_avg = avg_px_count * pixel_spacing[1] / 10;

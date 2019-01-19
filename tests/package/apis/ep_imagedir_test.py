@@ -2,11 +2,9 @@ import logging, os
 from pathlib import Path
 from diana.dixel import DixelView
 from diana.apis import DcmDir, ImageDir
-from diana.utils.gateways import ImageFileFormat
 
 from test_utils import find_resource
 
-import shutil
 
 def test_conversion(tmp_path):
 
@@ -31,7 +29,7 @@ def test_conversion(tmp_path):
     fn = "6ee6f414e4c779c8bb1f90baf45c000c-0004-0002.png"
     fp = Path( tmp_path / fn )
     assert( fp.is_file() )
-    # os.remove(fp)
+    os.remove(fp)
 
 
 def test_unzip(tmp_path):
@@ -47,10 +45,12 @@ def test_unzip(tmp_path):
     fn = "6ee6f414e4c779c8bb1f90baf45c000c-0004-0002.png"
     fp = Path( tmp_path / fn )
     assert( fp.is_file() )
+    os.remove(fp)
 
     fn = "78496388f522585b71b90f374051f552-0016-0001.png"
     fp = Path( tmp_path / fn )
     assert( fp.is_file() )
+    os.remove(fp)
 
 
 if __name__ == "__main__":
@@ -58,5 +58,5 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     tmp_path = Path("/Users/derek/tmp")
 
-    #test_conversion(tmp_path)
+    test_conversion(tmp_path)
     test_unzip(tmp_path)
