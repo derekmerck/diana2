@@ -1,5 +1,4 @@
 cython
-numpy
 scipy
 tensorflow
 keras

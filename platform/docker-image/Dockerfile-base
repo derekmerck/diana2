@@ -35,6 +35,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt -y install --no-install-recommends \
     python3-setuptools \
     python3-openssl \
     python3-wheel \
+    python3-numpy \
     python3-pillow \
     software-properties-common \
     libfreetype6-dev \

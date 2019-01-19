@@ -1,4 +1,4 @@
-import os, logging
+import os, logging, io
 from typing import Union
 import attr
 from ..dixel import Dixel, DixelView, ShamDixel
@@ -184,14 +184,15 @@ class ImageDir(DcmDir):
             item = ShamDixel.from_dixel(item)
 
         fn = "{}.{}".format(item.image_base_fn, self.format.value)
-        self.gateway.put(fn, item.pixels)
+        self.gateway.put(fn, item.get_pixels(normalize=True))
 
     def put_zipped(self, item: str):
 
         gateway = ZipFileHandler(path=self.path)
-        files = gateway.unpack(item)
+        files = gateway.unpack(item)  # Returns files as bytes
         for f in files:
-            # TODO: cast f to streamIO
-            ds = pydicom.dcmread(f, stop_before_pixels=False)
+            if not DcmFileHandler.is_dicom(io.BytesIO(f)):
+                continue
+            ds = pydicom.dcmread(io.BytesIO(f), stop_before_pixels=False)
             d = Dixel.from_pydicom(ds)
             self.put(d)

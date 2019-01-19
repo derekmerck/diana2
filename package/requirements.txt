@@ -1,6 +1,7 @@
 attrs >= 18.1.0
 bs4
 docker
+numpy
 pydicom
 pyyaml
 pillow

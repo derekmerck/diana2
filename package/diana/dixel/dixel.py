@@ -74,7 +74,7 @@ class Dixel(Serializable):
                                                    self.tags.get("InstanceCreationTime"))
 
     @staticmethod
-    def from_pydicom(ds: pydicom.Dataset, fn: str, file=None):
+    def from_pydicom(ds: pydicom.Dataset, fn: str=None, file=None):
         """Generate a dixel from a pydicom dataset"""
 
         meta = {
@@ -104,6 +104,8 @@ class Dixel(Serializable):
             'InstanceCreationDate': ds.get("InstanceCreationDate"),
             'InstanceCreationTime': ds.get("InstanceCreationTime"),
 
+            'RescaleIntercept': ds.get("RescaleIntercept"),
+            'RescaleSlope': ds.get("RescaleSlope"),
             'PixelSpacing': [float(x) for x in ds.get("PixelSpacing", [])],  # Odd serializing types
             'ImageOrientationPatient': [float(x) for x in ds.get("ImageOrientationPatient", []) ] ,
 
@@ -266,7 +268,7 @@ class Dixel(Serializable):
                                                 ser=self.tags["SeriesNumber"],
                                                 ins=self.tags["InstanceNumber"])
 
-    def get_pixels(self):
+    def get_pixels(self, normalize=False):
         if self.pixels is None:
             raise TypeError
 
@@ -275,9 +277,8 @@ class Dixel(Serializable):
         else:
             pixels = self.pixels
 
-        # This is irrelevant if values are normalized anyway
-        if "RescaleSlope" in self.tags.keys() and \
-           "RescaleIntercept" in self.tags.keys():
+        if self.tags.get("RescaleSlope") and \
+           self.tags.get("RescaleIntercept"):
             pixels *= int(self.tags.get("RescaleSlope"))
             pixels += int(self.tags.get("RescaleIntercept"))
         else:

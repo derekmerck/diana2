@@ -34,7 +34,6 @@ setuptools.setup(
     license='MIT',
     install_requires=reqs,
     extras_require={
-        # 'sci': ['numpy', 'scikit-learn'],
         'plus': plus_reqs
     }
 )
