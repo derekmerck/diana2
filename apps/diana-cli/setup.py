@@ -37,7 +37,7 @@ setuptools.setup(
     },
     entry_points='''
         [console_scripts]
-        diana-cli=diana_cli:cli
-        diana-plus=diana_plus:cli [plus]
+        diana-cli=diana_cli:main
+        diana-plus=diana_plus:main [plus]
     ''',
 )
