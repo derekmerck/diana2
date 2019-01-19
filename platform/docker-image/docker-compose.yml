@@ -9,13 +9,13 @@ services:
   diana2-base-amd64:
     build:
       context: ""
-      dockerfile: Dockerfile-python
+      dockerfile: Dockerfile-base
     image: diana2-base-amd64
 
   diana2-base-arm32v7:
     build:
       context: ""
-      dockerfile: Dockerfile-python
+      dockerfile: Dockerfile-base
       args:
         RESIN_ARCH:   armv7hf
         DOCKER_ARCH:  arm32v7
@@ -24,7 +24,7 @@ services:
   diana2-base-arm64v8:
     build:
       context: ""
-      dockerfile: Dockerfile-python
+      dockerfile: Dockerfile-base
       args:
         RESIN_ARCH:   aarch64
         DOCKER_ARCH:  arm64v8
@@ -55,3 +55,58 @@ services:
       args:
         DOCKER_ARCH:  arm64v8
     image: diana2-arm64v8
+
+
+  # ----------------------
+  # Plus-base-images need not be recreated all the time
+  # ----------------------
+
+  diana2-plus-base-amd64:
+    build:
+      context: ""
+      dockerfile: Dockerfile-plus-base
+    image: diana2-plus-base-amd64
+
+  diana2-plus-base-arm32v7:
+    build:
+      context: ""
+      dockerfile: Dockerfile-plus-base
+      args:
+        RESIN_ARCH:   armv7hf
+        DOCKER_ARCH:  arm32v7
+    image: diana2-plus-base-arm32v7
+
+#  diana2-plus-base-arm64v8:
+#    build:
+#      context: ""
+#      dockerfile: Dockerfile-plus-base
+#      args:
+#        RESIN_ARCH:   aarch64
+#        DOCKER_ARCH:  arm64v8
+#    image: diana2-plus-base-arm64v8
+
+  # ----------------------
+  # Should be updated when code is updated
+  # ----------------------
+
+  diana2-plus-amd64:
+    build:
+      context: ""
+      dockerfile: Dockerfile-plus
+    image: diana2-plus-amd64
+
+  diana2-plus-arm32v7:
+    build:
+      context: ""
+      dockerfile: Dockerfile-plus
+      args:
+        DOCKER_ARCH:  arm32v7
+    image: diana2-plus-arm32v7
+
+#  diana2-plus-arm64v8:
+#    build:
+#      context: ""
+#      dockerfile: Dockerfile-plus
+#      args:
+#        DOCKER_ARCH:  arm64v8
+#    image: diana2-plus-arm64v8
