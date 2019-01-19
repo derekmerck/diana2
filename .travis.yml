@@ -15,6 +15,14 @@ addons:
   apt:
     packages:
       - docker-ce
+      - python3-pip
+      - python3-setuptools
+      - python3-openssl
+      - python3-wheel
+      - python3-pillow
+      - python3-numpy
+      - python3-sklearn
+      - python3-scipy
 
 before_install:
 
@@ -39,6 +47,7 @@ install:
 
   # All pip dependencies
   - pip3 install codecov
+  - pip3 install -r requirements.txt
   - pip3 install -e package[plus]
   - pip3 install -e apps/diana-cli[plus]
 
@@ -47,7 +56,7 @@ install:
   - docker pull redis
   - docker pull derekmerck/orthanc-confd
 
-script: # skip
+script:
 
   - pytest --cov
 
@@ -64,6 +73,6 @@ after_success:
   - cd platform/docker-image
   - docker-compose build diana2-arm32v7 diana2-arm64v8
   # Retag image "latest" and push
-  - docker-manifest -d ${DOCKER_USERNAME} diana2
+  - docker-manifest -d ${DOCKER_USERNAME} -s diana2
   # Retag image ${DIANA_VERSION} and push
-  - docker-manifest -d ${DOCKER_USERNAME} -t ${DIANA_VERSION} diana2
+  - docker-manifest -d ${DOCKER_USERNAME} -t ${DIANA_VERSION} -s diana2

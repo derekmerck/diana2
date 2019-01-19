@@ -4,7 +4,7 @@ from test_utils import find_resource
 from click.testing import CliRunner
 
 """
-python diana-cli.py -s "{redis: {ctype: Redis}}" check
+diana-cli -s "{redis: {ctype: Redis}}" check
 """
 
 import diana_cli as app

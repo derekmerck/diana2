@@ -3,8 +3,10 @@ import subprocess
 from diana.apis import Orthanc
 from diana.utils.endpoint import Containerized as C
 from test_utils import find_resource
+import pytest
 
 
+@pytest.mark.skip(reason="Need to rebuild diana image")
 def test_mock_svcs():
 
     C.start_swarm()
