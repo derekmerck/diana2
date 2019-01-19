@@ -6,7 +6,8 @@ from test_utils import find_resource
 import pytest
 
 
-# @pytest.mark.skip(reason="Need to rebuild diana image")
+# TODO: Broken and needs attention...
+@pytest.mark.skip(reason="Unknown change to swarm manager?")
 def test_mock_svcs():
 
     C.start_swarm()
