@@ -8,7 +8,7 @@ with open("requirements.txt") as f:
 
 metadata = {
     'name': "diana-cli",
-    'version': "2.1.0",
+    'version': "2.1.1",
     'author': "Derek Merck",
     'author_email': "derek_merck@brown.edu",
 }

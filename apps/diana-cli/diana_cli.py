@@ -5,7 +5,7 @@ import cli_commands
 from diana.utils.gateways import supress_urllib_debug
 from diana import __version__ as diana_version
 
-__version__ = "2.1.0"
+__version__ = "2.1.1"
 
 epilog = """
 SERVICES is a required platform endpoint description in yaml format.
@@ -59,6 +59,7 @@ def cli(ctx, verbose, services, services_path):
         ctx.obj = {}
     ctx.obj['services'] = _services
 
+
 coms = [
     cli_commands.check,
     cli_commands.collect,
@@ -75,5 +76,10 @@ for c in coms:
     cli.add_command(c)
 
 
-if __name__ == '__main__':
+# Indirection to set envar prefix from setuptools entry pt
+def main():
     cli(auto_envvar_prefix='DIANA', obj={})
+
+
+if __name__ == "__main__":
+    main()

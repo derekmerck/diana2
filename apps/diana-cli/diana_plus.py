@@ -4,7 +4,7 @@ import plus_commands
 from diana.utils.gateways import supress_urllib_debug
 from diana import __version__ as diana_version
 
-__version__ = "2.1.0"
+__version__ = "2.1.1"
 
 
 @click.group(name="diana-plus")
@@ -22,6 +22,7 @@ def cli(verbose):
         logging.basicConfig(level=logging.WARNING)
         supress_urllib_debug()
 
+
 coms = [
     plus_commands.ssde,
     plus_commands.classify,
@@ -31,5 +32,10 @@ for c in coms:
     cli.add_command(c)
 
 
-if __name__ == '__main__':
+# Indirection to set envar prefix from setuptools entry pt
+def main():
     cli(auto_envvar_prefix='DIANA', obj={})
+
+
+if __name__ == "__main__":
+    main()
