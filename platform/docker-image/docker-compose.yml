@@ -74,7 +74,7 @@ services:
       context: ""
       dockerfile: Dockerfile-plus-base-tfwheel
       args:
-        RESIN_ARCH:   armv7hf
+        DOCKER_ARCH:  arm32v7
         TF_PACKAGE:   tensorflow-1.12.0-cp37-none-linux_armv7l.whl
     image: diana2-plus-base-arm32v7
 
