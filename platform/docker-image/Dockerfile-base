@@ -51,11 +51,15 @@ RUN DEBIAN_FRONTEND=noninteractive apt -y install --no-install-recommends \
 
 RUN pip3 install -U pip
 
-# Leave entrypoint alone for resin-init
+# Leave entrypoint alone for resin-init with Tini
 CMD ["tail", "-f", "/dev/null"]
 
 ENV TZ=America/New_York
+
 # Disable resin.io's systemd init system
 ENV INITSYSTEM off
+
+# In case TINI is not PID 1
+ENV TINI_SUBREAPER
 
 

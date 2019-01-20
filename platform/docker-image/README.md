@@ -25,7 +25,6 @@ These images are manifested per modern Docker.io guidelines so that an appropria
 ```bash
 $ docker run derekmerck/diana2      # (latest-amd64, latest-arm32v7, latest-arm64v8)
 $ docker run derekmerck/diana2-plus # (latest-amd64, latest-arm32v7)
-
 ```
 
 Images for specific architectures images can be directly pulled from the same namespace using the format `derekmerck/diana2:${TAG}-${ARCH}`, where `$ARCH` is one of `amd64`, `arm32v7`, or `arm64v8`.  Explicit architecture specification is sometimes helpful when an indirect build service shadows the production architecture.
@@ -86,7 +85,9 @@ $ docker run derekmerck/diana2:2.0.10 python3 -c "import diana; print(diana.__ve
 
 ### Build a DIANA-Plus Docker Image
 
-DIANA-Plus includes scientfic and machine learning packages for advanced image processing on medical image data.  It is currently only available for `amd64` and `arm32v7` because tensorflow is hard to compile for `arm64v8`.  For `amd64`, DIANA-Plus uses the `tf-nightly` package and for `arm32v7` we compile our own wheel (see [TF on arm32 note](./TF_on_arm32v7.md))  The DIANA-Plus Docker image is also 700MB, compared to 300MB for the vanilla image.
+DIANA-Plus includes scientfic and machine learning packages for advanced image processing on medical image data.  It is currently only available for `amd64` and `arm32v7` because tensorflow is hard to compile for `arm64v8`.  For `amd64`, DIANA-Plus uses the `tf-nightly` package (currently 1.13) and for `arm32v7` we compile our own wheel (currently 1.12, see [TF on arm32 note](./TF_on_arm32v7.md))  
+
+The DIANA-Plus Docker image is much heavier at 700MB, compared to 300MB for the vanilla image.
 
 ```
 $ cp ${WHEEL_DIR}/tensorflowXX-py37-arm23.whl .
@@ -94,6 +95,11 @@ $ docker-compose build diana2-plus-base-amd64 diana2-plus-base-arm32v7
 $ docker-manifest -s diana-plus-base derekmerck
 $ docker-compose build diana2-plus-amd64 diana2-plus-arm32v7
 $ docker-manifest -s diana-plus derekmerck
+```
+
+```
+$ docker run derekmerck/diana2-plus:latest-arm32v7 python3 -c "import tensorflow; print(tensorflow.__version__)" 
+1.12.0
 ```
 
 

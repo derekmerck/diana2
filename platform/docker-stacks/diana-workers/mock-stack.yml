@@ -35,10 +35,7 @@ services:
 
   diana-mock:
     image:                   derekmerck/diana2
-#    command: >
-#      sh -c "git pull && pip3 install -e apps/diana-cli && python3 -u apps/diana-cli/diana_cli.py mock --dest MockPacs"
-    # Have to invoke python with -u for docker or set PYTHONUBUFFERED
-    command:  python3 -u apps/diana-cli/diana_cli.py mock --dest MockPacs
+    command:                 diana_cli mock --dest MockPacs
     environment:
       PYTHONUNBUFFERED: true
       DIANA_SERVICES: >

@@ -6,13 +6,14 @@ services:
   diana-indexer1:
     image:                  derekmerck/diana2
 #    command: >
-#      sh -c "git pull && diana-cli findex /research2/orthanc/db Redis -o -r '*'"
+#      diana-cli findex /research2/orthanc/db Redis -o -r '*'
     command: >
-      sh -c "git pull && diana-cli findex /research/orthanc-archive/db Redis -o -r '*'"
+      diana-cli findex /research/orthanc-archive/db Redis -o -r '*'
     volumes:
       - "/research/:/research/"
       - "/research2/:/research2/"
     environment:
+      PYTHONUNBUFFERED: true
       DIANA_SERVICES: >
         {
           "Redis": {

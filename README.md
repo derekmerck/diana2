@@ -25,6 +25,52 @@ Hospital picture archive and communications systems (PACS) are not well suited f
 [DICOM]: http://www.dicomstandard.org/
 
 
+Python-Diana
+----------------
+
+The Python-Diana package for Python >= 3.6 provides an api for a network of DICOM-file related services including PACS query, local archive, anonymization, file access, and study indexing.
+
+It comes in two flavors: vanilla and "plus", which includes dependencies on scientific and machine learning packages.
+
+### Installation
+
+```bash
+$ git clone git+https://github.com/derekmerck/diana2
+$ pip3 install -e diana2/package
+$ pip3 install -e diana2/package[plus]
+```
+
+Diana-CLI
+-----------------
+
+Diana-CLI provides a command-line interface to invoke several common pipelines.  It requires a service definition yaml file as input.
+
+### Installation
+
+```bash
+$ pip3 install -e diana2/apps/diana-cli
+$ diana-cli --version
+2.0.11
+```
+
+Diana-Plus functions are available as well.
+```bash
+$ pip3 install -e diana2/apps/diana-cli[plus]
+$ diana-plus --version
+2.0.11
+```
+
+Docker-Image
+----------------
+
+The docker-image directory includes details on building diana2 and diana2-plus docker cross-platform docker images.  Current builds of these images from ci are available on docker hub.
+
+```bash
+$ docker run -it derekmerck/diana2 /bin/bash diana-cli --version
+('diana-cli.py', 'python-diana'), version ('2.1.1', '2.0.12')
+```
+
+
 License
 -------
 

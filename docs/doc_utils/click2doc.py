@@ -29,6 +29,7 @@ MIT
 
 """
 
+
 def run_cli_help(app, cmd=None):
     runner = CliRunner()
     if cmd:

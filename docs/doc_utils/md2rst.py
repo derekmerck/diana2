@@ -3,6 +3,7 @@ from pathlib import Path
 from pypandoc import convert_file
 import click
 
+
 @click.command()
 @click.argument("path", default=".", type=click.Path(exists=True))
 @click.argument("outdir", default=".", type=click.Path())
@@ -45,6 +46,7 @@ def cli(path, outdir, recurse):
                     if fp.parent is outdir or ignored:
                         continue
                     _convert_file(fp, "rst", outputfile=mk_outfile(fp))
+
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)

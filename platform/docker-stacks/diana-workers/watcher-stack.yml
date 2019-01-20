@@ -1,4 +1,5 @@
 # Provides a mock PACS service available as DICOM node: "MOCKPACS@orthanc-mock:4242"
+# This is essentially similar to a Balena embedded watcher build
 
 version: '3.0'
 
@@ -33,10 +34,11 @@ services:
 
   diana-watcher:
     image:                   derekmerck/diana2
-    command: >
-      sh -c "git pull && diana-cli watch"
-#    command:                 diana-cli watch
+    command:                 diana-cli watch
+#    command: >
+#      sh -c "git pull && diana-cli watch"
     environment:
+      PYTHONUNBUFFERED: true
       DIANA_SERVICES: >
         {
           "Remote": {

@@ -14,8 +14,8 @@ class ProxiedDicom(Endpoint, Serializable):
     proxy = attr.ib( init=False )
     @proxy.default
     def setup_proxy(self):
-        if self.proxy_desc.get("ctype"):
-            self.proxy_desc.pop("ctype")
+        # if self.proxy_desc.get("ctype"):
+        #     self.proxy_desc.pop("ctype")
         return Orthanc(**self.proxy_desc)
 
     def find(self, query: Mapping, level=DicomLevel.STUDIES, retrieve: bool=False, **kwargs):

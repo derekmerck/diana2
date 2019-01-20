@@ -1,4 +1,5 @@
-import logging
+import logging, os
+from pprint import pformat
 import yaml
 import click
 import cli_commands
@@ -42,17 +43,23 @@ def cli(ctx, verbose, services, services_path):
         logging.basicConfig(level=logging.WARNING)
         supress_urllib_debug()
 
-    if services:
-        click.echo("Found services")
-        _services = yaml.load(services)
-        click.echo(_services)
-    else:
-        _services = {}
-
+    _services = {}
     if services_path:
+        logging.debug("Found services path")
         with open(services_path) as f:
-            _servicesp = yaml.load(f)
-        _services.update(_servicesp)
+            services_exp = os.path.expandvars(f.read())
+            services_in = yaml.safe_load(services_exp)
+            _services.update(services_in)
+
+    if services:
+        logging.debug("Found services var")
+        services_exp = os.path.expandvars(services)
+        services_in = yaml.safe_load(services_exp)
+        _services.update(services_in)
+
+    click.echo("SERVICES")
+    click.echo("--------------")
+    click.echo(pformat(_services))
 
     # Runner does not instantiate ctx properly
     if not ctx.obj:
