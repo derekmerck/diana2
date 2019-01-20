@@ -6,7 +6,10 @@ from diana.plus.halibut import get_mobilenet
 
 from test_utils import find_resource
 
+import pytest
 
+
+@pytest.mark.skip(reason="Need to dl models")
 def test_view_classifier():
 
     # These weights classify as AP (pos) or Lateral (neg)
