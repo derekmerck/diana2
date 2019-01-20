@@ -68,15 +68,15 @@ services:
       dockerfile: Dockerfile-plus-base
     image: diana2-plus-base-amd64
 
-  # TODO: arm32v7-plus is broken b/c TF for Raspian only supports python 2.7/3.4 :(
-#  diana2-plus-base-arm32v7:
-#    build:
-#      context: ""
-#      dockerfile: Dockerfile-plus-base
-#      args:
-#        RESIN_ARCH:   armv7hf
-#        DOCKER_ARCH:  arm32v7
-#    image: diana2-plus-base-arm32v7
+  # Requires WHEEL_DIR env is set to directory where tf can be found
+  diana2-plus-base-arm32v7:
+    build:
+      context: ""
+      dockerfile: Dockerfile-plus-base-tfwheel
+      args:
+        RESIN_ARCH:   armv7hf
+        TF_PACKAGE:   tensorflow-1.12.0-cp37-none-linux_armv7l.whl
+    image: diana2-plus-base-arm32v7
 
   # TODO: arm64v8-plus is broken b/c TF from nVidia only works with nVidia sdk?
 #  diana2-plus-base-arm64v8:
@@ -103,10 +103,9 @@ services:
   diana2-plus-arm32v7:
     build:
       context: ""
-      dockerfile: Dockerfile-plus-tfwheel
+      dockerfile: Dockerfile-plus
       args:
         DOCKER_ARCH:  arm32v7
-        TF_PACKAGE:   tensorflow-1.12.0-cp37-none-linux_armv7l.whl
     image: diana2-plus-arm32v7
 
 #  diana2-plus-arm64v8:
