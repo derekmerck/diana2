@@ -96,15 +96,18 @@ services:
     build:
       context: ""
       dockerfile: Dockerfile-plus
+      args:
+        TF_PACKAGE: tf-nightly
     image: diana2-plus-amd64
 
-#  diana2-plus-arm32v7:
-#    build:
-#      context: ""
-#      dockerfile: Dockerfile-plus
-#      args:
-#        DOCKER_ARCH:  arm32v7
-#    image: diana2-plus-arm32v7
+  diana2-plus-arm32v7:
+    build:
+      context: ""
+      dockerfile: Dockerfile-plus
+      args:
+        DOCKER_ARCH:  arm32v7
+        TF_PACKAGE:   tensorflow-1.12.0-cp37-none-linux_armv7l.whl
+    image: diana2-plus-arm32v7
 
 #  diana2-plus-arm64v8:
 #    build:

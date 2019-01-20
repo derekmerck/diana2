@@ -23,7 +23,9 @@ Use It
 These images are manifested per modern Docker.io guidelines so that an appropriately architected image can be will automatically selected for a given tag depending on the pulling architecture.
 
 ```bash
-$ docker run derekmerck/diana2           # (latest-amd64, latest-arm32v7, latest-arm64v8)
+$ docker run derekmerck/diana2      # (latest-amd64, latest-arm32v7, latest-arm64v8)
+$ docker run derekmerck/diana2-plus # (latest-amd64, latest-arm32v7)
+
 ```
 
 Images for specific architectures images can be directly pulled from the same namespace using the format `derekmerck/diana2:${TAG}-${ARCH}`, where `$ARCH` is one of `amd64`, `arm32v7`, or `arm64v8`.  Explicit architecture specification is sometimes helpful when an indirect build service shadows the production architecture.
@@ -51,21 +53,22 @@ This supports builds for `amd64`, `armhf`/`arm32v7`, and `aarch64`/`arm64v8` arc
 To build all images:
 
 1. Register the Docker QEMU cross-compilers
-2. Call `docker-compose` to build the `diana-base` images
-4. Get [docker-manifest][] from Github
-5. Put Docker into "experimental mode" for manifest creation
-6. Call `docker-manifest.py` with an appropriate domain to retag and push the base images
-7. Call `docker-compose` to build the `diana-base` images
-8. Call `docker-manifest.py` with an appropriate domain to retag and push the completed images
+2. Get [docker-manifest][] from Github
+3. Put Docker into "experimental mode" for manifest creation
+4. Call `docker-compose` to build the `diana2-base` images
+5. Call `docker-manifest.py` with an appropriate domain to retag and push the base images
+6. Call `docker-compose` to build the `diana2` images
+7. Call `docker-manifest.py` with an appropriate domain to retag and push the completed images
 
 [docker-manifest]: https://github.com/derekmerck/docker-manifest
 
 ```bash
 $ docker run --rm --privileged multiarch/qemu-user-static:register --reset
-$ cd diana2/platform/images/diana-docker
-$ docker-compose build diana2-base-amd64 diana2-base-arm32v7 diana2-base-arm64v8
 $ pip install git+https://github.com/derekmerck/docker-manifest
 $ mkdir -p $HOME/.docker && echo '{"experimental":"enabled"}' > "$HOME/.docker/config.json"
+$ git clone git+https://github.com/derekmerck/diana2
+$ cd diana2/platform/images/diana-docker
+$ docker-compose build diana2-base-amd64 diana2-base-arm32v7 diana2-base-arm64v8
 $ docker-manifest -s diana2-base $DOCKER_USERNAME
 $ docker-compose build diana2-amd64 diana2-arm32v7 diana2-arm64v8
 $ docker-manifest -s diana2 $DOCKER_USERNAME 
@@ -80,6 +83,11 @@ Because the base image rarely changes, but the latest Diana build is still fluid
 $ docker run derekmerck/diana2:2.0.10 python3 -c "import diana; print(diana.__version__)"
 2.0.10
 ```
+
+### DIANA-Plus
+
+DIANA-Plus includes scientfic and machine learning packages for advanced image processing on medical image data.  It is currently only available for `amd64` and `arm32v7` because tensorflow is hard to compile for `arm64v8`.  For `amd64`, DIANA-Plus uses the `tf-nightly` package and for `arm32v7` we compile our own wheel (see [TF on arm32 note](./TF_on_arm32v7.md))
+
 
 ### DIANA on ARM
  

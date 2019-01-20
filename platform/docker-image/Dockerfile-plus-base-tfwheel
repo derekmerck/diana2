@@ -31,7 +31,8 @@ RUN pip3 install --no-deps --no-cache-dir -U \
     absl-py \
     pyparsing
 
+COPY {$WHEEL_DIR}/${TF_PACKAGE} /tmp
+RUN pip3 install --no-cache-dir -U tmp/${TF_PACKAGE} && rm /tmp/${TF_PACKAGE}
+
 ENV KERAS_BACKEND=tensorflow
-RUN pip3 install --no-cache-dir -U \
-    tf-nightly \
-    keras
+RUN pip3 install --no-cache-dir -U keras
