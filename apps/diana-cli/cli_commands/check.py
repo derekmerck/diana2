@@ -17,4 +17,8 @@ def check(ctx, endpoints):
 
     for ep_key in endpoints:
         ep = Serializable.Factory.create(**services.get(ep_key))
-        click.echo("{}: {}".format( ep_key, "Ready" if ep.check() else "Not Ready" ))
+        try:
+            click.echo("{}: {}".format( ep_key, "Ready" if ep.check() else "Not Ready" ))
+        except NotImplementedError:
+            click.echo("{}: {}".format( ep_key, "Unimplemented health check" ))
+
