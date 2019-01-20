@@ -11,13 +11,15 @@ LABEL description="X-Arch Diana-Plus Base"
 
 RUN apt -y update
 RUN DEBIAN_FRONTEND=noninteractive apt -y install --no-install-recommends \
-    python3-scipy \
+    python3-cffi \
+    python3-grpcio \
     python3-h5py \
     python3-protobuf \
     python3-numpy-dev \
+    python3-opencv \
+    python3-pydot \
+    python3-scipy \
     python3-sklearn \
-    python3-cffi \
-    python3-grpcio \
     cython3 \
     libhdf5-dev \
     libatlas-base-dev \
@@ -26,9 +28,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt -y install --no-install-recommends \
    && apt clean && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install --no-deps --no-cache-dir -U \
-    pydot \
     parameterized \
-    protobuf \
     absl-py \
     pyparsing
 

@@ -86,7 +86,15 @@ $ docker run derekmerck/diana2:2.0.10 python3 -c "import diana; print(diana.__ve
 
 ### DIANA-Plus
 
-DIANA-Plus includes scientfic and machine learning packages for advanced image processing on medical image data.  It is currently only available for `amd64` and `arm32v7` because tensorflow is hard to compile for `arm64v8`.  For `amd64`, DIANA-Plus uses the `tf-nightly` package and for `arm32v7` we compile our own wheel (see [TF on arm32 note](./TF_on_arm32v7.md))
+DIANA-Plus includes scientfic and machine learning packages for advanced image processing on medical image data.  It is currently only available for `amd64` and `arm32v7` because tensorflow is hard to compile for `arm64v8`.  For `amd64`, DIANA-Plus uses the `tf-nightly` package and for `arm32v7` we compile our own wheel (see [TF on arm32 note](./TF_on_arm32v7.md))  The image is also quite large.
+
+```
+$ cp ${WHEEL_DIR}/tensorflowXX-py37-arm.whl .
+$ docker-compose build diana2-plus-base-amd64 diana2-plus-base-arm32v7
+$ docker-manifest -s diana-plus-base derekmerck
+$ docker-compose build diana2-plus-amd64 diana2-plus-arm32v7
+$ docker-manifest -s diana-plus derekmerck
+```
 
 
 ### DIANA on ARM

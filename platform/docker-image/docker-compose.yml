@@ -68,7 +68,7 @@ services:
       dockerfile: Dockerfile-plus-base
     image: diana2-plus-base-amd64
 
-  # Requires WHEEL_DIR env is set to directory where tf can be found
+  # Copy the wheel to the docker-image directory
   diana2-plus-base-arm32v7:
     build:
       context: ""

@@ -22,9 +22,16 @@ pyyaml
 cython
 numpy
 scipy
-tensorflow
 keras
+keras-retinanet
+python-opencv
 scikit-learn
+
+# ANY OF THESE
+# tensorflow
+# tensorflow-gpu
+# tf-nightly
+# tf-nightly-gpu
 
 # TESTING REQS
 # -----------------
