@@ -32,8 +32,8 @@ RUN pip3 install --no-deps --no-cache-dir -U \
     absl-py \
     pyparsing
 
-COPY tensorflow-1.12.0-cp37-none-linux_armv7l.whl /tmp/tensorflow-1.12.0-cp37-none-linux_armv7l.whl
-RUN pip3 install --no-cache-dir -U /tmp/tensorflow-1.12.0-cp37-none-linux_armv7l.whl && rm /tmp/tensorflow-1.12.0-cp37-none-linux_armv7l.whl
+COPY *.whl /tmp/
+RUN pip3 install --no-cache-dir -U /tmp/${TF_WHEEL} && rm /tmp/${TF_WHEEL}
 
 ENV KERAS_BACKEND=tensorflow
 RUN pip3 install --no-cache-dir -U keras
