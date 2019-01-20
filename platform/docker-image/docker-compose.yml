@@ -103,7 +103,7 @@ services:
   diana2-plus-arm32v7:
     build:
       context: ""
-      dockerfile: Dockerfile-plus
+      dockerfile: Dockerfile-plus-tfwheel
       args:
         DOCKER_ARCH:  arm32v7
         TF_PACKAGE:   tensorflow-1.12.0-cp37-none-linux_armv7l.whl
