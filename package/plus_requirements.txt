@@ -2,4 +2,5 @@ cython
 scipy
 tensorflow
 keras
+keras-retinanet
 scikit-learn

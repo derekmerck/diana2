@@ -46,7 +46,7 @@ def get_pixels(dixel: Dixel, imsize=224):
     return pixels
 
 
-from .MobileNetGray import MobileNet
+from .models import MobileNet
 # from keras.applications import MobileNet
 from keras.layers import Dense, Dropout, GlobalMaxPooling2D, GlobalAveragePooling2D, Flatten
 from keras.engine import Model

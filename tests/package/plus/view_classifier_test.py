@@ -10,7 +10,7 @@ from test_utils import find_resource
 def test_view_classifier():
 
     # These weights classify as AP (pos) or Lateral (neg)
-    fp = find_resource("resources/models/view_classifier.h5")
+    fp = find_resource("resources/models/view_classifier/view_classifier.h5")
 
     _model = get_mobilenet(0, weights=None)
     _model.load_weights(fp)
