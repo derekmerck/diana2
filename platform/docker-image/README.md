@@ -84,12 +84,12 @@ $ docker run derekmerck/diana2:2.0.10 python3 -c "import diana; print(diana.__ve
 2.0.10
 ```
 
-### DIANA-Plus
+### Build a DIANA-Plus Docker Image
 
-DIANA-Plus includes scientfic and machine learning packages for advanced image processing on medical image data.  It is currently only available for `amd64` and `arm32v7` because tensorflow is hard to compile for `arm64v8`.  For `amd64`, DIANA-Plus uses the `tf-nightly` package and for `arm32v7` we compile our own wheel (see [TF on arm32 note](./TF_on_arm32v7.md))  The image is also quite large.
+DIANA-Plus includes scientfic and machine learning packages for advanced image processing on medical image data.  It is currently only available for `amd64` and `arm32v7` because tensorflow is hard to compile for `arm64v8`.  For `amd64`, DIANA-Plus uses the `tf-nightly` package and for `arm32v7` we compile our own wheel (see [TF on arm32 note](./TF_on_arm32v7.md))  The DIANA-Plus Docker image is also 700MB, compared to 300MB for the vanilla image.
 
 ```
-$ cp ${WHEEL_DIR}/tensorflowXX-py37-arm.whl .
+$ cp ${WHEEL_DIR}/tensorflowXX-py37-arm23.whl .
 $ docker-compose build diana2-plus-base-amd64 diana2-plus-base-arm32v7
 $ docker-manifest -s diana-plus-base derekmerck
 $ docker-compose build diana2-plus-amd64 diana2-plus-arm32v7
@@ -124,7 +124,7 @@ Although [Resin uses Packet ARM servers to compile arm32 images][resin-on-packet
 [resin-on-packet]: https://resin.io/blog/docker-builds-on-arm-servers-youre-not-crazy-your-builds-really-are-5x-faster/
 [no-arm32]: https://gitlab.com/gitlab-org/omnibus-gitlab/issues/2544
 
-Now pull the image tag. You can confirm that the appropriate image has been pulled by starting a container with the command `arch`.  
+Now pull the image without specifying the architecture tag. You can confirm that the appropriate image has been pulled by starting a container with the command `arch`.  
 
 ```bash
 $ docker run derekmerck/diana2 arch

@@ -23,12 +23,12 @@ cython
 numpy
 scipy
 keras
-keras-retinanet
-python-opencv
+#keras-retinanet  # broken on arm, deps opencv
+#opencv-python    # no arm32 pip, can install cv2 with apt
 scikit-learn
 
 # ANY OF THESE
-# tensorflow
+# tensorflow      # arm32 custom wheel for this
 # tensorflow-gpu
 # tf-nightly
 # tf-nightly-gpu
