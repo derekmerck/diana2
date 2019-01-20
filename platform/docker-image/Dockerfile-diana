@@ -1,5 +1,5 @@
 # xArch Diana Image
-# Derek Merck, Summer 2018
+# Derek Merck, Winter 2019
 
 ARG DOCKER_ARCH="amd64"
 # ARG DOCKER_ARCH="arm32v7"

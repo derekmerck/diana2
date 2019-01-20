@@ -61,21 +61,24 @@ services:
   # Plus-base-images need not be recreated all the time
   # ----------------------
 
+  # Use tf-nightly for python 3.7 support
   diana2-plus-base-amd64:
     build:
       context: ""
       dockerfile: Dockerfile-plus-base
     image: diana2-plus-base-amd64
 
-  diana2-plus-base-arm32v7:
-    build:
-      context: ""
-      dockerfile: Dockerfile-plus-base
-      args:
-        RESIN_ARCH:   armv7hf
-        DOCKER_ARCH:  arm32v7
-    image: diana2-plus-base-arm32v7
+  # TODO: arm32v7-plus is broken b/c TF for Raspian only supports python 2.7/3.4 :(
+#  diana2-plus-base-arm32v7:
+#    build:
+#      context: ""
+#      dockerfile: Dockerfile-plus-base
+#      args:
+#        RESIN_ARCH:   armv7hf
+#        DOCKER_ARCH:  arm32v7
+#    image: diana2-plus-base-arm32v7
 
+  # TODO: arm64v8-plus is broken b/c TF from nVidia only works with nVidia sdk?
 #  diana2-plus-base-arm64v8:
 #    build:
 #      context: ""
@@ -95,13 +98,13 @@ services:
       dockerfile: Dockerfile-plus
     image: diana2-plus-amd64
 
-  diana2-plus-arm32v7:
-    build:
-      context: ""
-      dockerfile: Dockerfile-plus
-      args:
-        DOCKER_ARCH:  arm32v7
-    image: diana2-plus-arm32v7
+#  diana2-plus-arm32v7:
+#    build:
+#      context: ""
+#      dockerfile: Dockerfile-plus
+#      args:
+#        DOCKER_ARCH:  arm32v7
+#    image: diana2-plus-arm32v7
 
 #  diana2-plus-arm64v8:
 #    build:

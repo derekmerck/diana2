@@ -66,9 +66,9 @@ $ cd diana2/platform/images/diana-docker
 $ docker-compose build diana2-base-amd64 diana2-base-arm32v7 diana2-base-arm64v8
 $ pip install git+https://github.com/derekmerck/docker-manifest
 $ mkdir -p $HOME/.docker && echo '{"experimental":"enabled"}' > "$HOME/.docker/config.json"
-$ python3 docker-manifest.py --d $DOCKER_USERNAME diana2-base
+$ docker-manifest -s diana2-base $DOCKER_USERNAME
 $ docker-compose build diana2-amd64 diana2-arm32v7 diana2-arm64v8
-$ python3 docker-manifest.py --d $DOCKER_USERNAME diana2
+$ docker-manifest -s diana2 $DOCKER_USERNAME 
 ```
 
 Because the base image rarely changes, but the latest Diana build is still fluid, the 
@@ -77,8 +77,8 @@ Because the base image rarely changes, but the latest Diana build is still fluid
 [Travis]: http://travis-ci.org
 
 ```bash
-$ docker run -it diana2-amd64 python3 -c "import diana; print(diana.__version__)"
-2.0.3
+$ docker run derekmerck/diana2:2.0.10 python3 -c "import diana; print(diana.__version__)"
+2.0.10
 ```
 
 ### DIANA on ARM
@@ -98,7 +98,8 @@ $ sh get-docker.sh
 $ docker run hello-world
 $ apt install git python-pip
 $ pip install docker-compose
-$ git clone http://github.com/derekmerck/diana2 ... continue as above
+$ git clone http://github.com/derekmerck/diana2 
+... continue as above
 ```
 
 Although [Resin uses Packet ARM servers to compile arm32 images][resin-on-packet], the available ThunderX does not implement the arm32 instruction set, so it [cannot compile natively for the Raspberry Pi][no-arm32].
