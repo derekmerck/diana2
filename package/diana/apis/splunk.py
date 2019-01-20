@@ -22,6 +22,7 @@ class Splunk(Endpoint, Serializable):
     port = attr.ib(default=8088)
     path = attr.ib(default=None)
 
+    hec_protocol = attr.ib(default="http")
     hec_port = attr.ib(default=8089)
     hec_token = attr.ib(default=None)
 
