@@ -17,6 +17,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt -y install --no-install-recommends \
     python3-numpy-dev \
     python3-sklearn \
     python3-cffi \
+    python3-grpcio \
     cython3 \
     libhdf5-dev \
     libatlas-base-dev \
@@ -29,7 +30,8 @@ RUN pip3 install --no-deps --no-cache-dir -U \
     parameterized \
     protobuf \
     absl-py \
-    pyparsing
+    pyparsing \
+    grpcio
 
 ENV KERAS_BACKEND=tensorflow
 RUN pip3 install --no-cache-dir -U \

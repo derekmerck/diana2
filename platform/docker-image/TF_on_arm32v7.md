@@ -57,7 +57,7 @@ $ CI_DOCKER_EXTRA_PARAMS="-e CI_BUILD_PYTHON=python3 -e CROSSTOOL_PYTHON_INCLUDE
     tensorflow/tools/ci_build/pi/build_raspberry_pi.sh
 ```
 
-Compilation takes about 20 minutes.
+Compilation takes about 20 minutes.  Installing on rpi is quick except for `grpcio`.
 
 
 ## Acknowledgments
