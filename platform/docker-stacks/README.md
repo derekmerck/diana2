@@ -113,6 +113,10 @@ $ docker stack deploy -c admin/admin-stack.yml admin
 $ docker-stack deploy -c diana-workers/mock-stack.yml mock
 ```
 
+### Diana Watcher
+
+Additionally, see [Remote Embedded Diana Watcher](https://github.com/derekmerck/red-dcm-watcher) for Raspberry Pi and Balena.
+
 Provisioning
 -------------------
 
