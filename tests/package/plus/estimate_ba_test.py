@@ -1,6 +1,10 @@
 import logging
 
-from diana.plus.halibut.predict import predict_ba
+# currently missing keras-retinanet (and opencv dep) on travis
+# import pytest
+# predict = pytest.importorskip("diana.plus.halibut.predict")
+
+# from diana.plus.halibut.predict import predict_ba
 
 from test_utils import find_resource
 
