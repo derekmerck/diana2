@@ -31,4 +31,3 @@ def check(ctx, endpoints):
             out = click.style("{}: {}".format(ep_key, "Unimplemented health check"),
                               fg="yellow")
         click.echo(out)
-

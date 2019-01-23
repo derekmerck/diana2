@@ -22,6 +22,7 @@ DESC must be a mock-site description in yaml format.
 ...
 """
 
+
 @click.command(epilog=epilog, short_help="Generate mock DICOM traffic")
 @click.argument('desc', required=False)
 @click.option('--dest', help="Destination DICOM service")
@@ -29,10 +30,9 @@ DESC must be a mock-site description in yaml format.
 def mock(ctx, desc, dest):
     """Generate synthetic studies on a schedule according to a site
     description DESC.  Studies are optionally forwarded to an endpoint DEST."""
-
     services = ctx.obj.get('services')
-    click.echo('Generate mock DICOM data')
-    click.echo('------------------------')
+
+    click.echo(click.style('Generate mock DICOM data', underline=True, bold=True))
 
     if not desc:
         desc = sample_site_desc

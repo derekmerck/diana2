@@ -29,7 +29,7 @@ class ObservableProxiedDicom(ProxiedDicom, ObservableMixin):
                  "PatientName": "",
                  "PatientID": "",
                  "PatientBirthDate": ""}
-    qlevel = attr.ib(default=DicomLevel.STUDIES)
+    qlevel = attr.ib(default=DicomLevel.STUDIES, converter=DicomLevel.from_label)
     qperiod = attr.ib( default=600, converter=int)  #: Check last 10 mins by default
 
     history_len = attr.ib(default=200)              #: Set to at least 10 mins of studies
@@ -53,6 +53,10 @@ class ObservableProxiedDicom(ProxiedDicom, ObservableMixin):
 
             q = {}
             q.update(self.query)
+            if self.qlevel == DicomLevel.SERIES:
+                q['SeriesInstanceUID'] = ""
+                q['SeriesDate'] = ""
+                q['SeriesTime'] = ""
             q['StudyDate'] = de if de==dl else "{}-{}".format(de, dl)
             q['StudyTime'] = "{}-{}".format(te, tl)
 

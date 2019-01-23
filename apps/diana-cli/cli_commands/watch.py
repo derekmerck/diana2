@@ -37,16 +37,16 @@ Provided route handlers:
 - index_dlvl
 """
 
+
 @click.command(short_help="Watch sources and route events", epilog=epilog)
 @click.option('-r', '--route', default=None, nargs=3)
 @click.option('-R', '--routes_path', type=click.Path(exists=True), default=None)
 @click.pass_context
 def watch(ctx, route, routes_path):
     """Watch sources for events to handle based on ROUTES"""
-
     services = ctx.obj.get('services')
-    click.echo('Watcher')
-    click.echo('------------------------')
+
+    click.echo(click.style('Watcher', underline=True, bold=True))
 
     routes = []
 

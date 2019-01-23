@@ -11,6 +11,7 @@ $ python3 diana-cli.py --verbose -S ../../.secrets/lifespan_services.yml collect
 
 """
 
+
 @click.command(short_help="Collect and handle studies")
 @click.argument('project', type=click.STRING)
 @click.argument('data_path', type=click.Path())
@@ -22,10 +23,9 @@ $ python3 diana-cli.py --verbose -S ../../.secrets/lifespan_services.yml collect
 def collect(ctx, project, data_path, source, domain, dest, subpath_depth):
     """Create a PROJECT key at DATA_PATH, then pull data from
     SOURCE and send to DEST."""
-
     services = ctx.obj.get('services')
-    click.echo('Collect DICOM data')
-    click.echo('------------------------')
+
+    click.echo(click.style('Collect DICOM data', underline=True, bold=True))
 
     C = Collector()
 
@@ -43,5 +43,3 @@ def collect(ctx, project, data_path, source, domain, dest, subpath_depth):
         dest_inst = Orthanc(**_dest)
 
     C.run(project, data_path, source_inst, domain, dest_inst)
-
-

@@ -10,8 +10,7 @@ from diana.plus import measure_scout  # monkey patches Dixel
 def ssde(path, images):
     """Compute patient size from localizer imaging"""
 
-    click.echo('Measuring scout images')
-    click.echo('------------------------')
+    click.echo(click.style('Measuring scout images', underline=True, bold=True))
 
     D = DcmDir(path=path)
 

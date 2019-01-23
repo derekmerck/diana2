@@ -2,6 +2,7 @@ import click
 from diana.apis import DcmDir, Redis, Orthanc
 from diana.daemons import FileIndexer
 
+
 @click.command(short_help="Create a persistent DICOM file index")
 @click.argument('path')
 @click.argument('registry')
@@ -12,8 +13,8 @@ from diana.daemons import FileIndexer
 def findex(ctx, path, registry, orthanc_db, regex, pool_size):
     """Inventory collections of files by accession number with a PATH REGISTRY for retrieval"""
     services = ctx.obj.get('services')
-    click.echo('Register Files by Accession Number')
-    click.echo('------------------------')
+
+    click.echo(click.style('Register Files by Accession Number', underline=True, bold=True))
 
     file_indexer = FileIndexer(pool_size=pool_size)
     R = Redis(**services[registry])
@@ -27,6 +28,7 @@ def findex(ctx, path, registry, orthanc_db, regex, pool_size):
 
     click.echo(result)
 
+
 @click.command(short_help="Upload indexed DICOM files")
 @click.argument('collection')
 @click.argument('path')
@@ -38,8 +40,9 @@ def fiup(ctx, collection, path, index, dest, pool_size):
     """Collect files in a study by COLLECTION (accession number) using a
     PATH REGISTRY, and send to DEST."""
     services = ctx.obj.get('services')
-    click.echo('Upload Registered Files by Accession Number')
-    click.echo('------------------------')
+
+    click.echo(click.style('Upload Registered Files by Accession Number',
+                           underline=True, bold=True))
 
     file_indexer = FileIndexer(pool_size=pool_size)
     R = Redis(**services[index])

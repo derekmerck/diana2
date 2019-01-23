@@ -25,6 +25,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/derekmerck/diana2",
     packages=setuptools.find_packages(),
+    package_data={'python-diana': ['utils/guid/us_census/*.txt']},
     classifiers=(
         'Development Status :: 3 - Alpha',
         "Programming Language :: Python :: 3",

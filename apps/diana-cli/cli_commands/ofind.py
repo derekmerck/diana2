@@ -12,10 +12,9 @@ from diana.utils.dicom import DicomLevel
 def ofind(ctx, query, source, domain, retrieve):
     """Find studies matching yaml/json QUERY in SOURCE Orthanc service.  The optional
     proxy DOMAIN issues a remote-find to a proxied DICOM endpoint."""
-
     services = ctx.obj.get('services')
-    click.echo('Orthanc Find')
-    click.echo('------------------------')
+
+    click.echo(click.style('Orthanc Find', underline=True, bold=True))
 
     S = Orthanc(**services.get(source))
     if isinstance(query, str):

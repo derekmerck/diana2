@@ -15,6 +15,7 @@ WARNING:GUIDMint:Creating non-reproducible GUID using current date
  'TimeOffset': datetime.timedelta(-47, 82822)}
 """
 
+
 @click.command(short_help="Generate a GUID", epilog=epilog)
 @click.argument('name', type=click.STRING)
 @click.argument('dob', required=False, type=click.DateTime())
@@ -25,11 +26,10 @@ WARNING:GUIDMint:Creating non-reproducible GUID using current date
 def guid(ctx, name, dob, gender, age, reference_date):
     """Generate a globally unique sham ID from NAME, DOB, and GENDER."""
 
-    click.echo('Generating GUID')
-    click.echo('------------------------')
+    click.echo(click.style('Generating GUID', underline=True, bold=True))
 
     sham = GUIDMint.get_sham_id(name=name, dob=dob, gender=gender,
-                              age=age, reference_date=reference_date)
+                                age=age, reference_date=reference_date)
 
     resp = {
         "name": dicom_name(sham['Name']),
