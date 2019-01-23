@@ -29,6 +29,6 @@ def check(ctx, endpoints):
                               fg="green" if ready else "red")
         except NotImplementedError:
             out = click.style("{}: {}".format(ep_key, "Unimplemented health check"),
-                              fg="orange")
+                              fg="yellow")
         click.echo(out)
 

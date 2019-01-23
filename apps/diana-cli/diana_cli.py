@@ -1,5 +1,4 @@
 import logging, os
-from pprint import pformat
 import yaml
 import click
 import cli_commands
