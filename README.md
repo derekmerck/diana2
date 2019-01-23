@@ -50,14 +50,14 @@ Diana-CLI provides a command-line interface to invoke several common pipelines. 
 ```bash
 $ pip3 install -e diana2/apps/diana-cli
 $ diana-cli --version
-2.0.11
+2.x.x
 ```
 
 Diana-Plus functions are available as well.
 ```bash
 $ pip3 install -e diana2/apps/diana-cli[plus]
 $ diana-plus --version
-2.0.11
+2.x.x
 ```
 
 Docker-Image
@@ -67,7 +67,7 @@ The docker-image directory includes details on building diana2 and diana2-plus d
 
 ```bash
 $ docker run -it derekmerck/diana2 /bin/bash diana-cli --version
-('diana-cli.py', 'python-diana'), version ('2.1.1', '2.0.12')
+('diana-cli.py', 'python-diana'), version ('2.x.x', '2.x.x')
 ```
 
 

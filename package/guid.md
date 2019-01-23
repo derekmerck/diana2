@@ -10,7 +10,7 @@ As a Python library:
 
 ````python
 >>> from diana.utils.guid import GUIDMint
->>> GUIDMint().get_sham_id( name="MERCK^DEREK^L" )
+>>> GUIDMint().get_sham_id( name="MERCK^DEREK^L", age=30 )
 {
   'BirthDate': datetime.date(1988, 11, 20),
   'ID': 'VXNQHHN523ZQNJFIY3TXJM4YXABTL6SL',
@@ -22,7 +22,7 @@ As a Python library:
 From `diana-cli`:
 
 ```yaml
-$ python3 diana-cli.py guid "MERCK^DEREK^L" --age 30
+$ diana-cli guid "MERCK^DEREK^L" --age 30
 Generating GUID
 ------------------------
 WARNING:GUIDMint:Creating non-reproducible GUID using current date

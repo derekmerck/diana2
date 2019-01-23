@@ -4,7 +4,7 @@ Merck, Winter 2019
 
 Binary: <https://www.dropbox.com/s/ed1ay1qsvrv2l4c/tensorflow-1.12.0-cp37-none-linux_armv7l.whl?dl=1>
 
-The Diana docker-image is based on Debian-Buster, which uses Python 3.7.  Available TF builds for arm32v7 are based on Raspian9/Python 3.4.
+The Diana docker-image is based on Debian Buster, which uses Python 3.7.  Available TF builds for arm32v7 are based on Raspian9, which uses Python 3.4.
  
 Following recipe for building a TF wheel for Python 3.7 on a Raspberry Pi is based on modifying the workflow described at <https://www.tensorflow.org/install/source_rpi>.
 

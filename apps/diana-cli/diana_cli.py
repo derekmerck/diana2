@@ -57,10 +57,6 @@ def cli(ctx, verbose, services, services_path):
         services_in = yaml.safe_load(services_exp)
         _services.update(services_in)
 
-    click.echo("SERVICES")
-    click.echo("--------------")
-    click.echo(pformat(_services))
-
     # Runner does not instantiate ctx properly
     if not ctx.obj:
         ctx.obj = {}

@@ -79,8 +79,8 @@ Because the base image rarely changes, but the latest Diana build is still fluid
 [Travis]: http://travis-ci.org
 
 ```bash
-$ docker run derekmerck/diana2:2.0.10 python3 -c "import diana; print(diana.__version__)"
-2.0.10
+$ docker run derekmerck/diana2:2.x.x python3 -c "import diana; print(diana.__version__)"
+2.x.x
 ```
 
 ### Build a DIANA-Plus Docker Image
