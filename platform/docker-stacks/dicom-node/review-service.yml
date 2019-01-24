@@ -26,6 +26,7 @@ services:
 #      ORTHANC_PG_DATABASE:      ${ORTHANC_PG_DATABASE}-review01
       ORTHANC_PG_DATABASE:      review01
       ORTHANC_PG_HOST:          postgres
+      ORTHANC_PG_USER:          orthanc
       ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
       ORTHANC_WBV_ENABLED:      "true"
       ORTHANC_WBV_STORE_ANNOTATIONS:  "true"
