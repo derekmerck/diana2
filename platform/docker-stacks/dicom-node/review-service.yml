@@ -16,7 +16,6 @@ services:
     networks:
       - admin_proxy_network
       - cirr_service_network
-      - default
     environment:
       ORTHANC_NAME:             Archive
       ORTHANC_AET:              ARCHIVE
@@ -38,4 +37,4 @@ services:
       labels:
         - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8042"
-        - "traefik.frontend.rule=PathPrefixStrip:/review01/"
+        - "traefik.frontend.rule=PathPrefixStrip:/review-01/"

@@ -25,7 +25,7 @@ services:
       ORTHANC_MAX_PATIENTS:  50
       ORTHANC_PASSWORD:      ${ORTHANC_PASSWORD}
       ORTHANC_MOD_0:         mock,MOCK,orthanc-mock,4242  # Private port at swarm addr
-      ORTHANC_MOD_1:         ${WATCHER_DCM_NODE}          # Other host addr
+      ORTHANC_MOD_1:         ${MOD_WATCHER}               # Other host addr
       TZ:                    "America/New_York"
     deploy:
       labels:
