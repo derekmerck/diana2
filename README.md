@@ -30,7 +30,7 @@ Python-Diana
 
 The Python-Diana package for Python >= 3.6 provides an api for a network of DICOM-file related services including PACS query, local archive, anonymization, file access, and study indexing.
 
-It comes in two flavors: vanilla and "plus", which includes dependencies on scientific and machine learning packages.
+It comes in two flavors: vanilla and "plus," which includes dependencies on scientific and machine learning packages.
 
 ### Installation
 
