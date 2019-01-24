@@ -21,7 +21,7 @@ services:
     ports:
       - "2424:4242"
     environment:
-      ORTHANC_NAME:          DIANA Mock PACS
+      ORTHANC_NAME:          Mock PACS
       ORTHANC_AET:           MOCK
       ORTHANC_MAX_PATIENTS:  50
       ORTHANC_PASSWORD:      ${ORTHANC_PASSWORD}
@@ -31,7 +31,7 @@ services:
       labels:
         - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8042"
-        - "traefik.frontend.rule=PathPrefixStrip:/orthanc-mock/"
+        - "traefik.frontend.rule=PathPrefixStrip:/mock/"
 
   diana-mock:
     image:                   derekmerck/diana2
@@ -41,7 +41,7 @@ services:
       DIANA_SERVICES: >
         {"MockPacs": {
             "ctype": "Orthanc",
-            "host":  "orthanc-mock",
+            "host":  "orthanc-proxy",
             "password": "${ORTHANC_PASSWORD}"
         }}
       TZ:                   "America/New_York"

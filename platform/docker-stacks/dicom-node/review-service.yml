@@ -9,34 +9,33 @@ networks:
   cirr_service_network:
     external: true   # Created by (old) cirr data-stack
 
-
 services:
 
-  orthanc-bridge:
-    image: derekmerck/orthanc-confd:latest-amd64
-    ports:
-      - 4242:14242
+  orthanc-review01:
+    image: derekmerck/orthanc-wbv:latest-amd64
     networks:
       - admin_proxy_network
       - cirr_service_network
       - default
     environment:
-      ORTHANC_NAME:             Bridge
-      ORTHANC_AET:              BRIDGE
-      ORTHANC_MAX_STUDIES:      50
+      ORTHANC_NAME:             Archive
+      ORTHANC_AET:              ARCHIVE
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
-      ORTHANC_STORE_COMPRESSED: "false"
+      ORTHANC_STORE_COMPRESSED: "true"
       ORTHANC_PG_ENABLED:       "true"
       ORTHANC_PG_STORE_DICOM:   "true"
-      ORTHANC_PG_DATABASE:      ${ORTHANC_PG_DATABASE}-bridge
+#      ORTHANC_PG_DATABASE:      ${ORTHANC_PG_DATABASE}-review01
+      ORTHANC_PG_DATABASE:      review01
       ORTHANC_PG_HOST:          postgres
       ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
-      ORTHANC_MOD_0:            ${ORTHANC_MOD_0}
+      ORTHANC_WBV_ENABLED:      "true"
+      ORTHANC_WBV_STORE_ANNOTATIONS:  "true"
       ORTHANC_VERBOSE:          "true"
+      ORTHANC_USER_0:           "review:L0ur3nC0"
       TZ:                       "America/New_York"
     deploy:
       replicas: 2  # Multiple nodes, PG provides data persistence
       labels:
         - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8042"
-        - "traefik.frontend.rule=PathPrefixStrip:/bridge/"
+        - "traefik.frontend.rule=PathPrefixStrip:/review01/"

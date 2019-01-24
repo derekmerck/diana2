@@ -12,7 +12,7 @@ networks:
 
 services:
 
-  orthanc-bridge:
+  orthanc-proxy:
     image: derekmerck/orthanc-confd:latest-amd64
     networks:
       - default
@@ -20,11 +20,12 @@ services:
     ports:
       - "4242:4242"
     environment:
-      ORTHANC_NAME:          DIANA Bridge
+      ORTHANC_NAME:          DIANA Proxy
       ORTHANC_AET:           BRIDGE
       ORTHANC_MAX_PATIENTS:  50
       ORTHANC_PASSWORD:      ${ORTHANC_PASSWORD}
       ORTHANC_MOD_0:         mock,MOCK,orthanc-mock,4242  # Private port at swarm addr
+      ORTHANC_MOD_1:         ${WATCHER_DCM_NODE}          # Other host addr
       TZ:                    "America/New_York"
     deploy:
       labels:
