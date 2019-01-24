@@ -30,7 +30,7 @@ services:
       ORTHANC_WBV_ENABLED:      "true"
       ORTHANC_WBV_STORE_ANNOTATIONS:  "true"
       ORTHANC_VERBOSE:          "true"
-      ORTHANC_USER_0:           "review:L0ur3nC0"
+      ORTHANC_USER_0:           "review,${REVIEW01_PASS}"
       TZ:                       "America/New_York"
     deploy:
       replicas: 2  # Multiple nodes, PG provides data persistence

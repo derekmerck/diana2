@@ -62,6 +62,7 @@ def cli(ctx, verbose, services, services_path):
     ctx.obj['services'] = _services
 
 
+
 coms = [
     cli_commands.check,
     cli_commands.collect,
@@ -71,12 +72,12 @@ coms = [
     cli_commands.guid,
     cli_commands.mock,
     cli_commands.ofind,
-    cli_commands.watch
+    cli_commands.verify,
+    cli_commands.watch,
+    # cli_commands.verify
 ]
-
 for c in coms:
     cli.add_command(c)
-
 
 # Indirection to set envar prefix from setuptools entry pt
 def main():
