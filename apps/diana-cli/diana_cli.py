@@ -72,9 +72,7 @@ coms = [
     cli_commands.guid,
     cli_commands.mock,
     cli_commands.ofind,
-    cli_commands.verify,
     cli_commands.watch,
-    # cli_commands.verify
 ]
 for c in coms:
     cli.add_command(c)
