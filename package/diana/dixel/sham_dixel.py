@@ -183,6 +183,8 @@ class ShamDixel(Dixel):
         else:
             keep.append('StudyDescription')
 
+        # TODO: At study level - set keep series descriptions when?
+
         if self.level >= DicomLevel.SERIES:
             replace['SeriesInstanceUID'] = ShamDixel.ShamSeriesUID(self)
             replace['SeriesTime'] = ShamDixel.ShamSeriesTime(self)
