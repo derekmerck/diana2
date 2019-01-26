@@ -66,6 +66,10 @@ after_success:
   # Put testing coverage data on code cov
   - codecov
 
+  # Save the new version hashes
+  - pip3 install git+https://github.com/derekmerck/gistsig
+  - gistsig -g 4b0bfbca0a415655d97f36489629e1cc diana diana_cli
+
   - DIANA_VERSION=$(python3 -c "import diana; print(diana.__version__)")
 
   # Login to docker for push
