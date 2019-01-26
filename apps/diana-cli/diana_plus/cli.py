@@ -1,10 +1,9 @@
 import logging
 import click
-import plus_commands
+from . import classify, ssde
 from diana.utils.gateways import supress_urllib_debug
+from diana_cli import __version__
 from diana import __version__ as diana_version
-
-__version__ = "2.1.1"
 
 
 @click.group(name="diana-plus")
@@ -24,8 +23,8 @@ def cli(verbose):
 
 
 coms = [
-    plus_commands.ssde,
-    plus_commands.classify,
+    ssde,
+    classify,
 ]
 
 for c in coms:

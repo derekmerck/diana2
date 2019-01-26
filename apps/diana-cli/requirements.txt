@@ -1,3 +1,4 @@
 click
 pyyaml
 python-diana
+gistsig @ git+https://github.com/derekmerck/gistsig

@@ -1,11 +1,9 @@
 import logging, os
 import yaml
 import click
-import cli_commands
+from . import check, collect, dcm2im, findex, fiup, guid, mock, ofind, verify, watch, __version__
 from diana.utils.gateways import supress_urllib_debug
 from diana import __version__ as diana_version
-
-__version__ = "2.1.1"
 
 epilog = """
 SERVICES is a required platform endpoint description in yaml format.
@@ -64,18 +62,20 @@ def cli(ctx, verbose, services, services_path):
 
 
 coms = [
-    cli_commands.check,
-    cli_commands.collect,
-    cli_commands.dcm2im,
-    cli_commands.findex,
-    cli_commands.fiup,
-    cli_commands.guid,
-    cli_commands.mock,
-    cli_commands.ofind,
-    cli_commands.watch,
+    check,
+    collect,
+    dcm2im,
+    findex,
+    fiup,
+    guid,
+    mock,
+    ofind,
+    verify,
+    watch,
 ]
 for c in coms:
     cli.add_command(c)
+
 
 # Indirection to set envar prefix from setuptools entry pt
 def main():

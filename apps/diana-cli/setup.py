@@ -1,4 +1,4 @@
-import setuptools
+import setuptools, re
 
 with open("README.md") as f:
     long_description = f.read()
@@ -6,12 +6,11 @@ with open("README.md") as f:
 with open("requirements.txt") as f:
     reqs = f.read().splitlines()
 
-metadata = {
-    'name': "diana-cli",
-    'version': "2.1.1",
-    'author': "Derek Merck",
-    'author_email': "derek_merck@brown.edu",
-}
+with open("diana_cli/__init__.py") as f:
+    content = f.read()
+    match = re.findall(r"__([a-z0-9_]+)__\s*=\s*\"([^\"]+)\"", content)
+    print(match)
+    metadata = dict(match)
 
 setuptools.setup(
     name=metadata.get("name"),
@@ -22,7 +21,6 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/derekmerck/diana2",
-    pymodules=["diana_cli", "diana_plus"],
     packages=setuptools.find_packages(),
     classifiers=(
         'Development Status :: 3 - Alpha',
@@ -35,9 +33,10 @@ setuptools.setup(
     extras_require={
         'plus': 'python-diana[plus]'
     },
-    entry_points='''
+
+entry_points='''
         [console_scripts]
-        diana-cli=diana_cli:main
-        diana-plus=diana_plus:main [plus]
+        diana-cli=diana_cli.cli:main
+        diana-plus=diana_plus.cli:main [plus]
     ''',
 )
