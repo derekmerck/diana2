@@ -1,9 +1,11 @@
 import logging
 import click
-from . import classify, ssde
 from diana.utils.gateways import supress_urllib_debug
 from diana_cli import __version__
 from diana import __version__ as diana_version
+
+from .ssde import ssde
+from .classify import classify
 
 
 @click.group(name="diana-plus")

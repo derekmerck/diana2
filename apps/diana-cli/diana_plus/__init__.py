@@ -1,2 +1,1 @@
-from .ssde import ssde
-from .classify import classify
+from .cli import cli as app

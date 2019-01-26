@@ -7,12 +7,12 @@ from click.testing import CliRunner
 diana-cli -s "{redis: {ctype: Redis}}" check
 """
 
-import diana_cli as app
-# app = __import__('diana-cli')
+from diana_cli import app
+
 
 def test_cli_help():
     runner = CliRunner()
-    result = runner.invoke(app.cli, ["--help"])
+    result = runner.invoke(app, ["--help"])
     print(result.output)
 
     assert("Check endpoint status" in result.output)
@@ -21,7 +21,7 @@ def test_cli_help():
 def test_cli_svc_check(setup_orthanc, setup_redis):
     runner = CliRunner()
     services_file = find_resource("resources/test_services.yml")
-    result = runner.invoke(app.cli, [
+    result = runner.invoke(app, [
         "-s", "{redis_bad2: {ctype: Redis, port: 9999}}",
         "-S", services_file, "check"])
     print(result.output)
