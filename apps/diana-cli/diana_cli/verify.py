@@ -17,6 +17,7 @@ def verify():
     # DIANA gist
     gist_id = diana.__gistsig__
 
+    exit_code = 0
     for pkg_name in ["diana", "diana_cli"]:
         key, value = get_pkg_info(pkg_name)
         pkg_sigs = get_gist(gist_id=gist_id, name=pkg_name)

@@ -23,7 +23,8 @@ given tag depending on the pulling architecture.
 
 .. code:: bash
 
-    $ docker run derekmerck/diana2           # (latest-amd64, latest-arm32v7, latest-arm64v8)
+    $ docker run derekmerck/diana2      # (latest-amd64, latest-arm32v7, latest-arm64v8)
+    $ docker run derekmerck/diana2-plus # (latest-amd64, latest-arm32v7)
 
 Images for specific architectures images can be directly pulled from the
 same namespace using the format ``derekmerck/diana2:${TAG}-${ARCH}``,
@@ -57,27 +58,28 @@ a simple ``diana`` image with all requirements pre-installed.
 To build all images:
 
 1. Register the Docker QEMU cross-compilers
-2. Call ``docker-compose`` to build the ``diana-base`` images
-3. Get
+2. Get
    `docker-manifest <https://github.com/derekmerck/docker-manifest>`__
    from Github
-4. Put Docker into “experimental mode” for manifest creation
+3. Put Docker into "experimental mode" for manifest creation
+4. Call ``docker-compose`` to build the ``diana2-base`` images
 5. Call ``docker-manifest.py`` with an appropriate domain to retag and
    push the base images
-6. Call ``docker-compose`` to build the ``diana-base`` images
+6. Call ``docker-compose`` to build the ``diana2`` images
 7. Call ``docker-manifest.py`` with an appropriate domain to retag and
    push the completed images
 
 .. code:: bash
 
     $ docker run --rm --privileged multiarch/qemu-user-static:register --reset
-    $ cd diana2/platform/images/diana-docker
-    $ docker-compose build diana2-base-amd64 diana2-base-arm32v7 diana2-base-arm64v8
     $ pip install git+https://github.com/derekmerck/docker-manifest
     $ mkdir -p $HOME/.docker && echo '{"experimental":"enabled"}' > "$HOME/.docker/config.json"
-    $ python3 docker-manifest.py --d $DOCKER_USERNAME diana2-base
+    $ git clone git+https://github.com/derekmerck/diana2
+    $ cd diana2/platform/images/diana-docker
+    $ docker-compose build diana2-base-amd64 diana2-base-arm32v7 diana2-base-arm64v8
+    $ docker-manifest -s diana2-base $DOCKER_USERNAME
     $ docker-compose build diana2-amd64 diana2-arm32v7 diana2-arm64v8
-    $ python3 docker-manifest.py --d $DOCKER_USERNAME diana2
+    $ docker-manifest -s diana2 $DOCKER_USERNAME 
 
 Because the base image rarely changes, but the latest Diana build is
 still fluid, the `Travis <http://travis-ci.org>`__ automation pipeline
@@ -85,8 +87,34 @@ for git-push-triggered image creation only automates only steps 7 and 8.
 
 .. code:: bash
 
-    $ docker run -it diana2-amd64 python3 -c "import diana; print(diana.__version__)"
-    2.0.3
+    $ docker run derekmerck/diana2:2.x.x python3 -c "import diana; print(diana.__version__)"
+    2.x.x
+
+Build a DIANA-Plus Docker Image
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+DIANA-Plus includes scientfic and machine learning packages for advanced
+image processing on medical image data. It is currently only available
+for ``amd64`` and ``arm32v7`` because tensorflow is hard to compile for
+``arm64v8``. For ``amd64``, DIANA-Plus uses the ``tf-nightly`` package
+(currently 1.13) and for ``arm32v7`` we compile our own wheel (currently
+1.12, see `TF on arm32 note <./TF_on_arm32v7.md>`__)
+
+The DIANA-Plus Docker image is much heavier at 700MB, compared to 300MB
+for the vanilla image.
+
+::
+
+    $ cp ${WHEEL_DIR}/tensorflowXX-py37-arm23.whl .
+    $ docker-compose build diana2-plus-base-amd64 diana2-plus-base-arm32v7
+    $ docker-manifest -s diana-plus-base derekmerck
+    $ docker-compose build diana2-plus-amd64 diana2-plus-arm32v7
+    $ docker-manifest -s diana-plus derekmerck
+
+::
+
+    $ docker run derekmerck/diana2-plus:latest-arm32v7 python3 -c "import tensorflow; print(tensorflow.__version__)" 
+    1.12.0
 
 DIANA on ARM
 ~~~~~~~~~~~~
@@ -95,7 +123,7 @@ If you need access to an ARM device for development,
 `Packet.net <https://packet.net>`__ rents bare-metal 96-core 128GB
 ``aarch64`` `Cavium
 ThunderX <https://www.cavium.com/product-thunderx-arm-processors.html>`__
-servers for $0.50/hour. Packet’s affiliated `Works On
+servers for $0.50/hour. Packet's affiliated `Works On
 Arm <https://www.worksonarm.com>`__ program provided compute time for
 developing and testing these cross-platform images.
 
@@ -110,7 +138,8 @@ a brief tenancy on a bare-metal Cavium ThunderX ARMv8 server.
     $ docker run hello-world
     $ apt install git python-pip
     $ pip install docker-compose
-    $ git clone http://github.com/derekmerck/diana2 ... continue as above
+    $ git clone http://github.com/derekmerck/diana2 
+    ... continue as above
 
 Although `Resin uses Packet ARM servers to compile arm32
 images <https://resin.io/blog/docker-builds-on-arm-servers-youre-not-crazy-your-builds-really-are-5x-faster/>`__,
@@ -118,8 +147,9 @@ the available ThunderX does not implement the arm32 instruction set, so
 it `cannot compile natively for the Raspberry
 Pi <https://gitlab.com/gitlab-org/omnibus-gitlab/issues/2544>`__.
 
-Now pull the image tag. You can confirm that the appropriate image has
-been pulled by starting a container with the command ``arch``.
+Now pull the image without specifying the architecture tag. You can
+confirm that the appropriate image has been pulled by starting a
+container with the command ``arch``.
 
 .. code:: bash
 
@@ -129,7 +159,7 @@ been pulled by starting a container with the command ``arch``.
 You can also confirm the image architecture without running a container
 by inspecting the value of ``.Config.Labels.architecture``. (This is a
 creator-defined label that is *different* than the normal
-``.Architecture`` key – which appears to *always* report as ``amd64``.)
+``.Architecture`` key -- which appears to *always* report as ``amd64``.)
 
 .. code:: bash
 

@@ -6,7 +6,7 @@ import click
 
 @click.command()
 @click.argument("path", default=".", type=click.Path(exists=True))
-@click.argument("outdir", default=".", type=click.Path())
+@click.option("--outdir", type=click.Path())
 @click.option("--recurse", is_flag=True, default=False)
 def cli(path, outdir, recurse):
     """Convert markdown files at PATH and re-save them in OUTDIR"""

@@ -12,8 +12,6 @@ The RIH CIRR
 | Documentation: https://diana.readthedocs.io
 | Image: https://cloud.docker.com/repository/docker/derekmerck/diana2
 
-.. _the-rih-cirr-1:
-
 The RIH CIRR
 ------------
 
@@ -23,10 +21,8 @@ development site for all of these configurations.
 Overview
 ~~~~~~~~
 
-The RIH CIRR stack deploys multiple services to the Swarm cluster.
+The RIH CIRR stack provides multiple services:
 
--  A [Traefik][] reverse proxy
--  A [Portainer][] agent network
 -  A [Postgres][] database with bind-mounted storage
 -  A [Splunk][] data aggregator with bind-mounted storage
 -  An [Orthanc][] DICOM archive
@@ -34,6 +30,7 @@ The RIH CIRR stack deploys multiple services to the Swarm cluster.
    to the archive and 3D workstations
 -  An Orthanc instance configured as a DICOM Q/R bridge to the PACS for
    external data pulls
+-  An Orthanc "MockPacs"
 
 The bridge service can be manipulated using DIANA watcher scripts to
 monitor and index the clinical PACS, and to exfiltrate and anonymize
@@ -89,7 +86,7 @@ Create a ``cirr.env`` file on the master and source it.
 *Note: The Splunk password must be at least 8 characters long, or Splunk
 will fail to initialize properly.*
 
-5. Install the “admin” backend stack:
+5. Install the "admin" backend stack:
 
 .. code:: bash
 
@@ -104,11 +101,10 @@ Result:
    enabled) on ports 8000 and 8088-89
 -  Adds a network overlay for Portainer-agent communication
 -  Adds a proxy network overlay for Traefik routing
-
-   -  Additional stacks should be connected to ``admin_proxy_network``
-      as an external network
-   -  Labels on participating services should be set for the Traefik
-      network, i.e., ``traefik.docker.network=admin_proxy_network``
+-  Additional stacks should be connected to ``admin_proxy_network`` as
+   an external network
+-  Labels on participating services should be set for the Traefik
+   network, i.e., ``traefik.docker.network=admin_proxy_network``
 
 TODO:
 
@@ -147,11 +143,9 @@ Addend ``cirr.env`` with service-specific secrets.
 
 Result:
 
--  Adds the postgres backend for the cirr_service_network on port 5432
-
-   -  Additional stacks should be connected to ``cirr_service_network``
-      to use the shared postgres backend
-
+-  Adds the postgres backend for the cirr\_service\_network on port 5432
+-  Additional stacks should be connected to ``cirr_service_network`` to
+   use the shared postgres backend
 -  Adds a replicated Orthanc archive service on DICOM port 4242
 -  Adds the Orthanc ingress MUX on DICOM port 5252
 -  Adds the Orthanc bridge service on DICOM port 6262
@@ -212,7 +206,7 @@ Some points of potential failure here:
    disk store. This would benefit from a distributed storage system,
    like Rexray.
 -  The IP address for the bridge is hardcoded into the sending
-   modalities and PACS. They should be using a name with multiple IP’s
+   modalities and PACS. They should be using a name with multiple IP's
    or an non-bound IP that can be reassigned across the cluster as
    necessary.
 -  With a setup of 3 machines, only fault tolerant against loss of a
@@ -231,8 +225,6 @@ The OpenDose CIRR
 Differences: - Orthanc router ingress - DIANA watcher for instance
 indexing - Splunk dashboards
 
-.. _notes-1:
-
 Notes
 -----
 
@@ -244,8 +236,8 @@ Portainer showing multiple copies of the same container:
     $ docker service rm admin_portainer
     $ docker stack deploy -c admin-stack.yml admin
 
-Don’t forget to turn off acknoweldgement in the HEC – otherwise it will
-insist on a data channel and show up with 400’s
+Don't forget to turn off acknoweldgement in the HEC -- otherwise it will
+insist on a data channel and show up with 400's
 
 Testing:
 
@@ -276,6 +268,14 @@ public hashes:
 
     pip install git+https://github.com/derekmerck/check-hashes
     python3 -m check-hashes verify 4b0bfbca0a415655d97f36489629e1cc cirr_hashes RIH/cirr_stack.yml
+
+Running the Old CIRR
+--------------------
+
+.. code:: bash
+
+    $ docker stack deploy -c docker-stacks/admin/admin-stack.yml admin
+    $ docker stack deploy -c examples/rih-cirr/cirr_v1.yml cirr1
 
 .. |Build Status| image:: https://travis-ci.org/derekmerck/diana2.svg?branch=master
    :target: https://travis-ci.org/derekmerck/diana2

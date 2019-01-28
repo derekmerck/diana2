@@ -27,7 +27,7 @@ Returns image orientation and estimated distance in centimeters.  These measurem
 
 ```text
 $ diana-plus ssde ../../tests/resources/scouts \
-                             ct_scout_01.dcm ct_scout_02.dcm
+                  ct_scout_01.dcm ct_scout_02.dcm
 Measuring scout images
 ------------------------
 ct_scout_01.dcm (AP): 28.0cm

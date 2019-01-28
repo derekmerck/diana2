@@ -11,7 +11,7 @@ As a Python library:
 .. code:: python
 
     >>> from diana.utils.guid import GUIDMint
-    >>> GUIDMint().get_sham_id( name="MERCK^DEREK^L" )
+    >>> GUIDMint().get_sham_id( name="MERCK^DEREK^L", age=30 )
     {
       'BirthDate': datetime.date(1988, 11, 20),
       'ID': 'VXNQHHN523ZQNJFIY3TXJM4YXABTL6SL',
@@ -23,7 +23,7 @@ From ``diana-cli``:
 
 .. code:: yaml
 
-    $ python3 diana-cli.py guid "MERCK^DEREK^L" --age 30
+    $ diana-cli guid "MERCK^DEREK^L" --age 30
     Generating GUID
     ------------------------
     WARNING:GUIDMint:Creating non-reproducible GUID using current date
@@ -79,8 +79,8 @@ Pseudonym Generation
 | It is often useful to replace the subject name with something more
   natural than a GUID.
 | Any string beginning with at least 3 (capitalized) alphabetic
-  characters can be used to reproducibly generate a `“John
-  Doe” <http://en.wikipedia.org/wiki/John_Doe>`__ style placeholder name
+  characters can be used to reproducibly generate a `"John
+  Doe" <http://en.wikipedia.org/wiki/John_Doe>`__ style placeholder name
   in DICOM patient name format (``last^first^middle``)\ `1 <>`__. This
   is very useful for alphabetizing subject name lists similarly to their
   ID while still allowing for anonymized data sets to be referenced

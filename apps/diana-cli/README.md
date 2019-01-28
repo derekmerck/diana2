@@ -1,5 +1,4 @@
-
-`diana-cli`
+diana-cli
 ==================
 
 Derek Merck  
@@ -14,6 +13,8 @@ Providence, RI
 Source: <https://www.github.com/derekmerck/diana2>  
 Documentation: <https://diana.readthedocs.io>  
 Image:  <https://cloud.docker.com/repository/docker/derekmerck/diana2>
+
+`diana-cli` provides a command-line interface to DIANA endpoints.
 
 ```
 Usage: diana-cli [OPTIONS] COMMAND [ARGS]...
@@ -37,6 +38,7 @@ Commands:
   guid     Generate a GUID
   mock     Generate mock DICOM traffic
   ofind    Find in Orthanc node
+  verify   Verify DIANA source code against public gist signature
   watch    Watch sources and route events
 
   SERVICES is a required platform endpoint description in yaml format.
@@ -63,13 +65,14 @@ Options:
 ## collect
 
 ```
-Usage: diana-cli collect [OPTIONS] PROJECT DATA_PATH SOURCE DEST
+Usage: diana-cli collect [OPTIONS] PROJECT DATA_PATH SOURCE DOMAIN [DEST]
 
   Create a PROJECT key at DATA_PATH, then pull data from SOURCE and send to
   DEST.
 
 Options:
-  --help  Show this message and exit.
+  -b, --subpath_depth INTEGER  Number of sub-directories to use
+  --help                       Show this message and exit.
 ```
 ## dcm2im
 
@@ -171,6 +174,21 @@ Options:
   -r, --retrieve
   --help          Show this message and exit.
 ```
+## verify
+
+```
+Usage: diana-cli verify [OPTIONS]
+
+  Verify DIANA source code against public gist signature.
+
+  This function is a convenience only; if the package has been altered, it
+  could easily be altered to return correct hashes or check the wrong gist.
+  The paranoid should refer to <https://github.com/derekmerck/gistsig> for
+  instructions on finding performing an external manual audit.
+
+Options:
+  --help  Show this message and exit.
+```
 ## watch
 
 ```
@@ -213,9 +231,79 @@ Options:
   - index_dlvl
 ```
 
+diana-plus
+=================
+
+`diana-plus` provides additional commands for pixel-processing.
+
+```
+Usage: diana-plus [OPTIONS] COMMAND [ARGS]...
+
+  Run diana-plus packages using a command-line interface.
+
+Options:
+  --verbose / --no-verbose
+  --version                 Show the version and exit.
+  --help                    Show this message and exit.
+
+Commands:
+  check     Check endpoint status
+  classify  Classify DICOM files
+  collect   Collect and handle studies
+  dcm2im    Convert DICOM to image
+  findex    Create a persistent DICOM file index
+  fiup      Upload indexed DICOM files
+  guid      Generate a GUID
+  mock      Generate mock DICOM traffic
+  ofind     Find in Orthanc node
+  ssde      Estimate patient size from localizer
+  verify    Verify DIANA source code against public gist signature
+  watch     Watch sources and route events
+```
+## ssde
+
+```
+Usage: diana-plus ssde [OPTIONS] PATH [IMAGES]...
+
+  Estimate patient dimensions from CT-localizer IMAGES for size-specific dose
+  estimation.
+
+Options:
+  --help  Show this message and exit.
+
+  Basic algorithm is to use a 2-element Guassian mixture model to find a
+  threshold that separates air from tissue across breadth of the image.  Known
+  to fail when  patients do not fit in the scout field of view.
+
+  Returns image orientation and estimated distance in centimeters.  These
+  measurements can be converted into equivalent water volumes using AAPM-
+  published tables.
+
+  $ diana-plus ssde tests/resources/scouts ct_scout_01.dcm ct_scout_02.dcm
+  Measuring scout images
+  ------------------------
+  ct_scout_01.dcm (AP): 28.0cm
+  ct_scout_02.dcm (LATERAL): 43.0cm
+```
+## classify
+
+```
+Usage: diana-plus classify [OPTIONS] MODEL PATH [IMAGES]...
+
+  Apply a classification MODEL to PATH with IMAGES
+
+Options:
+  -p, --positive TEXT  Positive class
+  -n, --negative TEXT  Negative class
+  --help               Show this message and exit.
+
+  $ diana-plus classify resources/models/view_classifier/view_classifier.h5 tests/resources/dcm IM2263
+  Classifying images
+  ------------------
+  Predicted: negative (0.88)
+```
 
 License
 -------------
 
 MIT
-

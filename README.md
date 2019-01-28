@@ -48,14 +48,14 @@ Diana-CLI provides a command-line interface to invoke several common pipelines. 
 ### Installation
 
 ```bash
-$ pip3 install -e diana2/apps/diana-cli
+$ pip3 install diana2/apps/diana-cli
 $ diana-cli --version
 2.x.x
 ```
 
 Diana-Plus functions are available as well.
 ```bash
-$ pip3 install -e diana2/apps/diana-cli[plus]
+$ pip3 install diana2/apps/diana-cli[plus]
 $ diana-plus --version
 2.x.x
 ```

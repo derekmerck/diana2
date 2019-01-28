@@ -33,7 +33,7 @@ redis:
 @click.group(name="diana-cli", epilog=epilog)
 @click.option('--verbose/--no-verbose', default=False)
 @click.version_option(version=(__version__, diana_version),
-                      prog_name=("diana-cli.py", "python-diana"))
+                      prog_name=("diana-cli", "python-diana"))
 @click.option('-s', '--services', type=click.STRING,
               help="Diana service desc as yaml format string")
 @click.option('-S', '--services_path', type=click.Path(exists=True),
@@ -71,7 +71,7 @@ def cli(ctx, verbose, services, services_path):
 
 
 
-coms = [
+cmds = [
     check,
     collect,
     dcm2im,
@@ -83,7 +83,7 @@ coms = [
     verify,
     watch,
 ]
-for c in coms:
+for c in cmds:
     cli.add_command(c)
 
 
