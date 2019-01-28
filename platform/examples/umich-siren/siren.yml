@@ -43,6 +43,7 @@ services:
       ORTHANC_PG_USER:          postgres
       ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
       ORTHANC_VERBOSE:          "true"
+      ORTHANC_WBV_ENABLED:      "true"
       TZ:                       "America/New_York"
     deploy:
       replicas: 2  # Multiple nodes, PG provides data persistence
