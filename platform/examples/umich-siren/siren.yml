@@ -38,7 +38,7 @@ services:
       ORTHANC_STORE_COMPRESSED: "true"
       ORTHANC_PG_ENABLED:       "true"
       ORTHANC_PG_STORE_DICOM:   "true"
-      ORTHANC_PG_DATABASE:      orthanc-hobit
+      ORTHANC_PG_DATABASE:      orthanc_hobit
       ORTHANC_PG_HOST:          postgres
       ORTHANC_PG_USER:          postgres
       ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
