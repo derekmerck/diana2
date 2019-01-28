@@ -120,6 +120,10 @@ Additionally, see [Remote Embedded Diana Watcher](https://github.com/derekmerck/
 Provisioning
 -------------------
 
+### Installing Docker-CE on RHEL
+
+Follow the CentOS guide and [update `container-selinux`](https://nickjanetakis.com/blog/docker-tip-39-installing-docker-ce-on-redhat-rhel-7x).
+
 ### Setup a Swarm
 
 ```bash
