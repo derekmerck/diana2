@@ -6,7 +6,7 @@ networks:
   admin_proxy_network:
     external: true   # Created by admin-stack
 
-  cirr2_default_network:
+  cirr_default_network:
     external: true   # Created by cirr_v2-stack
 
 
@@ -16,7 +16,7 @@ services:
     image: derekmerck/orthanc-wbv:latest-amd64
     networks:
       - admin_proxy_network
-      - cirr2_default_network
+      - cirr_default_network
     environment:
       ORTHANC_NAME:             ${PROJECT1_NAME}
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
@@ -24,7 +24,7 @@ services:
       ORTHANC_STORE_COMPRESSED: "true"
       ORTHANC_PG_ENABLED:       "true"
       ORTHANC_PG_STORE_DICOM:   "true"
-      ORTHANC_PG_DATABASE:      project1
+      ORTHANC_PG_DATABASE:      review1
       ORTHANC_PG_HOST:          postgres
       ORTHANC_PG_USER:          postgres
       ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
@@ -43,7 +43,7 @@ services:
     image: derekmerck/orthanc-wbv:latest-amd64
     networks:
       - admin_proxy_network
-      - cirr2_default_network
+      - cirr_default_network
     environment:
       ORTHANC_NAME:             ${PROJECT2_NAME}
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
@@ -64,3 +64,4 @@ services:
         - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/project2/"
+

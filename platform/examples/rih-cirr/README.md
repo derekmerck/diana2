@@ -237,7 +237,7 @@ python3 -m check-hashes verify 4b0bfbca0a415655d97f36489629e1cc cirr_hashes RIH/
 
 ```bash
 $ docker stack deploy -c docker-stacks/admin/admin-stack.yml admin
-$ docker stack deploy -c examples/rih-cirr/cirr_v2.yml cirr2
+$ docker stack deploy -c examples/rih-cirr/cirr_v2.yml cirr
 $ docker stack deploy -c examples/rih-cirr/projects.yml projects
 $ docker stack deploy -c examples/rih-cirr/cirr_v1.yml cirr1
 ```
