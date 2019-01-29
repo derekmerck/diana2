@@ -239,7 +239,7 @@ diana-plus
 ```
 Usage: diana-plus [OPTIONS] COMMAND [ARGS]...
 
-  Run diana-plus packages using a command-line interface.
+  Run diana and diana-plus packages using a command-line interface.
 
 Options:
   --verbose / --no-verbose

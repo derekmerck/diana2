@@ -7,20 +7,27 @@ services:
     image:                  derekmerck/diana2
 #    command: >
 #      diana-cli findex /research2/orthanc/db Redis -o -r '*'
-    command: >
-      diana-cli findex /research/orthanc-archive/db Redis -o -r '*'
+#    command: >
+#      diana-cli findex /research/orthanc-archive/db Redis -o -r '*'
     volumes:
       - "/research/:/research/"
       - "/research2/:/research2/"
     environment:
-      PYTHONUNBUFFERED: true
+      PYTHONUNBUFFERED: "true"
       DIANA_SERVICES: >
         {
           "Redis": {
             "ctype": "Redis",
             "host": "redis",
             "password": "${REDIS_PASSWORD}"
-          }
+          },
+          {
+        	"archive": {
+        		"ctype": "Orthanc",
+        		"host": "orthanc-archive",
+        		"password": "${ORTHANC_PASSWORD}",
+        	}
+        }
         }
       TZ:                   "America/New_York"
     deploy:

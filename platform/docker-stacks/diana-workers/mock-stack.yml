@@ -37,7 +37,7 @@ services:
     image:                   derekmerck/diana2
     command:                 diana_cli mock --dest MockPacs
     environment:
-      PYTHONUNBUFFERED: true
+      PYTHONUNBUFFERED: "true"
       DIANA_SERVICES: >
         {"MockPacs": {
             "ctype": "Orthanc",
