@@ -60,6 +60,18 @@ $ diana-plus --version
 2.x.x
 ```
 
+DIANA package hashes by version number are publicly posted at <https://gist.github.com/derekmerck/4b0bfbca0a415655d97f36489629e1cc> and can be easily validated through `diana-cli`.
+
+```bash
+$ diana-cli verify
+Package signature python-diana:2.x.x:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx is valid.
+```
+
+Of course, users should never trust a package to validate itself, so see [gistsig][] for details on the algorithm and how to perform a simple external audit.
+
+[gistsig]: https://github.com/derekmerck/gistsig
+
+
 Docker-Image
 ----------------
 
