@@ -85,6 +85,8 @@ services:
       ORTHANC_PG_HOST:          postgres
       ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
       ORTHANC_MOD_0:            ${RIH_MOD_RIHA}
+      ORTHANC_PEER_0:           "project1,http://orthanc-project1/,admin,${ORTHANC_PASSWORD}"
+      ORTHANC_PEER_1:           "project2,http://orthanc-project1/,admin,${ORTHANC_PASSWORD}"
       ORTHANC_VERBOSE:          "true"
       TZ:                       "America/New_York"
     deploy:

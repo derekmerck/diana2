@@ -12,15 +12,15 @@ networks:
 
 services:
 
-  orthanc-project1:
+  orthanc-project01:
     image: derekmerck/orthanc-confd:latest-amd64
     networks:
       - admin_proxy_network
       - cirr2_default_network
     environment:
-      ORTHANC_NAME:             CIRR Project 1
+      ORTHANC_NAME:             ${PROJECT01_NAME}
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
-      ORTHANC_USER_0:           ${PROJECT1_USER_0}
+      ORTHANC_USER_0:           "admin:${PROJECT01_PASSWORD}"
       ORTHANC_STORE_COMPRESSED: "true"
       ORTHANC_PG_ENABLED:       "true"
       ORTHANC_PG_STORE_DICOM:   "true"
@@ -31,7 +31,7 @@ services:
       ORTHANC_VERBOSE:          "true"
       TZ:                       "America/New_York"
     deploy:
-      replicas: 2  # Multiple nodes, PG provides data persistence
+      replicas: 1
       labels:
         - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8042"

@@ -3,6 +3,8 @@ version: '3.0'
 
 services:
 
+# TODO: this intermittently fails on sends when it doesn't receive a quick response; needs troubleshooting
+
   diana-indexer1:
     image:                  derekmerck/diana2
 #    command: >
