@@ -23,6 +23,8 @@ services:
     image: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - service_network
     environment:
       POSTGRES_PASSWORD:        ${POSTGRES_PASSWORD}
       TZ: "America/New_York"
@@ -46,7 +48,7 @@ services:
       - 4242:4242
     networks:
       - admin_proxy_network
-      - default
+      - service_network
     environment:
       ORTHANC_NAME:             CIRR v2 Archive
       ORTHANC_AET:              CIRR
@@ -76,7 +78,7 @@ services:
       - 11112:4242
     networks:
       - admin_proxy_network
-      - default
+      - service_network
     environment:
       ORTHANC_NAME:             Bridge
       ORTHANC_AET:              ${ORTHANC_BRIDGE_AET}
