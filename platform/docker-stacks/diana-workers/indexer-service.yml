@@ -21,13 +21,11 @@ services:
             "host": "redis",
             "password": "${REDIS_PASSWORD}"
           },
-          {
-        	"archive": {
-        		"ctype": "Orthanc",
-        		"host": "orthanc-archive",
-        		"password": "${ORTHANC_PASSWORD}",
-        	}
-        }
+          "archive": {
+             "ctype": "Orthanc",
+             "host": "orthanc-archive",
+             "password": "${ORTHANC_PASSWORD}"
+          }
         }
       TZ:                   "America/New_York"
     deploy:
