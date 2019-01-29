@@ -26,7 +26,7 @@ services:
       ORTHANC_PG_STORE_DICOM:   "true"
       ORTHANC_PG_DATABASE:      review1
       ORTHANC_PG_HOST:          postgres
-      ORTHANC_PG_USER:          postgres
+      ORTHANC_PG_USER:          ${POSTGRES_USER}
       ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
       ORTHANC_WBV_ENABLED:      "true"
       ORTHANC_VERBOSE:          "true"
@@ -53,7 +53,7 @@ services:
       ORTHANC_PG_STORE_DICOM:   "true"
       ORTHANC_PG_DATABASE:      project2
       ORTHANC_PG_HOST:          postgres
-      ORTHANC_PG_USER:          postgres
+      ORTHANC_PG_USER:          ${POSTGRES_USER}
       ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
       ORTHANC_WBV_ENABLED:      "true"
       ORTHANC_VERBOSE:          "true"

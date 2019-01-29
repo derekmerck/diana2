@@ -27,6 +27,7 @@ services:
       - service_network
     environment:
       POSTGRES_PASSWORD:        ${POSTGRES_PASSWORD}
+      POSTGRES_USER:            ${POSTGRES_USER}
       TZ: "America/New_York"
     deploy:
       replicas: 1
@@ -60,7 +61,7 @@ services:
       ORTHANC_PG_STORE_DICOM:   "true"
       ORTHANC_PG_DATABASE:      archive2
       ORTHANC_PG_HOST:          postgres
-      ORTHANC_PG_USER:          postgres
+      ORTHANC_PG_USER:          ${POSTGRES_USER}
       ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
       ORTHANC_MOD_0:            ${RIH_MOD_RIHA}
       ORTHANC_MOD_1:            ${RIH_MOD_TERA}
@@ -91,7 +92,7 @@ services:
       ORTHANC_PG_STORE_DICOM:   "true"
       ORTHANC_PG_DATABASE:      bridge
       ORTHANC_PG_HOST:          postgres
-      ORTHANC_PG_USER:          postgres
+      ORTHANC_PG_USER:          ${POSTGRES_USER}
       ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
       ORTHANC_MOD_0:            ${RIH_MOD_RIHA}
       ORTHANC_MOD_1:            ${RIH_MOD_TERA}
