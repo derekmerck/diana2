@@ -6,7 +6,7 @@ networks:
   admin_proxy_network:
     external: true   # Created by admin-stack
 
-  cirr_default_network:
+  cirr_service_network:
     external: true   # Created by cirr_v2-stack
 
 

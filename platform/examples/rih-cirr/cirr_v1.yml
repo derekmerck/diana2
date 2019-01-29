@@ -6,6 +6,8 @@ networks:
   admin_proxy_network:
     external: true   # Created by admin-stack
 
+  service_network:
+    driver: overlay
 
 volumes:
   postgres_data:
@@ -26,7 +28,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - default
+      - service_network
     environment:
       POSTGRES_USER:            orthanc
       POSTGRES_PASSWORD:        ${POSTGRES_PASSWORD}
@@ -45,7 +47,7 @@ services:
       - 14242:4242
     networks:
       - admin_proxy_network
-      - default
+      - service_network
     environment:
       ORTHANC_NAME:             CIRR v1 Archive
       ORTHANC_AET:              CIRRV1

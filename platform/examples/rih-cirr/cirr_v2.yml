@@ -6,6 +6,9 @@ networks:
   admin_proxy_network:
     external: true   # Created by admin-stack
 
+  service_network:
+    driver: overlay
+
 
 volumes:
   postgres_data:
