@@ -20,7 +20,7 @@ services:
     environment:
       ORTHANC_NAME:             ${PROJECT1_NAME}
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
-      ORTHANC_USER_0:           "admin:${PROJECT1_PASSWORD}"
+      ORTHANC_USER_0:           "admin,${PROJECT1_PASSWORD}"
       ORTHANC_STORE_COMPRESSED: "true"
       ORTHANC_PG_ENABLED:       "true"
       ORTHANC_PG_STORE_DICOM:   "true"
@@ -47,7 +47,7 @@ services:
     environment:
       ORTHANC_NAME:             ${PROJECT2_NAME}
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
-      ORTHANC_USER_0:           "admin:${PROJECT2_PASSWORD}"
+      ORTHANC_USER_0:           "admin,${PROJECT2_PASSWORD}"
       ORTHANC_STORE_COMPRESSED: "true"
       ORTHANC_PG_ENABLED:       "true"
       ORTHANC_PG_STORE_DICOM:   "true"
