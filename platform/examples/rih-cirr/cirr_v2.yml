@@ -70,13 +70,13 @@ services:
   orthanc-bridge:
     image: derekmerck/orthanc-confd:latest-amd64
     ports:
-      - 4242:14242
+      - 11112:4242
     networks:
       - admin_proxy_network
       - default
     environment:
       ORTHANC_NAME:             Bridge
-      ORTHANC_AET:              CIRRV2
+      ORTHANC_AET:              ${ORTHANC_BRIDGE_AET}
       ORTHANC_MAX_STUDIES:      50
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_STORE_COMPRESSED: "false"
