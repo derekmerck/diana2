@@ -20,7 +20,7 @@ volumes:
 
 services:
   postgres:
-    image: postgres:11
+    image: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -39,6 +39,8 @@ services:
     ports:
       - "6379:6379"
     command: ["redis-server", "--requirepass ${REDIS_PASSWORD}"]
+    networks:
+      - service_network
     environment:
       TZ: "America/New_York"
 
