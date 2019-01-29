@@ -16,7 +16,7 @@ services:
     image: derekmerck/orthanc-wbv:latest-amd64
     networks:
       - admin_proxy_network
-      - cirr_default_network
+      - cirr_service_network
     environment:
       ORTHANC_NAME:             ${PROJECT1_NAME}
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
@@ -43,7 +43,7 @@ services:
     image: derekmerck/orthanc-wbv:latest-amd64
     networks:
       - admin_proxy_network
-      - cirr_default_network
+      - cirr_service_network
     environment:
       ORTHANC_NAME:             ${PROJECT2_NAME}
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
