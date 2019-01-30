@@ -6,6 +6,9 @@ networks:
   admin_proxy_network:
     external: true   # Created by admin-stack
 
+  service_network:
+    driver: overlay
+
 
 volumes:
   postgres_data:
@@ -20,6 +23,8 @@ services:
     image: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - service_network
     environment:
       POSTGRES_PASSWORD:        ${POSTGRES_PASSWORD}
       TZ: "America/New_York"
@@ -30,7 +35,7 @@ services:
       - 4242:42421
     networks:
       - admin_proxy_network
-      - default
+      - service_network
     environment:
       ORTHANC_NAME:             HOBIT Image Registry
       ORTHANC_AET:              HOBIT
