@@ -1,4 +1,4 @@
-version: '3.0'
+version: '3.2'
 
 
 networks:
@@ -102,6 +102,9 @@ services:
       TZ:                       "America/New_York"
     deploy:
       replicas: 2  # Multiple nodes, PG provides data persistence
+      placement:
+        constraints:
+          - node.labels.bridge==true
       labels:
         - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8042"
