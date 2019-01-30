@@ -4,11 +4,11 @@ version: '3.0'
 networks:
 
   admin_proxy_network:
-    external: "true"   # Created by admin-stack
+    external: true   # Created by admin-stack
 
   service_network:
     driver: overlay
-    attachable: "true"
+    attachable: true
 
 
 volumes:

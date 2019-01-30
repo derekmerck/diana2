@@ -5,7 +5,7 @@ version: '3.0'
 networks:
   proxy_network:
     driver: overlay
-    attachable: "true"
+    attachable: true
 
   agent_network:
     driver: overlay
