@@ -39,8 +39,8 @@ class Dixel(Serializable):
     # Making this init=False removes it from the serializer
     # Use a "from" constructor or add "file" manually after creation
     file   = attr.ib(default=None, repr=False, init=False)   #: Stores binary file representation
-    pixels = attr.ib(default=None, repr=False, init=False) #: Stores pixel array representation
-    report = attr.ib(default=None, repr=False, init=False) #: Stores study report as RadiologyReport
+    pixels = attr.ib(default=None, repr=False, init=False)   #: Stores pixel array representation
+    report = attr.ib(default=None, repr=False, init=False)   #: Stores study report as RadiologyReport
 
     #: Stores information about sub-dixels (series for study, instances for series)
     children = attr.ib(init=False, factory=list, repr=False)

@@ -195,4 +195,9 @@ class ImageDir(DcmDir):
                 continue
             ds = pydicom.dcmread(io.BytesIO(f), stop_before_pixels=False)
             d = Dixel.from_pydicom(ds)
-            self.put(d)
+
+            try:
+                self.put(d)
+            except ValueError as e:
+                logging.error(e)
+                continue
