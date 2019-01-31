@@ -23,7 +23,7 @@ from pathlib import Path
 import yaml
 from datetime import datetime, timedelta
 from diana.apis import Montage, ImageDir, Orthanc, ProxiedDicom
-from diana.dixel import DixelView
+from diana.dixel import Dixel, DixelView
 from diana.utils.dicom import DicomLevel
 from diana.utils.gateways import TextFileHandler, MontageModality as Modality, supress_urllib_debug
 
@@ -116,7 +116,12 @@ def get_daily_events(start, end):
         result.append(item_meta)
 
         qq = {"AccessionNumber": d.tags["AccessionNumber"]}
-        d = P.rfind(query=qq, level=DicomLevel.STUDIES, retrieve=True, domain="pacs")[0]
+        ret = P.rfind(query=qq, level=DicomLevel.STUDIES, retrieve=True, domain="pacs")[0]
+
+        d = Dixel(tags={"AccessionNumber": ret["AccessionNumber"],
+                        "StudyInstanceUID": ret["StudyInstanceUID"],
+                        "PatientID": ret["PatientID"]})
+
         logging.info(d)
         d = P.get(d, view=DixelView.FILE)
         FI.put_zipped(d.file)
