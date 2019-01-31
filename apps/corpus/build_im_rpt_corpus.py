@@ -116,7 +116,8 @@ def get_daily_events(start, end):
         result.append(item_meta)
 
         qq = {"AccessionNumber": d.tags["AccessionNumber"]}
-        d = P.rfind(query=qq, level=DicomLevel.STUDIES, retrieve=True, domain="pacs")
+        d = P.rfind(query=qq, level=DicomLevel.STUDIES, retrieve=True, domain="pacs")[0]
+        logging.info(d)
         d = P.get(d, view=DixelView.FILE)
         FI.put_zipped(d.file)
 
