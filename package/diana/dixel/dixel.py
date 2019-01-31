@@ -87,8 +87,8 @@ class Dixel(Serializable):
 
         # Most relevant tags for indexing, hard stop on missing a/n, mrn, or uuids
         tags = {
-            'AccessionNumber': ds.AccessionNumber,
-            'PatientName': str(ds.get("PatientName")),  # Odd serializing type
+            'AccessionNumber': ds.get('AccessionNumber') or ds.StudyInstanceUID,
+            'PatientName': str(ds.get("PatientName")) or ds.PatientID,  # Odd serializing type
             'PatientID': ds.PatientID,
             'PatientBirthDate': ds.get("PatientBirthDate"),
             'StudyInstanceUID': ds.StudyInstanceUID,
