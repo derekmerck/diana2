@@ -204,6 +204,18 @@ class Orthanc(Endpoint, Serializable):
             logger.error(e)
             return False
 
+    def info(self):
+        logger = logging.getLogger(self.name)
+        logger.debug("Info")
+
+        try:
+            return self.gateway.statistics()
+        except GatewayConnectionError as e:
+            logger.warning("Failed to connect to Endpoint")
+            logger.error(type(e))
+            logger.error(e)
+            return False
+
 
     def patients(self):
         return self.gateway.inventory(level=DicomLevel.PATIENTS)
