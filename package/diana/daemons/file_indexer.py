@@ -54,6 +54,17 @@ class FileIndexer(object):
         if self.pool_size > 0:
             return Pool(self.pool_size)
 
+    @staticmethod
+    def prefix_for_path(basepath):
+        reg_prefix = hashlib.md5(basepath.encode("UTF-*")).hexdigest()[0:4] + "-"
+        return reg_prefix
+
+    @staticmethod
+    def items_on_path(basepath, registry):
+        reg_prefix = FileIndexer.prefix_for_path(basepath)
+        count = registry.collections(prefix=reg_prefix)
+        return count
+
     def index_path(self,
                    basepath,
                    registry,
@@ -66,7 +77,7 @@ class FileIndexer(object):
 
         print("Indexing path: {}".format(basepath))
 
-        reg_prefix = hashlib.md5(basepath.encode("UTF-*")).hexdigest()[0:4] + "-"
+        reg_prefix = FileIndexer.prefix_for_path(basepath)
         D = DcmDir(path=basepath, recurse_style=recurse_style)
         for path in D.subdirs():
             print("Working on path: {}".format(path))
@@ -101,7 +112,7 @@ class FileIndexer(object):
 
         print("Uploading path: {}".format(basepath))
 
-        reg_prefix = hashlib.md5(basepath.encode("UTF-*")).hexdigest()[0:4] + "-"
+        reg_prefix = FileIndexer.prefix_for_path(basepath)
         for collection in registry.collections(prefix=reg_prefix):
             self.upload_collection(collection, basepath, registry, dest)
 
@@ -113,7 +124,7 @@ class FileIndexer(object):
         print("Handling rate: {} files per second".format(round(handling_rate,1)))
 
     def upload_collection(self, collection, basepath, registry, dest):
-        reg_prefix = hashlib.md5(basepath.encode("UTF-*")).hexdigest()[0:4] + "-"
+        reg_prefix = FileIndexer.prefix_for_path(basepath)
         files = registry.collected_items(collection, prefix=reg_prefix)
         # logging.debug(files)
 

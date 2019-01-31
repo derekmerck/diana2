@@ -35,8 +35,9 @@ def findex(ctx, path, registry, orthanc_db, regex, pool_size):
 @click.argument('registry')
 @click.argument('dest')
 @click.option('-p', '--pool_size', default=10, help="Worker threads")
+@click.option('-d', '--dryrun', default=False, is_flag=True)
 @click.pass_context
-def fiup(ctx, collection, path, registry, dest, pool_size):
+def fiup(ctx, collection, path, registry, dest, pool_size, dryrun):
     """Collect files in a study by COLLECTION (accession number) using a
     PATH REGISTRY, and send to DEST."""
     services = ctx.obj.get('services')
@@ -49,6 +50,12 @@ def fiup(ctx, collection, path, registry, dest, pool_size):
     O = Orthanc(**services[dest])
 
     if collection != "ALL":
+
+        items = file_indexer.items_on_path(path)
+        click.echo('Expecting {} items on path'.format(len(items)))
+
+        if dryrun:
+            exit()
 
         result = file_indexer.upload_collection(
             collection=collection,
