@@ -60,7 +60,7 @@ def fiup(ctx, collection, path, registry, dest, pool_size):
 
     else:
 
-        items = file_indexer.items_on_path(path, registry)
+        items = file_indexer.items_on_path(basepath=path, registry=R)
         click.echo('Expecting {} items on path'.format(len(items)))
 
         result = file_indexer.upload_path(
