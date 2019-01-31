@@ -28,14 +28,17 @@ services:
       ORTHANC_STORE_COMPRESSED: "false"
       ORTHANC_PG_ENABLED:       "true"
       ORTHANC_PG_STORE_DICOM:   "true"
-      ORTHANC_PG_DATABASE:      ${ORTHANC_PG_DATABASE}-bridge
+      ORTHANC_PG_DATABASE:      bridge
       ORTHANC_PG_HOST:          postgres
       ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
       ORTHANC_MOD_0:            ${ORTHANC_MOD_0}
       ORTHANC_VERBOSE:          "true"
       TZ:                       "America/New_York"
     deploy:
-      replicas: 2  # Multiple nodes, PG provides data persistence
+      replicas: 1  # Only run one replica or the DICOM connector gets confused
+      placement:
+        constraints:
+          - node.labels.bridge==true
       labels:
         - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8042"

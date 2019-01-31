@@ -94,7 +94,6 @@ class FileIndexer(object):
         print("Checking rate: {} files per second".format(round(checking_rate,1)))
         print("Handling rate: {} files per second".format(round(handling_rate,1)))
 
-
     def upload_path(self, basepath, registry: Redis, dest: Orthanc):
 
         tic = datetime.now()

@@ -1,4 +1,5 @@
 import logging, os
+from pathlib import Path
 from glob import glob
 import attr
 
@@ -22,7 +23,7 @@ class FileHandler(object):
 
     def get_files(self, rex="*"):
         fp = self.get_path(rex)
-        return [os.path.basename(x) for x in glob(fp)]
+        return [os.path.basename(x) for x in glob(fp) if Path(x).is_file()]
 
     def write_file(self, fn: str, fdata):
         """Write binary file data"""
