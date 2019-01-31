@@ -189,7 +189,7 @@ class ImageDir(DcmDir):
     def put_zipped(self, item: str):
 
         gateway = ZipFileHandler(path=self.path)
-        files = gateway.unpack(item)  # Returns files as bytes
+        files = gateway.unpack(io.BytesIO(item))  # Returns files as bytes
         for f in files:
             if not DcmFileHandler.is_dicom(io.BytesIO(f)):
                 continue
