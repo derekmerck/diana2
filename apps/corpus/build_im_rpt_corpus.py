@@ -58,7 +58,8 @@ logging.basicConfig(level=logging.DEBUG)
 supress_urllib_debug()
 
 with open(services_path) as f:
-    services = yaml.load(f)
+    services_exp = os.path.expandvars(f.read())
+    services = yaml.safe_load(services_exp)
 
 M = Montage(**services[montage_svc])
 M.check()
