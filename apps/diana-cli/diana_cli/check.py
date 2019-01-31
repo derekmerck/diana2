@@ -62,14 +62,16 @@ def info(ctx, endpoints):
             continue
         ep = Serializable.Factory.create(**v)
         try:
-            info = ep.info()
-            out = click.style("{}: {}".format(k, "Ready" if info else "Not Ready"),
-                              fg="green" if info else "red")
-            if info:
-                click.echo(pformat(info))
+            _info = ep.info()
+            out = click.style("{}: {}".format(k, "Ready" if _info else "Not Ready"),
+                              fg="green" if _info else "red")
         except NotImplementedError:
+            _info = None
             out = click.style("{}: {}".format(k, "Unimplemented info"),
                               fg="yellow")
         click.echo(out)
+
+        if _info:
+            click.echo(pformat(_info))
 
 
