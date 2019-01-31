@@ -22,7 +22,7 @@ from hashlib import md5
 from pathlib import Path
 import yaml
 from datetime import datetime, timedelta
-from diana.apis import Montage, ImageDir, ProxiedDicom
+from diana.apis import Montage, ImageDir, Orthanc, ProxiedDicom
 from diana.dixel import DixelView
 from diana.utils.dicom import DicomLevel
 from diana.utils.gateways import TextFileHandler, MontageModality as Modality, supress_urllib_debug
@@ -34,7 +34,7 @@ from diana.utils.gateways import TextFileHandler, MontageModality as Modality, s
 data_path = Path("/data")
 services_path = "/services.yml"
 montage_svc = "montage"
-remote_svc = "pacs"
+remote_svc = "bridge"
 start_date = datetime(year=2018, month=1, day=1).date()
 end_date = datetime(year=2018, month=1, day=2).date()
 chunk_interval = {"weeks": 2}
@@ -63,7 +63,7 @@ with open(services_path) as f:
 M = Montage(**services[montage_svc])
 M.check()
 
-P = ProxiedDicom(**services[remote_svc])
+P = Orthanc(**services[remote_svc])
 
 FR = TextFileHandler(path=data_path/"corpus", subpath_depth=2, subpath_width=2)
 FI = ImageDir(path=data_path/"images", subpath_depth=2, subpath_width=2, anonymizing=True)
@@ -115,7 +115,7 @@ def get_daily_events(start, end):
         result.append(item_meta)
 
         qq = {"AccessionNumber": d.tags["AccessionNumber"]}
-        d = P.find(query=qq, level=DicomLevel.STUDIES, retrieve=True)
+        d = P.rfind(query=qq, level=DicomLevel.STUDIES, retrieve=True, domain="pacs")
         d = P.get(d, view=DixelView.FILE)
         FI.put_zipped(d.file)
 
