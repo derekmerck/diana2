@@ -5,7 +5,7 @@ import attr
 import pydicom
 import numpy as np
 from .report import RadiologyReport
-from ..utils.dicom import DicomLevel
+from ..utils.dicom import DicomLevel, DicomFormatError
 from ..utils import Serializable
 from ..utils.gateways import orthanc_id, Montage
 
@@ -85,9 +85,13 @@ class Dixel(Serializable):
             'MediaStorage': str(ds.file_meta.MediaStorageSOPClassUID),
         }
 
+        if not (ds.get('AccessionNumber') or ds.get('StudyInstanceUID')):
+            logging.error(ds)
+            raise DicomFormatError("No a/n or study UID")
+
         # Most relevant tags for indexing, hard stop on missing a/n, mrn, or uuids
         tags = {
-            'AccessionNumber': ds.get('AccessionNumber') or ds.StudyInstanceUID,
+            'AccessionNumber': ds.get('AccessionNumber') or ds.get('StudyInstanceUID'),
             'PatientName': str(ds.get("PatientName")) or ds.PatientID,  # Odd serializing type
             'PatientID': ds.PatientID,
             'PatientBirthDate': ds.get("PatientBirthDate"),
