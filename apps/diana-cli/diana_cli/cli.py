@@ -5,7 +5,7 @@ from . import __version__
 from diana.utils.gateways import supress_urllib_debug
 from diana import __version__ as diana_version
 
-from .check import check
+from .check import check, info
 from .collect import collect
 from .dcm2im import dcm2im
 from .file_index import findex, fiup
@@ -73,6 +73,7 @@ def cli(ctx, verbose, services, services_path):
 
 cmds = [
     check,
+    info,
     collect,
     dcm2im,
     findex,
