@@ -114,8 +114,8 @@ def get_daily_events(start, end):
 
         result.append(item_meta)
 
-        q = {"AccessionNumber": d.tags["AccessionNumber"]}
-        d = P.find(query=q, level=DicomLevel.STUDIES, retrieve=True)
+        qq = {"AccessionNumber": d.tags["AccessionNumber"]}
+        d = P.find(query=qq, level=DicomLevel.STUDIES, retrieve=True)
         d = P.get(d, view=DixelView.FILE)
         FI.put_zipped(d.file)
 
