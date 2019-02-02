@@ -85,6 +85,8 @@ class Montage(Endpoint, Serializable):
             _end = max(start, stop)
             q["start_date"] = _start.date().isoformat()
             q["end_date"] = _end.date().isoformat()
+            q["start_time"] = _start.time().isoformat()
+            q["end_time"] = _end.time().isoformat()
             return q
 
         func = partial(qdt, q)
