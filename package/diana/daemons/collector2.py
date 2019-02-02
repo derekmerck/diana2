@@ -102,8 +102,8 @@ class Collector(object):
         item.tags.update(r[0])
 
         # TODO: Should report data to redis and aggregate later to avoid mp locks
-        meta_fn = "{:04}-{:02}.csv".format(item.meta["StudyDate"].year,
-                                     item.meta["StudyDate"].month)
+        meta_fn = "{:04}-{:02}.csv".format(item.meta["StudyDateTime"].year,
+                                     item.meta["StudyDateTime"].month)
         key = CsvFile(fp=meta_path / meta_fn)
         key.put(item, include_report=(report_dest is not None), anonymize=anonymize)
 
