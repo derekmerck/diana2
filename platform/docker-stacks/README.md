@@ -124,6 +124,9 @@ Provisioning
 
 Follow the CentOS guide and [update `container-selinux`](https://nickjanetakis.com/blog/docker-tip-39-installing-docker-ce-on-redhat-rhel-7x).
 
+Sometimes RHEL behind firewalls can benefit from access to the CentOS yum repos.  
+<https://unix.stackexchange.com/questions/433046/how-do-i-enable-centos-repositories-on-rhel-red-hat>
+
 ### Setup a Swarm
 
 ```bash

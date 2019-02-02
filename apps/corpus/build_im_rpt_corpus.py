@@ -36,7 +36,7 @@ services_path = "/services.yml"
 montage_svc = "montage"
 remote_svc = "bridge"
 start_date = datetime(year=2018, month=1, day=1).date()
-end_date = datetime(year=2018, month=1, day=2).date()
+end_date = datetime(year=2018, month=1, day=31).date()
 chunk_interval = {"weeks": 2}
 query_interval = {"days": 1}
 key_fn_fmt = "corpus_meta.{}-{}.csv"
@@ -124,6 +124,7 @@ def get_daily_events(start, end):
 
         logging.info(d)
         d = P.get(d, view=DixelView.FILE)
+        P.delete(d) #clean up
         FI.put_zipped(d.file)
 
     return result
