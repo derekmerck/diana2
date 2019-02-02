@@ -82,7 +82,8 @@ class Montage(Endpoint, Serializable):
             if not q:
                 q = {}
             __start = min(_start, _stop)
-            __stop = max(_start, _stop) - timedelta(seconds=1)
+            __stop = max(_start, _stop)
+            __stop -= timedelta(seconds=1)
             q["start_date"] = __start.date().isoformat()
             q["end_date"] = __stop.date().isoformat()
             return q
