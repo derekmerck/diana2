@@ -78,13 +78,13 @@ class Montage(Endpoint, Serializable):
     def iter_query_by_date(self, q: Mapping,
                            start: datetime, stop: datetime, step: timedelta):
 
-        def qdt(q, start, stop):
+        def qdt(q, _start, _stop):
             if not q:
                 q = {}
-            _start = min(start, stop)
-            _end = max(start, stop)
-            q["start_date"] = _start.date().isoformat()
-            q["end_date"] = _end.date().isoformat()
+            __start = min(_start, _stop)
+            __stop = max(_start, _stop)
+            q["start_date"] = __start.date().isoformat()
+            q["end_date"] = __stop.date().isoformat()
             return q
 
         func = partial(qdt, q)
@@ -92,9 +92,12 @@ class Montage(Endpoint, Serializable):
 
         for q in _gen:
             logging.debug(pformat(q))
-            cache = self.find(q)
 
-            for item in cache:
-                yield item
+            try:
+                cache = self.find(q)
+                for item in cache:
+                    yield item
+            except:
+                logging.error("No connection")
 
 
