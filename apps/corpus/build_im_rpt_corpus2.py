@@ -10,7 +10,7 @@ services_path = "/services.yml"
 pacs_svc = "pacs"
 dest_path = Path("/data/")
 montage_svc = "montage"
-query = {"q": "RADCAT5", "Modality": [Modality.CR]}
+query = {"q": "", "Modality": Modality.CR}
 start = datetime(year=2018, month=1, day=1)
 stop = datetime(year=2018, month=1, day=3)
 # Montage can only query by day
