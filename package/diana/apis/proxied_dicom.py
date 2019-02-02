@@ -48,4 +48,7 @@ class ProxiedDicom(Endpoint, Serializable):
 
         for q in _gen:
             logging.debug(pformat(q))
-            yield self.find(q)
+            cache = self.find(q)
+
+            for item in cache:
+                yield item

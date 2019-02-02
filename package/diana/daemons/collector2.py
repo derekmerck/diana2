@@ -1,30 +1,28 @@
 from multiprocessing import Pool
+from functools import partial
 from datetime import datetime, timedelta
-from typing import Union, Mapping, Iterable
+from typing import Union, Iterable
 from pathlib import Path
 import attr
 
-from diana.apis import ProxiedDicom, Orthanc, DcmDir, ImageDir, TextDir, CsvFile, Montage
-from diana.dixel import Dixel, DixelView
-from .routes import put_item
-from diana.utils.endpoint import Endpoint
-from diana.utils.gateways import MontageModality as Modality
+from ..apis import ProxiedDicom, DcmDir, ImageDir, CsvFile, Montage
+from ..dixel import Dixel
+from ..utils.gateways import MontageModality as Modality, TextFileHandler
+from .routes import put_item, pull_and_save_item
 
-montage = Montage()
-query = {"q": "", "Modality": Modality.CR}
-start = datetime(year=2018, month=1, day=1)
-stop = datetime(year=2018, month=1, day=2)
-step = timedelta(hours=1)
 
-def test():
-    worklists = montage.iter_query_by_date(query, start, stop, step)
+def test(montage: Montage, pacs: ProxiedDicom, dest_path: Path):
 
-    source = ProxiedDicom()
-    dest_path = Path("/a/b/c")
+    query = {"q": "", "Modality": Modality.CR}
+    start = datetime(year=2018, month=1, day=1)
+    stop = datetime(year=2018, month=1, day=2)
+    step = timedelta(hours=1)
+
+    worklist = montage.iter_query_by_date(query, start, stop, step)
 
     c = Collector()
     c.run(worklist=worklist,
-          source=source,
+          source=pacs,
           dest_path=dest_path,
           inline_reports=False,
           anonymize=True)
@@ -40,39 +38,53 @@ class Collector(object):
         if self.pool_size > 0:
             return Pool(self.pool_size)
 
-    # Worklists = iterable of lists of partial dixels, i.e., small Montage queries
-    def run(self, worklists: Iterable,
+    def run(self, worklist: Iterable,
             source: ProxiedDicom,
             dest_path: Path,
             inline_reports: bool = True,
-            anonymize: bool = True):
+            anonymize: bool = True,
+            save_as_im: bool = False):
 
         meta_path = dest_path / "meta"
-        data_dest = ImageDir( dest_path / "images" )
+
+        if save_as_im:
+            data_dest = ImageDir( path=dest_path / "images" )
+        else:
+            data_dest = DcmDir( path=dest_path / "images" )
+
         if inline_reports:
-            report_dest = TextDir( dest_path / "reports" )
+            report_dest = TextFileHandler( path=dest_path / "reports" )
         else:
             report_dest = None
 
-        for worklist in worklists:
+        if self.pool_size == 0:
             for item in worklist:
-
-                self.handle_item(item=item,
+                Collector.handle_item(item=item,
                                  source=source,
                                  meta_path=meta_path,
                                  data_dest=data_dest,
                                  report_dest=report_dest,
                                  anonymize=anonymize)
+        else:
+            p = partial(Collector.handle_item,
+                         source=source,
+                         meta_path=meta_path,
+                         data_dest=data_dest,
+                         report_dest=report_dest,
+                         anonymize=anonymize)
+            self.pool.map(p, worklist)
 
     @staticmethod
     def handle_item(item: Dixel,
                     source: ProxiedDicom,
                     meta_path: Path,
                     data_dest: Union[DcmDir, ImageDir],
-                    report_dest: TextDir = None,
+                    report_dest: TextFileHandler = None,
                     anonymize=True):
 
-        # Minimal data for oid and sham plus study and series desc
+        # TODO: Need early exit for already handled, ie, hash a/n exists
+
+        # Minimal data for oid and sham plus study desc
         def mkq(item):
             return {
                 "PatientName": "",
@@ -89,14 +101,16 @@ class Collector(object):
         r = source.find(mkq(item))
         item.tags.update(r[0])
 
-        meta_fn = "{}/{}.csv".format(item.meta["StudyDate"].year,
+        # TODO: Should report data to redis and aggregate later to avoid mp locks
+        meta_fn = "{:04}-{:02}.csv".format(item.meta["StudyDate"].year,
                                      item.meta["StudyDate"].month)
         key = CsvFile(fp=meta_path / meta_fn)
         key.put(item, include_report=(report_dest is not None), anonymize=anonymize)
 
         if report_dest:
-            report_dest.put(item, anonymize=anonymize)
+            # report_dest.put(item, anonymize=anonymize)
+            report_dest.put(item)
 
-        put_item(item, source, data_dest, anonymize=anonymize)
+        pull_and_save_item(item, source, data_dest, anonymize=anonymize)
 
 
