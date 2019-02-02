@@ -6,9 +6,9 @@ from diana.daemons.collector2 import Collector
 from diana.utils.gateways import MontageModality as Modality
 
 # CONFIG
-services_path = ".secrets/lifespan_services.yml"
+services_path = "/services.yml"
 pacs_svc = "pacs"
-dest_path = Path("/data/all_cr3")
+dest_path = Path("/data/")
 montage_svc = "montage"
 query = {"q": "", "Modality": Modality.CR}
 start = datetime(year=2018, month=1, day=1)
