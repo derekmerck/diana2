@@ -80,21 +80,23 @@ class Montage(Endpoint, Serializable):
 
         def qdt(q, _start, _stop):
             if not q:
-                q = {}
+                _q = {}
+            else:
+                _q = {**q}
             __start = min(_start, _stop)
             __stop = max(_start, _stop)
             __stop -= timedelta(seconds=1)
-            q["start_date"] = __start.date().isoformat()
-            q["end_date"] = __stop.date().isoformat()
-            return q
+            _q["start_date"] = __start.date().isoformat()
+            _q["end_date"] = __stop.date().isoformat()
+            return _q
 
         func = partial(qdt, q)
-        _gen = FuncByDates(func, start, stop, step)
+        gen = FuncByDates(func, start, stop, step)
 
-        for q in _gen:
-            logging.debug(pformat(q))
+        for qq in gen:
+            logging.debug(pformat(qq))
 
-            cache = self.find(q)
+            cache = self.find(qq)
             for item in cache:
                 yield item
 
