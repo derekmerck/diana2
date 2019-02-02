@@ -14,6 +14,12 @@ def put_item(item: str, source: Endpoint, dest: Endpoint, **kwargs):
         return upload_item(fn=item, source=source,
                            dest=dest)
 
+    elif isinstance(source, ProxiedDicom) and (isinstance(dest, ImageDir) or isinstance(dest, DcmDir)):
+        query = {"AccessionNumber", item.tags["AccessionNumber"]}
+        return pull_and_save_item(query=query, level=item.level, source=source,
+                           dest=dest,
+                           anonymize=kwargs.get("anonymize"))
+
     elif isinstance(source, Orthanc) and isinstance(dest, Orthanc):
         return send_item(  oid=item, level=kwargs.get("level"), source=source,
                            dest=dest,
@@ -26,6 +32,7 @@ def put_item(item: str, source: Endpoint, dest: Endpoint, **kwargs):
                            dest=dest, index=kwargs.get("index"), token=kwargs.get("token"))
 
     raise NotImplementedError
+
 
 def send_item(oid: str, level: DicomLevel, source: Orthanc,
               dest: Union[Orthanc, str],
@@ -45,6 +52,23 @@ def send_item(oid: str, level: DicomLevel, source: Orthanc,
 
     if anonymize and remove_anon:
         source.delete(_oid, level=level)
+
+
+def pull_and_save_item(item: Dixel, source: ProxiedDicom,
+              dest: Union[DcmDir, ImageDir],
+              anonymize=False):
+
+    query = {"AccessionNumber": item.tags["AccessionNumber"]}
+    source.find(query=query, level=item.level, retrieve=True)
+
+    if anonymize and isinstance(dest, DcmDir):
+        # No need to anonymize if we are converting to images
+        item = source.proxy.anonymize(item, remove=True)
+
+    item = source.proxy.get(item, view=DixelView.FILE)
+    dest.put(item)
+    source.delete(item)
+
 
 def upload_item(fn: str, source: DcmDir, dest: Orthanc):
 

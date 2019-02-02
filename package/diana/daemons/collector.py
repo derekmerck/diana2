@@ -19,7 +19,6 @@ from diana.dixel import Dixel, ShamDixel, DixelView
 from diana.utils.dicom import DicomLevel
 
 
-
 @attr.s
 class Collector(object):
 

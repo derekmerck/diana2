@@ -1,10 +1,14 @@
 import logging
+from functools import partial
+from datetime import datetime, timedelta
 from typing import Mapping
+from pprint import pformat
 import attr
 
-from ..utils import Endpoint, Serializable
+from ..utils import Endpoint, Serializable, FuncByDates
 from ..utils.gateways import Montage as MontageGateway, GatewayConnectionError
 from ..dixel import Dixel
+
 
 @attr.s(hash=False)
 class Montage(Endpoint, Serializable):
@@ -69,3 +73,25 @@ class Montage(Endpoint, Serializable):
             logger.error(type(e))
             logger.error(e)
             return False
+
+
+    def iter_query_by_date(self, q: Mapping,
+                           start: datetime, stop: datetime, step: timedelta):
+
+        def qdt(q, start, stop):
+            if not q:
+                q = {}
+            _start = min(start, stop)
+            _end = max(start, stop)
+            q["start_date"] = _start.isoformat()
+            q["end_date"] = _end.isoformat()
+            return q
+
+        func = partial(qdt, q)
+        _gen = FuncByDates(func, start, stop, step)
+
+        for q in _gen:
+            logging.debug(pformat(q))
+            yield self.find(q)
+
+
