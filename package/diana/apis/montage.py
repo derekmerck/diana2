@@ -93,11 +93,9 @@ class Montage(Endpoint, Serializable):
         for q in _gen:
             logging.debug(pformat(q))
 
-            try:
-                cache = self.find(q)
-                for item in cache:
-                    yield item
-            except:
-                logging.error("No connection")
+            cache = self.find(q)
+            for item in cache:
+                yield item
+
 
 
