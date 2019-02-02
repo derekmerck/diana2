@@ -12,8 +12,9 @@ dest_path = Path("/data/")
 montage_svc = "montage"
 query = {"q": "", "Modality": Modality.CR}
 start = datetime(year=2018, month=1, day=1)
-stop = datetime(year=2018, month=1, day=2)
-step = timedelta(hours=1)
+stop = datetime(year=2018, month=1, day=3)
+# Montage can only query by day
+step = timedelta(days=1)
 
 
 def collect_corpus(_worklist, _pacs, _dest_path):
