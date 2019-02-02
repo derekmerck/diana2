@@ -40,6 +40,6 @@ if __name__ == "__main__":
     worklist = montage.iter_query_by_date(query, start, stop, step)
 
     pacs = ProxiedDicom(**services[pacs_svc])
-    pacs.check()
+    # pacs.check()
 
     collect_corpus(worklist, pacs, dest_path)
