@@ -48,12 +48,20 @@ class Collector(object):
         meta_path = dest_path / "meta"
 
         if save_as_im:
-            data_dest = ImageDir( path=dest_path / "images" )
+            data_dest = ImageDir(path=dest_path / "images",
+                                 subpath_width=2,
+                                 subpath_depth=2
+                                 )
         else:
-            data_dest = DcmDir( path=dest_path / "images" )
+            data_dest = DcmDir(path=dest_path / "images",
+                               subpath_width=2,
+                               subpath_depth=2
+                               )
 
         if inline_reports:
-            report_dest = TextFileHandler( path=dest_path / "reports" )
+            report_dest = TextFileHandler(path=dest_path / "reports",
+                                          subpath_width=2,
+                                          subpath_depth=2)
         else:
             report_dest = None
 
@@ -105,7 +113,7 @@ class Collector(object):
         meta_fn = "{:04}-{:02}.csv".format(item.meta["StudyDateTime"].year,
                                      item.meta["StudyDateTime"].month)
         key = CsvFile(fp=meta_path / meta_fn)
-        key.put(item, include_report=(report_dest is not None), anonymize=anonymize)
+        # key.put(item, include_report=(report_dest is not None), anonymize=anonymize)
 
         if report_dest:
             # report_dest.put(item, anonymize=anonymize)
