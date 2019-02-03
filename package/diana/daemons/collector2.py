@@ -5,7 +5,7 @@ from typing import Union, Iterable
 from pathlib import Path
 import attr
 
-from ..apis import ProxiedDicom, DcmDir, ImageDir, CsvFile, Montage
+from ..apis import ProxiedDicom, DcmDir, ImageDir, CsvFile, Montage, ReportDir
 from ..dixel import Dixel
 from ..utils.gateways import MontageModality as Modality, TextFileHandler
 from .routes import put_item, pull_and_save_item
@@ -60,9 +60,10 @@ class Collector(object):
                                )
 
         if not inline_reports:
-            report_dest = TextFileHandler(path=dest_path / "reports",
-                                          subpath_width=2,
-                                          subpath_depth=2)
+            report_dest = ReportDir(path=dest_path / "reports",
+                                    subpath_width=2,
+                                    subpath_depth=2,
+                                    anonymzing=anonymize)
         else:
             report_dest = None
 
@@ -88,7 +89,7 @@ class Collector(object):
                     source: ProxiedDicom,
                     meta_path: Path,
                     data_dest: Union[DcmDir, ImageDir],
-                    report_dest: TextFileHandler = None,
+                    report_dest: ReportDir = None,
                     anonymize=True):
 
         # TODO: Need early exit for already handled, ie, hash a/n exists

@@ -4,7 +4,7 @@ import attr
 from ..dixel import Dixel, DixelView, ShamDixel
 from ..utils import Endpoint, Serializable
 from ..utils.dicom import DicomLevel
-from ..utils.gateways import DcmFileHandler, ZipFileHandler, ImageFileHandler, ImageFileFormat
+from ..utils.gateways import DcmFileHandler, ZipFileHandler, ImageFileHandler, ImageFileFormat, TextFileHandler
 
 
 
@@ -160,6 +160,27 @@ class DcmDir(Endpoint, Serializable):
 
 
 @attr.s
+class ReportDir(DcmDir):
+    name = attr.ib(default="ReportDir")
+
+    gateway = attr.ib(init=False, repr=False)
+    @gateway.default
+    def setup_gateway(self):
+        return TextFileHandler(path=self.path,
+                                subpath_width = self.subpath_width,
+                                subpath_depth = self.subpath_depth)
+
+    def put(self, item: Dixel, **kwargs):
+        logger = logging.getLogger(self.name)
+        logger.debug("EP PUT")
+
+        if self.anonymizing:
+            item = ShamDixel.from_dixel(item)
+
+        fn = "{}.txt".format(item.image_base_fn)
+        self.gateway.put(fn, item.report.anonymized())
+
+@attr.s
 class ImageDir(DcmDir):
 
     name = attr.ib(default="ImageDir")
@@ -172,7 +193,6 @@ class ImageDir(DcmDir):
                                 subpath_width = self.subpath_width,
                                 subpath_depth = self.subpath_depth)
 
-    # TODO: handle pulling an image instance format directly from Orthanc (im_file attr?)
     def put(self, item: Dixel, **kwargs):
         logger = logging.getLogger(self.name)
         logger.debug("EP PUT")
