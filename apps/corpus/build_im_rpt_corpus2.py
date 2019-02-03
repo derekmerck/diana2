@@ -12,7 +12,7 @@ dest_path = Path("/data/")
 montage_svc = "montage"
 query = {"q": "RADCAT4|RADCAT5", "modality": Modality.CR}
 start = datetime(year=2018, month=12, day=1)
-stop = datetime(year=2018, month=11, day=5)
+stop = datetime(year=2018, month=12, day=5)
 # Montage can only query by day
 step = timedelta(days=1)
 
