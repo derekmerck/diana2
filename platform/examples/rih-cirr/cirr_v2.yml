@@ -87,6 +87,7 @@ services:
       ORTHANC_NAME:             Bridge
       ORTHANC_AET:              ${ORTHANC_BRIDGE_AET}
       ORTHANC_MAX_SIZE:         10000
+      ORTHANC_MAX_PATIENTS:     10
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_STORE_COMPRESSED: "false"
       ORTHANC_PG_ENABLED:       "true"
