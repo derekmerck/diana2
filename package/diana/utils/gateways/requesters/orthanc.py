@@ -37,28 +37,31 @@ class Orthanc(Requester):
         return self._post(resource, json=query)
 
     def rfind(self, query, domain, retrieve=False):
-        # logger = logging.getLogger(name=self.name)
+        logger = logging.getLogger(name=self.name)
 
         result = []
 
         resource = "modalities/{}/query".format(domain)
         response0 = self._post(resource, json=query)
-        # logger.debug(response0)
+        logger.debug(response0)
 
         if response0.get('ID'):
             resource = "queries/{}/answers".format(response0.get('ID'))
             response1 = self._get(resource)
-            # logger.debug(response1)
+            logger.debug(response1)
 
             for answer in response1:
-                # logger.debug(answer)
+                logger.debug(answer)
                 resource = "queries/{}/answers/{}/content?simplify".format(response0.get('ID'), answer)
                 response2 = self._get(resource)
                 result.append(response2)
+                logger.debug(response2)
 
                 if retrieve:
                     resource = "queries/{}/answers/{}/retrieve".format(response0.get('ID'), answer)
                     response3 = self._post(resource, data=self.aet)
+                    result.append(response3)
+                    logger.debug(response3)
 
         return result
 
