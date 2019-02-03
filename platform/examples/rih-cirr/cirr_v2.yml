@@ -86,7 +86,7 @@ services:
     environment:
       ORTHANC_NAME:             Bridge
       ORTHANC_AET:              ${ORTHANC_BRIDGE_AET}
-      ORTHANC_MAX_STUDIES:      50
+      ORTHANC_MAX_SIZE:         10000
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_STORE_COMPRESSED: "false"
       ORTHANC_PG_ENABLED:       "true"
@@ -101,7 +101,7 @@ services:
       ORTHANC_VERBOSE:          "true"
       TZ:                       "America/New_York"
     deploy:
-      replicas: 2  # Only run one replica or the DICOM connector gets confused, or add sticky?
+      replicas: 3  # Make sure it has sticky label and access via traefik
       placement:
         constraints:
           - node.labels.bridge==true
