@@ -50,7 +50,8 @@ class Collector(object):
         if save_as_im:
             data_dest = ImageDir(path=dest_path / "images",
                                  subpath_width=2,
-                                 subpath_depth=2
+                                 subpath_depth=2,
+                                 anonymizing=anonymize
                                  )
         else:
             data_dest = DcmDir(path=dest_path / "images",
