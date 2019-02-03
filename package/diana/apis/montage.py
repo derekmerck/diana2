@@ -37,13 +37,14 @@ class Montage(Endpoint, Serializable):
             password = self.password
         )
 
-    def find(self, query: Mapping, index="rad", ignore_errs=True):
+    def find(self, query: Mapping, index="rad", ignore_errs=True, get_meta=False):
         r = self.gateway.find(query=query, index=index)
         ret = set()
         for item in r:
             try:
                 d = Dixel.from_montage_json(item)
-                d = self.get_meta(d)
+                if get_meta:
+                    d = self.get_meta(d)
                 ret.add(d)
             except Exception as e:
                 logger = logging.getLogger(self.name)
@@ -74,9 +75,9 @@ class Montage(Endpoint, Serializable):
             logger.error(e)
             return False
 
-
     def iter_query_by_date(self, q: Mapping,
-                           start: datetime, stop: datetime, step: timedelta):
+                           start: datetime, stop: datetime, step: timedelta,
+                           get_meta=False):
 
         def qdt(q, _start, _stop):
             if not q:
@@ -96,7 +97,7 @@ class Montage(Endpoint, Serializable):
         for qq in gen:
             logging.debug(pformat(qq))
 
-            cache = self.find(qq)
+            cache = self.find(qq, get_meta=get_meta)
             for item in cache:
                 yield item
 

@@ -15,6 +15,7 @@ start = datetime(year=2018, month=12, day=1)
 stop = datetime(year=2018, month=12, day=5)
 # Montage can only query by day
 step = timedelta(days=1)
+get_meta = False
 
 
 def collect_corpus(_worklist, _pacs, _dest_path):
@@ -38,7 +39,7 @@ if __name__ == "__main__":
 
     montage = Montage(**services[montage_svc])
     montage.check()
-    worklist = montage.iter_query_by_date(query, start, stop, step)
+    worklist = montage.iter_query_by_date(query, start, stop, step, get_meta)
 
     pacs = ProxiedDicom(**services[pacs_svc])
     # pacs.check()

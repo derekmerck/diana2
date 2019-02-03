@@ -143,9 +143,9 @@ class Collector(object):
 
         result = pull_and_save_item(item, source, data_dest, anonymize=anonymize)
 
-        if result == 0:
+        if result == "COMPLETED":
             handled.value += 1
-        elif result == 1:
+        elif result == "SKIPPED":
             skipped.value += 1
         else:
             failed.value += 1

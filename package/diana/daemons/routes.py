@@ -56,11 +56,11 @@ def send_item(oid: str, level: DicomLevel, source: Orthanc,
 
 def pull_and_save_item(item: Dixel, source: ProxiedDicom,
               dest: Union[DcmDir, ImageDir],
-              anonymize=False) -> int:
+              anonymize=False) -> str:
 
     if dest.exists(item):
         logging.debug("File already exists, exiting early")
-        return 0
+        return "SKIPPED"
 
     query = {"AccessionNumber": item.tags["AccessionNumber"]}
     source.find(query=query, level=item.level, retrieve=True)
@@ -73,12 +73,12 @@ def pull_and_save_item(item: Dixel, source: ProxiedDicom,
         item = source.proxy.get(item, view=DixelView.FILE)
     except FileNotFoundError as e:
         logging.error(e)
-        return -1
+        return "FAILED"
 
     dest.put(item)
     source.proxy.delete(item)
 
-    return 1
+    return "COMPLETED"
 
 
 def upload_item(fn: str, source: DcmDir, dest: Orthanc):
