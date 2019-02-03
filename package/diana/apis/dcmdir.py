@@ -179,6 +179,7 @@ class ImageDir(DcmDir):
 
         if item.level != DicomLevel.INSTANCES:
             self.put_zipped(item.file)
+            return
 
         if item.pixels is None:
             raise ValueError("Dixel has no pixels attribute, can only save pixel data")
