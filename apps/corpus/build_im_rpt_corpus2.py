@@ -16,11 +16,11 @@ stop = datetime(year=2018, month=12, day=5)
 # Montage can only query by day
 step = timedelta(days=1)
 get_meta = False
-
+pool_size = 1
 
 def collect_corpus(_worklist, _pacs, _dest_path):
 
-    c = Collector(pool_size=5)
+    c = Collector(pool_size=pool_size)
     c.run(worklist=_worklist,
           source=_pacs,
           dest_path=_dest_path,
