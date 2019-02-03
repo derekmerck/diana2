@@ -59,7 +59,7 @@ class Collector(object):
                                subpath_depth=2
                                )
 
-        if inline_reports:
+        if not inline_reports:
             report_dest = TextFileHandler(path=dest_path / "reports",
                                           subpath_width=2,
                                           subpath_depth=2)
