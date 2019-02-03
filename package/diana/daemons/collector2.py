@@ -1,4 +1,6 @@
 from multiprocessing import Pool, Value
+import itertools
+from time import sleep
 from functools import partial
 from datetime import datetime, timedelta
 from typing import Union, Iterable
@@ -7,7 +9,6 @@ import attr
 
 from ..apis import ProxiedDicom, DcmDir, ImageDir, CsvFile, Montage, ReportDir
 from ..dixel import Dixel
-from ..utils.gateways import MontageModality as Modality, TextFileHandler
 from .routes import put_item, pull_and_save_item
 
 counter = Value('i', 0)
@@ -22,6 +23,11 @@ class Collector(object):
     def create_pool(self):
         if self.pool_size > 0:
             return Pool(self.pool_size)
+
+    sublist_len = attr.ib( init=False )
+    @sublist_len.default
+    def estimate_sublist_len(self):
+        return 2 * self.pool_size
 
     def run(self, worklist: Iterable,
             source: ProxiedDicom,
@@ -69,7 +75,12 @@ class Collector(object):
                          data_dest=data_dest,
                          report_dest=report_dest,
                          anonymize=anonymize)
-            self.pool.map(p, worklist)
+            while True:
+                result = self.pool.map(p, itertools.islice(worklist, self.sublist_len))
+                if result:
+                    sleep(0.1)
+                else:
+                    break
 
         toc = datetime.now()
         elapsed_time = (toc - tic).seconds or 1
@@ -108,7 +119,7 @@ class Collector(object):
         # TODO: Should report data to redis and aggregate later to avoid mp locks
         meta_fn = "{:04}-{:02}.csv".format(item.meta["StudyDateTime"].year,
                                      item.meta["StudyDateTime"].month)
-        key = CsvFile(fp=meta_path / meta_fn)
+        # key = CsvFile(fp=meta_path / meta_fn)
         # key.put(item, include_report=(report_dest is not None), anonymize=anonymize)
 
         if report_dest:

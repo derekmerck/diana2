@@ -1,4 +1,4 @@
-import os
+import os, logging
 from pprint import pprint
 from typing import Union, Mapping
 from functools import partial
@@ -57,6 +57,10 @@ def send_item(oid: str, level: DicomLevel, source: Orthanc,
 def pull_and_save_item(item: Dixel, source: ProxiedDicom,
               dest: Union[DcmDir, ImageDir],
               anonymize=False):
+
+    if dest.exists(item):
+        logging.debug("File already exists, exiting early")
+        return
 
     query = {"AccessionNumber": item.tags["AccessionNumber"]}
     source.find(query=query, level=item.level, retrieve=True)
