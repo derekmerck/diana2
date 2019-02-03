@@ -14,6 +14,7 @@ from ..utils.endpoint import Serializable
 
 handled = Value('i', 0)
 skipped = Value('i', 0)
+failed = Value('i', 0)
 
 
 @attr.s
@@ -92,6 +93,9 @@ class Collector(object):
 
         print("Handled {} objects in {} seconds".format(handled.value, elapsed_time))
         print("Handling rate: {} objects per second".format(round(handling_rate, 1)))
+        print("Skipped {}".format(skipped.value))
+        print("Failed {}".format(failed.value))
+
 
     @staticmethod
     def handle_item(item: Dixel,
@@ -123,6 +127,7 @@ class Collector(object):
         r = source.find(mkq(item))
         if not r:
             logging.error("Item {} not findable!")
+            failed.value += 1
             return
         item.tags.update(r[0])
 
@@ -138,10 +143,14 @@ class Collector(object):
 
         result = pull_and_save_item(item, source, data_dest, anonymize=anonymize)
 
-        if result:
+        if result == 0:
             handled.value += 1
-        else:
+        elif result == 1:
             skipped.value += 1
+        else:
+            failed.value += 1
 
-        print("Handled {} items and skipped {}".format(handled.value, skipped.value))
+        print("Handled {} items, skipped {}, failed {}".format(handled.value,
+                                                               skipped.value,
+                                                               failed.value))
 

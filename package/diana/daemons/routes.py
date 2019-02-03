@@ -56,11 +56,11 @@ def send_item(oid: str, level: DicomLevel, source: Orthanc,
 
 def pull_and_save_item(item: Dixel, source: ProxiedDicom,
               dest: Union[DcmDir, ImageDir],
-              anonymize=False) -> bool:
+              anonymize=False) -> int:
 
     if dest.exists(item):
         logging.debug("File already exists, exiting early")
-        return False
+        return 0
 
     query = {"AccessionNumber": item.tags["AccessionNumber"]}
     source.find(query=query, level=item.level, retrieve=True)
@@ -69,11 +69,16 @@ def pull_and_save_item(item: Dixel, source: ProxiedDicom,
         # No need to anonymize if we are converting to images
         item = source.proxy.anonymize(item, remove=True)
 
-    item = source.proxy.get(item, view=DixelView.FILE)
+    try:
+        item = source.proxy.get(item, view=DixelView.FILE)
+    except FileNotFoundError as e:
+        logging.error(e)
+        return -1
+
     dest.put(item)
     source.proxy.delete(item)
 
-    return True
+    return 1
 
 
 def upload_item(fn: str, source: DcmDir, dest: Orthanc):
