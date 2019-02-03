@@ -10,6 +10,7 @@ import attr
 from ..apis import ProxiedDicom, DcmDir, ImageDir, CsvFile, Montage, ReportDir
 from ..dixel import Dixel
 from .routes import put_item, pull_and_save_item
+from ..utils.endpoint import Serializable
 
 counter = Value('i', 0)
 
@@ -19,12 +20,14 @@ class Collector(object):
 
     pool_size = attr.ib( default=0 )
     pool = attr.ib( init=False, repr=False )
+
     @pool.default
     def create_pool(self):
         if self.pool_size > 0:
             return Pool(self.pool_size)
 
     sublist_len = attr.ib( init=False )
+
     @sublist_len.default
     def estimate_sublist_len(self):
         return 2 * self.pool_size
@@ -112,6 +115,9 @@ class Collector(object):
                 "StudyDate": "",
                 "StudyTime": "",
             }
+
+        # Get a fresh source, in case this is a pooled job
+        source = Serializable.Factory.copy(source)
 
         r = source.find(mkq(item))
         item.tags.update(r[0])
