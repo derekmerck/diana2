@@ -1,4 +1,4 @@
-import os, logging, io
+import os, logging, io, hashlib
 from typing import Union
 import attr
 from ..dixel import Dixel, DixelView, ShamDixel
@@ -175,10 +175,14 @@ class ReportDir(DcmDir):
         logger.debug("EP PUT")
 
         if self.anonymizing:
-            item = ShamDixel.from_dixel(item)
+            base_fn = hashlib.md5(item.tags["AccessionNumber"].encode("UTF-8")).hexdigest()
+            data = item.report.anonymized()
+        else:
+            base_fn = item.tags["AccessionNumber"]
+            data = item.report.text
 
-        fn = "{}.txt".format(item.image_base_fn)
-        self.gateway.put(fn, item.report.anonymized())
+        fn = "{}.txt".format(base_fn)
+        self.gateway.put(fn, data)
 
 @attr.s
 class ImageDir(DcmDir):
