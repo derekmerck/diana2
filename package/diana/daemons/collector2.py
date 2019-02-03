@@ -121,11 +121,8 @@ class Collector(object):
 
         r = source.find(mkq(item))
         if not r:
-            logging.error(source)
-            logging.error(source.proxy.gateway)
-            logging.error(source.proxy.gateway.session)
-            logging.error(source.proxy.gateway.session.cookies)
-            raise ConnectionError
+            logging.error("Item {} not findable!")
+            return
         item.tags.update(r[0])
 
         # TODO: Should report data to redis and aggregate later to avoid mp locks
@@ -138,8 +135,9 @@ class Collector(object):
             # report_dest.put(item, anonymize=anonymize)
             report_dest.put(item)
 
-        pull_and_save_item(item, source, data_dest, anonymize=anonymize)
+        result = pull_and_save_item(item, source, data_dest, anonymize=anonymize)
 
-        counter.value += 1
-        print("Handled {} items".format(counter.value))
+        if result:
+            counter.value += 1
+            print("Handled {} items".format(counter.value))
 
