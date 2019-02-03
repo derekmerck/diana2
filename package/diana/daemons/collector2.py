@@ -138,7 +138,7 @@ class Collector(object):
             return
         item.tags.update(r[0])
 
-        if not source.exists(item):
+        if not source.proxy.exists(item):
             logging.error("Item {} not retrieved!".format(item))
             failed.value += 1
             return
