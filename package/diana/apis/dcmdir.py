@@ -177,6 +177,9 @@ class ImageDir(DcmDir):
         logger = logging.getLogger(self.name)
         logger.debug("EP PUT")
 
+        if item.level != DicomLevel.INSTANCES:
+            self.put_zipped(item.file)
+
         if item.pixels is None:
             raise ValueError("Dixel has no pixels attribute, can only save pixel data")
 

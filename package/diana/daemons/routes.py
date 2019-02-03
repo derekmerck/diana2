@@ -66,7 +66,7 @@ def pull_and_save_item(item: Dixel, source: ProxiedDicom,
         item = source.proxy.anonymize(item, remove=True)
 
     item = source.proxy.get(item, view=DixelView.FILE)
-    dest.put_zipped(item)
+    dest.put(item)
     source.delete(item)
 
 
