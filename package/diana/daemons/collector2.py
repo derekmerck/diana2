@@ -1,4 +1,4 @@
-from multiprocessing import Pool
+from multiprocessing import Pool, Value
 from functools import partial
 from datetime import datetime, timedelta
 from typing import Union, Iterable
@@ -10,22 +10,7 @@ from ..dixel import Dixel
 from ..utils.gateways import MontageModality as Modality, TextFileHandler
 from .routes import put_item, pull_and_save_item
 
-
-def test(montage: Montage, pacs: ProxiedDicom, dest_path: Path):
-
-    query = {"q": "", "Modality": Modality.CR}
-    start = datetime(year=2018, month=1, day=1)
-    stop = datetime(year=2018, month=1, day=2)
-    step = timedelta(hours=1)
-
-    worklist = montage.iter_query_by_date(query, start, stop, step)
-
-    c = Collector()
-    c.run(worklist=worklist,
-          source=pacs,
-          dest_path=dest_path,
-          inline_reports=False,
-          anonymize=True)
+counter = Value('i', 0)
 
 
 @attr.s
@@ -44,6 +29,8 @@ class Collector(object):
             inline_reports: bool = True,
             anonymize: bool = True,
             save_as_im: bool = False):
+
+        tic = datetime.now()
 
         meta_path = dest_path / "meta"
 
@@ -84,6 +71,13 @@ class Collector(object):
                          anonymize=anonymize)
             self.pool.map(p, worklist)
 
+        toc = datetime.now()
+        elapsed_time = (toc - tic).seconds or 1
+        handling_rate = counter.value / elapsed_time
+
+        print("Handled {} objects in {} seconds".format(counter.value, elapsed_time))
+        print("Handling rate: {} objects per second".format(round(handling_rate, 1)))
+
     @staticmethod
     def handle_item(item: Dixel,
                     source: ProxiedDicom,
@@ -123,4 +117,6 @@ class Collector(object):
 
         pull_and_save_item(item, source, data_dest, anonymize=anonymize)
 
+        counter.value += 1
+        print("Handled {} items".format(counter.value))
 
