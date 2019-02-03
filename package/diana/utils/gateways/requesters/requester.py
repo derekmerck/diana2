@@ -4,6 +4,7 @@ import attr
 from ..exceptions import GatewayConnectionError
 from ...smart_json import SmartJSONEncoder
 
+# Enabled sessions to handle cookies from Docker swarm for sticky connections
 
 def supress_urllib_debug():
     logging.getLogger("urllib3").setLevel(logging.WARNING)
@@ -23,6 +24,8 @@ class Requester(object):
 
     base_url = attr.ib(init=False, repr=False)
     auth = attr.ib(init=False, default=None)
+
+    session = attr.ib(init=False, factory=requests.Session)
 
     # Can't use attr.s defaults here b/c the derived classes don't see the vars yet
     def __attrs_post_init__(self):
@@ -54,7 +57,8 @@ class Requester(object):
         logger.debug("Calling get")
         url = self.make_url(resource)
         try:
-            result = requests.get(url, params=params, headers=headers, auth=self.auth)
+            result = self.session.get(url, params=params, headers=headers, auth=self.auth)
+            # result = requests.get(url, params=params, headers=headers, auth=self.auth)
             return self.handle_result(result)
 
         except (requests.exceptions.ConnectionError,
@@ -68,7 +72,8 @@ class Requester(object):
         if json:
             data = _json.dumps(json, cls=SmartJSONEncoder)
         try:
-            result = requests.put(url, data=data, headers=headers, auth=self.auth)
+            result = self.session.put(url, data=data, headers=headers, auth=self.auth)
+            # result = requests.put(url, data=data, headers=headers, auth=self.auth)
         except requests.exceptions.ConnectionError as e:
             raise GatewayConnectionError(e)
         return self.handle_result(result)
@@ -80,7 +85,8 @@ class Requester(object):
         if json:
             data = _json.dumps(json, cls=SmartJSONEncoder)
         try:
-            result = requests.post(url, data=data, headers=headers, auth=self.auth)
+            result = self.session.post(url, data=data, headers=headers, auth=self.auth)
+            # result = requests.post(url, data=data, headers=headers, auth=self.auth)
         except requests.exceptions.ConnectionError as e:
             raise GatewayConnectionError(e)
         return self.handle_result(result)
@@ -90,7 +96,8 @@ class Requester(object):
         logger.debug("Calling delete")
         url = self.make_url(resource)
         try:
-            result = requests.delete(url, headers=headers, auth=self.auth)
+            result = self.session.delete(url, headers=headers, auth=self.auth)
+            # result = requests.delete(url, headers=headers, auth=self.auth)
         except requests.exceptions.ConnectionError as e:
             raise GatewayConnectionError(e)
         return self.handle_result(result)
