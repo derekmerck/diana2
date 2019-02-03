@@ -67,7 +67,7 @@ def pull_and_save_item(item: Dixel, source: ProxiedDicom,
 
     item = source.proxy.get(item, view=DixelView.FILE)
     dest.put(item)
-    source.delete(item)
+    source.proxy.delete(item)
 
 
 def upload_item(fn: str, source: DcmDir, dest: Orthanc):
