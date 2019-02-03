@@ -11,15 +11,15 @@ pacs_svc = "pacs"
 dest_path = Path("/data/")
 montage_svc = "montage"
 query = {"q": "RADCAT5", "modality": Modality.CR}
-start = datetime(year=2018, month=1, day=1)
-stop = datetime(year=2018, month=1, day=3)
+start = datetime(year=2018, month=11, day=1)
+stop = datetime(year=2018, month=11, day=5)
 # Montage can only query by day
 step = timedelta(days=1)
 
 
 def collect_corpus(_worklist, _pacs, _dest_path):
 
-    c = Collector()
+    c = Collector(pool_size=5)
     c.run(worklist=_worklist,
           source=_pacs,
           dest_path=_dest_path,
