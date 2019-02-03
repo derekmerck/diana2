@@ -1,7 +1,7 @@
 from pathlib import Path
 import yaml, os, logging
 from datetime import datetime, timedelta
-from diana.apis import Montage, ProxiedDicom
+from diana.apis import Montage, ProxiedDicom, Orthanc
 from diana.daemons.collector2 import Collector
 from diana.utils.gateways import MontageModality as Modality
 
@@ -43,5 +43,9 @@ if __name__ == "__main__":
 
     pacs = ProxiedDicom(**services[pacs_svc])
     # pacs.check()
+
+    bridge = Orthanc(**services["stickybridge"])
+    bridge.clear()
+    bridge.info()
 
     collect_corpus(worklist, pacs, dest_path)
