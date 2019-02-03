@@ -63,7 +63,7 @@ class Collector(object):
             report_dest = ReportDir(path=dest_path / "reports",
                                     subpath_width=2,
                                     subpath_depth=2,
-                                    anonymzing=anonymize)
+                                    anonymizing=anonymize)
         else:
             report_dest = None
 
