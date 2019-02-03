@@ -1,5 +1,5 @@
 from multiprocessing import Pool, Value
-import itertools
+import itertools, logging
 from time import sleep
 from functools import partial
 from datetime import datetime, timedelta
@@ -121,10 +121,10 @@ class Collector(object):
 
         r = source.find(mkq(item))
         if not r:
-            print(source)
-            print(source.proxy.gateway)
-            print(source.proxy.gateway.session)
-            print(source.proxy.gateway.session.cookies)
+            logging.error(source)
+            logging.error(source.proxy.gateway)
+            logging.error(source.proxy.gateway.session)
+            logging.error(source.proxy.gateway.session.cookies)
             raise ConnectionError
         item.tags.update(r[0])
 
