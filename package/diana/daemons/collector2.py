@@ -12,7 +12,8 @@ from ..dixel import Dixel
 from .routes import put_item, pull_and_save_item
 from ..utils.endpoint import Serializable
 
-counter = Value('i', 0)
+handled = Value('i', 0)
+skipped = Value('i', 0)
 
 
 @attr.s
@@ -87,9 +88,9 @@ class Collector(object):
 
         toc = datetime.now()
         elapsed_time = (toc - tic).seconds or 1
-        handling_rate = counter.value / elapsed_time
+        handling_rate = handled.value / elapsed_time
 
-        print("Handled {} objects in {} seconds".format(counter.value, elapsed_time))
+        print("Handled {} objects in {} seconds".format(handled.value, elapsed_time))
         print("Handling rate: {} objects per second".format(round(handling_rate, 1)))
 
     @staticmethod
@@ -138,6 +139,9 @@ class Collector(object):
         result = pull_and_save_item(item, source, data_dest, anonymize=anonymize)
 
         if result:
-            counter.value += 1
-            print("Handled {} items".format(counter.value))
+            handled.value += 1
+        else:
+            skipped.value += 1
+
+        print("Handled {} items and skipped {}".format(handled.value, skipped.value))
 

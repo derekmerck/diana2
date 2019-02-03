@@ -1,4 +1,4 @@
-import os, enum, logging, glob
+import os, enum, logging
 import attr
 from PIL.Image import fromarray
 import numpy as np
@@ -12,12 +12,6 @@ class ImageFileFormat(enum.Enum):
 
 @attr.s
 class ImageFileHandler(FileHandler):
-
-    def exists(self, fnre: str):
-        fpre = self.get_path(fnre)
-        logger = logging.getLogger(self.name)
-        logger.debug("Checking exists {}".format(fpre))
-        return glob.glob(fpre) is not None
 
     @staticmethod
     def squash_to_8bit(data: np.array):

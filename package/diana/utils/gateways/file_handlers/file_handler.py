@@ -58,6 +58,12 @@ class FileHandler(object):
         logger.debug("Checking exists {}".format(fp))
         return os.path.exists(fp)  # Better than exists
 
+    def exists_re(self, fnre: str):
+        fpre = self.get_path(fnre)
+        logger = logging.getLogger(self.name)
+        logger.debug("Checking exists {}".format(fpre))
+        return glob(fpre) is not []
+
     def delete(self, fn: str):
         fp = self.get_path(fn)
         logger = logging.getLogger(self.name)

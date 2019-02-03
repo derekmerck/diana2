@@ -207,7 +207,7 @@ class ImageDir(DcmDir):
         else:
             base_fn = item.tags["AccessionNumber"]
 
-        fnre="{}*.txt".format(base_fn)
+        fnre="{}*".format(base_fn)
         return self.gateway.exists(fnre)
 
     def put(self, item: Dixel, **kwargs):
