@@ -105,7 +105,14 @@ class Collector(object):
                     report_dest: ReportDir = None,
                     anonymize=True):
 
-        # TODO: Need early exit for already handled, ie, hash a/n exists
+        if data_dest.exists(item):
+            logging.debug("File already exists, exiting early")
+            skipped.value += 1
+            return
+
+        if report_dest:
+            # report_dest.put(item, anonymize=anonymize)
+            report_dest.put(item)
 
         # Minimal data for oid and sham plus study desc
         def mkq(item):
@@ -124,32 +131,23 @@ class Collector(object):
         # Get a fresh source, in case this is a pooled job
         source = Serializable.Factory.copy(source)
 
-        r = source.find(mkq(item))
+        r = source.find(mkq(item), retrieve=True)
         if not r:
-            logging.error("Item {} not findable!")
+            logging.error("Item {} not findable!".format(item))
             failed.value += 1
             return
         item.tags.update(r[0])
+
+        if not source.exists(item):
+            logging.error("Item {} not retrieved!".format(item))
+            failed.value += 1
+            return
 
         # TODO: Should report data to redis and aggregate later to avoid mp locks
         # meta_fn = "{:04}-{:02}.csv".format(item.meta["StudyDateTime"].year,
         #                             item.meta["StudyDateTime"].month)
         # key = CsvFile(fp=meta_path / meta_fn)
         # key.put(item, include_report=(report_dest is not None), anonymize=anonymize)
-
-        if report_dest:
-            # report_dest.put(item, anonymize=anonymize)
-            report_dest.put(item)
-
-        if data_dest.exists(item):
-            logging.debug("File already exists, exiting early")
-            skipped.value += 1
-            return
-
-        query = {"AccessionNumber": item.tags["AccessionNumber"]}
-        source.find(query=query, level=item.level, retrieve=True)
-
-        # logging.debug("Retrieved id: {} vs item id: {}".format(r[0], item.oid() ))
 
         if anonymize and not isinstance(data_dest, ImageDir):
             # No need to anonymize if we are converting to images
