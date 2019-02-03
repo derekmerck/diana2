@@ -1,4 +1,5 @@
 import logging
+from pprint import pformat
 from hashlib import sha1
 from enum import Enum
 import attr
@@ -38,6 +39,8 @@ class Orthanc(Requester):
 
     def rfind(self, query, domain, retrieve=False):
         logger = logging.getLogger(name=self.name)
+
+        logger.debug(pformat(query))
 
         result = []
 
