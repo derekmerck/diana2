@@ -65,6 +65,8 @@ def pull_and_save_item(item: Dixel, source: ProxiedDicom,
     query = {"AccessionNumber": item.tags["AccessionNumber"]}
     source.find(query=query, level=item.level, retrieve=True)
 
+    # logging.debug("Retrieved id: {} vs item id: {}".format(r[0], item.oid() ))
+
     if anonymize and not isinstance(dest, ImageDir):
         # No need to anonymize if we are converting to images
         item = source.proxy.anonymize(item, remove=True)

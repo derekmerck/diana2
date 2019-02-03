@@ -96,8 +96,8 @@ class Orthanc(Endpoint, Serializable):
 
 
     def get(self, item: Union[Dixel, str],
-            level: DicomLevel=DicomLevel.STUDIES,
-            view: DixelView=DixelView.TAGS, **kwargs):
+            level: DicomLevel = DicomLevel.STUDIES,
+            view: DixelView = DixelView.TAGS, **kwargs):
         logger = logging.getLogger(self.name)
         logger.debug("Get")
 
@@ -121,13 +121,13 @@ class Orthanc(Endpoint, Serializable):
                 return item
             else:
                 # Want a new file
-                if view==DixelView.TAGS:
+                if view == DixelView.TAGS:
                     return Dixel(meta={"ID": oid}, tags=r, level=level)
-                elif view==DixelView.FILE:
+                elif view == DixelView.FILE:
                     d = Dixel(meta={"ID": oid}, level=level)
                     d.file = r
                     return d
-                elif view==DixelView.META:
+                elif view == DixelView.META:
                     return Dixel(meta=r, level=level)
 
         raise FileNotFoundError("Item {} does not exist".format(item))

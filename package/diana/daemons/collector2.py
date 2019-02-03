@@ -8,7 +8,7 @@ from pathlib import Path
 import attr
 
 from ..apis import ProxiedDicom, DcmDir, ImageDir, CsvFile, Montage, ReportDir
-from ..dixel import Dixel
+from ..dixel import Dixel, DixelView
 from .routes import put_item, pull_and_save_item
 from ..utils.endpoint import Serializable
 
@@ -141,14 +141,34 @@ class Collector(object):
             # report_dest.put(item, anonymize=anonymize)
             report_dest.put(item)
 
-        result = pull_and_save_item(item, source, data_dest, anonymize=anonymize)
-
-        if result == "COMPLETED":
-            handled.value += 1
-        elif result == "SKIPPED":
+        if data_dest.exists(item):
+            logging.debug("File already exists, exiting early")
             skipped.value += 1
-        else:
+            return
+
+        query = {"AccessionNumber": item.tags["AccessionNumber"]}
+        source.find(query=query, level=item.level, retrieve=True)
+
+        # logging.debug("Retrieved id: {} vs item id: {}".format(r[0], item.oid() ))
+
+        if anonymize and not isinstance(data_dest, ImageDir):
+            # No need to anonymize if we are converting to images
+            item = source.proxy.anonymize(item, remove=True)
+
+        try:
+            item = source.proxy.get(item, view=DixelView.FILE)
+        except FileNotFoundError as e:
+            logging.error(e)
             failed.value += 1
+            return
+
+        data_dest.put(item)
+        source.proxy.delete(item)
+
+        #
+        # result = pull_and_save_item(item, source, data_dest, anonymize=anonymize)
+
+        handled.value += 1
 
         print("Handled {} items, skipped {}, failed {}".format(handled.value,
                                                                skipped.value,
