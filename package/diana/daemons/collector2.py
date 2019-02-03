@@ -122,9 +122,9 @@ class Collector(object):
         r = source.find(mkq(item))
         if not r:
             print(source)
-            print(source.gateway)
-            print(source.gateway.session)
-            print(source.gateway.session.cookies)
+            print(source.proxy.gateway)
+            print(source.proxy.gateway.session)
+            print(source.proxy.gateway.session.cookies)
             raise ConnectionError
         item.tags.update(r[0])
 
