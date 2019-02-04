@@ -45,7 +45,7 @@ if __name__ == "__main__":
     # pacs.check()
 
     bridge = Orthanc(**services["stickybridge"])
-    bridge.clear()
+    # bridge.clear()
     bridge.info()
 
     collect_corpus(worklist, pacs, dest_path)
