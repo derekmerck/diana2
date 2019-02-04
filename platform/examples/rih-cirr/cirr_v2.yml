@@ -104,7 +104,7 @@ services:
       ORTHANC_VERBOSE:          "true"
       TZ:                       "America/New_York"
     deploy:
-      replicas: 3  # Make sure it has sticky label and access via traefik
+      replicas: 1  # Make sure it has sticky label and access via traefik
       placement:
         constraints:
           - node.labels.bridge==true
@@ -112,4 +112,4 @@ services:
         - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/bridge/"
-        - "traefik.backend.loadbalancer.sticky=true"
+        - "traefik.backend.loadbalancer.stickiness=true"
