@@ -12,6 +12,7 @@ from diana.apis import *
 @click.option('--accession_number', '-a')
 @click.option('--today', is_flag=True, default=False)
 @click.option('--query', '-q', help="Query in json format", default="{}")
+@click.option('--level', '-l', default="studies")
 @click.option('--domain', '-d', help="Domain for proxied query when using Orthanc source", default=None)
 @click.option('-r', '--retrieve', default=False, is_flag=True)
 @click.pass_context
@@ -19,7 +20,7 @@ def ofind(ctx,
           source,
           accession_number,
           today,
-          query,
+          query, level,
           domain, retrieve):
     """Find studies matching yaml/json QUERY in SOURCE Orthanc or ProxiedDicom service.
      The optional proxy DOMAIN issues a remote-find to a manually proxied DICOM endpoint."""
@@ -27,7 +28,7 @@ def ofind(ctx,
 
     click.echo(click.style('Orthanc Find', underline=True, bold=True))
 
-    level = DicomLevel.STUDIES
+    level = DicomLevel.from_label(level)
     S = Serializable.Factory.create(**services.get(source))
 
     # S = Orthanc(**services.get(source))
