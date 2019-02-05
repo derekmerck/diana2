@@ -43,6 +43,6 @@ def ofind(ctx,
     if domain and hasattr(S, "rfind"):
         result = S.rfind(query, domain, DicomLevel.STUDIES, retrieve=retrieve)
     else:
-        result = S.find(query, DicomLevel.STUDIES)
+        result = S.find(query, DicomLevel.STUDIES, retrieve=retrieve)
 
     click.echo(pformat(result))

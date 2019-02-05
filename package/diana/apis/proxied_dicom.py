@@ -36,7 +36,7 @@ class ProxiedDicom(Endpoint, Serializable):
         try:
             return self.proxy.gateway.recho(self.proxy_domain) is not None
         except GatewayConnectionError as e:
-            logger.warning("Failed to connect to PProxied Endpoint")
+            logger.warning("Failed to connect to Proxied Endpoint")
             logger.error(type(e))
             logger.error(e)
             return False
