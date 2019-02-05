@@ -47,7 +47,7 @@ class Requester(object):
 
     def handle_result(self, result):
         if result.status_code > 299 or result.status_code < 200:
-            logging.debug("Cookies: {}".format(self.session.cookies))
+            # logging.debug("Cookies: {}".format(self.session.cookies))
             result.raise_for_status()
 
         # logging.debug(result.headers)

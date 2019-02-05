@@ -16,7 +16,7 @@ stop = datetime(year=2018, month=2, day=14)
 # Montage can only query by day
 step = timedelta(days=1)
 get_meta = False
-pool_size = 8
+pool_size = 4
 
 
 def collect_corpus(_worklist, _pacs, _dest_path):
@@ -32,7 +32,7 @@ def collect_corpus(_worklist, _pacs, _dest_path):
 
 if __name__ == "__main__":
 
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.WARNING)
 
     with open(services_path) as f:
         services_exp = os.path.expandvars(f.read())

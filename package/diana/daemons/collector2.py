@@ -135,12 +135,18 @@ class Collector(object):
         if not r:
             logging.error("Item {} not findable!".format(item))
             failed.value += 1
+            print("Handled {} items, skipped {}, failed {}".format(handled.value,
+                                                                   skipped.value,
+                                                                   failed.value))
             return
         item.tags.update(r[0])
 
         if not source.proxy.exists(item):
             logging.error("Item {} not retrieved!".format(item))
             failed.value += 1
+            print("Handled {} items, skipped {}, failed {}".format(handled.value,
+                                                                   skipped.value,
+                                                                   failed.value))
             return
 
         # TODO: Should report data to redis and aggregate later to avoid mp locks
@@ -158,6 +164,9 @@ class Collector(object):
         except FileNotFoundError as e:
             logging.error(e)
             failed.value += 1
+            print("Handled {} items, skipped {}, failed {}".format(handled.value,
+                                                                   skipped.value,
+                                                                   failed.value))
             return
 
         data_dest.put(item)
