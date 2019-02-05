@@ -45,7 +45,7 @@ def ofind(ctx,
         query["NumberOfStudyRelatedInstances"] = ""
     if level==DicomLevel.STUDIES and not query.get("ModalitiesInStudy"):
         query["ModalitiesInStudy"] = ""
-    if not query.find("StudyDate") and not query.find("StudyTime"):
+    if not query.get("StudyDate") and not query.get("StudyTime"):
         query["StudyDate"] = ""
         query["StudyTime"] = ""
 
