@@ -1,5 +1,6 @@
 import logging
 from typing import Mapping, Union
+from pprint import pformat
 import attr
 from ..dixel import Dixel, ShamDixel, DixelView
 from ..utils import Endpoint, Serializable
@@ -138,6 +139,9 @@ class Orthanc(Endpoint, Serializable):
 
         q = {"Level": "{!s}".format(level),
              "Query": query }
+
+        logger.debug(pformat(q))
+
         r = self.gateway.find(q)
 
         # Returns a list of OIDs
@@ -153,6 +157,8 @@ class Orthanc(Endpoint, Serializable):
 
         q = {"Level": "{!s}".format(level),
              "Query": query }
+
+        logger.debug(pformat(q))
 
         try:
             r = self.gateway.rfind(q, domain, retrieve=retrieve)
