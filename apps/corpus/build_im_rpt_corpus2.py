@@ -10,13 +10,14 @@ services_path = "/services.yml"
 pacs_svc = "pacs"
 dest_path = Path("/data/")
 montage_svc = "montage"
-query = {"q": "RADCAT4|RADCAT5", "modality": Modality.CR}
-start = datetime(year=2018, month=12, day=1)
-stop = datetime(year=2018, month=12, day=5)
+query = {"q": "", "modality": Modality.CR}
+start = datetime(year=2018, month=2, day=1)
+stop = datetime(year=2018, month=2, day=14)
 # Montage can only query by day
 step = timedelta(days=1)
 get_meta = False
-pool_size = 0
+pool_size = 8
+
 
 def collect_corpus(_worklist, _pacs, _dest_path):
 
@@ -42,10 +43,6 @@ if __name__ == "__main__":
     worklist = montage.iter_query_by_date(query, start, stop, step, get_meta)
 
     pacs = ProxiedDicom(**services[pacs_svc])
-    # pacs.check()
-
-    bridge = Orthanc(**services["stickybridge"])
-    # bridge.clear()
-    bridge.info()
+    pacs.check()
 
     collect_corpus(worklist, pacs, dest_path)
