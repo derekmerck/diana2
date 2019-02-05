@@ -41,13 +41,15 @@ def ofind(ctx,
         dt = datetime.today()
         query['StudyDate'] = dicom_date(dt)
 
-    if level==DicomLevel.STUDIES and not query.get("NumberOfStudyRelatedInstances"):
-        query["NumberOfStudyRelatedInstances"] = ""
-    if level==DicomLevel.STUDIES and not query.get("ModalitiesInStudy"):
-        query["ModalitiesInStudy"] = ""
-    if not query.get("StudyDate") and not query.get("StudyTime"):
-        query["StudyDate"] = ""
-        query["StudyTime"] = ""
+    # For simple local Orthanc find, we don't need placeholder query attribs
+    if not isinstance(S, Orthanc) and not domain:
+        if level==DicomLevel.STUDIES and not query.get("NumberOfStudyRelatedInstances"):
+            query["NumberOfStudyRelatedInstances"] = ""
+        if level==DicomLevel.STUDIES and not query.get("ModalitiesInStudy"):
+            query["ModalitiesInStudy"] = ""
+        if not query.get("StudyDate") and not query.get("StudyTime"):
+            query["StudyDate"] = ""
+            query["StudyTime"] = ""
 
     if domain and hasattr(S, "rfind"):
         result = S.rfind(query, domain, level, retrieve=retrieve)
