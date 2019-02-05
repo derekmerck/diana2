@@ -3,7 +3,8 @@ from datetime import datetime
 import click
 from diana.utils.endpoint import Serializable
 from diana.utils.dicom import DicomLevel, dicom_date
-
+# importing all apis allows them to be immediately deserialized
+from diana.apis import *
 
 @click.command(short_help="Find item by query")
 @click.argument('source')
