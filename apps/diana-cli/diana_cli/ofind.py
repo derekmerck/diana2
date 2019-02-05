@@ -1,5 +1,6 @@
 import yaml
 from datetime import datetime
+from pprint import pformat
 import click
 from diana.utils.endpoint import Serializable
 from diana.utils.dicom import DicomLevel, dicom_date
@@ -44,4 +45,4 @@ def ofind(ctx,
     else:
         result = S.find(query, DicomLevel.STUDIES)
 
-    click.echo(result)
+    click.echo(pformat(result))
