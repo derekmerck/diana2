@@ -128,3 +128,9 @@ class Orthanc(Requester):
     def changes(self, current=0, limit=10):
         params = { 'since': current, 'limit': limit }
         return self._get("changes", params=params)
+
+    def recho(self, domain):
+        resource = "modalities/{}/echo".format(domain)
+        response = self._post(resource, data=self.aet)
+        return response
+
