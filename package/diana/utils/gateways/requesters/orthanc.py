@@ -39,7 +39,6 @@ class Orthanc(Requester):
 
     def rfind(self, query, domain, retrieve=False):
         logger = logging.getLogger(name=self.name)
-
         logger.debug(pformat(query))
 
         result = []
