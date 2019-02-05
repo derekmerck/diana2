@@ -159,6 +159,7 @@ class Orthanc(Endpoint, Serializable):
              "Query": query }
 
         logger.debug(pformat(q))
+        logger.debug(retrieve)
 
         try:
             r = self.gateway.rfind(q, domain, retrieve=retrieve)
