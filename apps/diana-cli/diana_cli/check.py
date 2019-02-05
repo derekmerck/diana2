@@ -39,7 +39,6 @@ def check(ctx, endpoints):
         click.echo(out)
 
 
-
 @click.command(short_help="Get endpoint info")
 @click.argument('endpoints', nargs=-1)
 @click.pass_context
@@ -73,5 +72,3 @@ def info(ctx, endpoints):
 
         if _info:
             click.echo(pformat(_info))
-
-

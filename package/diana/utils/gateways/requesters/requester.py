@@ -5,7 +5,7 @@ from ..exceptions import GatewayConnectionError
 from ...smart_json import SmartJSONEncoder
 
 # Enabled sessions to handle cookies from Docker swarm for sticky connections
-USE_SESSIONS = False
+USE_SESSIONS = True
 
 
 def supress_urllib_debug():

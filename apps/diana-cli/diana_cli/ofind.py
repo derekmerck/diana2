@@ -1,26 +1,44 @@
 import yaml
+from datetime import datetime
 import click
-from diana.apis import Orthanc
-from diana.utils.dicom import DicomLevel
+from diana.utils.endpoint import Serializable
+from diana.utils.dicom import DicomLevel, dicom_date
 
-@click.command(short_help="Find in Orthanc node")
-@click.argument('query')
+
+@click.command(short_help="Find item by query")
 @click.argument('source')
-@click.option('--domain', help="Domain for proxied query", default=None)
+@click.option('--accession_number', '-a')
+@click.option('--today', is_flag=True, default=False)
+@click.option('--query', '-q', help="Query in json format", default="{}")
+@click.option('--domain', '-d', help="Domain for proxied query when using Orthanc source", default=None)
 @click.option('-r', '--retrieve', default=False, is_flag=True)
 @click.pass_context
-def ofind(ctx, query, source, domain, retrieve):
-    """Find studies matching yaml/json QUERY in SOURCE Orthanc service.  The optional
-    proxy DOMAIN issues a remote-find to a proxied DICOM endpoint."""
+def ofind(ctx,
+          source,
+          accession_number,
+          today,
+          query,
+          domain, retrieve):
+    """Find studies matching yaml/json QUERY in SOURCE Orthanc or ProxiedDicom service.
+     The optional proxy DOMAIN issues a remote-find to a manually proxied DICOM endpoint."""
     services = ctx.obj.get('services')
 
     click.echo(click.style('Orthanc Find', underline=True, bold=True))
 
-    S = Orthanc(**services.get(source))
+    S = Serializable.Factory.create(**services.get(source))
+
+    # S = Orthanc(**services.get(source))
     if isinstance(query, str):
         query = yaml.safe_load(query)
 
-    if domain:
+    if accession_number:
+        query["AccessionNumber"] = accession_number
+
+    if today:
+        dt = datetime.today()
+        query['StudyDate'] = dicom_date(dt)
+
+    if domain and hasattr(S, "rfind"):
         result = S.rfind(query, domain, DicomLevel.STUDIES, retrieve=retrieve)
     else:
         result = S.find(query, DicomLevel.STUDIES)

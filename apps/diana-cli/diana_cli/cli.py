@@ -70,7 +70,6 @@ def cli(ctx, verbose, services, services_path):
     ctx.obj['services'] = _services
 
 
-
 cmds = [
     check,
     info,

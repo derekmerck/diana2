@@ -37,4 +37,3 @@ def verify():
             click.echo(msg)
 
     exit(exit_code)
-
