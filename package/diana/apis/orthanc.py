@@ -132,7 +132,7 @@ class Orthanc(Endpoint, Serializable):
 
         raise FileNotFoundError("Item {} does not exist".format(item))
 
-    def find(self, query: Mapping, level=DicomLevel.STUDIES, **kwargs):
+    def find(self, query: Mapping, level=DicomLevel.STUDIES, **kwargs) -> list:
         logger = logging.getLogger(self.name)
         logger.debug("Find")
 

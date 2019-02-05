@@ -27,6 +27,7 @@ def ofind(ctx,
 
     click.echo(click.style('Orthanc Find', underline=True, bold=True))
 
+    level = DicomLevel.STUDIES
     S = Serializable.Factory.create(**services.get(source))
 
     # S = Orthanc(**services.get(source))
@@ -40,9 +41,17 @@ def ofind(ctx,
         dt = datetime.today()
         query['StudyDate'] = dicom_date(dt)
 
+    if level==DicomLevel.STUDIES and not query.get("NumberOfStudyRelatedInstances"):
+        query["NumberOfStudyRelatedInstances"] = ""
+    if level==DicomLevel.STUDIES and not query.get("ModalitiesInStudy"):
+        query["ModalitiesInStudy"] = ""
+    if not query.find("StudyDate") and not query.find("StudyTime"):
+        query["StudyDate"] = ""
+        query["StudyTime"] = ""
+
     if domain and hasattr(S, "rfind"):
-        result = S.rfind(query, domain, DicomLevel.STUDIES, retrieve=retrieve)
+        result = S.rfind(query, domain, level, retrieve=retrieve)
     else:
-        result = S.find(query, DicomLevel.STUDIES, retrieve=retrieve)
+        result = S.find(query, level, retrieve=retrieve)
 
     click.echo(pformat(result))
