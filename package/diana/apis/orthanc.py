@@ -131,7 +131,7 @@ class Orthanc(Endpoint, Serializable):
                 elif view == DixelView.META:
                     return Dixel(meta=r, level=level)
 
-        raise FileNotFoundError("Item {} does not exist".format(item))
+        raise FileNotFoundError("Item {} does not exist".format(oid))
 
     def find(self, query: Mapping, level=DicomLevel.STUDIES, **kwargs) -> list:
         logger = logging.getLogger(self.name)
@@ -140,7 +140,7 @@ class Orthanc(Endpoint, Serializable):
         q = {"Level": "{!s}".format(level),
              "Query": query }
 
-        logger.debug(pformat(q))
+        # logger.debug(pformat(q))
 
         r = self.gateway.find(q)
 
@@ -158,8 +158,8 @@ class Orthanc(Endpoint, Serializable):
         q = {"Level": "{!s}".format(level),
              "Query": query }
 
-        logger.debug(pformat(q))
-        logger.debug(retrieve)
+        # logger.debug(pformat(q))
+        # logger.debug(retrieve)
 
         try:
             r = self.gateway.rfind(q, domain, retrieve=retrieve)
@@ -185,7 +185,7 @@ class Orthanc(Endpoint, Serializable):
 
     def anonymize(self, item: Union[str, Dixel],
                   level=DicomLevel.STUDIES,
-                  replacement_map: Mapping=None,
+                  replacement_map: Mapping = None,
                   **kwargs):
 
         oid, level = self.id_from_item(item, level)
