@@ -2,6 +2,7 @@
 import click
 from pprint import pformat
 from diana.utils.endpoint import Serializable
+from diana.apis import *
 
 
 @click.command(short_help="Call endpoint method")
