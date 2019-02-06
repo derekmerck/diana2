@@ -22,7 +22,8 @@ def epdo(ctx, method, endpoint):
 
     ep = Serializable.Factory.create(**services[endpoint])
     if hasattr(ep, method):
-        out = ep.__call__(method)
+
+        out = getattr(ep, method)()
 
         if out:
             click.echo(pformat(out))
