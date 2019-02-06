@@ -1,5 +1,5 @@
 from multiprocessing import Pool, Value
-import itertools, logging
+import itertools, logging, hashlib
 from time import sleep
 from functools import partial
 from datetime import datetime, timedelta
@@ -7,9 +7,8 @@ from typing import Union, Iterable
 from pathlib import Path
 import attr
 
-from ..apis import ProxiedDicom, DcmDir, ImageDir, CsvFile, Montage, ReportDir
+from ..apis import ProxiedDicom, DcmDir, ImageDir, CsvFile, ReportDir
 from ..dixel import Dixel, DixelView
-from .routes import put_item, pull_and_save_item
 from ..utils.endpoint import Serializable
 
 handled = Value('i', 0)
@@ -34,6 +33,13 @@ class Collector(object):
     def estimate_sublist_len(self):
         return 2 * self.pool_size
 
+    @staticmethod
+    def worklist_from_accession_nums(fn: Path):
+        with open(fn) as f:
+            study_ids = f.read().splitlines()
+            print("Created study id set with {} items".format(len(study_ids)))
+            return study_ids
+
     def run(self, worklist: Iterable,
             source: ProxiedDicom,
             dest_path: Path,
@@ -49,13 +55,11 @@ class Collector(object):
             data_dest = ImageDir(path=dest_path / "images",
                                  subpath_width=2,
                                  subpath_depth=2,
-                                 anonymizing=anonymize
-                                 )
+                                 anonymizing=anonymize)
         else:
             data_dest = DcmDir(path=dest_path / "images",
                                subpath_width=2,
-                               subpath_depth=2
-                               )
+                               subpath_depth=2)
 
         if not inline_reports:
             report_dest = ReportDir(path=dest_path / "reports",
@@ -125,7 +129,7 @@ class Collector(object):
                 "StudyDescription": "",
                 "StudyInstanceUID": "",
                 "StudyDate": "",
-                "StudyTime": "",
+                "StudyTime": ""
             }
 
         # Get a fresh source, in case this is a pooled job
@@ -149,11 +153,15 @@ class Collector(object):
                                                                    failed.value))
             return
 
-        # TODO: Should report data to redis and aggregate later to avoid mp locks
-        # meta_fn = "{:04}-{:02}.csv".format(item.meta["StudyDateTime"].year,
-        #                             item.meta["StudyDateTime"].month)
+        # TODO: Fix keying
+        # if anonymize:
+        #     base_fn = hashlib.md5(item.tags["AccessionNumber"].encode("UTF-8")).hexdigest()
+        #     meta_fn = "{:02}-key.csv".format(base_fn[0:2])
+        # else:
+        #     meta_fn = "project-key.csv"
         # key = CsvFile(fp=meta_path / meta_fn)
         # key.put(item, include_report=(report_dest is not None), anonymize=anonymize)
+        # key.write()
 
         if anonymize and not isinstance(data_dest, ImageDir):
             # No need to anonymize if we are converting to images
@@ -172,12 +180,7 @@ class Collector(object):
         data_dest.put(item)
         source.proxy.delete(item)
 
-        #
-        # result = pull_and_save_item(item, source, data_dest, anonymize=anonymize)
-
         handled.value += 1
-
         print("Handled {} items, skipped {}, failed {}".format(handled.value,
                                                                skipped.value,
                                                                failed.value))
-

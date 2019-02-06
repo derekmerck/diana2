@@ -12,18 +12,20 @@ registered = Value('i', 0)
 uploaded = Value('i', 0)
 
 
-def index_file(fn, path=None, reg=None, prefix=None, counter0: Value=checked, counter1: Value=registered):
+def index_file(fn, path=None, reg=None, prefix=None,
+               _checked: Value = checked,
+               _registered: Value = registered):
 
-    counter0.value += 1
-    if counter0.value % 1000 == 0:
-        print("Indexing - {} checked".format(counter0.value))
+    _checked.value += 1
+    if _checked.value % 1000 == 0:
+        print("Indexing - {} checked".format(_checked.value))
     if not isinstance(reg, Redis):
         reg = Redis(**reg)
     try:
         d = DcmDir(path=path).get(fn, view=DixelView.TAGS)
         reg.add_to_collection(d, path=path, prefix=prefix)
         logging.info("Registered DICOM file {}".format(fn))
-        counter1.value+=1
+        _registered.value += 1
     except DicomFormatError:
         logging.debug("Skipping non-DICOM or poorly formatted file {}".format(fn))
         pass
@@ -32,15 +34,15 @@ def index_file(fn, path=None, reg=None, prefix=None, counter0: Value=checked, co
         pass
 
 
-def put_inst(fn, dest, counter: Value=uploaded):
+def put_inst(fn, dest, _uploaded: Value = uploaded):
 
     d = DcmDir().get(fn, view=DixelView.FILE)  # Don't need pydicom data
     if not isinstance(dest, Orthanc):
         dest = Orthanc(**dest)
     dest.put(d)
-    counter.value+=1
-    if counter.value % 1000 == 0:
-        print("Uploading - {} handled".format(counter.value))
+    _uploaded.value+=1
+    if _uploaded.value % 1000 == 0:
+        print("Uploading - {} handled".format(_uploaded.value))
 
 
 @attr.s
