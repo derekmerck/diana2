@@ -37,38 +37,3 @@ def check(ctx, endpoints):
             out = click.style("{}: {}".format(k, "Unimplemented health check"),
                               fg="yellow")
         click.echo(out)
-
-
-@click.command(short_help="Get endpoint info")
-@click.argument('endpoints', nargs=-1)
-@click.pass_context
-def info(ctx, endpoints):
-    """Survey status of service ENDPOINTS"""
-    services = ctx.obj.get('services')
-
-    click.echo(click.style('Services', underline=True, bold=True))
-    click.echo(pformat(services))
-    click.echo()
-
-    click.echo(click.style('Checking endpoint info', underline=True, bold=True))
-
-    for k, v in services.items():
-        if endpoints and k not in endpoints:
-            logging.debug("{} not in list".format(k))
-            continue
-        if not isinstance(v, Mapping):
-            logging.debug("{} not mapping".format(v))
-            continue
-        ep = Serializable.Factory.create(**v)
-        try:
-            _info = ep.info()
-            out = click.style("{}: {}".format(k, "Ready" if _info else "Not Ready"),
-                              fg="green" if _info else "red")
-        except NotImplementedError:
-            _info = None
-            out = click.style("{}: {}".format(k, "Unimplemented info"),
-                              fg="yellow")
-        click.echo(out)
-
-        if _info:
-            click.echo(pformat(_info))

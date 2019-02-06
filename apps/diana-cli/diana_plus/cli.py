@@ -8,15 +8,6 @@ from diana_cli.cli import cmds as cli_cmds
 
 from .ssde import ssde
 from .classify import classify
-# from diana_cli.check import check
-# from diana_cli.collect import collect
-# from diana_cli.dcm2im import dcm2im
-# from diana_cli.file_index import findex, fiup
-# from diana_cli.guid import guid
-# from diana_cli.mock import mock
-# from diana_cli.ofind import ofind
-# from diana_cli.verify import verify
-# from diana_cli.watch import watch
 
 
 @click.group(name="diana-plus")
@@ -40,18 +31,6 @@ cmds = [
     classify,
 ]
 
-# cli_cmds =[
-#     check,
-#     collect,
-#     dcm2im,
-#     findex,
-#     fiup,
-#     guid,
-#     mock,
-#     ofind,
-#     verify,
-#     watch,
-# ]
 
 for c in cmds + cli_cmds:
     cli.add_command(c)
