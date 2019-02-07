@@ -37,12 +37,11 @@ def epdo(ctx, endpoint, method, kwargs, anonymize):
     else:
         ep = Serializable.Factory.create(**services[endpoint])
 
+    _kwargs = {}
     if kwargs:
         _kargs = yaml.load(kwargs)
-    else:
-        _kwargs = {}
 
-    print(kwargs)
+    print(_kwargs)
 
     if hasattr(ep, method):
 
