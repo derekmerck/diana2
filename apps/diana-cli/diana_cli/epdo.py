@@ -6,14 +6,14 @@ from diana.apis import *
 
 
 @click.command(short_help="Call endpoint method")
-@click.argument('method', type=click.STRING)
 @click.argument('endpoint', type=click.STRING)
+@click.argument('method', type=click.STRING)
 @click.option('--kwargs', '-k', type=click.STRING)
 @click.option('--anonymize', '-a', is_flag=True, default=False)
 @click.pass_context
-def epdo(ctx, method, endpoint, kwargs, anonymize):
-    """Call METHOD on ENDPOINT.  Use "path:" for a DcmDir ep and "ipath:" for an
-     ImageDir epp.
+def epdo(ctx, endpoint, method, kwargs, anonymize):
+    """Call ENDPOINT METHOD with KWARGS.  Use "path:" for a DcmDir ep and
+    "ipath:" for an ImageDir epp.
      \b
      $ diana-cli epdo info orthanc
      $ diana-cli epdo ipath:/data exists -k '{"item":"my_file_name"}'
