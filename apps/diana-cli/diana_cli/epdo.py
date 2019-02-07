@@ -18,7 +18,7 @@ def epdo(ctx, endpoint, method, args, kwargs, anonymize, subpath_depth):
     Use "path:" for a DcmDir ep and "ipath:" for an ImageDir epp.
      \b
      $ diana-cli epdo orthanc info
-     $ diana-cli epdo ipath:/data exists -g my_file_name
+     $ diana-cli epdo ipath:/data/images exists -g my_file_name
      """
     services = ctx.obj.get('services')
 
@@ -41,9 +41,10 @@ def epdo(ctx, endpoint, method, args, kwargs, anonymize, subpath_depth):
 
     _args = []
     if args:
-        _args = yaml.load(args)
-        if not isinstance(_args, list):
-            _args = [_args]
+        _args = [args]
+        # _args = yaml.load(args)
+        # if not isinstance(_args, list):
+        #     _args = [_args]
 
     _kwargs = {}
     if kwargs:
