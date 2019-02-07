@@ -62,6 +62,7 @@ class FileHandler(object):
         fpre = self.get_path(fnre)
         logger = logging.getLogger(self.name)
         logger.debug("Checking exists {}".format(fpre))
+        logger.debug(glob(fpre))
         return glob(fpre)
         # return glob(fpre) is not []
 
