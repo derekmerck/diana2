@@ -201,7 +201,7 @@ class ImageDir(DcmDir):
         """Uses regular expression exists in gateway"""
         logger = logging.getLogger(self.name)
         logger.debug("EP EXISTS")
-        
+
         if isinstance(item, Dixel):
             item = item.tags["AccessionNumber"]
 
@@ -211,7 +211,7 @@ class ImageDir(DcmDir):
             base_fn = item
 
         fnre="{}*".format(base_fn)
-        return self.gateway.exists(fnre)
+        return self.gateway.exists_re(fnre)
 
     def put(self, item: Dixel, **kwargs):
         logger = logging.getLogger(self.name)
