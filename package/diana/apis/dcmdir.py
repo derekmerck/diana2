@@ -197,15 +197,18 @@ class ImageDir(DcmDir):
                                 subpath_width = self.subpath_width,
                                 subpath_depth = self.subpath_depth)
 
-    def exists(self, item: Dixel):
+    def exists(self, item: Union[Dixel, str]):
         """Uses regular expression exists in gateway"""
         logger = logging.getLogger(self.name)
         logger.debug("EP EXISTS")
+        
+        if isinstance(item, Dixel):
+            item = item.tags["AccessionNumber"]
 
         if self.anonymizing:
-            base_fn = hashlib.md5(item.tags["AccessionNumber"].encode("UTF-8")).hexdigest()
+            base_fn = hashlib.md5(item.encode("UTF-8")).hexdigest()
         else:
-            base_fn = item.tags["AccessionNumber"]
+            base_fn = item
 
         fnre="{}*".format(base_fn)
         return self.gateway.exists(fnre)

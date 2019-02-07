@@ -109,6 +109,7 @@ class Collector(object):
                     report_dest: ReportDir = None,
                     anonymize=True):
 
+        # TODO: This does not work?
         if data_dest.exists(item):
             logging.debug("File already exists, exiting early")
             skipped.value += 1
@@ -145,6 +146,7 @@ class Collector(object):
             return
         item.tags.update(r[0])
 
+        # TODO: Log failures so we can retry them
         if not source.proxy.exists(item):
             logging.error("Item {} not retrieved!".format(item))
             failed.value += 1
