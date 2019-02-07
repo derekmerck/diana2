@@ -8,8 +8,8 @@ from diana.apis import *
 @click.command(short_help="Call endpoint method")
 @click.argument('method', type=click.STRING)
 @click.argument('endpoint', type=click.STRING)
-@click.options('--kwargs', '-k', type=click.STRING)
-@click.options('--anonymize', '-a', is_flag=True, default=False)
+@click.option('--kwargs', '-k', type=click.STRING)
+@click.option('--anonymize', '-a', is_flag=True, default=False)
 @click.pass_context
 def epdo(ctx, method, endpoint, kwargs, anonymize):
     """Call METHOD on ENDPOINT.  Use "path:" for a DcmDir ep and "ipath:" for an
