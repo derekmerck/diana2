@@ -10,8 +10,10 @@ from diana.apis import *
 @click.argument('method', type=click.STRING)
 @click.option('--args', '-g', type=click.STRING, default=None)
 @click.option('--kwargs', '-k', type=click.STRING, default=None)
+@click.option('--anonymize', '-a', is_flag=True, default=False, help="(ImageDir only)")
+@click.option('--subpath_depth', '-b', type=int, default=0, help="Number of sub-directories to use (*Dir Only)")
 @click.pass_context
-def epdo(ctx, endpoint, method, args, kwargs):
+def epdo(ctx, endpoint, method, args, kwargs, anonymize, subpath_depth):
     """Call ENDPOINT METHOD with *args and **kwargs.
     Use "path:" for a DcmDir ep and "ipath:" for an ImageDir epp.
      \b
@@ -24,11 +26,11 @@ def epdo(ctx, endpoint, method, args, kwargs):
 
     if endpoint.startswith("path:"):
         # make a dicom dir
-        ep = DcmDir(path=endpoint[5:])
+        ep = DcmDir(path=endpoint[5:], subpath_width=2, subpath_depth=subpath_depth)
 
     elif endpoint.startswith("ipath:"):
         # make an image dir
-        ep = ImageDir(path=endpoint[6:])
+        ep = ImageDir(path=endpoint[6:], subpath_width=2, subpath_depth=subpath_depth, anonymizing=anonymize)
 
     elif not services.get(endpoint):
         click.echo(click.style("No such service {}".format(endpoint), fg="red"))
@@ -46,8 +48,6 @@ def epdo(ctx, endpoint, method, args, kwargs):
     _kwargs = {}
     if kwargs:
         _kargs = yaml.load(kwargs)
-
-    print(_kwargs)
 
     if hasattr(ep, method):
 
