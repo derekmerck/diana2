@@ -8,15 +8,15 @@ from diana.apis import *
 @click.command(short_help="Call endpoint method")
 @click.argument('endpoint', type=click.STRING)
 @click.argument('method', type=click.STRING)
+@click.option('--args', '-g', type=click.STRING, default=None)
 @click.option('--kwargs', '-k', type=click.STRING, default=None)
-@click.option('--anonymize', '-a', is_flag=True, default=False)
 @click.pass_context
-def epdo(ctx, endpoint, method, kwargs, anonymize):
-    """Call ENDPOINT METHOD with KWARGS.  Use "path:" for a DcmDir ep and
-    "ipath:" for an ImageDir epp.
+def epdo(ctx, endpoint, method, args, kwargs):
+    """Call ENDPOINT METHOD with *args and **kwargs.
+    Use "path:" for a DcmDir ep and "ipath:" for an ImageDir epp.
      \b
      $ diana-cli epdo orthanc info
-     $ diana-cli epdo ipath:/data exists -k '{"item":"my_file_name"}'
+     $ diana-cli epdo ipath:/data exists -g my_file_name
      """
     services = ctx.obj.get('services')
 
@@ -28,7 +28,7 @@ def epdo(ctx, endpoint, method, kwargs, anonymize):
 
     elif endpoint.startswith("ipath:"):
         # make an image dir
-        ep = ImageDir(path=endpoint[6:], anonymizing=anonymize)
+        ep = ImageDir(path=endpoint[6:])
 
     elif not services.get(endpoint):
         click.echo(click.style("No such service {}".format(endpoint), fg="red"))
@@ -36,6 +36,12 @@ def epdo(ctx, endpoint, method, kwargs, anonymize):
 
     else:
         ep = Serializable.Factory.create(**services[endpoint])
+
+    _args = []
+    if args:
+        _args = yaml.load(args)
+        if not isinstance(_args, list):
+            _args = [_args]
 
     _kwargs = {}
     if kwargs:
@@ -45,7 +51,7 @@ def epdo(ctx, endpoint, method, kwargs, anonymize):
 
     if hasattr(ep, method):
 
-        out = getattr(ep, method)(**_kwargs)
+        out = getattr(ep, method)(*_args, **_kwargs)
 
         if out:
             click.echo(pformat(out))
