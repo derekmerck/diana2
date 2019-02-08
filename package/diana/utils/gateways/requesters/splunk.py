@@ -27,10 +27,11 @@ class Splunk(Requester):
     hec_port = attr.ib( default="8089" )
     hec_token = attr.ib( default=None, type=str )
     index = attr.ib( default="dicom" )
+
     hostname = attr.ib( )
     @hostname.default
     def set_hostname(self):
-        socket.gethostname()
+        return socket.gethostname()
 
     def find_events(self, q, timerange=None):
         logger = logging.getLogger(self.name)
@@ -96,8 +97,8 @@ class Splunk(Requester):
         return result
 
     def put_event( self,
-                   timestamp: datetime,
                    event: Mapping,
+                   timestamp: datetime = None,
                    hostname: str = None,
                    index: str = None,
                    hec_token: str = None ):
@@ -146,7 +147,8 @@ class Splunk(Requester):
             headers = {'Authorization': 'Splunk {0}'.format(hec_token)}
 
             try:
-                result = requests.post(url, data=data, headers=headers, auth=self.auth)
+                logging.debug(headers)
+                result = requests.post(url, data=data, headers=headers)
             except requests.exceptions.ConnectionError as e:
                 raise GatewayConnectionError(e)
 

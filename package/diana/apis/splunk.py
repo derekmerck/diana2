@@ -45,6 +45,7 @@ class Splunk(Endpoint, Serializable):
             password = self.password,
             hec_port = self.hec_port,
             hec_protocol = self.hec_protocol,
+            hec_token=self.hec_token,
             index = self.index
         )
 
@@ -102,7 +103,7 @@ class Splunk(Endpoint, Serializable):
         logger.debug(hec_token)
 
         # at $time $event was reported by $host for $index with credentials $auth
-        self.gateway.put_event( timestamp=timestamp, event=event,
+        self.gateway.put_event( event=event, timestamp=timestamp,
                                 hostname=hostname, index=index, hec_token=hec_token )
 
         # Real auth description
