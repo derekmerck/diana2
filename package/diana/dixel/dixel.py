@@ -93,10 +93,10 @@ class Dixel(Serializable):
         _tags = Dixel.dictify_ds(ds)
         _tags = dicom_simplify(_tags)
 
-        logging.debug(pformat(_tags))
+        # logging.debug(pformat(_tags))
 
         # Most relevant tags for indexing, hard stop on missing a/n, mrn, or uuids
-        tags = {
+        tags = {**_tags,
             'AccessionNumber': ds.get('AccessionNumber') or ds.get('StudyInstanceUID'),
             'PatientName': str(ds.get("PatientName")) or ds.PatientID,  # Odd serializing type
             'PatientID': ds.PatientID,
@@ -123,6 +123,8 @@ class Dixel(Serializable):
             # MONOCHROME, RGB etc.
             'PhotometricInterpretation': ds[0x0028, 0x0004].value if (0x0028, 0x0004) in ds else None,
         }
+
+        logging.debug(pformat(tags))
 
         d = Dixel(meta=meta,
                   tags=tags,
@@ -284,7 +286,8 @@ class Dixel(Serializable):
         output = dict()
         for elem in ds:
             if elem.VR != 'SQ':
-                output[elem.keyword] = elem.value
+                if elem.value:
+                    output[elem.keyword] = elem.value
             else:
                 output[elem.keyword] = [Dixel.dictify_ds(item) for item in elem]
         return output
