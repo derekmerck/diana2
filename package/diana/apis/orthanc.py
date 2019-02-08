@@ -5,7 +5,7 @@ import attr
 from ..dixel import Dixel, ShamDixel, DixelView
 from ..utils import Endpoint, Serializable
 from ..utils.gateways import Orthanc as OrthancGateway, GatewayConnectionError
-from ..utils.dicom import DicomLevel
+from ..utils.dicom import DicomLevel, dicom_simplify
 
 
 def sham_map(d: ShamDixel):
@@ -106,6 +106,7 @@ class Orthanc(Endpoint, Serializable):
 
         try:
             r = self.gateway.get(oid, level, str(view))
+            r = dicom_simplify(r)
         except GatewayConnectionError as e:
             logger.warning(e)
             r = None
