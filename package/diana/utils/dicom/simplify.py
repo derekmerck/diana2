@@ -48,6 +48,7 @@ def parse_timestamps(tags):
 
     return tags
 
+
 # This allows us to standardize how ctdi keys are included in dose reports.  They exist
 # in Siemens reports, but are _not_ present on GE reports, which makes the data difficult
 # to parse with Splunk
@@ -75,6 +76,7 @@ def normalize_ctdi_vol(tags):
         pass
 
     return tags
+
 
 # Make sure that a StationName is present or introduce a sensible alternative
 def normalize_station_name(tags):
@@ -157,6 +159,7 @@ def flatten_content_sequence(tags):
         data[key] = value
 
     return data
+
 
 def flatten_structured_tags(tags):
 

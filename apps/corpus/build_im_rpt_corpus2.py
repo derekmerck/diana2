@@ -16,7 +16,8 @@ stop = datetime(year=2018, month=12, day=31)
 # Montage can only query by day
 step = timedelta(days=1)
 get_meta = False
-pool_size = 32
+pool_size = 8
+delay = 1
 
 
 def collect_corpus(_worklist, _pacs, _dest_path):
@@ -27,7 +28,8 @@ def collect_corpus(_worklist, _pacs, _dest_path):
           dest_path=_dest_path,
           inline_reports=False,
           save_as_im=True,
-          anonymize=True)
+          anonymize=True,
+          delay=delay)
 
 
 if __name__ == "__main__":

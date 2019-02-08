@@ -45,7 +45,8 @@ class Collector(object):
             dest_path: Path,
             inline_reports: bool = True,
             anonymize: bool = True,
-            save_as_im: bool = False):
+            save_as_im: bool = False,
+            delay: float=0.1):
 
         tic = datetime.now()
 
@@ -87,7 +88,7 @@ class Collector(object):
             while True:
                 result = self.pool.map(p, itertools.islice(worklist, self.sublist_len))
                 if result:
-                    sleep(0.1)
+                    sleep(delay)
                 else:
                     break
 
