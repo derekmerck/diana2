@@ -87,23 +87,3 @@ services:
       ORTHANC_PASSWORD:     ${ORTHANC_PASSWORD}
       SPLUNK_HEC_TOKEN:     ${SPLUNK_HEC_TOKEN}
       TZ:                   "America/New_York"
-
-
-
-
-
-
-
-service_secrets:
-  ---
-  dose:
-    host: orthanc-dose
-    password: "${ORTHANC_PASSWORD}"
-    polling_interval: 30
-
-  splunk:
-    host: splunk
-    default_index: dose_reports1
-    default_token: diana_tok
-    hec_tokens:
-      diana_tok: "${SPLUNK_HEC_TOKEN}"
