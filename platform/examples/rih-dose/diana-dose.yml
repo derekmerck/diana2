@@ -62,7 +62,7 @@ services:
       TZ:                   "America/New_York"
 
   diana-indexer:
-    image: derekmerck/diana
+    image: derekmerck/diana2
     # Comment out command to idle a connected diana container for testing
     working_dir: /opt/diana
     command: sh -c "git pull && diana-cli watcher -r index_instances dose splunk"
