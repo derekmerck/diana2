@@ -56,6 +56,11 @@ def normalize_ctdi_vol(tags):
     try:
         exposures = tags["X-Ray Radiation Dose Report"]["CT Acquisition"]
 
+        # If there is only a single exposure, the exposures are not _listed_
+        # Converting to a list of 1 normalizes the code.
+        if not isinstance(exposures, list):
+            tags["X-Ray Radiation Dose Report"]["CT Acquisition"] = [exposures]
+
         for exposure in exposures:
 
             if "CT Dose" not in exposure:

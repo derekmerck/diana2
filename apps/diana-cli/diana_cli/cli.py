@@ -8,7 +8,7 @@ from diana import __version__ as diana_version
 from .check import check
 from .epdo import epdo
 from .collect import collect
-from .dcm2im import dcm2im
+from .dcm2im import dcm2im, dcm2json
 from .file_index import findex, fiup
 from .guid import guid
 from .mock import mock
@@ -75,6 +75,7 @@ cmds = [
     check,
     collect,
     dcm2im,
+    dcm2json,
     epdo,
     findex,
     fiup,

@@ -1,4 +1,5 @@
 import os, logging, io, hashlib
+from pathlib import Path
 from typing import Union
 import attr
 from ..dixel import Dixel, DixelView, ShamDixel
@@ -48,7 +49,7 @@ class DcmDir(Endpoint, Serializable):
 
         logger = logging.getLogger(self.name)
         logger.debug("EP GET")
-        if isinstance(item, str):
+        if isinstance(item, str) or isinstance(item, Path):
             fn = item
         elif isinstance(item, Dixel) or hasattr(item, 'fn'):
             fn = item.fn

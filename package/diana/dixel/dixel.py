@@ -1,4 +1,5 @@
 import logging
+from pprint import pformat
 from typing import Mapping
 from dateutil import parser as DatetimeParser
 import attr
@@ -6,7 +7,7 @@ import pydicom
 import numpy as np
 from .report import RadiologyReport
 from ..utils.dicom import DicomLevel, DicomFormatError
-from ..utils import Serializable
+from ..utils import Serializable, dicom_simplify
 from ..utils.gateways import orthanc_id, Montage
 
 
@@ -88,6 +89,11 @@ class Dixel(Serializable):
         if not (ds.get('AccessionNumber') or ds.get('StudyInstanceUID')):
             logging.error(ds)
             raise DicomFormatError("No a/n or study UID")
+
+        _tags = Dixel.dictify_ds(ds)
+        _tags = dicom_simplify(_tags)
+
+        logging.debug(pformat(_tags))
 
         # Most relevant tags for indexing, hard stop on missing a/n, mrn, or uuids
         tags = {
@@ -272,6 +278,16 @@ class Dixel(Serializable):
         return "{acc}-{ser:04}-{ins:04}".format(acc=self.tags['AccessionNumber'] or self.tags['StudyInstanceUID'],
                                                 ser=self.tags["SeriesNumber"],
                                                 ins=self.tags["InstanceNumber"])
+
+    @staticmethod
+    def dictify_ds(ds):
+        output = dict()
+        for elem in ds:
+            if elem.VR != 'SQ':
+                output[elem.keyword] = elem.value
+            else:
+                output[elem.keyword] = [Dixel.dictify_ds(item) for item in elem]
+        return output
 
     def get_pixels(self):
         if self.pixels is None:
