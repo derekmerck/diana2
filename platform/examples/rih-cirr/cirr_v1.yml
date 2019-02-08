@@ -8,6 +8,8 @@ networks:
 
   service_network:
     driver: overlay
+    attachable: true
+
 
 volumes:
   postgres_data:
