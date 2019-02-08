@@ -19,6 +19,10 @@ get_meta = False
 pool_size = 8
 delay = 1
 
+# Should make num jobs and delay time dependent
+# -- 32 jobs at night with 0.1 delay
+# -- 8 during day with 1 sec delay
+
 
 def collect_corpus(_worklist, _pacs, _dest_path):
 
