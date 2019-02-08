@@ -125,7 +125,8 @@ class Orthanc(Endpoint, Serializable):
             else:
                 # Want a new file
                 if view == DixelView.TAGS:
-                    return Dixel(meta={"ID": oid}, tags=r, level=level)
+                    d = Dixel(meta={"ID": oid}, tags=r, level=level)
+                    d.update_meta()
                 elif view == DixelView.FILE:
                     d = Dixel(meta={"ID": oid}, level=level)
                     d.file = r
