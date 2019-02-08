@@ -94,9 +94,10 @@ def upload_item(fn: str, source: DcmDir, dest: Orthanc):
         dest.put(item)
 
 
-def index_item(oid: str, level: DicomLevel, source: Endpoint,
+def index_item(item: Mapping, level: DicomLevel, source: Endpoint,
                dest: Endpoint, index=None, token=None):
 
+    oid = item.get("oid")
     d = source.get(oid, level=level, view=DixelView.TAGS)
     dest.put(d, index=index, token=token)
 
