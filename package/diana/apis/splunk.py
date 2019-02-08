@@ -19,11 +19,11 @@ class Splunk(Endpoint, Serializable):
 
     protocol = attr.ib(default="http")
     host = attr.ib(default="localhost")
-    port = attr.ib(default=8088)
+    port = attr.ib(default=8089)
     path = attr.ib(default=None)
 
     hec_protocol = attr.ib(default="http")
-    hec_port = attr.ib(default=8089)
+    hec_port = attr.ib(default=8088)
     hec_token = attr.ib(default=None)
 
     index = attr.ib(default="dicom")
