@@ -105,6 +105,7 @@ class Splunk(Requester):
         logger = logging.getLogger(self.name)
 
         if not timestamp:
+            logging.warning("Did not declare timestamp, using now")
             timestamp = datetime.now()
 
         hec_token = hec_token or self.hec_token
