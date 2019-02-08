@@ -102,7 +102,7 @@ def index_item(item: Mapping, level: DicomLevel, source: Endpoint,
         d = source.get(oid, level=level, view=DixelView.TAGS)
         dest.put(d, index=index, token=token)
     except FileNotFoundError as e:
-        logging.warning("Skippping {}".format(e))
+        logging.warning("Skipping {}".format(e))
         pass
 
 

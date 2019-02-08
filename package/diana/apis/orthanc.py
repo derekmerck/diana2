@@ -106,10 +106,11 @@ class Orthanc(Endpoint, Serializable):
 
         try:
             r = self.gateway.get(oid, level, str(view))
-            r = dicom_simplify(r)
         except GatewayConnectionError as e:
             logger.warning(e)
             r = None
+
+        r = dicom_simplify(r)
 
         if r:
             if isinstance(item, Dixel):
