@@ -70,20 +70,14 @@ services:
       DIANA_SERVICES:
         environment:
           DIANA_SERVICES: >
-            {
-            	"dose": {
-            		"ctype": "ObservableOrthanc",
+            { "dose": {"ctype": "ObservableOrthanc",
             		"host": "orthanc-dose",
             		"password": "${ORTHANC_PASSWORD}",
-            		"polling_interval": 30
-            	},
-            	"splunk": {
-            		"ctype": "Splunk",
+            		"polling_interval": 30 },
+              "splunk": {"ctype": "Splunk",
             		"host": "splunk",
             		"index": "${SPLUNK_DOSE_INDEX}",
-            		"hec_token": "${SPLUNK_HEC_TOKEN}"
-            	}
-            }
+            		"hec_token": "${SPLUNK_HEC_TOKEN}" }}
       ORTHANC_PASSWORD:     ${ORTHANC_PASSWORD}
       SPLUNK_HEC_TOKEN:     ${SPLUNK_HEC_TOKEN}
       TZ:                   "America/New_York"
