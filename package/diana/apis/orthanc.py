@@ -116,6 +116,7 @@ class Orthanc(Endpoint, Serializable):
                 # Want to update with data
                 if DixelView.TAGS in view:
                     item.tags.update(r)
+                    item.update_meta()
                 elif DixelView.FILE in view:
                     item.file = r
                 elif DixelView.META in view:
