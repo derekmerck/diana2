@@ -38,7 +38,7 @@ def collect_corpus(_worklist, _pacs, _dest_path):
 
 if __name__ == "__main__":
 
-    logging.basicConfig(level=logging.WARNING)
+    logging.basicConfig(level=logging.DEBUG)
 
     with open(services_path) as f:
         services_exp = os.path.expandvars(f.read())

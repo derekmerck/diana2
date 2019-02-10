@@ -143,7 +143,9 @@ class Collector(object):
         }
 
         if key_handler:
-            if type(key_handler) == type(Manager().Queue()):
+            logging.debug(type(key_handler))
+            logging.debug(type(Queue()))
+            if type(key_handler) == type(Queue()):
                 logging.debug("Found mp keying")
                 key_handler.put((key_id, key_data))
             else:
