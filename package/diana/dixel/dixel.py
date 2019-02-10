@@ -285,9 +285,14 @@ class Dixel(Serializable):
     def dictify_ds(ds):
         output = dict()
         for elem in ds:
-            if elem.VR != 'SQ':
-                if elem.value:
-                    output[elem.keyword] = elem.value
+            if not elem.value:
+                continue
+            if elem.VR == "PN":
+                output[elem.keyword] = str(elem.value)
+            elif elem.VM != 1:
+                output[elem.keyword] = [item for item in elem]
+            elif elem.VR != 'SQ':
+                output[elem.keyword] = elem.value
             else:
                 output[elem.keyword] = [Dixel.dictify_ds(item) for item in elem]
         return output

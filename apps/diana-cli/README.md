@@ -30,16 +30,18 @@ Options:
   --help                    Show this message and exit.
 
 Commands:
-  check    Check endpoint status
-  collect  Collect and handle studies
-  dcm2im   Convert DICOM to image
-  findex   Create a persistent DICOM file index
-  fiup     Upload indexed DICOM files
-  guid     Generate a GUID
-  mock     Generate mock DICOM traffic
-  ofind    Find in Orthanc node
-  verify   Verify DIANA source code against public gist signature
-  watch    Watch sources and route events
+  check     Check endpoint status
+  collect   Collect and handle studies
+  dcm2im    Convert DICOM to image
+  dcm2json  Convert DICOM header to json
+  epdo      Call endpoint method
+  findex    Create a persistent DICOM file index
+  fiup      Upload indexed DICOM files
+  guid      Generate a GUID
+  mock      Generate mock DICOM traffic
+  ofind     Find item by query
+  verify    Verify DIANA source code against public gist signature
+  watch     Watch sources and route events
 
   SERVICES is a required platform endpoint description in yaml format.
 
@@ -84,6 +86,33 @@ Usage: diana-cli dcm2im [OPTIONS] INPATH [OUTPATH]
 
 Options:
   --help  Show this message and exit.
+```
+## dcm2json
+
+```
+Usage: diana-cli dcm2json [OPTIONS] INPATH [OUTPATH]
+
+  Convert a DICOM file or directory of files at INPATH into dictionaries and
+  save result in text image format at OUTPATH.
+
+Options:
+  --help  Show this message and exit.
+```
+## epdo
+
+```
+Usage: diana-cli epdo [OPTIONS] ENDPOINT METHOD
+
+  Call ENDPOINT METHOD with *args and **kwargs. Use "path:" for a DcmDir ep
+  and "ipath:" for an ImageDir epp.    $ diana-cli epdo orthanc info  $
+  diana-cli epdo ipath:/data/images exists -g my_file_name
+
+Options:
+  -g, --args TEXT
+  -k, --kwargs TEXT
+  -a, --anonymize              (ImageDir only)
+  -b, --subpath_depth INTEGER  Number of sub-directories to use (*Dir Only)
+  --help                       Show this message and exit.
 ```
 ## findex
 
@@ -164,15 +193,21 @@ Options:
 ## ofind
 
 ```
-Usage: diana-cli ofind [OPTIONS] QUERY SOURCE
+Usage: diana-cli ofind [OPTIONS] SOURCE
 
-  Find studies matching yaml/json QUERY in SOURCE Orthanc service.  The
-  optional proxy DOMAIN issues a remote-find to a proxied DICOM endpoint.
+  Find studies matching yaml/json QUERY in SOURCE Orthanc or ProxiedDicom
+  service. The optional proxy DOMAIN issues a remote-find to a manually
+  proxied DICOM endpoint.
 
 Options:
-  --domain TEXT   Domain for proxied query
+  -a, --accession_number TEXT
+  --today
+  -q, --query TEXT             Query in json format
+  -l, --level TEXT
+  -d, --domain TEXT            Domain for proxied query when using Orthanc
+                               source
   -r, --retrieve
-  --help          Show this message and exit.
+  --help                       Show this message and exit.
 ```
 ## verify
 
@@ -251,11 +286,13 @@ Commands:
   classify  Classify DICOM files
   collect   Collect and handle studies
   dcm2im    Convert DICOM to image
+  dcm2json  Convert DICOM header to json
+  epdo      Call endpoint method
   findex    Create a persistent DICOM file index
   fiup      Upload indexed DICOM files
   guid      Generate a GUID
   mock      Generate mock DICOM traffic
-  ofind     Find in Orthanc node
+  ofind     Find item by query
   ssde      Estimate patient size from localizer
   verify    Verify DIANA source code against public gist signature
   watch     Watch sources and route events

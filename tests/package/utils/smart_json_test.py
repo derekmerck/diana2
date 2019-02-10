@@ -22,8 +22,6 @@ def test_encoder():
     assert( data_str == expected )
 
 
-
-
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     test_encoder()

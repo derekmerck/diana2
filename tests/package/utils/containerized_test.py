@@ -3,6 +3,7 @@ import docker
 import pytest
 from diana.utils.endpoint import Containerized
 
+
 def test_containers():
 
     C = Containerized(
@@ -22,6 +23,7 @@ def test_containers():
 
     with pytest.raises(Exception):
         c = client.containers.get("testing")
+
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)

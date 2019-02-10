@@ -8,13 +8,13 @@ Mamography Biopsy Path Classification (Lourenco)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  XXXX US bx pulled and anonymized
--  Reference: [@Chu\_CMIMI\_2018]
+-  Reference: [@Chu_CMIMI_2018]
 
 Thyroid Biopsy Path Classification
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  XXXX US bx pulled and anonymized
--  Reference: [@Pan\_SAR\_2019]
+-  Reference: [@Pan_SAR_2019]
 
 Radiography
 -----------
@@ -29,7 +29,7 @@ Chest Pathology Detection
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  17,000 CR pulled and anonymized
--  Reference: [@Pan\_SPIE\_2018]
+-  Reference: [@Pan_SPIE_2018]
 
 Computed Tomography
 -------------------
@@ -48,7 +48,7 @@ TBI Detection (L Merck)
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 -  3000 CT head studies pulled and anonymized
--  Reference: [@Pan\_RSNA\_p3\_2018]
+-  Reference: [@Pan_RSNA_p3_2018]
 
 Stroke Detection (McTaggart)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -65,7 +65,7 @@ Imaging Prior to Stroke (Cutting)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  50 MR head studies pulled
--  References: [@Andere\_2018a, @Andere\_2019b]
+-  References: [@Andere_2018a, @Andere_2019b]
 
 Report Handling
 ---------------
@@ -74,7 +74,7 @@ Automatic Priority Scoring (Movson, Langlotz)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  500k reports pulled and anonymized
--  Reference: [@Zhang\_RSNA\_2018]
+-  Reference: [@Zhang_RSNA_2018]
 
 ED Imaging Order Appropriateness (Movson)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -88,4 +88,4 @@ Dose Report Handling
 --------------------
 
 -  200k reports received, summarized, and reviewed for outliers
--  References: RIH Risk Management Award, [@Merck\_Splunk\_2017]
+-  References: RIH Risk Management Award, [@Merck_Splunk_2017]

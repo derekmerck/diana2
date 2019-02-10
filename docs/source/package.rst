@@ -17,14 +17,14 @@ Installation
 
 .. code:: bash
 
-    $ pip install git+https://github.com/derekmerck/diana2/diana2/package
+   $ pip install git+https://github.com/derekmerck/diana2/diana2/package
 
 The ``diana-plus`` extras package relies on scipy, tensorflow, keras,
 and other computational packages.
 
 .. code:: bash
 
-    $ pip install git+https://github.com/derekmerck/diana2/diana2/package[plus]
+   $ pip install git+https://github.com/derekmerck/diana2/diana2/package[plus]
 
 Dependencies
 ------------

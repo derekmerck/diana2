@@ -1,4 +1,5 @@
 import logging, json
+from pprint import pformat
 from diana.apis import DcmDir
 from diana.utils import Serializable
 
@@ -24,6 +25,9 @@ def test_exists():
     logging.debug("Checking round-trip")
 
     d = D.get("IM2263")
+
+    logging.debug(pformat(d.tags))
+
     dd = d.json()
     ee = json.loads(dd)
     e = Serializable.Factory.create(**ee)
