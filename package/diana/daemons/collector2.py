@@ -144,9 +144,6 @@ class Collector(object):
         }
 
         if key_handler:
-            logging.debug(type(key_handler))
-            logging.debug(type(Queue()))
-            logging.debug(type(BaseProxy))
             if isinstance(key_handler, BaseProxy):
                 logging.debug("Found mp keying")
                 key_handler.put((key_id, key_data))

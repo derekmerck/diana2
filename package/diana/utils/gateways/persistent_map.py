@@ -45,9 +45,10 @@ class PersistentMap(ABC):
 
     def run(self):
         while True:
+            logging.debug("Checking queue: {})".format(self.queue.empty()))
             if not self.queue.empty():
                 key, item = self.queue.get(False)
-                # logging.debug("Found ({}, {})".format(key, item))
+                logging.debug("Found ({}, {})".format(key, item))
                 self.put(key, item)
             time.sleep(0.2)
 
