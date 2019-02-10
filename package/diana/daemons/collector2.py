@@ -92,7 +92,7 @@ class Collector(object):
                          data_dest=data_dest,
                          report_dest=report_dest,
                          anonymize=anonymize,
-                         key_handler=key_handler.queue)
+                         key_handler=m.Queue())
 
             while True:
                 result = self.pool.map(p, itertools.islice(worklist, self.sublist_len))
@@ -134,7 +134,7 @@ class Collector(object):
         key_id = item.tags["AccessionNumber"]
         key_data = {
             "modality": item.tags["Modality"],
-            "body_part": item.meta["BodyParts"],
+            "body_parts": item.meta["BodyParts"],
             "cpts": item.meta["CPTCodes"],
             "age": item.meta['PatientAge'],
             "sex": item.tags["PatientSex"],
@@ -143,9 +143,11 @@ class Collector(object):
         }
 
         if key_handler:
-            if type(key_handler) == type(Queue()):
+            if type(key_handler) == type(Manager().Queue()):
+                logging.debug("Found mp keying")
                 key_handler.put((key_id, key_data))
             else:
+                logging.debug("Direct keying")
                 key_handler.put(key_id, key_data)
 
         ####################
