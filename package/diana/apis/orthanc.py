@@ -110,7 +110,7 @@ class Orthanc(Endpoint, Serializable):
             logger.warning(e)
             r = None
 
-        # TODO: Ugh, this doesn't always work!
+        # TODO: Fix simplify this doesn't always work!
         # r = dicom_simplify(r)
 
         if r:
@@ -126,15 +126,18 @@ class Orthanc(Endpoint, Serializable):
                 return item
             else:
                 # Want a new file
-                if view == DixelView.TAGS:
+                if DixelView.TAGS in view:
                     d = Dixel(meta={"ID": oid}, tags=r, level=level)
                     d.update_meta()
-                elif view == DixelView.FILE:
+
+                elif DixelView.FILE in view:
                     d = Dixel(meta={"ID": oid}, level=level)
                     d.file = r
-                    return d
-                elif view == DixelView.META:
-                    return Dixel(meta=r, level=level)
+
+                elif DixelView.META in view:
+                    d = Dixel(meta=r, level=level)
+
+                return d
 
         raise FileNotFoundError("Item {} does not exist".format(oid))
 

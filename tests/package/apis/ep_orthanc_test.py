@@ -5,7 +5,7 @@ from diana.dixel import DixelView, ShamDixel
 from diana.utils.dicom import DicomLevel
 
 
-def test_orthanc_ep(setup_orthanc):
+def test_orthanc_ep(setup_orthanc0):
 
     logging.debug("Test Orthanc EP")
 
@@ -14,7 +14,9 @@ def test_orthanc_ep(setup_orthanc):
     O.check()
 
 
-def test_orthanc_upload(setup_orthanc):
+def test_orthanc_upload(setup_orthanc0):
+
+    logging.debug("Test Orthanc Upload")
 
     O = Orthanc()
 
@@ -33,6 +35,9 @@ def test_orthanc_upload(setup_orthanc):
     logging.debug( id )
 
     result = O.exists(id)
+
+    logging.debug(result)
+
     assert( result )
 
     O.delete(d)
@@ -41,7 +46,7 @@ def test_orthanc_upload(setup_orthanc):
     assert( not result )
 
 
-def test_anon(setup_orthanc):
+def test_anon(setup_orthanc0):
     O = Orthanc()
     dicom_dir = find_resource("resources/dcm")
     D = DcmDir(path=dicom_dir)
@@ -61,13 +66,13 @@ def test_anon(setup_orthanc):
                 replacement_map=rep)
 
 
-def test_psend(setup_orthanc, setup_orthanc2):
+def test_psend(setup_orthanc0, setup_orthanc1):
 
-    O = Orthanc()
+    O = Orthanc(peername="peer0")
     print(O)
     O.check()
 
-    O2 = Orthanc(port=8043, name="Orthanc2")
+    O2 = Orthanc(port=8043, peername="peer0")
     print(O2)
     O2.check()
 
@@ -76,6 +81,9 @@ def test_psend(setup_orthanc, setup_orthanc2):
 
     d = D.get("IM2263", view=DixelView.TAGS_FILE)
     O2.put(d)
+
+    logging.debug( O2.gateway._get("peers") )
+
     O2.psend(d.oid(), O)
 
     e = O.get(d.oid(), level=DicomLevel.INSTANCES)
@@ -91,10 +99,12 @@ if __name__=="__main__":
 
     from conftest import mk_orthanc
     S0 = mk_orthanc()
-    S1 = mk_orthanc(8043, 4243, 4242)
+    S1 = mk_orthanc(8043, 4243, 8042, 4242)
 
+    test_orthanc_ep(None)
+    test_orthanc_upload(None)
+    test_anon(None)
     test_psend(None, None)
-    # test_anon(None)
 
     S0.stop_container()
     S1.stop_container()

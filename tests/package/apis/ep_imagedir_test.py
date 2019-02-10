@@ -33,7 +33,8 @@ def test_conversion(tmp_path):
     os.remove(fp)
 
 
-@pytest.skip(reason="Don't want to break in-memory zip unpacking, need to test both")
+# TODO: Fix these tests - both in-memory unzip and from-disk unzip
+@pytest.mark.skip(reason="Don't want to break in-memory zip unpacking, need to test both")
 def test_unzip(tmp_path):
 
     resources_dir = find_resource("resources/dcm_zip")

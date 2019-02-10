@@ -18,7 +18,7 @@ def test_cli_help():
     assert("Check endpoint status" in result.output)
 
 
-def test_cli_svc_check(setup_orthanc, setup_redis):
+def test_cli_svc_check(setup_orthanc0, setup_redis):
     runner = CliRunner()
     services_file = find_resource("resources/test_services.yml")
     result = runner.invoke(app, [

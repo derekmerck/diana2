@@ -7,7 +7,7 @@ from diana.dixel.mock_dixel import reset_mock_seed
 from diana.utils.dicom import DicomEventType
 from diana.utils.endpoint import Watcher, Trigger
 
-from conftest import setup_orthanc, setup_orthanc2
+from conftest import setup_orthanc0, setup_orthanc1
 from interruptingcow import timeout
 
 from diana.utils.gateways.requesters import supress_urllib_debug
@@ -34,7 +34,7 @@ def mock_runner():
     print("Stopping mock site")
 
 
-def test_mock_watcher(setup_orthanc, setup_orthanc2, capfd):
+def test_mock_watcher(setup_orthanc0, setup_orthanc1, capfd):
 
     obs = ObservableProxiedDicom(proxy_desc={"port": 8043})
     watcher = Watcher()

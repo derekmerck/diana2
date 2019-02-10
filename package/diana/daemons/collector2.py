@@ -17,6 +17,12 @@ handled = Value('i', 0)
 skipped = Value('i', 0)
 failed = Value('i', 0)
 
+# TODO: Don't write key if no change
+# TODO: Don't write report if no change
+# DONE: Don't pull images if images already exist
+# TODO: Add image file hashes for each key item?
+# TODO: Add consistent patient id and datetime for each key item?
+
 
 @attr.s
 class Collector(object):
@@ -205,7 +211,6 @@ class Collector(object):
                                                                    skipped.value,
                                                                    failed.value))
             return
-
 
         if anonymize and not isinstance(data_dest, ImageDir):
             # No need to anonymize if we are converting to images

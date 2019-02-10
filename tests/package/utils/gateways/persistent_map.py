@@ -1,5 +1,5 @@
 import logging, time
-from multiprocessing import Process
+from multiprocessing import Process, Queue
 from diana.utils.gateways import PicklePMap, PickleArrayPMap, CSVArrayPMap, CSVPMap
 
 import pytest
@@ -22,6 +22,7 @@ def test_cache(tmp_path, cache_class):
 
     cache.clear()
 
+
 @pytest.mark.parametrize("cache_class",
                          (PicklePMap, CSVPMap),
                          ids=("pickle_array", "csv_array"))
@@ -30,11 +31,12 @@ def test_polling_cache(tmp_path, cache_class):
     cache = cache_class(fn="{}/cache-{{}}".format(tmp_path))
     assert (not cache.get("key1"))
 
-    p = Process(target=cache.run)
+    q = Queue()
+    p = Process(target=cache.run, args=[q])
     p.start()
-    cache.queue.put( ("key1", {"value": 100}) )
-    cache.queue.put( ("key1", {"value": 101}) )
-    cache.queue.put( ("key2", {"value": 200}) )
+    q.put( ("key1", {"value": 100}) )
+    q.put( ("key1", {"value": 101}) )
+    q.put( ("key2", {"value": 200}) )
     time.sleep(2)
     p.terminate()
 

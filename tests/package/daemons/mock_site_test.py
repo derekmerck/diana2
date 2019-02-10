@@ -49,7 +49,8 @@ def test_mock_site():
         # print("{!s}".format( next(s.instances()) ))
         assert( "{!s}".format( next(s.instances()) ) in ref_studies )
 
-def test_site_submission(setup_orthanc):
+
+def test_site_submission(setup_orthanc0):
     reset_mock_seed()
 
     O = Orthanc()

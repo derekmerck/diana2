@@ -10,6 +10,7 @@ from diana.dixel import DixelView
 from test_utils import find_resource
 from interruptingcow import timeout
 
+
 def say(self, data):
     print(data)
 
@@ -28,7 +29,8 @@ def orth_test_runner():
     O.check()
     print("Ending script")
 
-def test_orthanc_watcher(setup_orthanc, capfd):
+
+def test_orthanc_watcher(setup_orthanc0, capfd):
 
     print("Starting")
 
@@ -58,11 +60,12 @@ def test_orthanc_watcher(setup_orthanc, capfd):
         captured = capfd.readouterr()
         assert "8ea24299-e051fc03-3ae9ed25-adc22b32-971a056a" in captured.out
 
+
 if __name__ == "__main__":
 
     logging.basicConfig(level=logging.DEBUG)
-    from conftest import setup_orthanc
+    from conftest import mk_orthanc
 
-    for i in setup_orthanc():
-        logging.debug(i.dkr_container.status)
-        test_orthanc_watcher(None, None)
+    O = mk_orthanc()
+    logging.debug(O.dkr_container.status)
+    test_orthanc_watcher(None, None)

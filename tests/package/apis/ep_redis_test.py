@@ -59,6 +59,7 @@ def test_redis_ep(setup_redis):
     b = R.get(id2)
     assert( a == b )
 
+
 def test_redis_index(setup_redis):
 
     R = Redis()
