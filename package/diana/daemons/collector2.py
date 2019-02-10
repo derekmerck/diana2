@@ -84,8 +84,8 @@ class Collector(object):
                                  key_handler=key_handler)
         else:
             m = Manager()
-            key_handler.queue = m.Queue()
-            kh = Process(target=key_handler.run)
+            q = m.Queue()
+            kh = Process(target=key_handler.run, args=[q])
             kh.start()
 
             p = partial(Collector.handle_item,
@@ -93,7 +93,7 @@ class Collector(object):
                          data_dest=data_dest,
                          report_dest=report_dest,
                          anonymize=anonymize,
-                         key_handler=m.Queue())
+                         key_handler=q)
 
             while True:
                 result = self.pool.map(p, itertools.islice(worklist, self.sublist_len))

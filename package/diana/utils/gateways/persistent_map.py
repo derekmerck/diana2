@@ -40,14 +40,12 @@ class PersistentMap(ABC):
     def write_data(self, data, key):
         raise NotImplemented
 
-    # self.queue.append((key,item))
-    queue = attr.ib(init=False, factory=Queue)
-
-    def run(self):
+    def run(self, queue):
         while True:
-            logging.debug("Checking queue: {})".format(self.queue.empty()))
-            if not self.queue.empty():
-                key, item = self.queue.get(False)
+            logging.debug("Checking queue: {}".format(
+                "Empty" if queue.empty() else "Pending"))
+            if not queue.empty():
+                key, item = queue.get(False)
                 logging.debug("Found ({}, {})".format(key, item))
                 self.put(key, item)
             time.sleep(0.2)
