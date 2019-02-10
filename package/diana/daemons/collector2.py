@@ -88,15 +88,15 @@ class Collector(object):
                          report_dest=report_dest,
                          anonymize=anonymize,
                          key_handler=key_handler.queue)
-            p = Process(key_handler.run)
-            p.start()
+            kh = Process(target=key_handler.run)
+            kh.start()
             while True:
                 result = self.pool.map(p, itertools.islice(worklist, self.sublist_len))
                 if result:
                     sleep(delay)
                 else:
                     break
-            p.terminate()
+            kh.terminate()
 
         toc = datetime.now()
         elapsed_time = (toc - tic).seconds or 1
