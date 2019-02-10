@@ -1,4 +1,4 @@
-from multiprocessing import Pool, Value
+from multiprocessing import Pool, Value, Process, Queue
 import itertools, logging, hashlib
 from time import sleep
 from functools import partial
@@ -10,6 +10,7 @@ import attr
 from ..apis import ProxiedDicom, DcmDir, ImageDir, CsvFile, ReportDir
 from ..dixel import Dixel, DixelView
 from ..utils.endpoint import Serializable
+from ..utils.gateways import CSVPMap, CSVArrayPMap
 
 handled = Value('i', 0)
 skipped = Value('i', 0)
@@ -28,7 +29,6 @@ class Collector(object):
             return Pool(self.pool_size)
 
     sublist_len = attr.ib( init=False )
-
     @sublist_len.default
     def estimate_sublist_len(self):
         return 2 * self.pool_size
@@ -50,8 +50,6 @@ class Collector(object):
 
         tic = datetime.now()
 
-        meta_path = dest_path / "meta"
-
         if save_as_im:
             data_dest = ImageDir(path=dest_path / "images",
                                  subpath_width=2,
@@ -70,27 +68,35 @@ class Collector(object):
         else:
             report_dest = None
 
+        pattern = "{}/meta/key-{{}}.csv".format(dest_path)
+        fieldnames = ["id", "modality", "body_part", "cpts",
+                      "age", "sex", "status", "radcat"]
+        key_handler = CSVArrayPMap(fn=pattern, keyfield="id", fieldnames=fieldnames)
+
         if self.pool_size == 0:
             for item in worklist:
                 Collector.handle_item(item=item,
                                  source=source,
-                                 meta_path=meta_path,
                                  data_dest=data_dest,
                                  report_dest=report_dest,
-                                 anonymize=anonymize)
+                                 anonymize=anonymize,
+                                 key_handler=key_handler)
         else:
             p = partial(Collector.handle_item,
                          source=source,
-                         meta_path=meta_path,
                          data_dest=data_dest,
                          report_dest=report_dest,
-                         anonymize=anonymize)
+                         anonymize=anonymize,
+                         key_handler=key_handler.queue)
+            p = Process(key_handler.run)
+            p.start()
             while True:
                 result = self.pool.map(p, itertools.islice(worklist, self.sublist_len))
                 if result:
                     sleep(delay)
                 else:
                     break
+            p.terminate()
 
         toc = datetime.now()
         elapsed_time = (toc - tic).seconds or 1
@@ -105,20 +111,57 @@ class Collector(object):
     @staticmethod
     def handle_item(item: Dixel,
                     source: ProxiedDicom,
-                    meta_path: Path,
                     data_dest: Union[DcmDir, ImageDir],
                     report_dest: ReportDir = None,
-                    anonymize=True):
+                    anonymize: bool=True,
+                    key_handler=None):
 
-        # TODO: This does not work?
-        if data_dest.exists(item):
-            logging.debug("File already exists, exiting early")
-            skipped.value += 1
-            return
+        ####################
+        # KEYING
+        ####################
+
+        try:
+            radcat = item.report.radcat()
+        except ValueError as e:
+            logging.error(e)
+            radcat = ""
+
+        # The key handler anonymizes id by default
+        key_id = item.tags["AccessionNumber"]
+        key_data = {
+            "modality": item.tags["Modality"],
+            "body_part": item.meta["BodyParts"],
+            "cpts": item.meta["CPTCodes"],
+            "age": item.meta['PatientAge'],
+            "sex": item.tags["PatientSex"],
+            "status": item.meta["PatientStatus"],
+            "radcat": radcat
+        }
+
+        if key_handler:
+            if isinstance(key_handler, Queue):
+                key_handler.put((key_id, key_data))
+            else:
+                key_handler.put(key_id, key_data)
+
+        ####################
+        # REPORT
+        ####################
 
         if report_dest:
-            # report_dest.put(item, anonymize=anonymize)
             report_dest.put(item)
+
+        ####################
+        # IMAGES
+        ####################
+
+        if data_dest.exists(item):
+            logging.info("File already exists, exiting early")
+            skipped.value += 1
+            print("Handled {} items, skipped {}, failed {}".format(handled.value,
+                                                                   skipped.value,
+                                                                   failed.value))
+            return
 
         # Minimal data for oid and sham plus study desc
         def mkq(item):
@@ -156,15 +199,6 @@ class Collector(object):
                                                                    failed.value))
             return
 
-        # TODO: Fix keying
-        # if anonymize:
-        #     base_fn = hashlib.md5(item.tags["AccessionNumber"].encode("UTF-8")).hexdigest()
-        #     meta_fn = "{:02}-key.csv".format(base_fn[0:2])
-        # else:
-        #     meta_fn = "project-key.csv"
-        # key = CsvFile(fp=meta_path / meta_fn)
-        # key.put(item, include_report=(report_dest is not None), anonymize=anonymize)
-        # key.write()
 
         if anonymize and not isinstance(data_dest, ImageDir):
             # No need to anonymize if we are converting to images
