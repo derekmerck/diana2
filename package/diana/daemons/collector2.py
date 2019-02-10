@@ -70,7 +70,7 @@ class Collector(object):
             report_dest = None
 
         pattern = "{}/meta/key-{{}}.csv".format(dest_path)
-        fieldnames = ["id", "modality", "body_part", "cpts",
+        fieldnames = ["id", "modality", "body_parts", "cpts",
                       "age", "sex", "status", "radcat"]
         key_handler = CSVArrayPMap(fn=pattern, keyfield="id", fieldnames=fieldnames)
 
