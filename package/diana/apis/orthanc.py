@@ -110,7 +110,8 @@ class Orthanc(Endpoint, Serializable):
             logger.warning(e)
             r = None
 
-        r = dicom_simplify(r)
+        # TODO: Ugh, this doesn't always work!
+        # r = dicom_simplify(r)
 
         if r:
             if isinstance(item, Dixel):
