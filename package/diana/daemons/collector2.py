@@ -143,7 +143,7 @@ class Collector(object):
         }
 
         if key_handler:
-            if isinstance(key_handler, Queue):
+            if type(key_handler) == type(Queue()):
                 key_handler.put((key_id, key_data))
             else:
                 key_handler.put(key_id, key_data)
