@@ -39,7 +39,12 @@ class ImageFileHandler(FileHandler):
         if not os.path.exists( os.path.dirname(fp) ):
             os.makedirs(os.path.dirname(fp))
 
-        im = fromarray(data)
+        try:
+            im = fromarray(data)
+        except TypeError as e:
+            logging.error(e)
+            logging.warning("Skipping file")
+
         logging.debug(im)
 
         if np.max(im.size) > max_size:

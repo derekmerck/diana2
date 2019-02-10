@@ -4,6 +4,7 @@ from diana.dixel import DixelView
 from diana.apis import DcmDir, ImageDir
 
 from test_utils import find_resource
+import pytest
 
 
 def test_conversion(tmp_path):
@@ -32,6 +33,7 @@ def test_conversion(tmp_path):
     os.remove(fp)
 
 
+@pytest.skip(reason="Don't want to break in-memory zip unpacking, need to test both")
 def test_unzip(tmp_path):
 
     resources_dir = find_resource("resources/dcm_zip")
