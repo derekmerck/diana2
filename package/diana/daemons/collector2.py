@@ -1,4 +1,5 @@
 from multiprocessing import Pool, Value, Process, Queue, Manager
+from multiprocessing.managers import BaseProxy
 import itertools, logging, hashlib
 from time import sleep
 from functools import partial
@@ -145,7 +146,8 @@ class Collector(object):
         if key_handler:
             logging.debug(type(key_handler))
             logging.debug(type(Queue()))
-            if type(key_handler) == type(Queue()):
+            logging.debug(type(BaseProxy))
+            if isinstance(key_handler, BaseProxy):
                 logging.debug("Found mp keying")
                 key_handler.put((key_id, key_data))
             else:
