@@ -1,4 +1,4 @@
-from multiprocessing import Pool, Value, Process, Queue
+from multiprocessing import Pool, Value, Process, Queue, Manager
 import itertools, logging, hashlib
 from time import sleep
 from functools import partial
@@ -82,14 +82,18 @@ class Collector(object):
                                  anonymize=anonymize,
                                  key_handler=key_handler)
         else:
+            m = Manager()
+            key_handler.queue = m.Queue()
+            kh = Process(target=key_handler.run)
+            kh.start()
+
             p = partial(Collector.handle_item,
                          source=source,
                          data_dest=data_dest,
                          report_dest=report_dest,
                          anonymize=anonymize,
                          key_handler=key_handler.queue)
-            kh = Process(target=key_handler.run)
-            kh.start()
+
             while True:
                 result = self.pool.map(p, itertools.islice(worklist, self.sublist_len))
                 if result:
