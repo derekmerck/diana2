@@ -31,7 +31,6 @@ def test_single_trigger(capsys):
         assert "THAT" not in captured.out
 
 
-
 def test_double_trigger(capsys):
 
     print("Starting double")

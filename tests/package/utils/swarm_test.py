@@ -1,7 +1,7 @@
 import logging
 from pprint import pformat
-from distutils.version import LooseVersion
 from diana.utils.endpoint import Containerized
+
 
 def test_swarm():
     Containerized.start_swarm()

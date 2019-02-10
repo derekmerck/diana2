@@ -3,6 +3,9 @@ from test_utils import find_resource
 from diana.utils import SmartJSONEncoder
 from diana.utils.dicom import dicom_simplify
 
+
+# TODO: Test in Dixel creation!
+
 def test_simplify():
 
     dir = find_resource("resources/dose")

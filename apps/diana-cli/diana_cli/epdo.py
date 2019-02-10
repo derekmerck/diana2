@@ -16,6 +16,7 @@ from diana.apis import *
 def epdo(ctx, endpoint, method, args, kwargs, anonymize, subpath_depth):
     """Call ENDPOINT METHOD with *args and **kwargs.
     Use "path:" for a DcmDir ep and "ipath:" for an ImageDir epp.
+
      \b
      $ diana-cli epdo orthanc info
      $ diana-cli epdo ipath:/data/images exists -g my_file_name

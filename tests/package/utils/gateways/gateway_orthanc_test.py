@@ -16,4 +16,3 @@ if __name__ == "__main__":
     O = mk_orthanc()
     logging.debug(O.dkr_container.status)
     test_orthanc_gateway(None)
-

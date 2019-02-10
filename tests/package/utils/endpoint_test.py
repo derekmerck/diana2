@@ -5,6 +5,7 @@ from diana.utils import Endpoint, Serializable
 
 import pytest
 
+
 @attr.s
 class TestEP(Endpoint, Serializable):
 

@@ -1,6 +1,7 @@
 import logging, datetime
 from diana.utils.guid import GUIDMint
 
+
 def test_guids():
 
     M = GUIDMint()
@@ -43,6 +44,3 @@ def test_guids():
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     test_guids()
-
-
-

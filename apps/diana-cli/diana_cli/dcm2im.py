@@ -9,7 +9,7 @@ from diana.utils.gateways import ImageFileHandler, DcmFileHandler, TextFileHandl
 @click.pass_context
 def dcm2json(ctx, inpath, outpath):
     """Convert a DICOM file or directory of files at INPATH into
-    dictionaries and save result in text image format at OUTPATH."""
+    dictionaries and save result in json format at OUTPATH."""
 
     click.echo(click.style('Covert DICOM to JSON', underline=True, bold=True))
 

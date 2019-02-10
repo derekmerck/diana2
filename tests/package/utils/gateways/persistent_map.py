@@ -5,7 +5,9 @@ from diana.utils.gateways import PicklePMap, PickleArrayPMap, CSVArrayPMap, CSVP
 import pytest
 
 
-@pytest.mark.parametrize("cache_class", (PicklePMap, CSVPMap), ids=("pickle", "csv"))
+@pytest.mark.parametrize("cache_class",
+                         (PicklePMap, CSVPMap, PickleArrayPMap, CSVArrayPMap),
+                         ids=("pickle", "csv", "pickle_array", "csv_array"))
 def test_cache(tmp_path, cache_class):
 
     cache = cache_class(fn="{}/cache".format(tmp_path))
@@ -24,8 +26,8 @@ def test_cache(tmp_path, cache_class):
 
 
 @pytest.mark.parametrize("cache_class",
-                         (PicklePMap, CSVPMap),
-                         ids=("pickle_array", "csv_array"))
+                         (PicklePMap, CSVPMap, PickleArrayPMap, CSVArrayPMap),
+                         ids=("pickle", "csv", "pickle_array", "csv_array"))
 def test_polling_cache(tmp_path, cache_class):
 
     cache = cache_class(fn="{}/cache-{{}}".format(tmp_path))

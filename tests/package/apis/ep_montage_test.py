@@ -3,11 +3,14 @@ import yaml
 from diana.apis import Montage
 from test_utils import find_resource
 
-def test_montage():
-    # TODO: Comment out to run test
-    return True
+import pytest
 
-    # TODO: Create Mock for Montage
+
+# TODO: Create Mock for Montage
+
+@pytest.mark.skip(reason="No connection to Montage")
+def test_montage():
+
     services_file = find_resource(".secrets/lifespan_services.yml")
     with open(services_file) as f:
         services = yaml.load(f)
@@ -26,7 +29,6 @@ def test_montage():
     worklist = source.find(qdict)
 
     assert(len(worklist) == 20)
-
 
 
 if __name__ == "__main__":

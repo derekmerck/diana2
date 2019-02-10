@@ -1,5 +1,6 @@
 from diana.utils.dicom import DicomUIDMint
 
+
 def test_uid():
     umint = DicomUIDMint()
     s = umint.uid("patient", "study", "series", "instance")

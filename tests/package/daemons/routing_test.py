@@ -70,7 +70,6 @@ def test_double_route(capsys):
         assert "SERIES" in captured.out
 
 
-
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     test_double_route(None)

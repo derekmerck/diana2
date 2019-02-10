@@ -5,9 +5,6 @@ from diana.apis import Redis
 from diana.dixel import Dixel
 from diana.utils import Serializable
 
-"""
-$ docker run -p 6379:6379 -d redis
-"""
 
 @attr.s
 class Test(Serializable):

@@ -5,8 +5,6 @@ from diana.daemons import FileIndexer
 from diana.apis import Orthanc, Redis
 
 import pytest
-from conftest import setup_orthanc0, setup_redis
-
 
 # path = "/Users/derek/data/DICOM/Christianson"
 # recursion_style = "ORTHANC"
