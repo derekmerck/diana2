@@ -1,8 +1,5 @@
 # Diana-agnostic API for Splunk, with no endpoint or dixel dependencies
 
-# splunk-sdk does not support Python 3; this gateway provides a minimal
-# replacement to 'find' and 'put' events
-
 import time, logging, datetime, json as _json, socket
 from pprint import pformat
 from datetime import datetime, timedelta
@@ -18,10 +15,12 @@ from ...smart_json import SmartJSONEncoder
 
 @attr.s
 class Splunk(Requester):
+    """The official splunk-sdk is for Python2.7 only, so diana.utils.gateway
+    provides a minimal Python3 query/put replacement for data logging"""
 
     name = attr.ib(default="SplunkGateway")
     port = attr.ib( default="8088")
-    user     = attr.ib( default="admin" )
+    user = attr.ib( default="admin" )
     password = attr.ib( default="passw0rd!" )
     hec_protocol = attr.ib( default="http" )
     hec_port = attr.ib( default="8089" )

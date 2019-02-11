@@ -1,4 +1,4 @@
-DICOM Image Analysis and Archive
+![logo](resources/images/diana_logo.png) DICOM Image Analysis and Archive
 ==================
 
 Derek Merck  

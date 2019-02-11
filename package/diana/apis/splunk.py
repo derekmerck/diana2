@@ -6,7 +6,6 @@ from ..dixel import Dixel
 from ..utils.endpoint import Endpoint, Serializable
 from ..utils.dicom import DicomLevel
 from ..utils.gateways import Splunk as SplunkGateway
-# splunk-sdk is 2.7 only, so diana.utils.gateway provides a minimal query/put replacement
 
 # Suppress insecure warning
 import urllib3
@@ -14,7 +13,6 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 @attr.s
 class Splunk(Endpoint, Serializable):
-
     name = attr.ib(default="Splunk")
 
     protocol = attr.ib(default="http")
