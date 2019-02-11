@@ -6,8 +6,6 @@ from test_utils import find_resource
 import pytest
 
 
-# TODO: Create Mock for Montage
-
 @pytest.mark.skip(reason="No connection to Montage")
 def test_montage():
 

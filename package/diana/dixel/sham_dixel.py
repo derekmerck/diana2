@@ -66,11 +66,9 @@ class ShamDixel(Dixel):
 
         return sham_info
 
-
     def __attrs_post_init__(self):
-        Dixel.update_meta(self)
+        self.simplify_tags()  # Create meta dts
         self.update_shams()
-
 
     def update_shams(self):
 

@@ -1,60 +1,54 @@
-import logging, json, os
-from . import parse_dicom_datetime
-from ..smart_json  import SmartJSONEncoder
+import logging
+from . import parse_dicom_datetime as mk_time
+from .exceptions import DicomFormatError
 
 
-def parse_timestamps(tags):
+def handle_errors(err, ignore_errors):
 
-    # Convert DICOM Date/Times into ISO DateTimes
-    try:
-        t = parse_dicom_datetime(tags['StudyDate'], tags['StudyTime'])
-        tags['StudyDateTime'] = t
-    except KeyError:
-        pass
+    if ignore_errors:
+        logger = logging.getLogger("DcmSimplify")
+        logger.error(err)
+        return
+    else:
+        raise DicomFormatError()
 
-    try:
-        t = parse_dicom_datetime(tags['SeriesDate'], tags['SeriesTime'])
-        tags['SeriesDateTime'] = t
-    except KeyError:
-        pass
 
-    # # Not all instances have ObservationDateTime
-    # try:
-    #     t = parse_dicom_datetime(tags['ObservationDateTime'])
-    #     tags['ObservationDateTime'] = t
-    # except KeyError:
-    #     pass
+def parse_timestamps(tags, ignore_errors):
+    """Convert times to DT objects and infer an instance dt if needed."""
 
-    # Not all instances have an InstanceCreationDate/Time
-    try:
-        t = parse_dicom_datetime(tags['InstanceCreationDate'], tags['InstanceCreationTime'])
-        tags['InstanceCreationDateTime'] = t
-    except KeyError:
-        pass
+    if tags.get("StudyDate"):
+        tags["StudyDateTime"] = mk_time(tags.get("StudyDate"), tags.get("StudyTime"))
 
-    # We want to use InstanceCreationDate as the _time field, so create a sensible
-    # value if it's missing
-    if not tags.get('InstanceCreationDateTime'):
-        if tags.get('SeriesDateTime'):
-            tags['InstanceCreationDateTime'] = tags['SeriesDateTime']
-        elif tags.get('StudyDateTime'):
-            tags['InstanceCreationDateTime'] = tags['StudyDateTime']
-        elif tags.get('ObservationDateTime'):
-            tags['InstanceCreationDateTime'] = tags['ObservationDateTime']
-        else:
-            logger = logging.getLogger("DcmSimplify")
-            logger.warning('No creation date could be parsed from instance, series, study, or observation.')
-            pass
+    if tags.get("SeriesDate"):
+        tags["SeriesDateTime"] = mk_time(tags.get("SeriesDate"), tags.get("SeriesTime"))
+
+    if tags.get("InstanceCreationDate"):
+        tags["InstanceCreationDateTime"] = mk_time(tags.get("InstanceCreationDate"),
+                                                   tags.get("InstanceCreationTime"))
+
+    if not tags.get("InstanceCreationDateTime"):
+        tags["InstanceCreationDateTime"] = tags.get("SeriesDateTime") or \
+                                           tags.get("StudyDateTime")
+
+    if not tags.get("InstanceCreationDateTime"):
+        err = "No instance creation time identified"
+        handle_errors(err, ignore_errors)
 
     return tags
 
 
-# This allows us to standardize how ctdi keys are included in dose reports.  They exist
-# in Siemens reports, but are _not_ present on GE reports, which makes the data difficult
-# to parse with Splunk
-def normalize_ctdi_vol(tags):
+def normalize_dose_report(tags):
+    """Standardize how dose report keys and values.  Certain data is presented
+    in platform-specific ways, which makes the data difficult to parse with
+    Splunk"""
 
     try:
+
+        # Note lowercase
+        if tags.get("X-ray Radiation Dose Report"):
+            tags["X-Ray Radiation Dose Report"] = tags.get("X-ray Radiation Dose Report")
+            del tags["X-ray Radiation Dose Report"]
+
         exposures = tags["X-Ray Radiation Dose Report"]["CT Acquisition"]
 
         # If there is only a single exposure, the exposures are not _listed_
@@ -78,10 +72,34 @@ def normalize_ctdi_vol(tags):
     return tags
 
 
-# Make sure that a StationName is present or introduce a sensible alternative
-def normalize_station_name(tags):
+def impute_accession_number(tags, ignore_errors):
 
-    if "StationName" not in tags:
+    if not tags.get("AccessionNumber"):
+        try:
+            tags["AccessionNumber"] = tags["StudyInstanceUID"]
+        except KeyError:
+            tags["AccessionNumber"] = "Unknown"
+            handle_errors("No accession number/study uid identified", ignore_errors)
+
+    return tags
+
+
+def impute_patient_name(tags, ignore_errors):
+    """Make sure that a StationName is present or introduce a sensible alternative"""
+    if not tags.get("PatientName"):
+        try:
+            tags["PatientName"] = tags["PatientID"]
+        except KeyError:
+            tags["PatientName"] = "Unknown"
+            handle_errors("No patient name/id identified", ignore_errors)
+
+    return tags
+
+
+def impute_station_name(tags):
+    """Make sure that a StationName is present or introduce a sensible alternative"""
+
+    if not tags.get("StationName"):
         try:
             tags["StationName"] = tags["DeviceSerialNumber"]
         except:
@@ -90,7 +108,7 @@ def normalize_station_name(tags):
             except:
                 tags["StationName"] = "Unknown"
                 logger = logging.getLogger("DcmSimplify")
-                logger.debug('No station name identifed')
+                logger.warning('No station name identified')
 
     return tags
 
@@ -132,7 +150,7 @@ def flatten_content_sequence(tags):
             value = item['UID']
             # logger.debug('Found uid value')
         elif type_ == 'DATETIME':
-            value = parse_dicom_datetime(item['DateTime'])
+            value = mk_time(item['DateTime'])
             # logger.debug('Found date/time value')
         elif type_ == 'CODE':
             try:
@@ -169,8 +187,8 @@ def flatten_structured_tags(tags):
         key = tags['ConceptNameCodeSequence'][0]['CodeMeaning']
         value = flatten_content_sequence(tags)
 
-        t = parse_dicom_datetime(tags['ContentDate'], tags['ContentTime'])
-        value['ContentDateTime'] = t
+        dt = mk_time(tags['ContentDate'], tags['ContentTime'])
+        value['ContentDateTime'] = dt
 
         del(tags['ConceptNameCodeSequence'])
         del(tags['ContentSequence'])
@@ -182,27 +200,29 @@ def flatten_structured_tags(tags):
     return tags
 
 
-def dicom_simplify(tags):
+def dicom_simplify(tags, ignore_errors=True):
     """
     Simplify a DICOM tag set:
-
       - Standardize dates and times as Python datetime objects
       - Identify a sensible creation datetime
       - Flatten and simplify ContentSequences in the manner of Orthanc's 'simplify' parameter
-      - Add sensible defaults for missing station names and ctdi_vols in dose reports
+      - Add sensible defaults for missing station names
+      - Add sensible defaults for exposure data in dose reports
     """
+
+    # Convert timestamps to python datetimes
+    tags = parse_timestamps(tags, ignore_errors)
 
     # Flatten content sequences
     tags = flatten_structured_tags(tags)
 
-    # Convert timestamps to python datetimes
-    tags = parse_timestamps(tags)
+    # Deal with missing tags
+    tags = impute_accession_number(tags, ignore_errors)
+    tags = impute_patient_name(tags, ignore_errors)
+    tags = impute_station_name(tags)
 
-    # Deal with missing fields in ctdi_vol
-    tags = normalize_ctdi_vol(tags)
-
-    # Deal with unnamed stations
-    tags = normalize_station_name(tags)
+    # Deal with radiation exposure data
+    tags = normalize_dose_report(tags)
 
     # logger.info(pformat(tags))
 

@@ -110,15 +110,12 @@ class Orthanc(Endpoint, Serializable):
             logger.warning(e)
             r = None
 
-        # TODO: Fix simplify this doesn't always work!
-        # r = dicom_simplify(r)
-
         if r:
             if isinstance(item, Dixel):
                 # Want to update with data
                 if DixelView.TAGS in view:
                     item.tags.update(r)
-                    item.update_meta()
+                    item.simplify_tags()
                 elif DixelView.FILE in view:
                     item.file = r
                 elif DixelView.META in view:
@@ -127,8 +124,9 @@ class Orthanc(Endpoint, Serializable):
             else:
                 # Want a new file
                 if DixelView.TAGS in view:
-                    d = Dixel(meta={"ID": oid}, tags=r, level=level)
-                    d.update_meta()
+                    d = Dixel.from_orthanc(meta={"ID": oid},
+                                           tags=r,
+                                           level=level)
 
                 elif DixelView.FILE in view:
                     d = Dixel(meta={"ID": oid}, level=level)
