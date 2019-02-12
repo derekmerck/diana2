@@ -71,6 +71,9 @@ class Dixel(Serializable):
         def dictify_ds(ds):
             output = dict()
             for elem in ds:
+                if elem.keyword == "PixelData":
+                    continue
+                    # Deal with that separately
                 if not elem.value:
                     continue
                 if elem.VR == "PN":
