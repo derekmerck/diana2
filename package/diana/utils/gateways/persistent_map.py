@@ -26,7 +26,7 @@ class PersistentMap(ABC):
             key = self.keyhash_func(key)
         logging.debug("Adding to pmap")
 
-        if early_exit and key in self.observed_keys:
+        if early_exit and (key in self.observed_keys):
             logging.debug("Item already exists in pmap (from observed), skipping")
             return
 
@@ -35,7 +35,7 @@ class PersistentMap(ABC):
             for _key in data.keys():
                 self.observed_keys.add(_key)
 
-        if early_exit and key in data.keys():
+        if early_exit and (key in data.keys()):
             logging.debug("Item already exists in pmap (read file), skipping")
             return
 
@@ -65,6 +65,7 @@ class PersistentMap(ABC):
                 logging.debug("Found ({}, {})".format(key, item))
                 self.put(key, item, early_exit=early_exit)
             time.sleep(0.2)
+
 
 @attr.s
 class PicklePMap(PersistentMap):
@@ -136,14 +137,6 @@ class ArrayPMapMixin(PersistentMap):
     def clear(self):
         for be in self.backends.values():
             be.clear()
-
-    def hard_clear(self):
-        pattern = self.fn.replace("{}", "*")
-        assert( pattern.endswith(".pkl") or pattern.endswith(".csv"))
-        logging.debug(pattern)
-        for cache_fn in glob.glob(pattern):
-            logging.debug(cache_fn)
-            os.remove(cache_fn)
 
     def mk_backend(self) -> PersistentMap:
         raise NotImplementedError
