@@ -67,7 +67,7 @@ class PersistentMap(ABC):
                 key, item = queue.get(False)
                 logger.debug("Found ({}, {})".format(key, item))
                 self.put(key, item, early_exit=early_exit)
-            time.sleep(0.1)
+            time.sleep(0.01)
 
 
 @attr.s

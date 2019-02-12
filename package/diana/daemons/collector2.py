@@ -53,7 +53,7 @@ class Collector(object):
             inline_reports: bool = True,
             anonymize: bool = True,
             save_as_im: bool = False,
-            delay: float=0.1):
+            delay: float = 0.01):
 
         tic = datetime.now()
 
@@ -109,6 +109,7 @@ class Collector(object):
                     break
 
             # Finish keying if necessary
+            print("Waiting for keying to be finished")
             while not q.empty():
                 sleep(0.1)
             kh.terminate()
