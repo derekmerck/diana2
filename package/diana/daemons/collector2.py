@@ -128,7 +128,7 @@ class Collector(object):
                     source: ProxiedDicom,
                     data_dest: Union[DcmDir, ImageDir],
                     report_dest: ReportDir = None,
-                    anonymize: bool=True,
+                    anonymize: bool = True,
                     key_handler=None):
 
         ####################
@@ -155,10 +155,10 @@ class Collector(object):
 
         if key_handler:
             if isinstance(key_handler, BaseProxy):
-                logging.debug("Found mp keying")
+                # logging.debug("Found mp keying")
                 key_handler.put((key_id, key_data))
             else:
-                logging.debug("Direct keying")
+                # logging.debug("Direct keying")
                 key_handler.put(key_id, key_data)
 
         ####################
@@ -167,17 +167,17 @@ class Collector(object):
 
         if report_dest:
             if not report_dest.exists(item):
-                logging.debug("Adding report")
+                logging.info("Item {} already exists as report, exiting early".format(item.acc_num))
                 report_dest.put(item)
             else:
-                logging.debug("Skipping report")
+                logging.info("Adding item {} as report".format(item.acc_num))
 
         ####################
         # IMAGES
         ####################
 
         if data_dest.exists(item):
-            logging.info("File already exists, exiting early")
+            logging.info("Item {} already exists as images, exiting early".format(item.acc_num))
             skipped.value += 1
             print("Handled {} items, skipped {}, failed {}".format(handled.value,
                                                                    skipped.value,
@@ -191,7 +191,7 @@ class Collector(object):
                 "PatientID": "",
                 "PatientBirthDate": "",
                 "PatientSex": "",
-                "AccessionNumber": item.tags["AccessionNumber"],
+                "AccessionNumber": item.acc_num,
                 "StudyDescription": "",
                 "StudyInstanceUID": "",
                 "StudyDate": "",
@@ -203,7 +203,7 @@ class Collector(object):
 
         r = source.find(mkq(item), retrieve=True)
         if not r:
-            logging.error("Item {} not findable!".format(item))
+            logging.error("Item {} not findable!".format(item.acc_num))
             failed.value += 1
             print("Handled {} items, skipped {}, failed {}".format(handled.value,
                                                                    skipped.value,
@@ -213,7 +213,7 @@ class Collector(object):
 
         # TODO: Log failures so we can retry them
         if not source.proxy.exists(item):
-            logging.error("Item {} not retrieved!".format(item))
+            logging.error("Item {} not retrieved!".format(item.acc_num))
             failed.value += 1
             print("Handled {} items, skipped {}, failed {}".format(handled.value,
                                                                    skipped.value,
@@ -227,7 +227,7 @@ class Collector(object):
         try:
             item = source.proxy.get(item, view=DixelView.FILE)
         except FileNotFoundError as e:
-            logging.error(e)
+            logging.error("Item {} not findable!".format(item.acc_num))
             failed.value += 1
             print("Handled {} items, skipped {}, failed {}".format(handled.value,
                                                                    skipped.value,

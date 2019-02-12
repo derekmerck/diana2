@@ -239,6 +239,10 @@ class Dixel(Serializable):
         return self.tags.get('AccessionNumber')
 
     @property
+    def acc_num(self):
+        return self.tags.get("AccessionNumber")
+
+    @property
     def fn(self):
         """Filename alias for meta['Filename']"""
         return self.meta.get('FileName')
