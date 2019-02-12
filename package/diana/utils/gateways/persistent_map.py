@@ -21,13 +21,14 @@ class PersistentMap(ABC):
             os.remove(self.fn)
 
     def put(self, key, item, early_exit=True):
+        logger = logging.getLogger("PMap")
 
         if self.keyhash_func:
             key = self.keyhash_func(key)
-        logging.debug("Adding to pmap")
+        logger.debug("Adding to pmap")
 
         if early_exit and (key in self.observed_keys):
-            logging.debug("Item already exists in pmap (from observed), skipping")
+            logger.debug("Item already exists in pmap (from observed), skipping")
             return
 
         data = self.read_data(key)
@@ -36,17 +37,18 @@ class PersistentMap(ABC):
                 self.observed_keys.add(_key)
 
         if early_exit and (key in data.keys()):
-            logging.debug("Item already exists in pmap (read file), skipping")
+            logger.debug("Item already exists in pmap (read file), skipping")
             return
 
-        logging.debug("Adding item to key")
+        logger.debug("Adding item to key")
         data[key] = item
         self.write_data(data, key)
 
     def get(self, key):
+        logger = logging.getLogger("PMap")
+        logger.debug("Retrieving from pmap")
         if self.keyhash_func:
             key = self.keyhash_func(key)
-        logging.debug("Retrieving from pmap")
         data = self.read_data(key)
         return data.get(key)
 
@@ -57,14 +59,15 @@ class PersistentMap(ABC):
         raise NotImplemented
 
     def run(self, queue, early_exit=True):
+        logger = logging.getLogger("PMap")
         while True:
-            logging.debug("Checking queue: {}".format(
-                "Empty" if queue.empty() else "Pending"))
+            # logger.debug("Checking queue: {}".format(
+            #     "Empty" if queue.empty() else "Pending"))
             if not queue.empty():
                 key, item = queue.get(False)
-                logging.debug("Found ({}, {})".format(key, item))
+                logger.debug("Found ({}, {})".format(key, item))
                 self.put(key, item, early_exit=early_exit)
-            time.sleep(0.2)
+            time.sleep(1)
 
 
 @attr.s
@@ -77,13 +80,13 @@ class PicklePMap(PersistentMap):
             return {}
         with open(self.fn, "rb") as f:
             data = pickle.load(f)
-        logging.debug("READING PKL: {}".format(data))
+        # logging.debug("READING PKL: {}".format(data))
         return data
 
     def write_data(self, data, *args, **kwargs):
         with open(self.fn, "wb") as f:
             pickle.dump(data, f)
-        logging.debug("WRITING PKL: {}".format(data))
+        # logging.debug("WRITING PKL: {}".format(data))
 
 
 @attr.s
@@ -102,7 +105,7 @@ class CSVPMap(PersistentMap):
             for row in reader:
                 _key = row.pop(self.keyfield)
                 data[_key] = {**row}
-            logging.debug("READING CSV: {}".format(data))
+            # logging.debug("READING CSV: {}".format(data))
             return data
 
     def write_data(self, data, *args, **kwargs):
@@ -125,7 +128,7 @@ class CSVPMap(PersistentMap):
             writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
             writer.writeheader()
             writer.writerows(rows)
-        logging.debug("WRITING CSV: {}".format(data))
+        # logging.debug("WRITING CSV: {}".format(data))
 
 
 @attr.s

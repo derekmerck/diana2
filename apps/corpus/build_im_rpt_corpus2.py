@@ -11,13 +11,14 @@ pacs_svc = "pacs"
 dest_path = Path("/data/")
 montage_svc = "montage"
 query = {"q": "", "modality": Modality.CR}
-start = datetime(year=2018, month=7, day=1)
-stop = datetime(year=2018, month=9, day=1)
+start = datetime(year=2018, month=8, day=15)
+stop = datetime(year=2018, month=8, day=21)
 # Montage can only query by day
 step = timedelta(days=1)
 get_meta = True
-pool_size = 2
-delay = 1
+pool_size = 4
+delay = 0.1
+logging_level = logging.DEBUG
 
 # Should make num jobs and delay time dependent
 # -- 32 jobs at night with 0.1 delay
@@ -38,7 +39,7 @@ def collect_corpus(_worklist, _pacs, _dest_path):
 
 if __name__ == "__main__":
 
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging_level)
 
     with open(services_path) as f:
         services_exp = os.path.expandvars(f.read())
