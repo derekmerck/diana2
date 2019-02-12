@@ -95,7 +95,6 @@ class Orthanc(Endpoint, Serializable):
 
         self.gateway.send(oid, dest, "peers")
 
-
     def get(self, item: Union[Dixel, str],
             level: DicomLevel = DicomLevel.STUDIES,
             view: DixelView = DixelView.TAGS, **kwargs):
@@ -107,6 +106,7 @@ class Orthanc(Endpoint, Serializable):
         try:
             r = self.gateway.get(oid, level, str(view))
         except GatewayConnectionError as e:
+            e = "Gateway connection error"
             logger.warning(e)
             r = None
 
@@ -169,7 +169,7 @@ class Orthanc(Endpoint, Serializable):
 
         try:
             r = self.gateway.rfind(q, domain, retrieve=retrieve)
-        except Exception as e:
+        except GatewayConnectionError as e:
             logger.warning(e)
             r = None
 
@@ -229,18 +229,14 @@ class Orthanc(Endpoint, Serializable):
             logger.error(e)
             return False
 
-
     def patients(self):
         return self.gateway.inventory(level=DicomLevel.PATIENTS)
-
 
     def studies(self):
         return self.gateway.inventory(level=DicomLevel.STUDIES)
 
-
     def series(self):
         return self.gateway.inventory(level=DicomLevel.SERIES)
-
 
     def instances(self):
         return self.gateway.inventory(level=DicomLevel.INSTANCES)

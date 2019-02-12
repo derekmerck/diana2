@@ -54,7 +54,8 @@ class Requester(object):
     def make_url(self, resource):
         return "{}/{}".format( self.base_url, resource )
 
-    def handle_result(self, result):
+    @staticmethod
+    def handle_result(result):
         if result.status_code > 299 or result.status_code < 200:
             # logging.debug("Cookies: {}".format(self.session.cookies))
             result.raise_for_status()
@@ -93,10 +94,11 @@ class Requester(object):
                 result = self.session.put(url, data=data, headers=headers,timeout=TIMEOUTS)
             else:
                 result = requests.put(url, data=data, headers=headers, auth=self.auth)
-        except requests.exceptions.ConnectionError as e:
-            raise GatewayConnectionError(e)
         except requests.exceptions.Timeout as e:
             raise GatewayConnectionError("Response timed out")
+        except (requests.exceptions.ConnectionError,
+                requests.exceptions.HTTPError) as e:
+            raise GatewayConnectionError(e)
         return self.handle_result(result)
 
     def _post(self, resource, json=None, data=None, headers=None):
@@ -110,10 +112,11 @@ class Requester(object):
                 result = self.session.post(url, data=data, headers=headers,timeout=TIMEOUTS)
             else:
                 result = requests.post(url, data=data, headers=headers, auth=self.auth)
-        except requests.exceptions.ConnectionError as e:
-            raise GatewayConnectionError(e)
         except requests.exceptions.Timeout as e:
             raise GatewayConnectionError("Response timed out")
+        except (requests.exceptions.ConnectionError,
+                requests.exceptions.HTTPError) as e:
+            raise GatewayConnectionError(e)
         return self.handle_result(result)
 
     def _delete(self, resource, headers=None):
@@ -125,8 +128,9 @@ class Requester(object):
                 result = self.session.delete(url, headers=headers)
             else:
                 result = requests.delete(url, headers=headers, auth=self.auth)
-        except requests.exceptions.ConnectionError as e:
-            raise GatewayConnectionError(e)
         except requests.exceptions.Timeout as e:
             raise GatewayConnectionError("Response timed out")
+        except (requests.exceptions.ConnectionError,
+                requests.exceptions.HTTPError) as e:
+            raise GatewayConnectionError(e)
         return self.handle_result(result)
