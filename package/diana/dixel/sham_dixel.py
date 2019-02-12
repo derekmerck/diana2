@@ -7,6 +7,7 @@ from . import Dixel
 from ..utils.gateways import orthanc_id
 from ..utils.guid import GUIDMint
 from ..utils.dicom import dicom_date, dicom_name, dicom_datetime, DicomLevel, DicomUIDMint
+from ..utils.dicom.uid_mint import hash_str
 
 def mktime(datestr, timestr=""):
     if not datestr and not timestr:
@@ -210,8 +211,12 @@ class ShamDixel(Dixel):
     @property
     def image_base_fn(self):
         """Filename for shammed image instance"""
+
+        ser_num = self.tags.get("SeriesNumber",
+                                hash_str(self.tags["SeriesInstanceUID"]), 4)
+        inst_num = self.tags.get("InstanceNumber",
+                                 hash_str(self.tags["SOPInstanceUID"]), 4)
+
         return "{acc}-{ser:04}-{ins:04}".format(acc=self.meta['ShamAccessionNumber'],
-                                                ser=self.tags["SeriesNumber"],
-                                                ins=self.tags["InstanceNumber"])
-
-
+                                                ser=ser_num,
+                                                ins=inst_num)

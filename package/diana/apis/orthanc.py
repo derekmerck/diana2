@@ -106,7 +106,7 @@ class Orthanc(Endpoint, Serializable):
         try:
             r = self.gateway.get(oid, level, str(view))
         except GatewayConnectionError as e:
-            e = "Gateway connection error"
+            # e = "Gateway connection error"
             logger.warning(e)
             r = None
 
@@ -170,7 +170,7 @@ class Orthanc(Endpoint, Serializable):
         try:
             r = self.gateway.rfind(q, domain, retrieve=retrieve)
         except GatewayConnectionError as e:
-            e = "Gateway connection error"
+            # e = "Gateway connection error"
             logger.warning(e)
             r = None
 
@@ -180,8 +180,6 @@ class Orthanc(Endpoint, Serializable):
     def delete(self, item: Union[str, Dixel], level=DicomLevel.STUDIES, **kwargs):
         logger = logging.getLogger(self.name)
         logger.debug("Delete")
-
-        # logger.debug(item)
 
         oid, level = self.id_from_item(item, level)
         r = self.gateway.delete(oid, level)
