@@ -74,11 +74,13 @@ class Requester(object):
                 result = self.session.get(url, params=params, headers=headers, timeout=TIMEOUTS)
             else:
                 result = requests.get(url, params=params, headers=headers, auth=self.auth)
-            return self.handle_result(result)
 
         except (requests.exceptions.ConnectionError,
                 requests.exceptions.HTTPError) as e:
             raise GatewayConnectionError(e)
+        except requests.exceptions.Timeout as e:
+            raise GatewayConnectionError("Response timed out")
+        return self.handle_result(result)
 
     def _put(self, resource, json=None, data=None, headers=None):
         logger = logging.getLogger(self.name)
@@ -93,6 +95,8 @@ class Requester(object):
                 result = requests.put(url, data=data, headers=headers, auth=self.auth)
         except requests.exceptions.ConnectionError as e:
             raise GatewayConnectionError(e)
+        except requests.exceptions.Timeout as e:
+            raise GatewayConnectionError("Response timed out")
         return self.handle_result(result)
 
     def _post(self, resource, json=None, data=None, headers=None):
@@ -108,6 +112,8 @@ class Requester(object):
                 result = requests.post(url, data=data, headers=headers, auth=self.auth)
         except requests.exceptions.ConnectionError as e:
             raise GatewayConnectionError(e)
+        except requests.exceptions.Timeout as e:
+            raise GatewayConnectionError("Response timed out")
         return self.handle_result(result)
 
     def _delete(self, resource, headers=None):
@@ -121,4 +127,6 @@ class Requester(object):
                 result = requests.delete(url, headers=headers, auth=self.auth)
         except requests.exceptions.ConnectionError as e:
             raise GatewayConnectionError(e)
+        except requests.exceptions.Timeout as e:
+            raise GatewayConnectionError("Response timed out")
         return self.handle_result(result)
