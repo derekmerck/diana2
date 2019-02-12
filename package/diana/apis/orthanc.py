@@ -181,7 +181,7 @@ class Orthanc(Endpoint, Serializable):
         logger = logging.getLogger(self.name)
         logger.debug("Delete")
 
-        logger.debug(item)
+        # logger.debug(item)
 
         oid, level = self.id_from_item(item, level)
         r = self.gateway.delete(oid, level)

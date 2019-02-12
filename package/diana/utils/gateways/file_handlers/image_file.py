@@ -58,3 +58,5 @@ class ImageFileHandler(FileHandler):
 
         im.save(fp)
 
+    def get(self, fn: str):
+        raise NotImplementedError("Can not create a DICOM object from an image file.")
