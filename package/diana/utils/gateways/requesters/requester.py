@@ -7,6 +7,11 @@ from ...smart_json import SmartJSONEncoder
 # Enabled sessions to handle cookies from Docker swarm for sticky connections
 USE_SESSIONS = True
 
+NORMAL_TO = (2, 20)
+LARGE_TO = (2, 120)
+
+TIMEOUTS = NORMAL_TO
+
 
 def supress_urllib_debug():
     logging.getLogger("urllib3").setLevel(logging.WARNING)
@@ -42,6 +47,10 @@ class Requester(object):
         if self.user:
             self.auth = (self.user, self.password)
 
+        if USE_SESSIONS:
+            self.session.auth = self.auth
+            self.session.timeout = NORMAL_TO
+
     def make_url(self, resource):
         return "{}/{}".format( self.base_url, resource )
 
@@ -62,7 +71,7 @@ class Requester(object):
         url = self.make_url(resource)
         try:
             if USE_SESSIONS:
-                result = self.session.get(url, params=params, headers=headers, auth=self.auth)
+                result = self.session.get(url, params=params, headers=headers)
             else:
                 result = requests.get(url, params=params, headers=headers, auth=self.auth)
             return self.handle_result(result)
@@ -79,7 +88,7 @@ class Requester(object):
             data = _json.dumps(json, cls=SmartJSONEncoder)
         try:
             if USE_SESSIONS:
-                result = self.session.put(url, data=data, headers=headers, auth=self.auth)
+                result = self.session.put(url, data=data, headers=headers)
             else:
                 result = requests.put(url, data=data, headers=headers, auth=self.auth)
         except requests.exceptions.ConnectionError as e:
@@ -94,7 +103,7 @@ class Requester(object):
             data = _json.dumps(json, cls=SmartJSONEncoder)
         try:
             if USE_SESSIONS:
-                result = self.session.post(url, data=data, headers=headers, auth=self.auth)
+                result = self.session.post(url, data=data, headers=headers)
             else:
                 result = requests.post(url, data=data, headers=headers, auth=self.auth)
         except requests.exceptions.ConnectionError as e:
@@ -107,7 +116,7 @@ class Requester(object):
         url = self.make_url(resource)
         try:
             if USE_SESSIONS:
-                result = self.session.delete(url, headers=headers, auth=self.auth)
+                result = self.session.delete(url, headers=headers)
             else:
                 result = requests.delete(url, headers=headers, auth=self.auth)
         except requests.exceptions.ConnectionError as e:
