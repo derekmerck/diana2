@@ -27,7 +27,7 @@ class PersistentMap(ABC):
         logging.debug("Adding to pmap")
 
         if early_exit and key in self.observed_keys:
-            logging.debug("Item already exists in pmap, skipping")
+            logging.debug("Item already exists in pmap (from observed), skipping")
             return
 
         data = self.read_data(key)
@@ -36,7 +36,7 @@ class PersistentMap(ABC):
                 self.observed_keys.add(_key)
 
         if early_exit and key in data.keys():
-            logging.debug("Item already exists in pmap, skipping")
+            logging.debug("Item already exists in pmap (read file), skipping")
             return
 
         logging.debug("Adding item to key")
@@ -56,14 +56,14 @@ class PersistentMap(ABC):
     def write_data(self, data, key):
         raise NotImplemented
 
-    def run(self, queue):
+    def run(self, queue, early_exit=True):
         while True:
             logging.debug("Checking queue: {}".format(
                 "Empty" if queue.empty() else "Pending"))
             if not queue.empty():
                 key, item = queue.get(False)
                 logging.debug("Found ({}, {})".format(key, item))
-                self.put(key, item)
+                self.put(key, item, early_exit=early_exit)
             time.sleep(0.2)
 
 @attr.s

@@ -91,7 +91,7 @@ class Collector(object):
         else:
             m = Manager()
             q = m.Queue()
-            kh = Process(target=key_handler.run, args=[q])
+            kh = Process(target=key_handler.run, args=[q], kwargs={"early_exit": True})
             kh.start()
 
             p = partial(Collector.handle_item,

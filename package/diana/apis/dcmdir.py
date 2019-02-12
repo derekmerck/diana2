@@ -179,7 +179,7 @@ class ReportDir(DcmDir):
             base_fn = item.tags["AccessionNumber"]
 
         fn = "{}.txt".format(base_fn)
-        self.gateway.exists(fn)
+        return self.gateway.exists(fn)
 
     def put(self, item: Dixel, **kwargs):
         logger = logging.getLogger(self.name)
