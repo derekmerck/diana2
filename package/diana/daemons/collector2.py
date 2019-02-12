@@ -107,6 +107,10 @@ class Collector(object):
                     sleep(delay)
                 else:
                     break
+
+            # Finish keying if necessary
+            while not q.empty():
+                sleep(0.1)
             kh.terminate()
 
         toc = datetime.now()
