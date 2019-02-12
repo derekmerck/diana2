@@ -53,7 +53,6 @@ class Montage(Endpoint, Serializable):
                     raise e
         return ret
 
-
     def get_meta(self, item: Dixel):
         cpts = self.gateway.lookup_cpts(item.meta["MontageCPTCodes"])
         body_part = self.gateway.lookup_body_part(item.meta["MontageCPTCodes"])

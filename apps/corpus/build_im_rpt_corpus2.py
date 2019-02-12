@@ -11,7 +11,7 @@ pacs_svc = "pacs"
 dest_path = Path("/data/")
 montage_svc = "montage"
 query = {"q": "", "modality": Modality.CR}
-start = datetime(year=2018, month=8, day=22)
+start = datetime(year=2018, month=8, day=28)
 stop = datetime(year=2018, month=8, day=30)
 # Montage can only query by day
 step = timedelta(days=1)

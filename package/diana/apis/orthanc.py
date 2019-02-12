@@ -170,6 +170,7 @@ class Orthanc(Endpoint, Serializable):
         try:
             r = self.gateway.rfind(q, domain, retrieve=retrieve)
         except GatewayConnectionError as e:
+            e = "Gateway connection error"
             logger.warning(e)
             r = None
 
@@ -203,7 +204,6 @@ class Orthanc(Endpoint, Serializable):
                 raise ValueError("Anonymization requires a replacement map or dixel shams")
 
         return self.gateway.anonymize(oid, level, replacement_map)
-
 
     def check(self):
         logger = logging.getLogger(self.name)
@@ -240,4 +240,3 @@ class Orthanc(Endpoint, Serializable):
 
     def instances(self):
         return self.gateway.inventory(level=DicomLevel.INSTANCES)
-
