@@ -7,10 +7,10 @@ from ...smart_json import SmartJSONEncoder
 # Enabled sessions to handle cookies from Docker swarm for sticky connections
 USE_SESSIONS = True
 
-NORMAL_TO = (3.1, 12.1)
-LARGE_TO = (3.1, 60.1)
+NORMAL_TIMEOUT = (3.1, 12.1)
+LARGE_TIMEOUT  = (6.1, 60.1)
 
-TIMEOUTS = NORMAL_TO
+TIMEOUTS = LARGE_TIMEOUT
 
 
 def supress_urllib_debug():

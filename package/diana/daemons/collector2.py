@@ -154,7 +154,7 @@ class Collector(object):
             "radcat": radcat
         }
 
-        if key_handler:
+        if key_handler and key_id and key_data:
             if isinstance(key_handler, BaseProxy):
                 # logging.debug("Found mp keying")
                 key_handler.put((key_id, key_data))

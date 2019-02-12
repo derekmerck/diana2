@@ -16,8 +16,8 @@ stop = datetime(year=2018, month=10, day=1)
 # Montage can only query by day
 step = timedelta(days=1)
 get_meta = True
-pool_size = 8
-delay = 0.1
+pool_size = 32
+delay = 0.01
 logging_level = logging.DEBUG
 
 # Should make num jobs and delay time dependent
