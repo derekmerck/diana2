@@ -14,7 +14,7 @@ class PersistentMap(ABC):
 
     keyhash_func = attr.ib( default=md5_digest )
     fn = attr.ib( type=str, default=None )
-    observed_keys = attr.ib( init=False, type=set)
+    observed_keys = attr.ib( init=False, factory=set)
 
     def clear(self):
         if os.path.isfile(self.fn):
