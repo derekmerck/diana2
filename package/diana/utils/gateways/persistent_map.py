@@ -14,16 +14,32 @@ class PersistentMap(ABC):
 
     keyhash_func = attr.ib( default=md5_digest )
     fn = attr.ib( type=str, default=None )
+    observed_keys = attr.ib( init=False, type=set)
 
     def clear(self):
         if os.path.isfile(self.fn):
             os.remove(self.fn)
 
-    def put(self, key, item):
+    def put(self, key, item, early_exit=True):
+
         if self.keyhash_func:
             key = self.keyhash_func(key)
         logging.debug("Adding to pmap")
+
+        if early_exit and key in self.observed_keys:
+            logging.debug("Item already exists in pmap, skipping")
+            return
+
         data = self.read_data(key)
+        if early_exit:
+            for _key in data.keys():
+                self.observed_keys.add(_key)
+
+        if early_exit and key in data.keys():
+            logging.debug("Item already exists in pmap, skipping")
+            return
+
+        logging.debug("Adding item to key")
         data[key] = item
         self.write_data(data, key)
 

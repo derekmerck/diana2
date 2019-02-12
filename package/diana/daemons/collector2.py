@@ -162,7 +162,11 @@ class Collector(object):
         ####################
 
         if report_dest:
-            report_dest.put(item)
+            if not report_dest.exists(item):
+                logging.debug("Adding report")
+                report_dest.put(item)
+            else:
+                logging.debug("Skipping report")
 
         ####################
         # IMAGES
