@@ -213,9 +213,9 @@ class ShamDixel(Dixel):
         """Filename for shammed image instance"""
 
         ser_num = self.tags.get("SeriesNumber",
-                                hash_str(self.tags["SeriesInstanceUID"]), 4)
+                                hash_str(self.tags["SeriesInstanceUID"], 4))
         inst_num = self.tags.get("InstanceNumber",
-                                 hash_str(self.tags["SOPInstanceUID"]), 4)
+                                 hash_str(self.tags["SOPInstanceUID"], 4))
 
         return "{acc}-{ser:04}-{ins:04}".format(acc=self.meta['ShamAccessionNumber'],
                                                 ser=ser_num,
