@@ -40,6 +40,9 @@ def collect_corpus(_worklist, _pacs, _dest_path):
 if __name__ == "__main__":
 
     logging.basicConfig(level=logging_level)
+    logging.getLogger("PMap").setLevel(logging.WARNING)
+    from diana.utils.gateways import supress_urllib_debug
+    supress_urllib_debug()
 
     with open(services_path) as f:
         services_exp = os.path.expandvars(f.read())
