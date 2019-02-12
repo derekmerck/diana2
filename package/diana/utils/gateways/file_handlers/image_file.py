@@ -49,12 +49,12 @@ class ImageFileHandler(FileHandler):
 
         if np.max(im.size) > max_size:
             logging.debug("Resizing")
-            logging.debug(data.shape)
+            # logging.debug(data.shape)
             _max = np.max(im.size)
             new_size = np.int32((im.size / _max) * max_size)
-            logging.debug(new_size)
+            # logging.debug(new_size)
             im = im.resize(new_size)
-            logging.debug(im)
+            # logging.debug(im)
 
         im.save(fp)
 
