@@ -254,7 +254,6 @@ class Dixel(Serializable):
                                                 ser=self.tags["SeriesNumber"],
                                                 ins=self.tags["InstanceNumber"])
 
-
     def get_pixels(self):
         if self.pixels is None:
             raise TypeError

@@ -18,7 +18,6 @@ class ImageFileHandler(FileHandler):
 
         data = np.float32(data)
 
-
         data = np.maximum(data, -1024)
         data -= np.min(data)
         data /= 2**12
@@ -44,8 +43,9 @@ class ImageFileHandler(FileHandler):
         except TypeError as e:
             logging.error(e)
             logging.warning("Skipping file")
+            return
 
-        logging.debug(im)
+        # logging.debug(im)
 
         if np.max(im.size) > max_size:
             logging.debug("Resizing")

@@ -61,7 +61,6 @@ class Montage(Endpoint, Serializable):
         item.meta['BodyParts'] = body_part
         return item
 
-
     def check(self):
         logger = logging.getLogger(self.name)
         logger.debug("Check")
