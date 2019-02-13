@@ -56,11 +56,11 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
 
     D = mk_diana_rest()
-    test_rest_guid(D, None, None)
+    test_rest_guid(D)
 
     from conftest import mk_orthanc, mk_redis
 
     O = mk_orthanc()
     R = mk_redis()
 
-    test_rest_check(D)
+    test_rest_check(D, None, None)
