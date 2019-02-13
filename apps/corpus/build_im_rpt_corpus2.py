@@ -5,23 +5,26 @@ from diana.apis import Montage, ProxiedDicom
 from diana.daemons.collector2 import Collector
 from diana.utils.gateways import MontageModality as Modality
 
+# 18/7/1 - 18/9/14 done
+# 19/1/1 - 19/2/1 images
+
 # CONFIG
 services_path = "/services.yml"
 pacs_svc = "pacs"
 dest_path = Path("/data/")
 montage_svc = "montage"
 query = {"q": "", "modality": Modality.CR}
-start = datetime(year=2018, month=9, day=1)
-stop = datetime(year=2018, month=10, day=1)
+start = datetime(year=2019, month=1, day=1)
+stop = datetime(year=2019, month=2, day=1)
 # Montage can only query by day
 step = timedelta(days=1)
 get_meta = True
-pool_size = 32
+pool_size = 4
 delay = 0.01
 logging_level = logging.DEBUG
 
 # Should make num jobs and delay time dependent
-# -- 32 jobs at night with 0.1 delay
+# -- 16 jobs at night with 0.1 delay
 # -- 8 during day with 1 sec delay
 
 
