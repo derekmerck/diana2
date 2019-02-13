@@ -63,7 +63,8 @@ services:
 
   diana-indexer:
     image: derekmerck/diana2
-    # command: sh -c "git pull && diana-cli watcher -r index_instances dose splunk"
+    # command: sh -c "git pull && diana-cli watch -r index_instances dose splunk"
+    command: diana-cli watch -r index_instances dose splunk
     networks:
       - service_network
     environment:

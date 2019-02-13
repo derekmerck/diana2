@@ -5,9 +5,9 @@ from diana.apis import Montage, ProxiedDicom
 from diana.daemons.collector2 import Collector
 from diana.utils.gateways import MontageModality as Modality
 
-# 18/1/1 - ?
-# 18/7/1 - 18/9/14 done
-# 19/1/1 - 19/1/17 done
+# 17/11/01 - 17/11/12 done
+# 18/07/01 - 18/09/14 done
+# 19/01/01 - 19/01/17 done
 
 # CONFIG
 services_path = "/services.yml"
