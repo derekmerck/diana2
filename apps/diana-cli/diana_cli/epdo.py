@@ -9,11 +9,12 @@ from diana.apis import *
 @click.argument('endpoint', type=click.STRING)
 @click.argument('method', type=click.STRING)
 @click.option('--args', '-g', type=click.STRING, default=None)
+@click.option('--mapped_arg', '-m', type=click.STRING, default=None)
 @click.option('--kwargs', '-k', type=click.STRING, default=None)
 @click.option('--anonymize', '-a', is_flag=True, default=False, help="(ImageDir only)")
 @click.option('--subpath_depth', '-b', type=int, default=0, help="Number of sub-directories to use (*Dir Only)")
 @click.pass_context
-def epdo(ctx, endpoint, method, args, kwargs, anonymize, subpath_depth):
+def epdo(ctx, endpoint, method, args, map_arg, kwargs, anonymize, subpath_depth):
     """Call ENDPOINT METHOD with *args and **kwargs.
     Use "path:" for a DcmDir ep and "ipath:" for an ImageDir epp.
 
@@ -43,9 +44,10 @@ def epdo(ctx, endpoint, method, args, kwargs, anonymize, subpath_depth):
     _args = []
     if args:
         _args = [args]
-        # _args = yaml.load(args)
-        # if not isinstance(_args, list):
-        #     _args = [_args]
+    elif map_arg:
+        _args = yaml.load(map_arg)
+        if not isinstance(_args, list):
+            _args = [_args]
 
     _kwargs = {}
     if kwargs:
