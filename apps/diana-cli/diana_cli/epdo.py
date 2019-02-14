@@ -9,7 +9,7 @@ from diana.apis import *
 @click.argument('endpoint', type=click.STRING)
 @click.argument('method', type=click.STRING)
 @click.option('--args', '-g', type=click.STRING, default=None)
-@click.option('--mapped_arg', '-m', type=click.STRING, default=None)
+@click.option('--map_arg', '-m', type=click.STRING, default=None)
 @click.option('--kwargs', '-k', type=click.STRING, default=None)
 @click.option('--anonymize', '-a', is_flag=True, default=False, help="(ImageDir only)")
 @click.option('--subpath_depth', '-b', type=int, default=0, help="Number of sub-directories to use (*Dir Only)")
@@ -20,8 +20,9 @@ def epdo(ctx, endpoint, method, args, map_arg, kwargs, anonymize, subpath_depth)
 
      \b
      $ diana-cli epdo orthanc info
-     $ diana-cli epdo ipath:/data/images exists -g my_file_name
-     """
+     $ diana-cli epdo ipath:/data/images exists my_file_name
+     $ diana-cli epdo montage find --map_arg '{"q": "<accession_number>"}'
+    """
     services = ctx.obj.get('services')
 
     click.echo(click.style('Calling endpoint method', underline=True, bold=True))
