@@ -6,7 +6,7 @@ from diana.daemons.collector2 import Collector
 from diana.utils.gateways import MontageModality as Modality
 
 # 17/11/01 - 17/11/12 done
-# 18/07/01 - 18/10/1 done
+# 18/07/01 - 18/10/31 done
 # 19/01/01 - 19/01/17 done
 
 # CONFIG
@@ -15,8 +15,8 @@ pacs_svc = "pacs"
 dest_path = Path("/data/")
 montage_svc = "montage"
 query = {"q": "", "modality": Modality.CR}
-start = datetime(year=2018, month=10, day=1)
-stop = datetime(year=2018, month=11, day=1)
+start = datetime(year=2018, month=11, day=1)
+stop = datetime(year=2018, month=12, day=31)
 # Montage can only query by day
 step = timedelta(days=1)
 get_meta = True
