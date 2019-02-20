@@ -6,7 +6,7 @@ from diana.daemons.collector2 import Collector
 from diana.utils.gateways import MontageModality as Modality
 
 # 17/11/01 - 17/11/12 done
-# 18/07/01 - 18/10/31 done
+# 18/07/01 - 18/11/26 done
 # 19/01/01 - 19/01/17 done
 
 # CONFIG

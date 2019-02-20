@@ -58,7 +58,10 @@ class Requester(object):
     def handle_result(result):
         if result.status_code > 299 or result.status_code < 200:
             # logging.debug("Cookies: {}".format(self.session.cookies))
-            result.raise_for_status()
+            try:
+                result.raise_for_status()
+            except requests.exceptions.HTTPError as e:
+                raise GatewayConnectionError(e)
 
         # logging.debug(result.headers)
 

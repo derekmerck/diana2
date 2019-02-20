@@ -100,6 +100,7 @@ services:
       ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
       ORTHANC_MOD_0:            ${RIH_MOD_PACS0}
       ORTHANC_MOD_1:            ${RIH_MOD_PACS1}
+      ORTHANC_MOD_2:            ${RIH_MOD_CARDIO}
       ORTHANC_PEER_0:           "project1,http://orthanc-project1/,admin,${ORTHANC_PASSWORD}"
       ORTHANC_PEER_1:           "project2,http://orthanc-project2/,admin,${ORTHANC_PASSWORD}"
       ORTHANC_VERBOSE:          "true"
