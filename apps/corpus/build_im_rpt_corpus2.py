@@ -6,22 +6,22 @@ from diana.daemons.collector2 import Collector
 from diana.utils.gateways import MontageModality as Modality
 
 # 17/11/01 - 17/11/12 done
-# 18/07/01 - 18/11/26 done
+# 18/07/01 - 18/12/18 done
 # 19/01/01 - 19/01/17 done
 
 # CONFIG
 services_path = "/services.yml"
-pacs_svc = "pacs"
+pacs_svc = "radarch"
 dest_path = Path("/data/")
 montage_svc = "montage"
 query = {"q": "", "modality": Modality.CR}
-start = datetime(year=2018, month=11, day=1)
+start = datetime(year=2018, month=12, day=19)
 stop = datetime(year=2018, month=12, day=31)
 # Montage can only query by day
 step = timedelta(days=1)
 get_meta = True
-pool_size = 8
-delay = 0.1
+pool_size = 2
+delay = 0.01
 logging_level = logging.DEBUG
 
 # Should make num jobs and delay time dependent
