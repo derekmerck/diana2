@@ -24,6 +24,7 @@ def test_paths():
     logging.debug(fp)
     assert(fp=="./a/b/c/{}".format(fn))
 
+
 def test_reader():
 
     dcm_file = find_resource("resources/dcm/IM2263")
@@ -33,7 +34,6 @@ def test_reader():
 
     with pytest.raises(DicomFormatError):
         DcmFileHandler().get(json_file)
-
 
 
 if __name__ == "__main__":

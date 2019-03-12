@@ -7,8 +7,13 @@ from ...smart_json import SmartJSONEncoder
 # Enabled sessions to handle cookies from Docker swarm for sticky connections
 USE_SESSIONS = True
 
-NORMAL_TIMEOUT = (3.1, 12.1)
-LARGE_TIMEOUT  = (6.1, 60.1)
+NORMAL_TIMEOUT = (3.1, 12.1)  # (connect to, read to)
+LARGE_TIMEOUT  = (6.1, 360.1) # Use large timeout on <1Gb connections
+
+# On a raspberry pi with a 400Mb connection:
+#   - ~5 mins to pull a 1500 image study
+#   - ~2 mins to anonymize
+#   - ~2 mons to zip
 
 TIMEOUTS = LARGE_TIMEOUT
 
@@ -49,7 +54,6 @@ class Requester(object):
 
         if USE_SESSIONS:
             self.session.auth = self.auth
-            # self.session.timeouts = NORMAL_TO
 
     def make_url(self, resource):
         return "{}/{}".format( self.base_url, resource )
@@ -77,7 +81,7 @@ class Requester(object):
             if USE_SESSIONS:
                 result = self.session.get(url, params=params, headers=headers, timeout=TIMEOUTS)
             else:
-                result = requests.get(url, params=params, headers=headers, auth=self.auth)
+                result = requests.get(url, params=params, headers=headers, auth=self.auth, timeout=TIMEOUTS)
 
         except (requests.exceptions.ConnectionError,
                 requests.exceptions.HTTPError) as e:
@@ -96,7 +100,7 @@ class Requester(object):
             if USE_SESSIONS:
                 result = self.session.put(url, data=data, headers=headers,timeout=TIMEOUTS)
             else:
-                result = requests.put(url, data=data, headers=headers, auth=self.auth)
+                result = requests.put(url, data=data, headers=headers, auth=self.auth, timeout=TIMEOUTS)
         except requests.exceptions.Timeout as e:
             raise GatewayConnectionError("Response timed out")
         except (requests.exceptions.ConnectionError,
@@ -114,7 +118,7 @@ class Requester(object):
             if USE_SESSIONS:
                 result = self.session.post(url, data=data, headers=headers,timeout=TIMEOUTS)
             else:
-                result = requests.post(url, data=data, headers=headers, auth=self.auth)
+                result = requests.post(url, data=data, headers=headers, auth=self.auth, timeout=TIMEOUTS)
         except requests.exceptions.Timeout as e:
             raise GatewayConnectionError("Response timed out")
         except (requests.exceptions.ConnectionError,

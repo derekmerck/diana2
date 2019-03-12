@@ -3,7 +3,7 @@ CRUD Endpoint API
 """
 
 from abc import ABC
-from typing import Mapping, TypeVar, NewType, Union, Sequence
+from typing import Mapping, TypeVar, NewType, Union, Sequence, Iterator, Collection
 import logging
 import attr
 
@@ -67,3 +67,22 @@ class Endpoint(ABC):
         """Remove an item from the endpoint"""
         raise NotImplementedError
 
+
+@attr.s
+class BroadcastingEndpoint(Endpoint):
+
+    eps = attr.ib(type=Iterator[Endpoint], default=None)
+
+    def put(self, item: Item, **kwargs):
+        for ep in self.eps:
+            ep.put(item, **kwargs)
+
+
+@attr.s
+class SelectiveEndpoint(Endpoint):
+
+    eps = attr.ib(type=Collection[Endpoint], default=None)
+
+    def put(self, item: Item, selector=None, **kwargs):
+        ep = self.eps[selector]
+        ep.put(item, **kwargs)

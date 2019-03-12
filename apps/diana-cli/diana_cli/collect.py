@@ -18,7 +18,7 @@ $ python3 diana-cli.py --verbose -S ../../.secrets/lifespan_services.yml collect
 @click.argument('source', type=click.STRING)
 @click.argument('domain', type=click.STRING)
 @click.argument('dest', type=click.STRING, required=False, default=None)
-@click.option('-b', '--subpath_depth', type=int, default=0, help="Number of sub-directories to use")
+@click.option('-b', '--subpath_depth (if dest is directory)', type=int, default=0, help="Number of sub-directories to use")
 @click.pass_context
 def collect(ctx, project, data_path, source, domain, dest, subpath_depth):
     """Create a PROJECT key at DATA_PATH, then pull data from

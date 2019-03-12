@@ -2,6 +2,7 @@ import os
 import attr
 from .file_handler import FileHandler
 
+
 @attr.s
 class TextFileHandler(FileHandler):
 
