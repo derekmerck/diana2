@@ -38,7 +38,7 @@ if __name__ == "__main__":
     logging.debug("Testing")
 
     test_cli_help()
-    for (i, j) in zip( setup_orthanc(), setup_redis() ):
+    for (i, j) in zip( mk_orthanc(), setup_redis() ):
         test_cli_svc_check(None, None)
 
         # i.stop_service()
