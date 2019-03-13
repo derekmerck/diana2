@@ -95,7 +95,7 @@ class Orthanc(Endpoint, Serializable):
 
         self.gateway.send(oid, dest, "peers")
 
-    def get(self, item: Union[Dixel, str],
+    def get(self, item: Union[str, Dixel],
             level: DicomLevel = DicomLevel.STUDIES,
             view: DixelView = DixelView.TAGS, **kwargs):
         logger = logging.getLogger(self.name)
@@ -139,9 +139,16 @@ class Orthanc(Endpoint, Serializable):
 
         raise FileNotFoundError("Item {} does not exist".format(oid))
 
-    def find(self, query: Mapping, level=DicomLevel.STUDIES, **kwargs) -> list:
+    def find(self, item: Union[Mapping, Dixel],
+             level=DicomLevel.STUDIES, **kwargs) -> list:
         logger = logging.getLogger(self.name)
         logger.debug("Find")
+
+        if isinstance(item, Dixel):
+            query = item.query()
+            level = item.level
+        else:
+            query = item
 
         q = {"Level": "{!s}".format(level),
              "Query": query }
@@ -154,12 +161,18 @@ class Orthanc(Endpoint, Serializable):
         return r
 
     def rfind(self,
-              query: Mapping,
+              item: Union[Mapping, Dixel],
               domain: str,
               level=DicomLevel.STUDIES,
               retrieve=False) -> list:
         logger = logging.getLogger(self.name)
         logger.debug("Remote Find")
+
+        if isinstance(item, Dixel):
+            query = item.query()
+            level = item.level
+        else:
+            query = item
 
         q = {"Level": "{!s}".format(level),
              "Query": query }

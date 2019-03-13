@@ -8,6 +8,7 @@ from diana import __version__ as diana_version
 from .check import check
 from .epdo import epdo
 from .collect import collect
+from .collect2 import collect2
 from .dcm2im import dcm2im, dcm2json
 from .file_index import findex, fiup
 from .guid import guid
@@ -74,6 +75,7 @@ def cli(ctx, verbose, services, services_path):
 cmds = [
     check,
     collect,
+    collect2,
     dcm2im,
     dcm2json,
     epdo,

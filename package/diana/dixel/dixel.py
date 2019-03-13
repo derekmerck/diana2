@@ -248,6 +248,8 @@ class Dixel(Serializable):
     @property
     def fn(self):
         """Filename alias for meta['Filename']"""
+        if not self.meta.get("FileName"):
+            self.meta["FileName"] = self.tags["AccessionNumber"]
         return self.meta.get('FileName')
 
     @property
@@ -290,3 +292,16 @@ class Dixel(Serializable):
             raise ValueError("No patient orientation info available")
         return [float(x) for x in self.tags.get("ImageOrientationPatient")]
 
+    def query(self):
+
+        return {
+            "PatientName": "",
+            "PatientID": "",
+            "PatientBirthDate": "",
+            "PatientSex": "",
+            "AccessionNumber": self.tags.get("AccessionNumber"),
+            "StudyDescription": "",
+            "StudyInstanceUID": "",
+            "StudyDate": "",
+            "StudyTime": "",
+        }

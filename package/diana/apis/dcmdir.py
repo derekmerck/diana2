@@ -86,9 +86,17 @@ class DcmDir(Endpoint, Serializable):
             raise ValueError("Item has no fn attribute, so it requires an explicit filename")
         return self.gateway.delete(fn)
 
-    def exists(self, fn: str):
+    def exists(self, item: Union[str, Dixel]):
         logger = logging.getLogger(self.name)
         logger.debug("EP EXISTS")
+
+        if isinstance(item, Dixel):
+            fn = item.fn
+        elif isinstance(item, str):
+            fn = item
+        else:
+            raise ValueError("Unknown file name")
+
         # if self.gateway.isdir(fn):
         #     return False
         return self.gateway.exists(fn)
@@ -194,6 +202,7 @@ class ReportDir(DcmDir):
 
         fn = "{}.txt".format(base_fn)
         self.gateway.put(fn, data)
+
 
 @attr.s
 class ImageDir(DcmDir):

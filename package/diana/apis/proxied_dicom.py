@@ -1,13 +1,18 @@
-from typing import Mapping
+from typing import Mapping, Union
 from datetime import datetime, timedelta
 from functools import partial
 from pprint import pformat
+import time
 import logging
 import attr
 from ..utils.gateways import GatewayConnectionError
 from ..utils.dicom import DicomLevel, dicom_date, dicom_time
 from ..utils import Endpoint, Serializable, FuncByDates
 from . import Orthanc
+from ..dixel import Dixel, DixelView
+
+FIND_SETTLE_TIME = 0.3
+
 
 @attr.s
 class ProxiedDicom(Endpoint, Serializable):
@@ -19,15 +24,34 @@ class ProxiedDicom(Endpoint, Serializable):
     proxy = attr.ib( init=False )
     @proxy.default
     def setup_proxy(self):
-        # if self.proxy_desc.get("ctype"):
-        #     self.proxy_desc.pop("ctype")
         return Orthanc(**self.proxy_desc)
 
-    def find(self, query: Mapping, level=DicomLevel.STUDIES, retrieve: bool=False, **kwargs):
-        return self.proxy.rfind(query=query,
+    def find(self, item: Union[Mapping, Dixel], level=DicomLevel.STUDIES,
+             retrieve: bool=False, **kwargs):
+        return self.proxy.rfind(item,
                                 level=level,
                                 domain=self.proxy_domain,
                                 retrieve=retrieve)
+
+    def get(self, item: Union[str, Dixel], level=DicomLevel.STUDIES,
+            view=DixelView.TAGS):
+        if not self.exists(item, level=level):
+            self.find(item, level=level, retrieve=True)
+            time.sleep(FIND_SETTLE_TIME)
+        return self.proxy.get(item, level=level, view=view)
+
+    def anonymize(self, item: Union[str, Dixel], level=DicomLevel.STUDIES):
+        if not self.exists(item, level=level):
+            self.find(item, level=level, retrieve=True)
+            time.sleep(FIND_SETTLE_TIME)
+        return self.proxy.anonymize(item, level=level)
+
+    def delete(self, item: Union[str, Dixel], level=DicomLevel.STUDIES):
+        if self.exists(item, level):
+            self.proxy.delete(item, level)
+
+    def exists(self, item, level=DicomLevel.STUDIES):
+        return self.proxy.exists(item, level=level)
 
     def check(self):
         logger = logging.getLogger(self.name)

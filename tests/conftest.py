@@ -27,12 +27,18 @@ def mk_orthanc(http_port=8042, dcm_port=4242, remote_peer=8043, remote_mod=4243)
     print("Standing up orthanc fixture")
     dkr_name = "orthanc-{}".format(http_port)
 
+    import socket
+    host_name = socket.gethostname()
+    host_ip = socket.gethostbyname(host_name)
+
     S = Containerized(
             dkr_name  = dkr_name,
             dkr_image = "derekmerck/orthanc-confd",
             dkr_ports = {"8042/tcp": http_port, "4242/tcp": dcm_port},
-            dkr_env={"ORTHANC_MOD_0": "mod0,ORTHANC,localhost,{}".format(remote_mod),
-                     "ORTHANC_PEER_0": "peer0,http://localhost:{},orthanc,passw0rd!".format(remote_peer)}
+            dkr_env = {"ORTHANC_MOD_0": "mod0,ORTHANC{},{},{}".format(remote_mod, host_ip, remote_mod),
+                       "ORTHANC_PEER_0": "peer0,http://{}:{},orthanc,passw0rd!".format(host_ip, remote_peer),
+                       "ORTHANC_AET": "ORTHANC{}".format(dcm_port),
+                       "ORTHANC_VERBOSE": "true"}
     )
     S.start_container()
 

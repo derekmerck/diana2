@@ -1,8 +1,9 @@
 import csv, logging, json
 import attr
-from ..dixel import Dixel
+from ..dixel import Dixel, ShamDixel
 from ..utils import Endpoint, Serializable
 from ..utils.dicom import DicomLevel
+
 
 @attr.s
 class CsvFile(Endpoint, Serializable):
@@ -12,6 +13,14 @@ class CsvFile(Endpoint, Serializable):
     name = attr.ib(default="CsvFile")
     dixels = attr.ib(init=False, factory=set)
     fieldnames = attr.ib(init=False, factory=list)
+
+    def put(self, item: Dixel, anonymize=False, force_write=False):
+        if anonymize:
+            item = ShamDixel.from_dixel(item)
+        self.dixels.add(item)
+
+        if force_write:
+            self.write()
 
     def read(self, fp: str=None):
         # logger = logging.getLogger(self.name)
