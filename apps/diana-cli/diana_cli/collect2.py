@@ -54,36 +54,43 @@ class Collector2(object):
                     images: Endpoint,
                     anonymize=False, dryrun=False):
 
+        logger = logging.getLogger("Collector")
+
         if isinstance(item, str):
             # It's an accession number
             accession_number = item
             item = Dixel(tags={"AccessionNumber": accession_number})
 
         # Check meta
+        logger.debug("Checking meta")
         if not meta.exists(item):
             items = source.find(item, retrieve=False)
             if items:
                 item = Dixel(tags=items[0])
                 if anonymize:
                     item = ShamDixel.from_dixel(item)
-                meta.put(item)  # force_write=True
+                meta.put(item, force_write=True)
             else:
-                logging.warning("Failed on unfindable item {}".format(item))
+                logger.warning("Failed on unfindable item {}".format(item))
                 return HandlerStatus.FAILED
         else:
             item = meta.get(item)
-            logging.info("Skipping find on keyed item")
+            logger.info("Skipping find on keyed item")
 
         # Check reports
+        logger.debug("Checking reports")
         if item.report and not reports.exists(item):
             reports.put(item)
 
         if anonymize:
-            item.meta["FileName"] = "{}.zip".format(item.meta["ShamAccessionNumber"])
+            item.meta["FileName"] = "{}.zip".format(
+                item.meta["ShamAccessionNumber"])
         else:
-            item.meta["FileName"] = "{}.zip".format(item.tags["AccessionNumber"])
+            item.meta["FileName"] = "{}.zip".format(
+                item.tags["AccessionNumber"])
 
         # Check file
+        logger.debug("Checking file")
         if not images.exists(item):
             try:
                 if not dryrun:
@@ -101,14 +108,14 @@ class Collector2(object):
                     if anonymize:
                         source.delete(_item)
             except FileNotFoundError as e:
-                logging.warning(e)
-                logging.warning("Failed on un-pullable item {}".format(item))
+                logger.warning(e)
+                logger.warning("Failed on un-pullable item {}".format(item))
                 return HandlerStatus.FAILED
         elif images.exists(item):
-            logging.info("Skipping pull on existing item")
+            logger.info("Skipping pull on existing item")
             return HandlerStatus.SKIPPED
 
-        logging.info("Handled item {}".format(item))
+        logger.info("Handled item {}".format(item))
         return HandlerStatus.HANDLED
 
     def run(self, worklist, anonymize=False, dryrun=False) -> Tuple[int, int, int]:

@@ -1,6 +1,7 @@
 import logging
 import os
 import tempfile
+import shutil
 from diana.utils.endpoint import Serializable
 from diana.apis import *
 from diana_cli import app
@@ -35,20 +36,26 @@ def test_collector_cli():
     assert("pacs: Ready" in result.output)
 
     result = runner.invoke(app, ["--verbose", "-s", json.dumps(services), "collect2",
-                                 "pacs", "path:/tmp", "100000", "100001"])
+                                 "pacs", "path:/tmp", "52682350"])
     print(result.output)
     print(result.exception)
 
 
-def test_collector():
+def test_collector(anonymize):
 
     pacs = Serializable.Factory.create(**services.get("pacs"))
     proxy = Serializable.Factory.create(**services.get("proxy"))
     proxy.clear()
 
     tmp = "/tmp"
+    shutil.rmtree(os.path.join(tmp, "images"), ignore_errors=True)
 
-    meta_dest = CsvFile(fp=os.path.join(tmp, "meta", "key.csv"))
+    meta_dest = CsvFile(fp=os.path.join(tmp, "key.csv"))
+    meta_dest.read()
+
+    meta_dest.fieldnames = ["AccessionNumber", "_ShamAccessionNumber",
+                            "PatientID", "_ShamID"]
+
     im_dest = DcmDir(path=os.path.join(tmp, "images"))
     report_dest = None
 
@@ -57,18 +64,25 @@ def test_collector():
                    reports=report_dest,
                    images=im_dest)
 
-    h, s, f = c.run(["52682350"], anonymize=True)
+    h, s, f = c.run(["52682350", "99920000"], anonymize=anonymize)
 
     print("Failed:  {}".format(f))
     print("Handled: {}".format(h))
     print("Skipped: {}".format(s))
 
-    # c.reset()
-    # h, s, f = c.run(["52682350", "99920000"])
-    #
-    # print("Failed:  {}".format(f))
-    # print("Handled: {}".format(h))
-    # print("Skipped: {}".format(s))
+    assert((h,s,f) == (1,0,1))
+
+    c.reset()
+    h, s, f = c.run(["52682350", "99920000"], anonymize=anonymize)
+
+    print("Failed:  {}".format(f))
+    print("Handled: {}".format(h))
+    print("Skipped: {}".format(s))
+
+    assert((h,s,f) == (0,1,1))
+
+    proxy.clear()
+    shutil.rmtree(os.path.join(tmp, "images"), ignore_errors=True)
 
 
 if __name__ == "__main__":
@@ -80,4 +94,6 @@ if __name__ == "__main__":
     mk_orthanc(8042, 4242, 8043, 4243)
     mk_orthanc(8043, 4243, 8042, 4242)
     # add data
-    test_collector()
+
+    test_collector(anonymize=False)
+    test_collector(anonymize=True)

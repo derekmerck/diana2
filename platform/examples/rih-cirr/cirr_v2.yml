@@ -92,6 +92,10 @@ services:
       ORTHANC_SYNC_CMOVE:       "true"
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_STORE_COMPRESSED: "false"
+
+      ORTHANC_STABLE_AGE:       90  # up from 60, working with EA
+      ORTHANC_DICOM_SCU_TO:     30  # up from 30, working with EA
+
       ORTHANC_PG_ENABLED:       "true"
       ORTHANC_PG_STORE_DICOM:   "true"
       ORTHANC_PG_DATABASE:      bridge

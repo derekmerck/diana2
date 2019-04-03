@@ -241,6 +241,11 @@ class Dixel(Serializable):
         """Serializer id alias for meta['AccessionNumber']"""
         return self.tags.get('AccessionNumber')
 
+    def __cmp__(self, other):
+        logging.debug(self.sid)
+        logging.debug(other.sid)
+        return self.sid == other.sid
+
     @property
     def acc_num(self):
         return self.tags.get("AccessionNumber")

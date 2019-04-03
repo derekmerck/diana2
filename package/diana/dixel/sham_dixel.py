@@ -220,3 +220,9 @@ class ShamDixel(Dixel):
         return "{acc}-{ser:04}-{ins:04}".format(acc=self.meta['ShamAccessionNumber'],
                                                 ser=ser_num,
                                                 ins=inst_num)
+
+    def sid(self):
+        return self.meta.get('ShamAccessionNumber')
+
+    def __cmp__(self, other):
+        return self.sid == other.sid or self.acc_num == other.sid
