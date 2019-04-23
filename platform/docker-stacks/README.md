@@ -27,7 +27,7 @@ A base stack and provides [Portainer][] and [Traefik][] services and networks.
 
 ```bash
 $ source sample.env
-$ docker-stack -f admin/admin-stack.yml
+$ docker-stack deploy -f admin/admin-stack.yml admin
 ```
 
 ### Exposes

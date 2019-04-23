@@ -30,7 +30,7 @@ services:
       TZ: "America/New_York"
 
   orthanc-christianson:
-    image: derekmerck/orthanc-confd:latest-amd64
+    image: derekmerck/orthanc-wbv:latest-amd64
     ports:
       - 4242:42421
     networks:
