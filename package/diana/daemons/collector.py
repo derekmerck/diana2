@@ -148,13 +148,13 @@ class Collector(object):
 
                 if working_level == DicomLevel.SERIES:
                     d_fn = "{}-{}-{}.zip".format(
-                        d.meta["PatientName"][0:6],
-                        d.meta["AccessionNumber"][0:8],
-                        d.meta["SeriesDescription"])
+                        d.tags["PatientName"][0:6],
+                        d.tags["AccessionNumber"][0:8],
+                        d.tags["SeriesDescription"])
                 else:
                     d_fn = "{}-{}.zip".format(
-                        d.meta["PatientName"][0:6],
-                        d.meta["AccessionNumber"][0:8])
+                        d.tags["PatientName"][0:6],
+                        d.tags["AccessionNumber"][0:8])
 
             if dest.exists(d_fn):
                 logging.debug("SKIPPING {}".format(d.tags["PatientName"]))

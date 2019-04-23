@@ -57,3 +57,9 @@ def parse_dicom_datetime(dts: str, tms: str = None) -> datetime:
 
     logger = logging.getLogger("DcmStrings")
     logger.error("Failed to parse date time string: {0}".format( dts ))
+
+
+def date_str_to_dicom(dstr):
+    dt = DatetimeParser.parse(dstr)
+    dcm_dt = dicom_date(dt)
+    return dcm_dt
