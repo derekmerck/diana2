@@ -1,8 +1,9 @@
 import os, yaml, logging
-from . import Serializable
+from diana.utils.endpoint import Serializable
+from . import *
 
 
-def get_endpoint(services_path, service_key, check=False):
+def get_service(services_path, service_name, check=False):
     _services = {}
     logging.debug("Found services path")
     with open(services_path) as f:
@@ -10,7 +11,7 @@ def get_endpoint(services_path, service_key, check=False):
         services_in = yaml.safe_load(services_exp)
         _services.update(services_in)
 
-    ep = Serializable.Factory.create(**_services.get(service_key))
+    ep = Serializable.Factory.create(**_services.get(service_name))
 
     if check:
         result = ep.check()

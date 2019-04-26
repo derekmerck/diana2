@@ -1,7 +1,9 @@
 import os, logging, io, hashlib
+from io import BytesIO
 from pathlib import Path
-from typing import Union
+from typing import Union, Collection
 import attr
+import pydicom
 from ..dixel import Dixel, DixelView, ShamDixel
 from ..utils import Endpoint, Serializable
 from ..utils.dicom import DicomLevel
@@ -106,15 +108,27 @@ class DcmDir(Endpoint, Serializable):
         logger.debug("EP CHECK")
         return os.path.exists(self.path)
 
-    def get_zipped(self, item: str):
+    def get_zipped(self, item: Union[Path, str]):
+        logger = logging.getLogger(self.name)
+        logger.debug("EP GET ZIPPED")
         gateway = ZipFileHandler(path=self.path)
-        files = gateway.unpack(item)
+        files = gateway.unzip(item)
         result = set()
-        for f in files:
-            d = Dixel(level=DicomLevel.INSTANCES)
-            d.file = f
-            result.add(d)
+        for fn, f in files:
+            try:
+                ds = pydicom.dcmread(BytesIO(f), stop_before_pixels=True)
+                d = Dixel.from_pydicom(ds, fn)
+                d.file = f
+                result.add(d)
+            except pydicom.errors.InvalidDicomError as e:
+                logging.warning("Failed to parse with {}".format(e))
         return result
+
+    def put_zipped(self, item: Union[Path, str], items: Collection):
+        logger = logging.getLogger(self.name)
+        logger.debug("EP PUT ZIPPED")
+        gateway = ZipFileHandler(path=self.path)
+        gateway.zip(item, items)
 
     def subdirs(self):
         """Generator for nested sub-directories.

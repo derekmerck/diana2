@@ -9,6 +9,7 @@ from ..utils.guid import GUIDMint
 from ..utils.dicom import dicom_date, dicom_name, dicom_datetime, DicomLevel, DicomUIDMint
 from ..utils.dicom.uid_mint import hash_str
 
+
 def mktime(datestr, timestr=""):
     if not datestr and not timestr:
         return
@@ -20,6 +21,7 @@ def mktime(datestr, timestr=""):
     return dt
 
 # TODO: Minor reformat to handle pre-shammed Dixels, ie, don't assume sham_info must be created
+
 
 @attr.s(cmp=False, hash=False)
 class ShamDixel(Dixel):
