@@ -23,7 +23,7 @@ ep = DcmDir(path=location)
 
 files = ["test.dum-1.zip"]
 
-# for f in ep.files():
+# for fi in ep.files(rex="*.zip"):
 for fi in files:
 
     contents = ep.get_zipped(fi)
