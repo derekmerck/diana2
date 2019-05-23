@@ -7,7 +7,8 @@ from diana.utils.dicom import DicomLevel, dicom_date
 # importing all apis allows them to be immediately deserialized
 from diana.apis import *
 
-@click.command(short_help="Find item by query")
+
+@click.command(short_help="Find item in Orthanc by query")
 @click.argument('source')
 @click.option('--accession_number', '-a')
 @click.option('--today', is_flag=True, default=False)

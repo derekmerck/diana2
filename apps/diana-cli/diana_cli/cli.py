@@ -13,6 +13,7 @@ from .dcm2im import dcm2im, dcm2json
 from .file_index import findex, fiup
 from .guid import guid
 from .mock import mock
+from .mfind import mfind
 from .ofind import ofind
 from .verify import verify
 from .watch import watch
@@ -83,6 +84,7 @@ cmds = [
     fiup,
     guid,
     mock,
+    mfind,
     ofind,
     verify,
     watch,
