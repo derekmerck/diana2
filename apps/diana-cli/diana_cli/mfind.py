@@ -1,7 +1,9 @@
 from datetime import datetime
 from pprint import pformat
+import json
 import click
 from diana.utils.endpoint import Serializable
+from diana.utils import SmartJSONEncoder
 from diana.dixel import RadiologyReport, LungScreeningReport
 # Importing all apis allows them to be immediately deserialized
 from diana.apis import *
@@ -23,6 +25,7 @@ $ diana-cli -S .secrets/lifespan_services.yml mfind -a 52xxxxxx -e lungrads -e r
 @click.option('--extraction', '-e', multiple=True,
               type=click.Choice(['radcat', 'lungrads']),
               help="Perform a data extraction on each report")
+@click.option('--json', '-j', "as_json", is_flag=True, default=False, help="Output as json")
 @click.pass_context
 def mfind(ctx,
           source,
@@ -30,7 +33,8 @@ def mfind(ctx,
           accessions_path,
           today,
           _query,
-          extraction):
+          extraction,
+          as_json):
     """Find studies matching QUERY string in SOURCE Montage service."""
     services = ctx.obj.get('services')
 
@@ -70,5 +74,12 @@ def mfind(ctx,
         if "radcat" in extraction:
             r.meta["radcat"] = RadiologyReport.radcat(r.report)
 
-    click.echo(pformat(result))
+    if as_json:
+        result = json.dumps([d.asdict() for d in result], cls=SmartJSONEncoder, sort_keys=True,
+                            indent=4, separators=(',', ': '))
+
+    else:
+        result = pformat(result)
+
+    click.echo(result)
 
