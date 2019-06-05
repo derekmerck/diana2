@@ -9,6 +9,8 @@ from diana.dixel import RadiologyReport, LungScreeningReport
 from diana.apis import *
 
 """
+$ diana-cli -S .secrets/lifespan_services.yml mfind -A studies.txt -j montage
+
 $ diana-cli -S .secrets/lifespan_services.yml mfind -a 52xxxxxx -e lungrads -e radcat montage
 
 { ... lungrads='2', current_smoker=False, pack_years=15, radcat=(3,true) ... }

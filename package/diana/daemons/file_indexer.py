@@ -26,7 +26,7 @@ def index_file(fn, path=None, reg=None, prefix=None,
         reg.add_to_collection(d, path=path, prefix=prefix)
         logging.info("Registered DICOM file {}".format(fn))
         _registered.value += 1
-    except DicomFormatError:
+    except (ValueError, DicomFormatError):
         logging.debug("Skipping non-DICOM or poorly formatted file {}".format(fn))
         pass
     except FileNotFoundError:
