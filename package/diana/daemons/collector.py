@@ -19,6 +19,7 @@ from diana.dixel import Dixel, ShamDixel, DixelView
 from diana.utils.dicom import DicomLevel
 
 from requests.exceptions import HTTPError
+from diana.utils.gateways.exceptions import GatewayConnectionError
 
 
 @attr.s
@@ -183,7 +184,7 @@ class Collector(object):
                     dest.put(e)
                     source.delete(e)
 
-                except HTTPError as e:
+                except (HTTPError, GatewayConnectionError) as e:
                     logging.error(e)
                     with open("errors.txt", "a+") as f:
                         f.write(d.tags["AccessionNumber"] + "\n")
