@@ -18,6 +18,8 @@ from diana.dixel import Dixel, ShamDixel, DixelView
 # from diana.utils.endpoint import Endpoint
 from diana.utils.dicom import DicomLevel
 
+from requests.exceptions import HTTPError
+
 
 @attr.s
 class Collector(object):
@@ -169,15 +171,22 @@ class Collector(object):
                 logging.debug("SKIPPING PULL for {}".format(d.tags["PatientName"]))
 
             if anonymize:
-                replacement_map = ShamDixel.orthanc_sham_map(d)
-                anon_id = source.anonymize(d, replacement_map=replacement_map)
+                try:
+                    replacement_map = ShamDixel.orthanc_sham_map(d)
 
-                e = source.get(anon_id, level=working_level, view=DixelView.FILE)
-                e.meta["FileName"] = d_fn
-                logging.debug(e)
+                    anon_id = source.anonymize(d, replacement_map=replacement_map)
 
-                dest.put(e)
-                source.delete(e)
+                    e = source.get(anon_id, level=working_level, view=DixelView.FILE)
+                    e.meta["FileName"] = d_fn
+                    logging.debug(e)
+
+                    dest.put(e)
+                    source.delete(e)
+
+                except HTTPError as e:
+                    logging.error(e)
+                    with open("errors.txt", "a+") as f:
+                        f.write(d.tags["AccessionNumber"] + "\n")
 
             else:
                 d = source.get(d, level=working_level, view=DixelView.FILE)
