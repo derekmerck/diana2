@@ -185,6 +185,7 @@ class Collector(object):
                     source.delete(e)
 
                 except (HTTPError, GatewayConnectionError) as e:
+                    logging.error("Failed to anonymize dixel")
                     logging.error(e)
                     with open("errors.txt", "a+") as f:
                         f.write(d.tags["AccessionNumber"] + "\n")
@@ -193,7 +194,11 @@ class Collector(object):
                 d = source.get(d, level=working_level, view=DixelView.FILE)
                 dest.put(d)
 
-            source.delete(d)
+            try:
+                source.delete(d)
+            except GatewayConnectionError as e:
+                logging.error("Failed to delete dixel")
+                logging.error(e)
 
     def pull_and_send(self, items: Iterable, source: Orthanc, domain: str, dest: Orthanc, anonymize=False):
 
