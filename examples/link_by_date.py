@@ -16,10 +16,10 @@ from typing import Collection
 import attr
 from dateutil.parser import parser as DateParser
 
-data_dir = "/Users/derek/Desktop/thyroid"
+data_dir = r"D:\Google Drive\Brown\Research\Raw_Data\thyroid_bx_path"
 data0_dir = "usbx"
 data1_dir = "path"
-target_distance = timedelta(days=14)
+target_distance = timedelta(days=3)
 
 
 def parse_date(s: str) -> date:
@@ -81,9 +81,10 @@ class SemiIdentifiedStudy(object):
     patient = attr.ib(type=Patient)
     cancer_status = attr.ib(default=None)
 
+    # usbx, path
     def proximal(self, other: "SemiIdentifiedStudy"):
         if self.patient == other.patient:
-            if (other.study_date - self.study_date) > target_distance:
+            if abs(self.study_date - other.study_date) > target_distance or (self.study_date - other.study_date) > timedelta(days=0):
                 # logging.debug("-> {} matches, but bx date {} not near path date {}".format(
                 #     self.patient.first, self.study_date, other.study_date))
                 return False
@@ -171,15 +172,15 @@ if __name__ == "__main__":
                 }
 
                 results.append(pair)
-                data1.remove(item1)
-                break
+                # data1.remove(item1)
+                # break
 
     logging.info("Num pairs: {}".format(len(results)))
 
     fieldnames = ["MRN", "Accession Number", "Bx Date", "Path Case",
                   "Path Date", "Cancer Status"]
 
-    with open("output.csv", "w") as f:
+    with open("output_{}daymatch_unrestricted.csv".format(target_distance.days), "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(results)
