@@ -1,8 +1,9 @@
 import csv, logging, json
 import attr
-from ..dixel import Dixel
+from ..dixel import Dixel, ShamDixel
 from ..utils import Endpoint, Serializable
 from ..utils.dicom import DicomLevel
+
 
 @attr.s
 class CsvFile(Endpoint, Serializable):
@@ -12,6 +13,18 @@ class CsvFile(Endpoint, Serializable):
     name = attr.ib(default="CsvFile")
     dixels = attr.ib(init=False, factory=set)
     fieldnames = attr.ib(init=False, factory=list)
+
+    def put(self, item: Dixel, force_write=False):
+        self.dixels.add(item)
+
+        if force_write:
+            self.write()
+
+    def exists(self, item: Dixel, **kwargs):
+        logging.debug("Checking exists {}".format(item))
+        logging.debug(self.dixels)
+        if item in self.dixels:
+            return True
 
     def read(self, fp: str=None):
         # logger = logging.getLogger(self.name)
@@ -38,8 +51,8 @@ class CsvFile(Endpoint, Serializable):
         logger = logging.getLogger(self.name)
 
         fp = fp or self.fp
-        if not fp:
-            raise ValueError("No file provided")
+        # if not fp:
+        #     raise ValueError("No file provided")
 
         if fieldnames=="ALL":
             sample = list(self.dixels)[0]
@@ -49,7 +62,7 @@ class CsvFile(Endpoint, Serializable):
 
         fieldnames = fieldnames or self.fieldnames
 
-        with open(fp, "w") as f:
+        with open(fp, "w+") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
             writer.writeheader()
             for item in self.dixels:

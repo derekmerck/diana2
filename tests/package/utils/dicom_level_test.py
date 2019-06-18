@@ -18,6 +18,7 @@ def test_dicom_levels():
 
     assert( patients_level < studies_level < series_level < instances_level )
 
+
 if __name__ == "__main__":
 
     logging.basicConfig(level=logging.DEBUG)

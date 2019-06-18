@@ -180,6 +180,11 @@ class GUIDMint(object):
         if isinstance(age, str):
             age = int(age)
 
+        if not gender:
+            gender = "U"
+        gender = gender[0].upper()
+        if gender not in ["M", "F", "U"]:
+            gender = "U"
         gender = GUIDGender(gender)
 
         _hash, _dob = cls.get_hash(name,

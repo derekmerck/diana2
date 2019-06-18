@@ -4,9 +4,23 @@ import attr
 from ..exceptions import GatewayConnectionError
 from ...smart_json import SmartJSONEncoder
 
+# Enabled sessions to handle cookies from Docker swarm for sticky connections
+USE_SESSIONS = True
+
+NORMAL_TIMEOUT = (3.1, 12.1)  # (connect to, read to)
+LARGE_TIMEOUT  = (6.1, 360.1) # Use large timeout on <1Gb connections
+
+# On a raspberry pi with a 400Mb connection:
+#   - ~5 mins to pull a 1500 image study
+#   - ~2 mins to anonymize
+#   - ~2 mons to zip
+
+TIMEOUTS = LARGE_TIMEOUT
+
 
 def supress_urllib_debug():
     logging.getLogger("urllib3").setLevel(logging.WARNING)
+
 
 @attr.s
 class Requester(object):
@@ -24,6 +38,8 @@ class Requester(object):
     base_url = attr.ib(init=False, repr=False)
     auth = attr.ib(init=False, default=None)
 
+    session = attr.ib(init=False, factory=requests.Session)
+
     # Can't use attr.s defaults here b/c the derived classes don't see the vars yet
     def __attrs_post_init__(self):
         base_url = "{protocol}://{host}:{port}/".format(
@@ -36,12 +52,20 @@ class Requester(object):
         if self.user:
             self.auth = (self.user, self.password)
 
+        if USE_SESSIONS:
+            self.session.auth = self.auth
+
     def make_url(self, resource):
         return "{}/{}".format( self.base_url, resource )
 
-    def handle_result(self, result):
+    @staticmethod
+    def handle_result(result):
         if result.status_code > 299 or result.status_code < 200:
-            result.raise_for_status()
+            # logging.debug("Cookies: {}".format(self.session.cookies))
+            try:
+                result.raise_for_status()
+            except requests.exceptions.HTTPError as e:
+                raise GatewayConnectionError(e)
 
         # logging.debug(result.headers)
 
@@ -54,12 +78,17 @@ class Requester(object):
         logger.debug("Calling get")
         url = self.make_url(resource)
         try:
-            result = requests.get(url, params=params, headers=headers, auth=self.auth)
-            return self.handle_result(result)
+            if USE_SESSIONS:
+                result = self.session.get(url, params=params, headers=headers, timeout=TIMEOUTS)
+            else:
+                result = requests.get(url, params=params, headers=headers, auth=self.auth, timeout=TIMEOUTS)
 
         except (requests.exceptions.ConnectionError,
                 requests.exceptions.HTTPError) as e:
             raise GatewayConnectionError(e)
+        except requests.exceptions.Timeout as e:
+            raise GatewayConnectionError("Response timed out")
+        return self.handle_result(result)
 
     def _put(self, resource, json=None, data=None, headers=None):
         logger = logging.getLogger(self.name)
@@ -68,8 +97,14 @@ class Requester(object):
         if json:
             data = _json.dumps(json, cls=SmartJSONEncoder)
         try:
-            result = requests.put(url, data=data, headers=headers, auth=self.auth)
-        except requests.exceptions.ConnectionError as e:
+            if USE_SESSIONS:
+                result = self.session.put(url, data=data, headers=headers,timeout=TIMEOUTS)
+            else:
+                result = requests.put(url, data=data, headers=headers, auth=self.auth, timeout=TIMEOUTS)
+        except requests.exceptions.Timeout as e:
+            raise GatewayConnectionError("Response timed out")
+        except (requests.exceptions.ConnectionError,
+                requests.exceptions.HTTPError) as e:
             raise GatewayConnectionError(e)
         return self.handle_result(result)
 
@@ -80,8 +115,14 @@ class Requester(object):
         if json:
             data = _json.dumps(json, cls=SmartJSONEncoder)
         try:
-            result = requests.post(url, data=data, headers=headers, auth=self.auth)
-        except requests.exceptions.ConnectionError as e:
+            if USE_SESSIONS:
+                result = self.session.post(url, data=data, headers=headers,timeout=TIMEOUTS)
+            else:
+                result = requests.post(url, data=data, headers=headers, auth=self.auth, timeout=TIMEOUTS)
+        except requests.exceptions.Timeout as e:
+            raise GatewayConnectionError("Response timed out")
+        except (requests.exceptions.ConnectionError,
+                requests.exceptions.HTTPError) as e:
             raise GatewayConnectionError(e)
         return self.handle_result(result)
 
@@ -90,7 +131,13 @@ class Requester(object):
         logger.debug("Calling delete")
         url = self.make_url(resource)
         try:
-            result = requests.delete(url, headers=headers, auth=self.auth)
-        except requests.exceptions.ConnectionError as e:
+            if USE_SESSIONS:
+                result = self.session.delete(url, headers=headers)
+            else:
+                result = requests.delete(url, headers=headers, auth=self.auth)
+        except requests.exceptions.Timeout as e:
+            raise GatewayConnectionError("Response timed out")
+        except (requests.exceptions.ConnectionError,
+                requests.exceptions.HTTPError) as e:
             raise GatewayConnectionError(e)
         return self.handle_result(result)

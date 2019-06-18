@@ -19,16 +19,16 @@ Usage
 
 .. code:: bash
 
-    $ export DIANA_SERVICES_PATH="${DIANA_DIR}/tests/resources/test_services.yml"
-    $ python3 diana-rest.py
-    $ curl -X GET "http://localhost:8080/v1.0/endpoint"
-    {
-      "orthanc": "Not Ready",
-      "orthanc_bad": "Not Ready",
-      "redis": "Not Ready",
-      "redis_bad": "Not Ready",
-      "redis_p": "Not Ready"
-    }
+   $ export DIANA_SERVICES_PATH="${DIANA_DIR}/tests/resources/test_services.yml"
+   $ python3 diana-rest.py
+   $ curl -X GET "http://localhost:8080/v1.0/endpoint"
+   {
+     "orthanc": "Not Ready",
+     "orthanc_bad": "Not Ready",
+     "redis": "Not Ready",
+     "redis_bad": "Not Ready",
+     "redis_p": "Not Ready"
+   }
 
 See http://localhost:8080/ui for a Swagger API dashboard.
 

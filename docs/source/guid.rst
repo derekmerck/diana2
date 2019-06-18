@@ -10,39 +10,39 @@ As a Python library:
 
 .. code:: python
 
-    >>> from diana.utils.guid import GUIDMint
-    >>> GUIDMint().get_sham_id( name="MERCK^DEREK^L" )
-    {
-      'BirthDate': datetime.date(1988, 11, 20),
-      'ID': 'VXNQHHN523ZQNJFIY3TXJM4YXABTL6SL',
-      'Name': ['VANWASSENHOVE', 'XAVIER', 'N'],
-      'TimeOffset': datetime.timedelta(-47, 82822)
-    }
+   >>> from diana.utils.guid import GUIDMint
+   >>> GUIDMint().get_sham_id( name="MERCK^DEREK^L", age=30 )
+   {
+     'BirthDate': datetime.date(1988, 11, 20),
+     'ID': 'VXNQHHN523ZQNJFIY3TXJM4YXABTL6SL',
+     'Name': ['VANWASSENHOVE', 'XAVIER', 'N'],
+     'TimeOffset': datetime.timedelta(-47, 82822)
+   }
 
 From ``diana-cli``:
 
 .. code:: yaml
 
-    $ python3 diana-cli.py guid "MERCK^DEREK^L" --age 30
-    Generating GUID
-    ------------------------
-    WARNING:GUIDMint:Creating non-reproducible GUID using current date
-    {'birth_date': '19881120',
-     'id': 'VXNQHHN523ZQNJFIY3TXJM4YXABTL6SL',
-     'name': 'VANWASSENHOVE^XAVIER^N',
-     'time_offset': '-47 days, 23:00:22'}
+   $ diana-cli guid "MERCK^DEREK^L" --age 30
+   Generating GUID
+   ------------------------
+   WARNING:GUIDMint:Creating non-reproducible GUID using current date
+   {'birth_date': '19881120',
+    'id': 'VXNQHHN523ZQNJFIY3TXJM4YXABTL6SL',
+    'name': 'VANWASSENHOVE^XAVIER^N',
+    'time_offset': '-47 days, 23:00:22'}
 
 Or from the ``diana-REST`` api:
 
 .. code:: yaml
 
-    $ curl -X GET "http://localhost:8080/v1.0/guid?name=MERCK%5EDEREK%5EL&age=30&sex=U"
-    {
-      "birth_date": "19881120",
-      "id": "VXNQHHN523ZQNJFIY3TXJM4YXABTL6SL",
-      "name": "VANWASSENHOVE^XAVIER^N",
-      "time_offset": "-47 days, 23:00:22"
-    }
+   $ curl -X GET "http://localhost:8080/v1.0/guid?name=MERCK%5EDEREK%5EL&age=30&sex=U"
+   {
+     "birth_date": "19881120",
+     "id": "VXNQHHN523ZQNJFIY3TXJM4YXABTL6SL",
+     "name": "VANWASSENHOVE^XAVIER^N",
+     "time_offset": "-47 days, 23:00:22"
+   }
 
 Algorithm
 ---------

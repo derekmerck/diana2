@@ -10,8 +10,10 @@ from diana.utils import SmartJSONEncoder
 
 services = {}
 
+
 def hello():
     print("Hello there")
+
 
 def endpoints():
 
@@ -23,17 +25,20 @@ def endpoints():
         results[ep_key] = "Ready" if ep.check() else "Not Ready"
     return results
 
+
 def get(service_key, id, level):
 
     ep = services.get(service_key)
     res = ep.get(id, level=level)
     return res
 
+
 def delete(service_key, id, level):
 
     ep = services.get(service_key)
     res = ep.delete(id, level=level)
     return res
+
 
 def find(service_key, query, domain=None):
 
@@ -43,6 +48,7 @@ def find(service_key, query, domain=None):
     else:
         res = ep.find(query)
     return res
+
 
 def fiup(registry_key, path, accession_number, dest_key):
     R = Redis(**services[registry_key])
@@ -55,12 +61,14 @@ def fiup(registry_key, path, accession_number, dest_key):
         dest=O
     )
 
+
 def collect(source_key, domain, dest_key, studies):
     source = Orthanc(**services[source_key])
     dest = Orthanc(**services[dest_key])
 
     # TODO: Need to create a tmp data dir?
-    Collector().run(_,_,source, domain, dest)
+    Collector().run(_, _, source, domain, dest)
+
 
 def mint_guid(name,
               birth_date=None,
@@ -87,7 +95,6 @@ def mint_guid(name,
     return resp
 
 
-
 def init_app():
 
     def load_services(services_path):
@@ -106,8 +113,8 @@ def init_app():
 
     return app
 
+
 app = init_app()
 
 if __name__ == "__main__":
     app.run(port=8080)
-

@@ -42,7 +42,6 @@ class AttrSerializable(object):
         data = json.dumps(map, cls=SmartJSONEncoder)
         return data
 
-
     class AttrFactory(object):
 
         registry = {}
@@ -68,5 +67,9 @@ class AttrSerializable(object):
 
             return _cls(**kwargs)
 
+        def copy(cls, ref: "AttrSerializable"):
+            kwargs = ref.asdict()
+            obj = cls.create(**kwargs)
+            return obj
 
     Factory = AttrFactory()

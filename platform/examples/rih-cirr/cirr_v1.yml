@@ -6,6 +6,10 @@ networks:
   admin_proxy_network:
     external: true   # Created by admin-stack
 
+  service_network:
+    driver: overlay
+    attachable: true
+
 
 volumes:
   postgres_data:
@@ -26,7 +30,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - default
+      - service_network
     environment:
       POSTGRES_USER:            orthanc
       POSTGRES_PASSWORD:        ${POSTGRES_PASSWORD}
@@ -45,14 +49,14 @@ services:
       - 14242:4242
     networks:
       - admin_proxy_network
-      - default
+      - service_network
     environment:
-      ORTHANC_NAME:             CIRR Archive v1
+      ORTHANC_NAME:             CIRR v1 Archive
       ORTHANC_AET:              CIRRV1
       ORTHANC_MOD_0:            ${RIH_MOD_RIHA}
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_PG_ENABLED:       "true"
-      ORTHANC_PG_DATABASE:      ${POSTGRES_DATABASE}
+      ORTHANC_PG_DATABASE:      archive2  # V1 database name
       ORTHANC_PG_HOST:          postgres
       ORTHANC_PG_USER:          orthanc
       ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}

@@ -6,6 +6,9 @@ networks:
   admin_proxy_network:
     external: true   # Created by admin-stack
 
+  cirr_service_network:
+    external: true   # Created by (old) cirr data-stack
+
 
 services:
 
@@ -15,6 +18,7 @@ services:
       - 4242:4242
     networks:
       - admin_proxy_network
+      - cirr_service_network
       - default
     environment:
       ORTHANC_NAME:             Archive

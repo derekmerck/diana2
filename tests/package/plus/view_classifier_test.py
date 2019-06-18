@@ -1,4 +1,4 @@
-import logging
+import os, logging
 
 from diana.dixel import DixelView
 from diana.apis import DcmDir
@@ -8,12 +8,15 @@ from test_utils import find_resource
 
 import pytest
 
+# On Mac there is a duplicate MP library from compilers
+os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
+
 
 @pytest.mark.skip(reason="Need to dl models")
 def test_view_classifier():
 
     # These weights classify as AP (pos) or Lateral (neg)
-    fp = find_resource("resources/models/view_classifier/view_classifier.h5")
+    fp = find_resource("resources/models/pose/view_classifier.h5")
 
     _model = get_mobilenet(0, weights=None)
     _model.load_weights(fp)
@@ -25,6 +28,7 @@ def test_view_classifier():
     d = D.get("ct_scout_01.dcm", view=DixelView.PIXELS)
     prediction = d.get_prediction(_model)
 
+    logging.debug("Prediction is {}".format(prediction))
     assert( prediction < 0.5 )
 
     # prediction = get_prediction( model, image )
@@ -40,6 +44,7 @@ def test_view_classifier():
     d = D.get("ct_scout_02.dcm", view=DixelView.PIXELS)
     prediction = d.get_prediction(_model)
 
+    logging.debug("Prediction is {}".format(prediction))
     assert( prediction >= 0.5 )
 
 

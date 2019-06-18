@@ -7,6 +7,8 @@ from . import Dixel
 from ..utils.gateways import orthanc_id
 from ..utils.guid import GUIDMint
 from ..utils.dicom import dicom_date, dicom_name, dicom_datetime, DicomLevel, DicomUIDMint
+from ..utils.dicom.uid_mint import hash_str
+
 
 def mktime(datestr, timestr=""):
     if not datestr and not timestr:
@@ -19,6 +21,7 @@ def mktime(datestr, timestr=""):
     return dt
 
 # TODO: Minor reformat to handle pre-shammed Dixels, ie, don't assume sham_info must be created
+
 
 @attr.s(cmp=False, hash=False)
 class ShamDixel(Dixel):
@@ -66,11 +69,9 @@ class ShamDixel(Dixel):
 
         return sham_info
 
-
     def __attrs_post_init__(self):
-        Dixel.update_meta(self)
+        self.simplify_tags()  # Create meta dts
         self.update_shams()
-
 
     def update_shams(self):
 
@@ -183,6 +184,8 @@ class ShamDixel(Dixel):
         else:
             keep.append('StudyDescription')
 
+        # TODO: At study level - set keep series descriptions when?
+
         if self.level >= DicomLevel.SERIES:
             replace['SeriesInstanceUID'] = ShamDixel.ShamSeriesUID(self)
             replace['SeriesTime'] = ShamDixel.ShamSeriesTime(self)
@@ -210,8 +213,18 @@ class ShamDixel(Dixel):
     @property
     def image_base_fn(self):
         """Filename for shammed image instance"""
+
+        ser_num = self.tags.get("SeriesNumber",
+                                hash_str(self.tags["SeriesInstanceUID"], 4))
+        inst_num = self.tags.get("InstanceNumber",
+                                 hash_str(self.tags["SOPInstanceUID"], 4))
+
         return "{acc}-{ser:04}-{ins:04}".format(acc=self.meta['ShamAccessionNumber'],
-                                                ser=self.tags["SeriesNumber"],
-                                                ins=self.tags["InstanceNumber"])
+                                                ser=ser_num,
+                                                ins=inst_num)
 
+    def sid(self):
+        return self.meta.get('ShamAccessionNumber')
 
+    def __cmp__(self, other):
+        return self.sid == other.sid or self.acc_num == other.sid

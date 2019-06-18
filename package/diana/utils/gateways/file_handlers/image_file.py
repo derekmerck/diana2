@@ -18,7 +18,6 @@ class ImageFileHandler(FileHandler):
 
         data = np.float32(data)
 
-
         data = np.maximum(data, -1024)
         data -= np.min(data)
         data /= 2**12
@@ -39,17 +38,25 @@ class ImageFileHandler(FileHandler):
         if not os.path.exists( os.path.dirname(fp) ):
             os.makedirs(os.path.dirname(fp))
 
-        im = fromarray(data)
-        logging.debug(im)
+        try:
+            im = fromarray(data)
+        except TypeError as e:
+            logging.error(e)
+            logging.warning("Skipping file")
+            return
+
+        # logging.debug(im)
 
         if np.max(im.size) > max_size:
             logging.debug("Resizing")
-            logging.debug(data.shape)
+            # logging.debug(data.shape)
             _max = np.max(im.size)
             new_size = np.int32((im.size / _max) * max_size)
-            logging.debug(new_size)
+            # logging.debug(new_size)
             im = im.resize(new_size)
-            logging.debug(im)
+            # logging.debug(im)
 
         im.save(fp)
 
+    def get(self, fn: str):
+        raise NotImplementedError("Can not create a DICOM object from an image file.")

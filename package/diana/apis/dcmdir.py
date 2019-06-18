@@ -1,10 +1,13 @@
-import os, logging, io
-from typing import Union
+import os, logging, io, hashlib
+from io import BytesIO
+from pathlib import Path
+from typing import Union, Collection
 import attr
+import pydicom
 from ..dixel import Dixel, DixelView, ShamDixel
 from ..utils import Endpoint, Serializable
 from ..utils.dicom import DicomLevel
-from ..utils.gateways import DcmFileHandler, ZipFileHandler, ImageFileHandler, ImageFileFormat
+from ..utils.gateways import DcmFileHandler, ZipFileHandler, ImageFileHandler, ImageFileFormat, TextFileHandler
 
 
 
@@ -48,7 +51,7 @@ class DcmDir(Endpoint, Serializable):
 
         logger = logging.getLogger(self.name)
         logger.debug("EP GET")
-        if isinstance(item, str):
+        if isinstance(item, str) or isinstance(item, Path):
             fn = item
         elif isinstance(item, Dixel) or hasattr(item, 'fn'):
             fn = item.fn
@@ -85,9 +88,17 @@ class DcmDir(Endpoint, Serializable):
             raise ValueError("Item has no fn attribute, so it requires an explicit filename")
         return self.gateway.delete(fn)
 
-    def exists(self, fn: str):
+    def exists(self, item: Union[str, Dixel]):
         logger = logging.getLogger(self.name)
         logger.debug("EP EXISTS")
+
+        if isinstance(item, Dixel):
+            fn = item.fn
+        elif isinstance(item, str):
+            fn = item
+        else:
+            raise ValueError("Unknown file name")
+
         # if self.gateway.isdir(fn):
         #     return False
         return self.gateway.exists(fn)
@@ -97,15 +108,27 @@ class DcmDir(Endpoint, Serializable):
         logger.debug("EP CHECK")
         return os.path.exists(self.path)
 
-    def get_zipped(self, item: str):
+    def get_zipped(self, item: Union[Path, str]):
+        logger = logging.getLogger(self.name)
+        logger.debug("EP GET ZIPPED")
         gateway = ZipFileHandler(path=self.path)
-        files = gateway.unpack(item)
+        files = gateway.unzip(item)
         result = set()
-        for f in files:
-            d = Dixel(level=DicomLevel.INSTANCES)
-            d.file = f
-            result.add(d)
+        for fn, f in files:
+            try:
+                ds = pydicom.dcmread(BytesIO(f), stop_before_pixels=True)
+                d = Dixel.from_pydicom(ds, fn)
+                d.file = f
+                result.add(d)
+            except pydicom.errors.InvalidDicomError as e:
+                logging.warning("Failed to parse with {}".format(e))
         return result
+
+    def put_zipped(self, item: Union[Path, str], items: Collection):
+        logger = logging.getLogger(self.name)
+        logger.debug("EP PUT ZIPPED")
+        gateway = ZipFileHandler(path=self.path)
+        gateway.zip(item, items)
 
     def subdirs(self):
         """Generator for nested sub-directories.
@@ -160,6 +183,42 @@ class DcmDir(Endpoint, Serializable):
 
 
 @attr.s
+class ReportDir(DcmDir):
+    name = attr.ib(default="ReportDir")
+
+    gateway = attr.ib(init=False, repr=False)
+    @gateway.default
+    def setup_gateway(self):
+        return TextFileHandler(path=self.path,
+                                subpath_width = self.subpath_width,
+                                subpath_depth = self.subpath_depth)
+
+    def exists(self, item: Dixel, **kwargs):
+
+        if self.anonymizing:
+            base_fn = hashlib.md5(item.tags["AccessionNumber"].encode("UTF-8")).hexdigest()
+        else:
+            base_fn = item.tags["AccessionNumber"]
+
+        fn = "{}.txt".format(base_fn)
+        return self.gateway.exists(fn)
+
+    def put(self, item: Dixel, **kwargs):
+        logger = logging.getLogger(self.name)
+        logger.debug("EP PUT")
+
+        if self.anonymizing:
+            base_fn = hashlib.md5(item.tags["AccessionNumber"].encode("UTF-8")).hexdigest()
+            data = item.report.anonymized()
+        else:
+            base_fn = item.tags["AccessionNumber"]
+            data = item.report.text
+
+        fn = "{}.txt".format(base_fn)
+        self.gateway.put(fn, data)
+
+
+@attr.s
 class ImageDir(DcmDir):
 
     name = attr.ib(default="ImageDir")
@@ -172,10 +231,29 @@ class ImageDir(DcmDir):
                                 subpath_width = self.subpath_width,
                                 subpath_depth = self.subpath_depth)
 
-    # TODO: handle pulling an image instance format directly from Orthanc (im_file attr?)
+    def exists(self, item: Union[Dixel, str]):
+        """Uses regular expression exists in gateway"""
+        logger = logging.getLogger(self.name)
+        logger.debug("EP EXISTS")
+
+        if isinstance(item, Dixel):
+            item = item.tags["AccessionNumber"]
+
+        if self.anonymizing:
+            base_fn = hashlib.md5(item.encode("UTF-8")).hexdigest()
+        else:
+            base_fn = item
+
+        fnre="{}*".format(base_fn)
+        return self.gateway.exists_re(fnre)
+
     def put(self, item: Dixel, **kwargs):
         logger = logging.getLogger(self.name)
         logger.debug("EP PUT")
+
+        if item.level != DicomLevel.INSTANCES:
+            self.put_zipped(item.file)
+            return
 
         if item.pixels is None:
             raise ValueError("Dixel has no pixels attribute, can only save pixel data")
@@ -189,10 +267,15 @@ class ImageDir(DcmDir):
     def put_zipped(self, item: str):
 
         gateway = ZipFileHandler(path=self.path)
-        files = gateway.unpack(item)  # Returns files as bytes
+        files = gateway.unpack(io.BytesIO(item))  # Returns files as bytes
         for f in files:
             if not DcmFileHandler.is_dicom(io.BytesIO(f)):
                 continue
             ds = pydicom.dcmread(io.BytesIO(f), stop_before_pixels=False)
             d = Dixel.from_pydicom(ds)
-            self.put(d)
+
+            try:
+                self.put(d)
+            except ValueError as e:
+                logging.error(e)
+                continue

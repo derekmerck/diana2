@@ -1,8 +1,5 @@
 # Diana-agnostic API for Splunk, with no endpoint or dixel dependencies
 
-# splunk-sdk does not support Python 3; this gateway provides a minimal
-# replacement to 'find' and 'put' events
-
 import time, logging, datetime, json as _json, socket
 from pprint import pformat
 from datetime import datetime, timedelta
@@ -18,19 +15,22 @@ from ...smart_json import SmartJSONEncoder
 
 @attr.s
 class Splunk(Requester):
+    """The official splunk-sdk is for Python2.7 only, so diana.utils.gateway
+    provides a minimal Python3 query/put replacement for data logging"""
 
     name = attr.ib(default="SplunkGateway")
     port = attr.ib( default="8088")
-    user     = attr.ib( default="admin" )
+    user = attr.ib( default="admin" )
     password = attr.ib( default="passw0rd!" )
     hec_protocol = attr.ib( default="http" )
     hec_port = attr.ib( default="8089" )
     hec_token = attr.ib( default=None, type=str )
     index = attr.ib( default="dicom" )
+
     hostname = attr.ib( )
     @hostname.default
     def set_hostname(self):
-        socket.gethostname()
+        return socket.gethostname()
 
     def find_events(self, q, timerange=None):
         logger = logging.getLogger(self.name)
@@ -96,14 +96,15 @@ class Splunk(Requester):
         return result
 
     def put_event( self,
-                   timestamp: datetime,
                    event: Mapping,
+                   timestamp: datetime = None,
                    hostname: str = None,
                    index: str = None,
                    hec_token: str = None ):
         logger = logging.getLogger(self.name)
 
         if not timestamp:
+            logging.warning("Did not declare timestamp, using now")
             timestamp = datetime.now()
 
         hec_token = hec_token or self.hec_token
@@ -146,7 +147,8 @@ class Splunk(Requester):
             headers = {'Authorization': 'Splunk {0}'.format(hec_token)}
 
             try:
-                result = requests.post(url, data=data, headers=headers, auth=self.auth)
+                logging.debug(headers)
+                result = requests.post(url, data=data, headers=headers)
             except requests.exceptions.ConnectionError as e:
                 raise GatewayConnectionError(e)
 

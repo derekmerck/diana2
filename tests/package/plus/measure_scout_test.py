@@ -2,11 +2,11 @@ import logging
 
 from diana.dixel import DixelView
 from diana.apis import DcmDir
-import diana.plus.measure_scout
+import diana.plus.measure_scout  # Monkey patch
 
 from test_utils import find_resource
 
-# TODO: Need to test after pulling directly from orthanc rather than reading from disk
+# TODO: Need to test after pulling directly from orthanc as well as reading from disk
 
 
 def test_measurement():

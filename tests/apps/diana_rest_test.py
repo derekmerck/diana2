@@ -2,19 +2,25 @@ import json
 import logging
 
 import pytest
-from conftest import setup_orthanc, setup_redis
 from test_utils import find_resource
 
 app = __import__('diana-rest').app
 
+
 @pytest.fixture
 def diana_rest():
+    client = mk_diana_rest()
+    yield client
+
+
+def mk_diana_rest():
     service_path = find_resource("resources/test_services.yml")
     app.app.load_services(service_path)
     client = app.app.test_client()
-    yield client
+    return client
 
-def test_rest_check(diana_rest, setup_orthanc, setup_redis):
+
+def test_rest_check(diana_rest, setup_orthanc0, setup_redis):
 
     expected = {
         "orthanc": "Ready",
@@ -48,8 +54,13 @@ def test_rest_guid(diana_rest):
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    for i in diana_rest():
-        test_rest_guid(i)
 
-    for i,j,k in zip( diana_rest(), setup_orthanc(), setup_redis() ):
-        test_rest_check(i,j,k)
+    D = mk_diana_rest()
+    test_rest_guid(D)
+
+    from conftest import mk_orthanc, mk_redis
+
+    O = mk_orthanc()
+    R = mk_redis()
+
+    test_rest_check(D, None, None)

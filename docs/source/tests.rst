@@ -18,9 +18,9 @@ Manually run pytest with coverage and upload to codecov:
 
 ::
 
-    $ pip install pytest coverage codecov
-    $ PYTHONPATH="./apps/diana-cli" pytest --cov
-    $ codecov --token=XXXXXXXXXX
+   $ pip install pytest coverage codecov
+   $ PYTHONPATH="./apps/diana-cli" pytest --cov
+   $ codecov --token=XXXXXXXXXX
 
 .. |Build Status| image:: https://travis-ci.org/derekmerck/diana2.svg?branch=master
    :target: https://travis-ci.org/derekmerck/diana2

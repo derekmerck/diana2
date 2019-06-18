@@ -5,9 +5,6 @@ from diana.apis import Redis
 from diana.dixel import Dixel
 from diana.utils import Serializable
 
-"""
-$ docker run -p 6379:6379 -d redis
-"""
 
 @attr.s
 class Test(Serializable):
@@ -58,6 +55,7 @@ def test_redis_ep(setup_redis):
     id2 = R.put(a)
     b = R.get(id2)
     assert( a == b )
+
 
 def test_redis_index(setup_redis):
 

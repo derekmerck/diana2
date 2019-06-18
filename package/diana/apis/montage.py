@@ -1,10 +1,14 @@
 import logging
+from functools import partial
+from datetime import datetime, timedelta
 from typing import Mapping
+from pprint import pformat
 import attr
 
-from ..utils import Endpoint, Serializable
+from ..utils import Endpoint, Serializable, FuncByDates
 from ..utils.gateways import Montage as MontageGateway, GatewayConnectionError
 from ..dixel import Dixel
+
 
 @attr.s(hash=False)
 class Montage(Endpoint, Serializable):
@@ -33,13 +37,14 @@ class Montage(Endpoint, Serializable):
             password = self.password
         )
 
-    def find(self, query: Mapping, index="rad", ignore_errs=True):
+    def find(self, query: Mapping, index="rad", ignore_errs=True, get_meta=False):
         r = self.gateway.find(query=query, index=index)
         ret = set()
         for item in r:
             try:
                 d = Dixel.from_montage_json(item)
-                d = self.get_meta(d)
+                if get_meta:
+                    d = self.get_meta(d)
                 ret.add(d)
             except Exception as e:
                 logger = logging.getLogger(self.name)
@@ -48,7 +53,6 @@ class Montage(Endpoint, Serializable):
                     raise e
         return ret
 
-
     def get_meta(self, item: Dixel):
         cpts = self.gateway.lookup_cpts(item.meta["MontageCPTCodes"])
         body_part = self.gateway.lookup_body_part(item.meta["MontageCPTCodes"])
@@ -56,7 +60,6 @@ class Montage(Endpoint, Serializable):
         item.meta['CPTCodes'] = cpts
         item.meta['BodyParts'] = body_part
         return item
-
 
     def check(self):
         logger = logging.getLogger(self.name)
@@ -69,3 +72,32 @@ class Montage(Endpoint, Serializable):
             logger.error(type(e))
             logger.error(e)
             return False
+
+    def iter_query_by_date(self, q: Mapping,
+                           start: datetime, stop: datetime, step: timedelta,
+                           get_meta=False):
+
+        def qdt(q, _start, _stop):
+            if not q:
+                _q = {}
+            else:
+                _q = {**q}
+            __start = min(_start, _stop)
+            __stop = max(_start, _stop)
+            __stop -= timedelta(seconds=1)
+            _q["start_date"] = __start.date().isoformat()
+            _q["end_date"] = __stop.date().isoformat()
+            return _q
+
+        func = partial(qdt, q)
+        gen = FuncByDates(func, start, stop, step)
+
+        for qq in gen:
+            logging.debug(pformat(qq))
+
+            cache = self.find(qq, get_meta=get_meta)
+            for item in cache:
+                yield item
+
+
+

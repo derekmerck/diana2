@@ -1,4 +1,4 @@
-DICOM Image Analysis and Archive
+![logo](resources/images/diana_logo_sm.png) DICOM Image Analysis and Archive
 ==================
 
 Derek Merck  
@@ -48,17 +48,29 @@ Diana-CLI provides a command-line interface to invoke several common pipelines. 
 ### Installation
 
 ```bash
-$ pip3 install -e diana2/apps/diana-cli
+$ pip3 install diana2/apps/diana-cli
 $ diana-cli --version
 2.x.x
 ```
 
 Diana-Plus functions are available as well.
 ```bash
-$ pip3 install -e diana2/apps/diana-cli[plus]
+$ pip3 install diana2/apps/diana-cli[plus]
 $ diana-plus --version
 2.x.x
 ```
+
+DIANA package hashes by version number are publicly posted at <https://gist.github.com/derekmerck/4b0bfbca0a415655d97f36489629e1cc> and can be easily validated through `diana-cli`.
+
+```bash
+$ diana-cli verify
+Package signature python-diana:2.x.x:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx is valid.
+```
+
+Of course, users should never trust a package to validate itself, so see [gistsig][] for details on the algorithm and how to perform a simple external audit.
+
+[gistsig]: https://github.com/derekmerck/gistsig
+
 
 Docker-Image
 ----------------

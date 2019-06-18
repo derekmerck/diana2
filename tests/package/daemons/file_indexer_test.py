@@ -5,8 +5,6 @@ from diana.daemons import FileIndexer
 from diana.apis import Orthanc, Redis
 
 import pytest
-from conftest import setup_orthanc, setup_redis
-
 
 # path = "/Users/derek/data/DICOM/Christianson"
 # recursion_style = "ORTHANC"
@@ -37,7 +35,7 @@ def test_index(setup_redis):
     """
 
 @pytest.mark.skip(reason="Needs large dataset for uploading")
-def test_upload(setup_redis, setup_orthanc):
+def test_upload(setup_redis, setup_orthanc0):
 
     print("Testing upload speed")
 
@@ -63,9 +61,16 @@ def test_upload(setup_redis, setup_orthanc):
 if __name__ == "__main__":
     logging.basicConfig(level=logging.WARNING)
 
-    for (i,j) in zip(setup_orthanc(), setup_redis()):
-        test_index(None)
-        #test_upload(None, None)
+    from conftest import mk_orthanc, mk_redis
+
+    O = mk_orthanc()
+    R = mk_redis
+
+    test_index(None)
+    #test_upload(None, None)
+
+    O.stop()
+    R.stop()
 
 """
 Overall fps about 120 for each part

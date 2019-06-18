@@ -1,4 +1,4 @@
-import os
+import os, logging
 from pprint import pprint
 from typing import Union, Mapping
 from functools import partial
@@ -14,6 +14,12 @@ def put_item(item: str, source: Endpoint, dest: Endpoint, **kwargs):
         return upload_item(fn=item, source=source,
                            dest=dest)
 
+    elif isinstance(source, ProxiedDicom) and (isinstance(dest, ImageDir) or isinstance(dest, DcmDir)):
+        query = {"AccessionNumber", item.tags["AccessionNumber"]}
+        return pull_and_save_item(query=query, level=item.level, source=source,
+                           dest=dest,
+                           anonymize=kwargs.get("anonymize"))
+
     elif isinstance(source, Orthanc) and isinstance(dest, Orthanc):
         return send_item(  oid=item, level=kwargs.get("level"), source=source,
                            dest=dest,
@@ -26,6 +32,7 @@ def put_item(item: str, source: Endpoint, dest: Endpoint, **kwargs):
                            dest=dest, index=kwargs.get("index"), token=kwargs.get("token"))
 
     raise NotImplementedError
+
 
 def send_item(oid: str, level: DicomLevel, source: Orthanc,
               dest: Union[Orthanc, str],
@@ -46,6 +53,36 @@ def send_item(oid: str, level: DicomLevel, source: Orthanc,
     if anonymize and remove_anon:
         source.delete(_oid, level=level)
 
+
+def pull_and_save_item(item: Dixel, source: ProxiedDicom,
+              dest: Union[DcmDir, ImageDir],
+              anonymize=False) -> str:
+
+    if dest.exists(item):
+        logging.debug("File already exists, exiting early")
+        return "SKIPPED"
+
+    query = {"AccessionNumber": item.tags["AccessionNumber"]}
+    source.find(query=query, level=item.level, retrieve=True)
+
+    # logging.debug("Retrieved id: {} vs item id: {}".format(r[0], item.oid() ))
+
+    if anonymize and not isinstance(dest, ImageDir):
+        # No need to anonymize if we are converting to images
+        item = source.proxy.anonymize(item, remove=True)
+
+    try:
+        item = source.proxy.get(item, view=DixelView.FILE)
+    except FileNotFoundError as e:
+        logging.error(e)
+        return "FAILED"
+
+    dest.put(item)
+    source.proxy.delete(item)
+
+    return "COMPLETED"
+
+
 def upload_item(fn: str, source: DcmDir, dest: Orthanc):
 
     if os.path.splitext(fn)[1] == "zip":
@@ -57,11 +94,16 @@ def upload_item(fn: str, source: DcmDir, dest: Orthanc):
         dest.put(item)
 
 
-def index_item(oid: str, level: DicomLevel, source: Endpoint,
+def index_item(item: Mapping, level: DicomLevel, source: Endpoint,
                dest: Endpoint, index=None, token=None):
 
-    d = source.get(oid, level=level, view=DixelView.TAGS)
-    dest.put(d, index=index, token=token)
+    try:
+        oid = item.get("oid")
+        d = source.get(oid, level=level, view=DixelView.TAGS)
+        dest.put(d, index=index, token=token)
+    except FileNotFoundError as e:
+        logging.warning("Skipping {}".format(e))
+        pass
 
 
 def query_and_index(query: Mapping, level: DicomLevel, source: Orthanc, domain: str,

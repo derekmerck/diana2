@@ -1,10 +1,11 @@
 import logging
 from typing import Mapping, Union
+from pprint import pformat
 import attr
 from ..dixel import Dixel, ShamDixel, DixelView
 from ..utils import Endpoint, Serializable
 from ..utils.gateways import Orthanc as OrthancGateway, GatewayConnectionError
-from ..utils.dicom import DicomLevel
+from ..utils.dicom import DicomLevel, dicom_simplify
 
 
 def sham_map(d: ShamDixel):
@@ -94,10 +95,9 @@ class Orthanc(Endpoint, Serializable):
 
         self.gateway.send(oid, dest, "peers")
 
-
-    def get(self, item: Union[Dixel, str],
-            level: DicomLevel=DicomLevel.STUDIES,
-            view: DixelView=DixelView.TAGS, **kwargs):
+    def get(self, item: Union[str, Dixel],
+            level: DicomLevel = DicomLevel.STUDIES,
+            view: DixelView = DixelView.TAGS, **kwargs):
         logger = logging.getLogger(self.name)
         logger.debug("Get")
 
@@ -106,6 +106,7 @@ class Orthanc(Endpoint, Serializable):
         try:
             r = self.gateway.get(oid, level, str(view))
         except GatewayConnectionError as e:
+            # e = "Gateway connection error"
             logger.warning(e)
             r = None
 
@@ -114,6 +115,7 @@ class Orthanc(Endpoint, Serializable):
                 # Want to update with data
                 if DixelView.TAGS in view:
                     item.tags.update(r)
+                    item.simplify_tags()
                 elif DixelView.FILE in view:
                     item.file = r
                 elif DixelView.META in view:
@@ -121,42 +123,67 @@ class Orthanc(Endpoint, Serializable):
                 return item
             else:
                 # Want a new file
-                if view==DixelView.TAGS:
-                    return Dixel(meta={"ID": oid}, tags=r, level=level)
-                elif view==DixelView.FILE:
+                if DixelView.TAGS in view:
+                    d = Dixel.from_orthanc(meta={"ID": oid},
+                                           tags=r,
+                                           level=level)
+
+                elif DixelView.FILE in view:
                     d = Dixel(meta={"ID": oid}, level=level)
                     d.file = r
-                    return d
-                elif view==DixelView.META:
-                    return Dixel(meta=r, level=level)
 
-        raise FileNotFoundError("Item {} does not exist".format(item))
+                elif DixelView.META in view:
+                    d = Dixel(meta=r, level=level)
 
-    def find(self, query: Mapping, level=DicomLevel.STUDIES, **kwargs):
+                return d
+
+        raise FileNotFoundError("Item {} does not exist".format(oid))
+
+    def find(self, item: Union[Mapping, Dixel],
+             level=DicomLevel.STUDIES, **kwargs) -> list:
         logger = logging.getLogger(self.name)
         logger.debug("Find")
 
+        if isinstance(item, Dixel):
+            query = item.query()
+            level = item.level
+        else:
+            query = item
+
         q = {"Level": "{!s}".format(level),
              "Query": query }
+
+        # logger.debug(pformat(q))
+
         r = self.gateway.find(q)
 
         # Returns a list of OIDs
         return r
 
     def rfind(self,
-              query: Mapping,
+              item: Union[Mapping, Dixel],
               domain: str,
               level=DicomLevel.STUDIES,
               retrieve=False) -> list:
         logger = logging.getLogger(self.name)
         logger.debug("Remote Find")
 
+        if isinstance(item, Dixel):
+            query = item.query()
+            level = item.level
+        else:
+            query = item
+
         q = {"Level": "{!s}".format(level),
              "Query": query }
 
+        # logger.debug(pformat(q))
+        # logger.debug(retrieve)
+
         try:
             r = self.gateway.rfind(q, domain, retrieve=retrieve)
-        except Exception as e:
+        except GatewayConnectionError as e:
+            # e = "Gateway connection error"
             logger.warning(e)
             r = None
 
@@ -167,8 +194,6 @@ class Orthanc(Endpoint, Serializable):
         logger = logging.getLogger(self.name)
         logger.debug("Delete")
 
-        logger.debug(item)
-
         oid, level = self.id_from_item(item, level)
         r = self.gateway.delete(oid, level)
 
@@ -178,7 +203,7 @@ class Orthanc(Endpoint, Serializable):
 
     def anonymize(self, item: Union[str, Dixel],
                   level=DicomLevel.STUDIES,
-                  replacement_map: Mapping=None,
+                  replacement_map: Mapping = None,
                   **kwargs):
 
         oid, level = self.id_from_item(item, level)
@@ -190,7 +215,6 @@ class Orthanc(Endpoint, Serializable):
                 raise ValueError("Anonymization requires a replacement map or dixel shams")
 
         return self.gateway.anonymize(oid, level, replacement_map)
-
 
     def check(self):
         logger = logging.getLogger(self.name)
@@ -204,19 +228,26 @@ class Orthanc(Endpoint, Serializable):
             logger.error(e)
             return False
 
+    def info(self):
+        logger = logging.getLogger(self.name)
+        logger.debug("Info")
+
+        try:
+            return self.gateway.statistics()
+        except GatewayConnectionError as e:
+            logger.warning("Failed to connect to Endpoint")
+            logger.error(type(e))
+            logger.error(e)
+            return False
 
     def patients(self):
         return self.gateway.inventory(level=DicomLevel.PATIENTS)
 
-
     def studies(self):
         return self.gateway.inventory(level=DicomLevel.STUDIES)
-
 
     def series(self):
         return self.gateway.inventory(level=DicomLevel.SERIES)
 
-
     def instances(self):
         return self.gateway.inventory(level=DicomLevel.INSTANCES)
-

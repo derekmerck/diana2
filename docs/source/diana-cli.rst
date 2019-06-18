@@ -1,5 +1,5 @@
-``diana-cli``
-=============
+diana-cli
+=========
 
 | Derek Merck
 | derek_merck@brown.edu
@@ -12,221 +12,359 @@
 | Documentation: https://diana.readthedocs.io
 | Image: https://cloud.docker.com/repository/docker/derekmerck/diana2
 
+``diana-cli`` provides a command-line interface to DIANA endpoints.
+
 ::
 
-    Usage: diana-cli [OPTIONS] COMMAND [ARGS]...
+   Usage: diana-cli [OPTIONS] COMMAND [ARGS]...
 
-      Run diana packages using a command-line interface.
+     Run diana packages using a command-line interface.
 
-    Options:
-      --verbose / --no-verbose
-      --version                 Show the version and exit.
-      -s, --services TEXT       Diana service desc as yaml format string
-      -S, --services_path PATH  Diana service desc as a yaml format file or
-                                directory of files
-      --help                    Show this message and exit.
+   Options:
+     --verbose / --no-verbose
+     --version                 Show the version and exit.
+     -s, --services TEXT       Diana service desc as yaml format string
+     -S, --services_path PATH  Diana service desc as a yaml format file or
+                               directory of files
+     --help                    Show this message and exit.
 
-    Commands:
-      check    Check endpoint status
-      collect  Collect and handle studies
-      dcm2im   Convert DICOM to image
-      findex   Create a persistent DICOM file index
-      fiup     Upload indexed DICOM files
-      guid     Generate a GUID
-      mock     Generate mock DICOM traffic
-      ofind    Find in Orthanc node
-      watch    Watch sources and route events
+   Commands:
+     check     Check endpoint status
+     collect   Collect and handle studies
+     dcm2im    Convert DICOM to image
+     dcm2json  Convert DICOM header to json
+     epdo      Call endpoint method
+     findex    Create a persistent DICOM file index
+     fiup      Upload indexed DICOM files
+     guid      Generate a GUID
+     mock      Generate mock DICOM traffic
+     ofind     Find item by query
+     verify    Verify DIANA source code against public gist signature
+     watch     Watch sources and route events
 
-      SERVICES is a required platform endpoint description in yaml format.
+     SERVICES is a required platform endpoint description in yaml format.
 
-      ---
-      orthanc:
-        ctype: Orthanc
-        port: 8042
-        host: my_orthanc
-      redis:
-        ctype: Redis
-      ...
+     ---
+     orthanc:
+       ctype: Orthanc
+       port: 8042
+       host: my_orthanc
+     redis:
+       ctype: Redis
+     ...
 
 check
 -----
 
 ::
 
-    Usage: diana-cli check [OPTIONS] [ENDPOINTS]...
+   Usage: diana-cli check [OPTIONS] [ENDPOINTS]...
 
-      Survey status of service ENDPOINTS
+     Survey status of service ENDPOINTS
 
-    Options:
-      --help  Show this message and exit.
+   Options:
+     --help  Show this message and exit.
 
 collect
 -------
 
 ::
 
-    Usage: diana-cli collect [OPTIONS] PROJECT DATA_PATH SOURCE DEST
+   Usage: diana-cli collect [OPTIONS] PROJECT DATA_PATH SOURCE DOMAIN [DEST]
 
-      Create a PROJECT key at DATA_PATH, then pull data from SOURCE and send to
-      DEST.
+     Create a PROJECT key at DATA_PATH, then pull data from SOURCE and send to
+     DEST.
 
-    Options:
-      --help  Show this message and exit.
+   Options:
+     -b, --subpath_depth INTEGER  Number of sub-directories to use
+     --help                       Show this message and exit.
 
 dcm2im
 ------
 
 ::
 
-    Usage: diana-cli dcm2im [OPTIONS] INPATH [OUTPATH]
+   Usage: diana-cli dcm2im [OPTIONS] INPATH [OUTPATH]
 
-      Convert a DICOM file or directory of files at INPATH into pixels and save
-      result in a standard image format (png, jpg) at OUTPATH.
+     Convert a DICOM file or directory of files at INPATH into pixels and save
+     result in a standard image format (png, jpg) at OUTPATH.
 
-    Options:
-      --help  Show this message and exit.
+   Options:
+     --help  Show this message and exit.
+
+dcm2json
+--------
+
+::
+
+   Usage: diana-cli dcm2json [OPTIONS] INPATH [OUTPATH]
+
+     Convert a DICOM file or directory of files at INPATH into dictionaries and
+     save result in text image format at OUTPATH.
+
+   Options:
+     --help  Show this message and exit.
+
+epdo
+----
+
+::
+
+   Usage: diana-cli epdo [OPTIONS] ENDPOINT METHOD
+
+     Call ENDPOINT METHOD with *args and **kwargs. Use "path:" for a DcmDir ep
+     and "ipath:" for an ImageDir epp.    $ diana-cli epdo orthanc info  $
+     diana-cli epdo ipath:/data/images exists -g my_file_name
+
+   Options:
+     -g, --args TEXT
+     -k, --kwargs TEXT
+     -a, --anonymize              (ImageDir only)
+     -b, --subpath_depth INTEGER  Number of sub-directories to use (*Dir Only)
+     --help                       Show this message and exit.
 
 findex
 ------
 
 ::
 
-    Usage: diana-cli findex [OPTIONS] PATH REGISTRY
+   Usage: diana-cli findex [OPTIONS] PATH REGISTRY
 
-      Inventory collections of files by accession number with a PATH REGISTRY for
-      retrieval
+     Inventory collections of files by accession number with a PATH REGISTRY for
+     retrieval
 
-    Options:
-      -o, --orthanc_db         Use subpath width/depth=2
-      -r, --regex TEXT         Glob regular expression
-      -p, --pool_size INTEGER  Worker threads
-      --help                   Show this message and exit.
+   Options:
+     -o, --orthanc_db         Use subpath width/depth=2
+     -r, --regex TEXT         Glob regular expression
+     -p, --pool_size INTEGER  Worker threads
+     --help                   Show this message and exit.
 
 fiup
 ----
 
 ::
 
-    Usage: diana-cli fiup [OPTIONS] COLLECTION PATH REGISTRY DEST
+   Usage: diana-cli fiup [OPTIONS] COLLECTION PATH REGISTRY DEST
 
-      Collect files in a study by COLLECTION (accession number) using a PATH
-      REGISTRY, and send to DEST.
+     Collect files in a study by COLLECTION (accession number) using a PATH
+     REGISTRY, and send to DEST.
 
-    Options:
-      -p, --pool_size INTEGER  Worker threads
-      --help                   Show this message and exit.
+   Options:
+     -p, --pool_size INTEGER  Worker threads
+     --help                   Show this message and exit.
 
 guid
 ----
 
 ::
 
-    Usage: diana-cli guid [OPTIONS] NAME [[%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d
-                          %H:%M:%S]] [GENDER]
+   Usage: diana-cli guid [OPTIONS] NAME [[%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d
+                         %H:%M:%S]] [GENDER]
 
-      Generate a globally unique sham ID from NAME, DOB, and GENDER.
+     Generate a globally unique sham ID from NAME, DOB, and GENDER.
 
-    Options:
-      --age INTEGER                   Substitute age and ref date for DOB
-      --reference_date [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
-                                      Reference date for AGE
-      --help                          Show this message and exit.
+   Options:
+     --age INTEGER                   Substitute age and ref date for DOB
+     --reference_date [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
+                                     Reference date for AGE
+     --help                          Show this message and exit.
 
-      $ python3 diana-cli.py guid "MERCK^DEREK^L" --age 30
-      Generating GUID
-      ------------------------
-      WARNING:GUIDMint:Creating non-reproducible GUID using current date
-      {'BirthDate': datetime.date(1988, 11, 20),
-       'ID': 'VXNQHHN523ZQNJFIY3TXJM4YXABTL6SL',
-       'Name': ['VANWASSENHOVE', 'XAVIER', 'N'],
-       'TimeOffset': datetime.timedelta(-47, 82822)}
+     $ python3 diana-cli.py guid "MERCK^DEREK^L" --age 30
+     Generating GUID
+     ------------------------
+     WARNING:GUIDMint:Creating non-reproducible GUID using current date
+     {'BirthDate': datetime.date(1988, 11, 20),
+      'ID': 'VXNQHHN523ZQNJFIY3TXJM4YXABTL6SL',
+      'Name': ['VANWASSENHOVE', 'XAVIER', 'N'],
+      'TimeOffset': datetime.timedelta(-47, 82822)}
 
 mock
 ----
 
 ::
 
-    Usage: diana-cli mock [OPTIONS] [DESC]
+   Usage: diana-cli mock [OPTIONS] [DESC]
 
-      Generate synthetic studies on a schedule according to a site description
-      DESC.  Studies are optionally forwarded to an endpoint DEST.
+     Generate synthetic studies on a schedule according to a site description
+     DESC.  Studies are optionally forwarded to an endpoint DEST.
 
-    Options:
-      --dest TEXT  Destination DICOM service
-      --help       Show this message and exit.
+   Options:
+     --dest TEXT  Destination DICOM service
+     --help       Show this message and exit.
 
-      DESC must be a mock-site description in yaml format.
+     DESC must be a mock-site description in yaml format.
 
-      ---
-      - name: Example Hospital
-        services:
-        - name: Main CT
-          modality: CT
-          devices: 3
-          studies_per_hour: 15
-        - name: Main MR
-          modality: MR
-          devices: 2
-          studies_per_hour: 4
-      ...
+     ---
+     - name: Example Hospital
+       services:
+       - name: Main CT
+         modality: CT
+         devices: 3
+         studies_per_hour: 15
+       - name: Main MR
+         modality: MR
+         devices: 2
+         studies_per_hour: 4
+     ...
 
 ofind
 -----
 
 ::
 
-    Usage: diana-cli ofind [OPTIONS] QUERY SOURCE
+   Usage: diana-cli ofind [OPTIONS] SOURCE
 
-      Find studies matching yaml/json QUERY in SOURCE Orthanc service.  The
-      optional proxy DOMAIN issues a remote-find to a proxied DICOM endpoint.
+     Find studies matching yaml/json QUERY in SOURCE Orthanc or ProxiedDicom
+     service. The optional proxy DOMAIN issues a remote-find to a manually
+     proxied DICOM endpoint.
 
-    Options:
-      --domain TEXT   Domain for proxied query
-      -r, --retrieve
-      --help          Show this message and exit.
+   Options:
+     -a, --accession_number TEXT
+     --today
+     -q, --query TEXT             Query in json format
+     -l, --level TEXT
+     -d, --domain TEXT            Domain for proxied query when using Orthanc
+                                  source
+     -r, --retrieve
+     --help                       Show this message and exit.
+
+verify
+------
+
+::
+
+   Usage: diana-cli verify [OPTIONS]
+
+     Verify DIANA source code against public gist signature.
+
+     This function is a convenience only; if the package has been altered, it
+     could easily be altered to return correct hashes or check the wrong gist.
+     The paranoid should refer to <https://github.com/derekmerck/gistsig> for
+     instructions on finding performing an external manual audit.
+
+   Options:
+     --help  Show this message and exit.
 
 watch
 -----
 
 ::
 
-    Usage: diana-cli watch [OPTIONS]
+   Usage: diana-cli watch [OPTIONS]
 
-      Watch sources for events to handle based on ROUTES
+     Watch sources for events to handle based on ROUTES
 
-    Options:
-      -r, --route TEXT...
-      -R, --routes_path PATH
-      --help                  Show this message and exit.
+   Options:
+     -r, --route TEXT...
+     -R, --routes_path PATH
+     --help                  Show this message and exit.
 
-      Examples:
+     Examples:
 
-      $ diana-cli watch -r upload_files path:/incoming queue
-      $ diana-cli watch -r anon_and_send_instances queue archive
-      $ diana-cli watch -r index_studies pacs splunk
-      $ diana-cli watch -r classify_ba archive splunk
-      $ diana-cli watch -R routes.yml
+     $ diana-cli watch -r upload_files path:/incoming queue
+     $ diana-cli watch -r anon_and_send_instances queue archive
+     $ diana-cli watch -r index_studies pacs splunk
+     $ diana-cli watch -r classify_ba archive splunk
+     $ diana-cli watch -R routes.yml
 
-      Multiple ROUTES file format:
+     Multiple ROUTES file format:
 
-      ---
-      - handler: upload_files
-        source: "path:/incoming"
-        dest: queue
-      - handler: anon_and_send_instances
-        source: queue
-        dest: archive
-      - handler: index_studies
-        source: pacs
-        dest: splunk
-      ...
+     ---
+     - handler: upload_files
+       source: "path:/incoming"
+       dest: queue
+     - handler: anon_and_send_instances
+       source: queue
+       dest: archive
+     - handler: index_studies
+       source: pacs
+       dest: splunk
+     ...
 
-      Provided route handlers:
+     Provided route handlers:
 
-      - say_dlvl
-      - send_dlvl or anon_and_send_dlvl
-      - upload_files
-      - index_dlvl
+     - say_dlvl
+     - send_dlvl or anon_and_send_dlvl
+     - upload_files
+     - index_dlvl
+
+diana-plus
+==========
+
+``diana-plus`` provides additional commands for pixel-processing.
+
+::
+
+   Usage: diana-plus [OPTIONS] COMMAND [ARGS]...
+
+     Run diana and diana-plus packages using a command-line interface.
+
+   Options:
+     --verbose / --no-verbose
+     --version                 Show the version and exit.
+     --help                    Show this message and exit.
+
+   Commands:
+     check     Check endpoint status
+     classify  Classify DICOM files
+     collect   Collect and handle studies
+     dcm2im    Convert DICOM to image
+     dcm2json  Convert DICOM header to json
+     epdo      Call endpoint method
+     findex    Create a persistent DICOM file index
+     fiup      Upload indexed DICOM files
+     guid      Generate a GUID
+     mock      Generate mock DICOM traffic
+     ofind     Find item by query
+     ssde      Estimate patient size from localizer
+     verify    Verify DIANA source code against public gist signature
+     watch     Watch sources and route events
+
+ssde
+----
+
+::
+
+   Usage: diana-plus ssde [OPTIONS] PATH [IMAGES]...
+
+     Estimate patient dimensions from CT-localizer IMAGES for size-specific dose
+     estimation.
+
+   Options:
+     --help  Show this message and exit.
+
+     Basic algorithm is to use a 2-element Guassian mixture model to find a
+     threshold that separates air from tissue across breadth of the image.  Known
+     to fail when  patients do not fit in the scout field of view.
+
+     Returns image orientation and estimated distance in centimeters.  These
+     measurements can be converted into equivalent water volumes using AAPM-
+     published tables.
+
+     $ diana-plus ssde tests/resources/scouts ct_scout_01.dcm ct_scout_02.dcm
+     Measuring scout images
+     ------------------------
+     ct_scout_01.dcm (AP): 28.0cm
+     ct_scout_02.dcm (LATERAL): 43.0cm
+
+classify
+--------
+
+::
+
+   Usage: diana-plus classify [OPTIONS] MODEL PATH [IMAGES]...
+
+     Apply a classification MODEL to PATH with IMAGES
+
+   Options:
+     -p, --positive TEXT  Positive class
+     -n, --negative TEXT  Negative class
+     --help               Show this message and exit.
+
+     $ diana-plus classify resources/models/view_classifier/view_classifier.h5 tests/resources/dcm IM2263
+     Classifying images
+     ------------------
+     Predicted: negative (0.88)
 
 License
 -------

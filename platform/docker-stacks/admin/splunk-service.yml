@@ -4,10 +4,10 @@ networks:
   admin_proxy_network:
     external: true   # Created by admin-stack
 
-  cirr1_default:
+  cirr_service_network:
     external: true
 
-  cirr2_default:
+  cirr1_service_network:
     external: true
 
 volumes:
@@ -26,7 +26,7 @@ services:
       - "8089:8089"
     networks:
       - admin_proxy_network
-      - cirr1_default
+      - cirr_default
       - cirr2_default
     volumes:
       - splunk_data:/opt/splunk/etc

@@ -25,6 +25,7 @@ addons:
       - python3-scipy
 
 before_install:
+  - pip3 install --upgrade pip
 
   # Put docker into "experimental" for manifest function
   - mkdir -p $HOME/.docker
@@ -65,6 +66,9 @@ after_success:
 
   # Put testing coverage data on code cov
   - codecov
+
+  # Save the new version hashes
+  - gistsig -g 4b0bfbca0a415655d97f36489629e1cc push diana diana_cli
 
   - DIANA_VERSION=$(python3 -c "import diana; print(diana.__version__)")
 

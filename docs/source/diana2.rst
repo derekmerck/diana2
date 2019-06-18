@@ -28,6 +28,75 @@ monitoring. It provides DICOM services, image data indexing, REST
 endpoints for scripting, and user access control through an amalgamation
 of free and free and open source (FOSS) systems.
 
+Python-Diana
+------------
+
+The Python-Diana package for Python >= 3.6 provides an api for a network
+of DICOM-file related services including PACS query, local archive,
+anonymization, file access, and study indexing.
+
+It comes in two flavors: vanilla and “plus,” which includes dependencies
+on scientific and machine learning packages.
+
+Installation
+~~~~~~~~~~~~
+
+.. code:: bash
+
+   $ git clone git+https://github.com/derekmerck/diana2
+   $ pip3 install -e diana2/package
+   $ pip3 install -e diana2/package[plus]
+
+Diana-CLI
+---------
+
+Diana-CLI provides a command-line interface to invoke several common
+pipelines. It requires a service definition yaml file as input.
+
+.. _installation-1:
+
+Installation
+~~~~~~~~~~~~
+
+.. code:: bash
+
+   $ pip3 install diana2/apps/diana-cli
+   $ diana-cli --version
+   2.x.x
+
+Diana-Plus functions are available as well.
+
+.. code:: bash
+
+   $ pip3 install diana2/apps/diana-cli[plus]
+   $ diana-plus --version
+   2.x.x
+
+DIANA package hashes by version number are publicly posted at
+https://gist.github.com/derekmerck/4b0bfbca0a415655d97f36489629e1cc and
+can be easily validated through ``diana-cli``.
+
+.. code:: bash
+
+   $ diana-cli verify
+   Package signature python-diana:2.x.x:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx is valid.
+
+Of course, users should never trust a package to validate itself, so see
+`gistsig <https://github.com/derekmerck/gistsig>`__ for details on the
+algorithm and how to perform a simple external audit.
+
+Docker-Image
+------------
+
+The docker-image directory includes details on building diana2 and
+diana2-plus docker cross-platform docker images. Current builds of these
+images from ci are available on docker hub.
+
+.. code:: bash
+
+   $ docker run -it derekmerck/diana2 /bin/bash diana-cli --version
+   ('diana-cli.py', 'python-diana'), version ('2.x.x', '2.x.x')
+
 License
 -------
 

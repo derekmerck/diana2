@@ -1,18 +1,21 @@
 import logging
 import click
-import plus_commands
 from diana.utils.gateways import supress_urllib_debug
+from diana_cli import __version__
 from diana import __version__ as diana_version
 
-__version__ = "2.1.1"
+from diana_cli.cli import cmds as cli_cmds
+
+from .ssde import ssde
+from .classify import classify
 
 
 @click.group(name="diana-plus")
 @click.option('--verbose/--no-verbose', default=False)
 @click.version_option(version=(__version__, diana_version),
-                      prog_name=("diana-plus.py", "python-diana"))
+                      prog_name=("diana-plus", "python-diana"))
 def cli(verbose):
-    """Run diana-plus packages using a command-line interface."""
+    """Run diana and diana-plus packages using a command-line interface."""
 
     if verbose:
         logging.basicConfig(level=logging.DEBUG)
@@ -23,12 +26,13 @@ def cli(verbose):
         supress_urllib_debug()
 
 
-coms = [
-    plus_commands.ssde,
-    plus_commands.classify,
+cmds = [
+    ssde,
+    classify,
 ]
 
-for c in coms:
+
+for c in cmds + cli_cmds:
     cli.add_command(c)
 
 

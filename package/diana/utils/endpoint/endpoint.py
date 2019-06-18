@@ -3,7 +3,7 @@ CRUD Endpoint API
 """
 
 from abc import ABC
-from typing import Mapping, TypeVar, NewType, Union, Sequence
+from typing import Mapping, TypeVar, NewType, Union, Sequence, Iterator, Collection
 import logging
 import attr
 
@@ -35,20 +35,20 @@ class Endpoint(ABC):
         """Retrieve item data"""
         raise NotImplementedError
 
-    def find(self, query: Query, retrieve: bool=False, **kwargs) -> Union[ItemID, Sequence[ItemID],
-                                                                          Item, Sequence[Item]]:
+    def find(self, item: Union[ItemID, Item, Query],
+             **kwargs) -> Union[Sequence[ItemID], Sequence[Item]]:
         """Identify items and optionally retrieve data by query"""
         raise NotImplementedError
 
-    def exists(self, item: Union[ItemID, Item, Query]) -> bool:
+    def exists(self, item: Union[ItemID, Item, Query], **kwargs) -> bool:
         """Check if an item exists by id or query"""
         logger = logging.getLogger(self.name)
         logger.debug("Checking exists on {}".format(item))
         if isinstance(item, Mapping):
-            return self.find(item) is not None
+            return self.find(item, **kwargs) is not None
         else:
             try:
-                return self.get(item) is not None
+                return self.get(item, **kwargs) is not None
             except Exception:
                 return False
 
@@ -57,6 +57,7 @@ class Endpoint(ABC):
         """Update data for an item in the endpoint"""
         raise NotImplementedError
 
+    # Handle
     def handle(self, item: Union[ItemID, Item], method: str, *args, **kwargs):
         """Call a class-specific method"""
         func = self.__getattribute__(method)
@@ -67,3 +68,22 @@ class Endpoint(ABC):
         """Remove an item from the endpoint"""
         raise NotImplementedError
 
+
+@attr.s
+class BroadcastingEndpoint(Endpoint):
+
+    eps = attr.ib(type=Iterator[Endpoint], default=None)
+
+    def put(self, item: Item, **kwargs):
+        for ep in self.eps:
+            ep.put(item, **kwargs)
+
+
+@attr.s
+class SelectiveEndpoint(Endpoint):
+
+    eps = attr.ib(type=Collection[Endpoint], default=None)
+
+    def put(self, item: Item, selector=None, **kwargs):
+        ep = self.eps[selector]
+        ep.put(item, **kwargs)

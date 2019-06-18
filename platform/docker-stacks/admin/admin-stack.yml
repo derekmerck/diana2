@@ -1,10 +1,11 @@
 # Provides Portainer and Traefik services and networks
 
-version: '3.0'
+version: '3.2'
 
 networks:
   proxy_network:
     driver: overlay
+    attachable: true
 
   agent_network:
     driver: overlay
@@ -24,6 +25,8 @@ services:
     deploy:
       mode: global
 
+  # create your portainer password:
+  # $ docker run --rm httpd:2.4-alpine htpasswd -nbB admin <password> | cut -d ":" -f 2
   portainer:
     image: portainer/portainer
     command: -H tcp://tasks.portainer-agent:9001 --tlsskipverify --admin-password ${PORTAINER_PASSWORD}

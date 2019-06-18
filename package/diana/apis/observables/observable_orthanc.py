@@ -3,6 +3,8 @@ from .. import Orthanc
 from ...utils.endpoint import Event, ObservableMixin
 from ...utils.dicom import DicomEventType
 
+# TODO: Add a persistent entry for "current_change", file with number, pickled state, redis...
+
 @attr.s
 class ObservableOrthanc(Orthanc, ObservableMixin):
     """

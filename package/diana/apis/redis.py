@@ -64,7 +64,6 @@ class Redis(Endpoint, Serializable):
 
         return key, data
 
-
     def put(self, item: Union[str, Serializable, Any], **kwargs) -> str:
         logger = logging.getLogger(self.name)
         logger.debug("EP PUT")
@@ -108,20 +107,17 @@ class Redis(Endpoint, Serializable):
         else:
             return data
 
-
     def find(self, query: Mapping, **kwargs):
         logger = logging.getLogger(self.name)
         logger.debug("EP FIND")
 
         raise NotImplementedError
 
-
     def delete(self, item: Union[str, Dixel], **kwargs):
         logger = logging.getLogger(self.name)
         logger.debug("EP DELETE")
 
         self.gateway.delete(item)
-
 
     def clear(self):
         logger = logging.getLogger(self.name)
@@ -130,6 +126,7 @@ class Redis(Endpoint, Serializable):
         self.gateway.flushdb()
 
 
+    ### Collections
 
     def add_to_collection(self, item: Dixel, prefix: str="",
                                  collection_key: str = "AccessionNumber",
@@ -143,8 +140,6 @@ class Redis(Endpoint, Serializable):
 
         See <https://stackoverflow.com/questions/34563144/redis-multiple-key-set-counts>
         """
-
-
 
         if item_key == "FilePath" and path:
             value = os.path.join(path, item.meta.get("FileName"))
@@ -169,7 +164,6 @@ class Redis(Endpoint, Serializable):
 
         self.gateway.sadd(key, value)
 
-
     def collections(self, prefix: str=""):
         keys = self.gateway.keys(prefix+"*")
         result = []
@@ -178,7 +172,6 @@ class Redis(Endpoint, Serializable):
             result.append( k[l:].decode("UTF-8") )
         return result
 
-
     def collected_items(self, collection: str, prefix: str=""):
         key = prefix + collection
         logger = logging.getLogger(self.name)
@@ -186,5 +179,5 @@ class Redis(Endpoint, Serializable):
         data = self.gateway.smembers(key)
         result = []
         for d in data:
-            result.append( d.decode("UTF-8") )
+            result.append(d.decode("UTF-8"))
         return result

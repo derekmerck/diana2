@@ -1,4 +1,4 @@
-version: '3.0'
+version: '3.2'
 
 
 networks:
@@ -6,12 +6,16 @@ networks:
   admin_proxy_network:
     external: true   # Created by admin-stack
 
+  service_network:
+    driver: overlay
+    attachable: true
+
 
 volumes:
   postgres_data:
     driver_opts:
         type: none
-        device: ${DATA_DIR}/${POSTGRES_DATA_DIR_V2}
+        device: ${DATA_DIR}/${POSTGRES_DATA_DIR}
         o: bind
 
 
@@ -20,7 +24,10 @@ services:
     image: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - service_network
     environment:
+      POSTGRES_USER:            ${POSTGRES_USER}
       POSTGRES_PASSWORD:        ${POSTGRES_PASSWORD}
       TZ: "America/New_York"
     deploy:
@@ -29,25 +36,36 @@ services:
         constraints:
           - node.labels.storage==true
 
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--requirepass ${REDIS_PASSWORD}"]
+    networks:
+      - service_network
+    environment:
+      TZ: "America/New_York"
+
   orthanc-archive:
     image: derekmerck/orthanc-confd:latest-amd64
     ports:
       - 4242:4242
     networks:
       - admin_proxy_network
-      - default
+      - service_network
     environment:
-      ORTHANC_NAME:             CIRR Archive v2
+      ORTHANC_NAME:             CIRR v2 Archive
       ORTHANC_AET:              CIRR
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_STORE_COMPRESSED: "true"
       ORTHANC_PG_ENABLED:       "true"
       ORTHANC_PG_STORE_DICOM:   "true"
-      ORTHANC_PG_DATABASE:      ${ORTHANC_PG_DATABASE}-archive
+      ORTHANC_PG_DATABASE:      archive2
       ORTHANC_PG_HOST:          postgres
-      ORTHANC_PG_USER:          postgres
+      ORTHANC_PG_USER:          ${POSTGRES_USER}
       ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
       ORTHANC_MOD_0:            ${RIH_MOD_RIHA}
+      ORTHANC_MOD_1:            ${RIH_MOD_TERA}
       ORTHANC_VERBOSE:          "true"
       TZ:                       "America/New_York"
     deploy:
@@ -56,33 +74,48 @@ services:
         - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/archive/"
-
+        - "traefik.backend.loadbalancer.stickiness=true"
 
   orthanc-bridge:
     image: derekmerck/orthanc-confd:latest-amd64
     ports:
-      - 4242:14242
+      - 11112:4242
     networks:
       - admin_proxy_network
-      - default
+      - service_network
     environment:
       ORTHANC_NAME:             Bridge
-      ORTHANC_AET:              BRIDGE
-      ORTHANC_MAX_STUDIES:      50
+      ORTHANC_AET:              ${ORTHANC_BRIDGE_AET}
+      ORTHANC_MAX_SIZE:         40000
+      ORTHANC_MAX_PATIENTS:     40  # 4x8 jobs max = 32 shared pts
+      ORTHANC_JOBS:             8
+      ORTHANC_SYNC_CMOVE:       "true"
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
       ORTHANC_STORE_COMPRESSED: "false"
+
+      ORTHANC_STABLE_AGE:       90  # up from 60, working with EA
+      ORTHANC_DICOM_SCU_TIMEOUT: 30  # up from 10, working with EA
+
       ORTHANC_PG_ENABLED:       "true"
       ORTHANC_PG_STORE_DICOM:   "true"
-      ORTHANC_PG_DATABASE:      ${ORTHANC_PG_DATABASE}-bridge
+      ORTHANC_PG_DATABASE:      bridge
       ORTHANC_PG_HOST:          postgres
+      ORTHANC_PG_USER:          ${POSTGRES_USER}
       ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
-      ORTHANC_MOD_0:            ${ORTHANC_MOD_0}   # Workstations
-      ORTHANC_PEER_1:           ${ORTHANC_PEER_1}  # Projects
+      ORTHANC_MOD_0:            ${RIH_MOD_PACS0}
+      ORTHANC_MOD_1:            ${RIH_MOD_PACS1}
+      ORTHANC_MOD_2:            ${RIH_MOD_CARDIO}
+      ORTHANC_PEER_0:           "project1,http://orthanc-project1/,admin,${ORTHANC_PASSWORD}"
+      ORTHANC_PEER_1:           "project2,http://orthanc-project2/,admin,${ORTHANC_PASSWORD}"
       ORTHANC_VERBOSE:          "true"
       TZ:                       "America/New_York"
     deploy:
-      replicas: 2  # Multiple nodes, PG provides data persistence
+      replicas: 2  # Make sure it has sticky label and access via traefik
+      placement:
+        constraints:
+          - node.labels.bridge==true
       labels:
         - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/bridge/"
+        - "traefik.backend.loadbalancer.stickiness=true"

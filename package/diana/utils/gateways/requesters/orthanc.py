@@ -1,4 +1,5 @@
 import logging
+from pprint import pformat
 from hashlib import sha1
 from enum import Enum
 import attr
@@ -38,6 +39,7 @@ class Orthanc(Requester):
 
     def rfind(self, query, domain, retrieve=False):
         # logger = logging.getLogger(name=self.name)
+        # logger.debug(pformat(query))
 
         result = []
 
@@ -55,10 +57,13 @@ class Orthanc(Requester):
                 resource = "queries/{}/answers/{}/content?simplify".format(response0.get('ID'), answer)
                 response2 = self._get(resource)
                 result.append(response2)
+                # logger.debug(response2)
 
                 if retrieve:
                     resource = "queries/{}/answers/{}/retrieve".format(response0.get('ID'), answer)
                     response3 = self._post(resource, data=self.aet)
+                    result.append(response3)
+                    # logger.debug(response3)
 
         return result
 
@@ -123,3 +128,8 @@ class Orthanc(Requester):
     def changes(self, current=0, limit=10):
         params = { 'since': current, 'limit': limit }
         return self._get("changes", params=params)
+
+    def recho(self, domain):
+        resource = "modalities/{}/echo".format(domain)
+        response = self._post(resource, data=self.aet)
+        return response

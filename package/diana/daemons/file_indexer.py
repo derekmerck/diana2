@@ -12,19 +12,21 @@ registered = Value('i', 0)
 uploaded = Value('i', 0)
 
 
-def index_file(fn, path=None, reg=None, prefix=None, counter0: Value=checked, counter1: Value=registered):
+def index_file(fn, path=None, reg=None, prefix=None,
+               _checked: Value = checked,
+               _registered: Value = registered):
 
-    counter0.value += 1
-    if counter0.value % 1000 == 0:
-        print("Indexing - {} checked".format(counter0.value))
+    _checked.value += 1
+    if _checked.value % 1000 == 0:
+        print("Indexing - {} checked".format(_checked.value))
     if not isinstance(reg, Redis):
         reg = Redis(**reg)
     try:
         d = DcmDir(path=path).get(fn, view=DixelView.TAGS)
         reg.add_to_collection(d, path=path, prefix=prefix)
         logging.info("Registered DICOM file {}".format(fn))
-        counter1.value+=1
-    except DicomFormatError:
+        _registered.value += 1
+    except (ValueError, DicomFormatError):
         logging.debug("Skipping non-DICOM or poorly formatted file {}".format(fn))
         pass
     except FileNotFoundError:
@@ -32,15 +34,15 @@ def index_file(fn, path=None, reg=None, prefix=None, counter0: Value=checked, co
         pass
 
 
-def put_inst(fn, dest, counter: Value=uploaded):
+def put_inst(fn, dest, _uploaded: Value = uploaded):
 
     d = DcmDir().get(fn, view=DixelView.FILE)  # Don't need pydicom data
     if not isinstance(dest, Orthanc):
         dest = Orthanc(**dest)
     dest.put(d)
-    counter.value+=1
-    if counter.value % 1000 == 0:
-        print("Uploading - {} handled".format(counter.value))
+    _uploaded.value+=1
+    if _uploaded.value % 1000 == 0:
+        print("Uploading - {} handled".format(_uploaded.value))
 
 
 @attr.s
@@ -54,6 +56,17 @@ class FileIndexer(object):
         if self.pool_size > 0:
             return Pool(self.pool_size)
 
+    @staticmethod
+    def prefix_for_path(basepath):
+        reg_prefix = hashlib.md5(basepath.encode("UTF-*")).hexdigest()[0:4] + "-"
+        return reg_prefix
+
+    @staticmethod
+    def items_on_path(basepath, registry):
+        reg_prefix = FileIndexer.prefix_for_path(basepath)
+        count = registry.collections(prefix=reg_prefix)
+        return count
+
     def index_path(self,
                    basepath,
                    registry,
@@ -66,7 +79,7 @@ class FileIndexer(object):
 
         print("Indexing path: {}".format(basepath))
 
-        reg_prefix = hashlib.md5(basepath.encode("UTF-*")).hexdigest()[0:4] + "-"
+        reg_prefix = FileIndexer.prefix_for_path(basepath)
         D = DcmDir(path=basepath, recurse_style=recurse_style)
         for path in D.subdirs():
             print("Working on path: {}".format(path))
@@ -94,7 +107,6 @@ class FileIndexer(object):
         print("Checking rate: {} files per second".format(round(checking_rate,1)))
         print("Handling rate: {} files per second".format(round(handling_rate,1)))
 
-
     def upload_path(self, basepath, registry: Redis, dest: Orthanc):
 
         tic = datetime.now()
@@ -102,7 +114,7 @@ class FileIndexer(object):
 
         print("Uploading path: {}".format(basepath))
 
-        reg_prefix = hashlib.md5(basepath.encode("UTF-*")).hexdigest()[0:4] + "-"
+        reg_prefix = FileIndexer.prefix_for_path(basepath)
         for collection in registry.collections(prefix=reg_prefix):
             self.upload_collection(collection, basepath, registry, dest)
 
@@ -114,7 +126,7 @@ class FileIndexer(object):
         print("Handling rate: {} files per second".format(round(handling_rate,1)))
 
     def upload_collection(self, collection, basepath, registry, dest):
-        reg_prefix = hashlib.md5(basepath.encode("UTF-*")).hexdigest()[0:4] + "-"
+        reg_prefix = FileIndexer.prefix_for_path(basepath)
         files = registry.collected_items(collection, prefix=reg_prefix)
         # logging.debug(files)
 

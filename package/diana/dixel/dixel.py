@@ -1,24 +1,14 @@
 import logging
+from pprint import pformat
 from typing import Mapping
 from dateutil import parser as DatetimeParser
 import attr
 import pydicom
 import numpy as np
 from .report import RadiologyReport
-from ..utils.dicom import DicomLevel
-from ..utils import Serializable
+from ..utils.dicom import DicomLevel, DicomFormatError
+from ..utils import Serializable, dicom_simplify
 from ..utils.gateways import orthanc_id, Montage
-
-
-def mktime(datestr, timestr):
-    if not datestr or not timestr:
-        return
-    # Parser does not like fractional seconds
-    timestr = timestr.split(".")[0]
-    dt_str = datestr + timestr
-    # logging.debug(dt_str)
-    dt = DatetimeParser.parse(dt_str)
-    return dt
 
 
 @attr.s(cmp=False, hash=False)
@@ -39,8 +29,8 @@ class Dixel(Serializable):
     # Making this init=False removes it from the serializer
     # Use a "from" constructor or add "file" manually after creation
     file   = attr.ib(default=None, repr=False, init=False)   #: Stores binary file representation
-    pixels = attr.ib(default=None, repr=False, init=False) #: Stores pixel array representation
-    report = attr.ib(default=None, repr=False, init=False) #: Stores study report as RadiologyReport
+    pixels = attr.ib(default=None, repr=False, init=False)   #: Stores pixel array representation
+    report = attr.ib(default=None, repr=False, init=False)   #: Stores study report as RadiologyReport
 
     #: Stores information about sub-dixels (series for study, instances for series)
     children = attr.ib(init=False, factory=list, repr=False)
@@ -60,19 +50,12 @@ class Dixel(Serializable):
         else:
             raise TypeError
 
-    def __attrs_post_init__(self):
-        self.update_meta()
-
-    def update_meta(self):
-        # Carry real date-time objects for computation and processing
-
-        if self.tags.get("StudyDate"):
-            self.meta["StudyDateTime"] = mktime(self.tags.get("StudyDate"), self.tags.get("StudyTime"))
-        if self.tags.get("SeriesDate") and self.level >= DicomLevel.SERIES:
-            self.meta["SeriesDateTime"] = mktime(self.tags.get("SeriesDate"), self.tags.get("SeriesTime"))
-        if self.tags.get("InstanceCreationDate") and self.level >= DicomLevel.INSTANCES:
-            self.meta["InstanceDateTime"] = mktime(self.tags.get("InstanceCreationDate"),
-                                                   self.tags.get("InstanceCreationTime"))
+    def simplify_tags(self):
+        self.tags = dicom_simplify(self.tags)
+        # Copy all datetimes into meta
+        for tag, value in self.tags.items():
+            if tag.endswith("DateTime"):
+                self.meta[tag] = value
 
     @staticmethod
     def from_pydicom(ds: pydicom.Dataset, fn: str=None, file=None):
@@ -85,38 +68,36 @@ class Dixel(Serializable):
             'MediaStorage': str(ds.file_meta.MediaStorageSOPClassUID),
         }
 
-        # Most relevant tags for indexing, hard stop on missing a/n, mrn, or uuids
-        tags = {
-            'AccessionNumber': ds.AccessionNumber,
-            'PatientName': str(ds.get("PatientName")),  # Odd serializing type
-            'PatientID': ds.PatientID,
-            'PatientBirthDate': ds.get("PatientBirthDate"),
-            'StudyInstanceUID': ds.StudyInstanceUID,
-            'StudyDescription': ds.get("StudyDescription"),
-            'StudyDate': ds.get("StudyDate"),
-            'StudyTime': ds.get("StudyTime"),
-            'SeriesDescription': ds.get("SeriesDescription"),
-            'SeriesNumber': ds.get("SeriesNumber"),
-            'SeriesInstanceUID': ds.SeriesInstanceUID,
-            'SeriesDate': ds.get("SeriesDate"),
-            'SeriesTime': ds.get("SeriesTime"),
-            'SOPInstanceUID': ds.SOPInstanceUID,
-            'InstanceNumber': ds.get("InstanceNumber"),
-            'InstanceCreationDate': ds.get("InstanceCreationDate"),
-            'InstanceCreationTime': ds.get("InstanceCreationTime"),
+        def dictify_ds(ds):
+            output = dict()
+            for elem in ds:
+                if elem.keyword == "PixelData":
+                    continue
+                    # Deal with that separately
+                if not elem.value:
+                    continue
+                if elem.VR == "PN":
+                    output[elem.keyword] = str(elem.value)
+                elif elem.VM != 1:
+                    output[elem.keyword] = [item for item in elem]
+                elif elem.VR != 'SQ':
+                    output[elem.keyword] = elem.value
+                else:
+                    output[elem.keyword] = [dictify_ds(item) for item in elem]
+            return output
 
-            'RescaleIntercept': ds.get("RescaleIntercept"),
-            'RescaleSlope': ds.get("RescaleSlope"),
-            'PixelSpacing': [float(x) for x in ds.get("PixelSpacing", [])],  # Odd serializing types
-            'ImageOrientationPatient': [float(x) for x in ds.get("ImageOrientationPatient", []) ] ,
+        tags = dictify_ds(ds)
+        # MONOCHROME, RGB etc.
+        if (0x0028, 0x0004) in ds:
+            tags['PhotometricInterpretation'] = ds[0x0028, 0x0004].value
 
-            # MONOCHROME, RGB etc.
-            'PhotometricInterpretation': ds[0x0028, 0x0004].value if (0x0028, 0x0004) in ds else None,
-        }
+        # logging.debug(pformat(tags))
 
         d = Dixel(meta=meta,
                   tags=tags,
                   level=DicomLevel.INSTANCES)
+        d.simplify_tags()
+
         if file:
             d.file = file
 
@@ -231,8 +212,11 @@ class Dixel(Serializable):
         d = Dixel(meta=meta,
                   tags=tags,
                   level=level)
+        d.simplify_tags()
         if file:
             d.file = file
+
+        return d
 
     def oid(self):
         """Compute Orthanc ID"""
@@ -257,9 +241,20 @@ class Dixel(Serializable):
         """Serializer id alias for meta['AccessionNumber']"""
         return self.tags.get('AccessionNumber')
 
+    def __cmp__(self, other):
+        logging.debug(self.sid)
+        logging.debug(other.sid)
+        return self.sid == other.sid
+
+    @property
+    def acc_num(self):
+        return self.tags.get("AccessionNumber")
+
     @property
     def fn(self):
         """Filename alias for meta['Filename']"""
+        if not self.meta.get("FileName"):
+            self.meta["FileName"] = self.tags["AccessionNumber"]
         return self.meta.get('FileName')
 
     @property
@@ -301,3 +296,17 @@ class Dixel(Serializable):
         if not self.tags.get("ImageOrientationPatient"):
             raise ValueError("No patient orientation info available")
         return [float(x) for x in self.tags.get("ImageOrientationPatient")]
+
+    def query(self):
+
+        return {
+            "PatientName": "",
+            "PatientID": "",
+            "PatientBirthDate": "",
+            "PatientSex": "",
+            "AccessionNumber": self.tags.get("AccessionNumber"),
+            "StudyDescription": "",
+            "StudyInstanceUID": "",
+            "StudyDate": "",
+            "StudyTime": "",
+        }

@@ -1,3 +1,6 @@
+import logging
+from pprint import pformat
+from collections import Mapping
 import click
 from diana.utils import Serializable
 from pprint import pformat
@@ -18,16 +21,19 @@ def check(ctx, endpoints):
 
     click.echo(click.style('Checking endpoint status', underline=True, bold=True))
 
-    if not endpoints or endpoints=="ALL":
-        endpoints = services.keys()
-
-    for ep_key in endpoints:
-        ep = Serializable.Factory.create(**services.get(ep_key))
+    for k, v in services.items():
+        if endpoints and k not in endpoints:
+            logging.debug("{} not in list".format(k))
+            continue
+        if not isinstance(v, Mapping):
+            logging.debug("{} not mapping".format(v))
+            continue
+        ep = Serializable.Factory.create(**v)
         try:
             ready = ep.check()
-            out = click.style("{}: {}".format(ep_key, "Ready" if ready else "Not Ready"),
+            out = click.style("{}: {}".format(k, "Ready" if ready else "Not Ready"),
                               fg="green" if ready else "red")
         except NotImplementedError:
-            out = click.style("{}: {}".format(ep_key, "Unimplemented health check"),
+            out = click.style("{}: {}".format(k, "Unimplemented health check"),
                               fg="yellow")
         click.echo(out)

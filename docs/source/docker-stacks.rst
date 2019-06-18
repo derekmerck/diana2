@@ -23,8 +23,8 @@ Setup
 
 .. code:: bash
 
-    $ source sample.env
-    $ docker-stack -f admin/admin-stack.yml
+   $ source sample.env
+   $ docker-stack -f admin/admin-stack.yml
 
 Exposes
 ~~~~~~~
@@ -40,9 +40,9 @@ and adding appropriate service labels.
 
 .. code:: yaml
 
-    networks:
-      admin_proxy_network:
-        external: true
+   networks:
+     admin_proxy_network:
+       external: true
 
 Backend Data Services
 ---------------------
@@ -59,11 +59,11 @@ Setup
 
 .. code:: bash
 
-    $ source sample.env
-    $ docker-stack -f admin/admin-stack.yml
-    $ docker-stack -f bacekend-data/postgres-service.yml data
-    $ docker-stack -f bacekend-data/redis-service.yml data
-    $ docker-stack -f bacekend-data/splunk-service.yml data
+   $ source sample.env
+   $ docker-stack -f admin/admin-stack.yml
+   $ docker-stack -f bacekend-data/postgres-service.yml data
+   $ docker-stack -f bacekend-data/redis-service.yml data
+   $ docker-stack -f bacekend-data/splunk-service.yml data
 
 .. _exposes-1:
 
@@ -88,8 +88,8 @@ Setup
 
 .. code:: bash
 
-    $ source sample.env
-    $ docker-stack -f dicom-node/archive-stack.yml
+   $ source sample.env
+   $ docker-stack -f dicom-node/archive-stack.yml
 
 .. _exposes-2:
 
@@ -120,21 +120,38 @@ Setup
 
 .. code:: bash
 
-    $ source sample.env
-    $ docker stack deploy -c admin/admin-stack.yml admin
-    $ docker-stack deploy -c diana-workers/mock-stack.yml mock
+   $ source sample.env
+   $ docker stack deploy -c admin/admin-stack.yml admin
+   $ docker-stack deploy -c diana-workers/mock-stack.yml mock
+
+Diana Watcher
+~~~~~~~~~~~~~
+
+Additionally, see `Remote Embedded Diana
+Watcher <https://github.com/derekmerck/red-dcm-watcher>`__ for Raspberry
+Pi and Balena.
 
 Provisioning
 ------------
+
+Installing Docker-CE on RHEL
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Follow the CentOS guide and `update
+``container-selinux`` <https://nickjanetakis.com/blog/docker-tip-39-installing-docker-ce-on-redhat-rhel-7x>`__.
+
+| Sometimes RHEL behind firewalls can benefit from access to the CentOS
+  yum repos.
+| https://unix.stackexchange.com/questions/433046/how-do-i-enable-centos-repositories-on-rhel-red-hat
 
 Setup a Swarm
 ~~~~~~~~~~~~~
 
 .. code:: bash
 
-    $ docker swarm init --advertise-addr <ip_addr>
-    $ ssh host2
-    > docker swarm join ... etc
+   $ docker swarm init --advertise-addr <ip_addr>
+   $ ssh host2
+   > docker swarm join ... etc
 
 Tag unique nodes for the scheduler
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -146,8 +163,19 @@ Tag unique nodes for the scheduler
 
 .. code:: bash
 
-    $ docker node update --label-add storage=true host1   # mounts mass storage
-    $ docker node update --label-add bridge=true host2    # registered IP address for DICOM receipt
+   $ docker node update --label-add storage=true host1   # mounts mass storage
+   $ docker node update --label-add bridge=true host2    # registered IP address for DICOM receipt
+
+Open the Firewall
+~~~~~~~~~~~~~~~~~
+
+If the firewall stops workers from joining see
+https://www.digitalocean.com/community/tutorials/how-to-configure-the-linux-firewall-for-docker-swarm-on-centos-7
+
+TODO
+~~~~
+
+Grant orthanc user superuser privileges so it can create trigrams
 
 License
 -------

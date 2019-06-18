@@ -18,6 +18,8 @@ from diana.dixel import Dixel, ShamDixel, DixelView
 # from diana.utils.endpoint import Endpoint
 from diana.utils.dicom import DicomLevel
 
+from requests.exceptions import HTTPError
+from diana.utils.gateways.exceptions import GatewayConnectionError
 
 
 @attr.s
@@ -25,6 +27,7 @@ class Collector(object):
 
     pool_size = attr.ib( default=0 )
     pool = attr.ib( init=False, repr=False )
+
     @pool.default
     def create_pool(self):
         if self.pool_size > 0:
@@ -34,7 +37,8 @@ class Collector(object):
             project: str,
             data_path: Path,
             source: Orthanc, domain: str,
-            dest: Union[Orthanc, DcmDir]):
+            dest: Union[Orthanc, DcmDir],
+            anonymize=False):
 
         logging.getLogger("GUIDMint").setLevel(level=logging.WARNING)
 
@@ -53,7 +57,7 @@ class Collector(object):
             C = CsvFile(fp=key_path, level=DicomLevel.STUDIES)
             C.read()
             worklist = C.dixels
-        self.handle_worklist(worklist, source, domain, dest)
+        self.handle_worklist(worklist, source, domain, dest, anonymize)
 
     def make_key(self, ids, source: Orthanc, domain: str) -> set:
 
@@ -110,19 +114,19 @@ class Collector(object):
         return items
 
     # TODO: Could replace Orthanc + domain with a ProxiedDICOM source
-    def handle_worklist(self, items: Iterable, source: Orthanc, domain: str, dest: Union[Orthanc, DcmDir]):
+    def handle_worklist(self, items: Iterable, source: Orthanc, domain: str, dest: Union[Orthanc, DcmDir], anonymize):
 
         print("Handling worklist")
 
         if isinstance(source, Orthanc) and isinstance(dest, Orthanc):
-            self.pull_and_send(items, source, domain, dest)
+            self.pull_and_send(items, source, domain, dest, anonymize)
         elif isinstance(source, Orthanc) and isinstance(dest, DcmDir):
-            self.pull_and_save(items, source, domain, dest)
+            self.pull_and_save(items, source, domain, dest, anonymize)
         else:
             raise ValueError("Unknown handler")
 
     # TODO: Could merge with pull_and_send if the api for Orthanc and DcmDir were closer
-    def pull_and_save(self, items: Iterable, source: Orthanc, domain: str, dest: DcmDir):
+    def pull_and_save(self, items: Iterable, source: Orthanc, domain: str, dest: DcmDir, anonymize=False):
 
         def mkq(d: Dixel):
             return {
@@ -133,13 +137,27 @@ class Collector(object):
 
             working_level = DicomLevel.STUDIES
 
-            if working_level == DicomLevel.SERIES:
-                d_fn = "{}-{}.zip".format(
-                    d.meta["ShamAccessionNumber"][0:6],
-                    d.meta["ShamSeriesDescription"])
+            if anonymize:
+
+                if working_level == DicomLevel.SERIES:
+                    d_fn = "{}-{}.zip".format(
+                        d.meta["ShamAccessionNumber"][0:6],
+                        d.meta["ShamSeriesDescription"])
+                else:
+                    d_fn = "{}.zip".format(
+                        d.meta["ShamAccessionNumber"][0:16])
+
             else:
-                d_fn = "{}.zip".format(
-                    d.meta["ShamAccessionNumber"][0:16])
+
+                if working_level == DicomLevel.SERIES:
+                    d_fn = "{}-{}-{}.zip".format(
+                        d.tags["PatientName"][0:6],
+                        d.tags["AccessionNumber"][0:8],
+                        d.tags["SeriesDescription"])
+                else:
+                    d_fn = "{}-{}.zip".format(
+                        d.tags["PatientName"][0:6],
+                        d.tags["AccessionNumber"][0:8])
 
             if dest.exists(d_fn):
                 logging.debug("SKIPPING {}".format(d.tags["PatientName"]))
@@ -147,24 +165,42 @@ class Collector(object):
 
             if not source.exists(d):
                 source.rfind(mkq(d),
-                        domain,
-                        level=working_level,
-                        retrieve=True)
+                             domain,
+                             level=working_level,
+                             retrieve=True)
             else:
                 logging.debug("SKIPPING PULL for {}".format(d.tags["PatientName"]))
 
-            replacement_map = ShamDixel.orthanc_sham_map(d)
-            anon_id = source.anonymize(d, replacement_map=replacement_map)
+            if anonymize:
+                try:
+                    replacement_map = ShamDixel.orthanc_sham_map(d)
 
-            e = source.get(anon_id, level=working_level, view=DixelView.FILE)
-            e.meta["FileName"] = d_fn
-            logging.debug(e)
+                    anon_id = source.anonymize(d, replacement_map=replacement_map)
 
-            dest.put(e)
-            source.delete(e)
-            source.delete(d)
+                    e = source.get(anon_id, level=working_level, view=DixelView.FILE)
+                    e.meta["FileName"] = d_fn
+                    logging.debug(e)
 
-    def pull_and_send(self, items: Iterable, source: Orthanc, domain: str, dest: Orthanc):
+                    dest.put(e)
+                    source.delete(e)
+
+                except (HTTPError, GatewayConnectionError) as e:
+                    logging.error("Failed to anonymize dixel")
+                    logging.error(e)
+                    with open("errors.txt", "a+") as f:
+                        f.write(d.tags["AccessionNumber"] + "\n")
+
+            else:
+                d = source.get(d, level=working_level, view=DixelView.FILE)
+                dest.put(d)
+
+            try:
+                source.delete(d)
+            except GatewayConnectionError as e:
+                logging.error("Failed to delete dixel")
+                logging.error(e)
+
+    def pull_and_send(self, items: Iterable, source: Orthanc, domain: str, dest: Orthanc, anonymize=False):
 
         def mkq(d: Dixel):
             return {

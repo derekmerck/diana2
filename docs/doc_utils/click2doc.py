@@ -1,34 +1,6 @@
 from click.testing import CliRunner
 import click
 
-header = """
-`diana-cli`
-==================
-
-Derek Merck  
-<derek_merck@brown.edu>  
-Rhode Island Hospital and Brown University  
-Providence, RI  
-
-[![Build Status](https://travis-ci.org/derekmerck/diana2.svg?branch=master)](https://travis-ci.org/derekmerck/diana2)
-[![Coverage Status](https://codecov.io/gh/derekmerck/diana2/branch/master/graph/badge.svg)](https://codecov.io/gh/derekmerck/diana2)
-[![Doc Status](https://readthedocs.org/projects/diana/badge/?version=master)](https://diana.readthedocs.io/en/master/?badge=master)
-
-Source: <https://www.github.com/derekmerck/diana2>  
-Documentation: <https://diana.readthedocs.io>  
-Image:  <https://cloud.docker.com/repository/docker/derekmerck/diana2>
-
-"""
-
-footer = """
-
-License
--------------
-
-MIT
-
-"""
-
 
 def run_cli_help(app, cmd=None):
     runner = CliRunner()
@@ -39,25 +11,40 @@ def run_cli_help(app, cmd=None):
     return result.output
 
 
+def get_app_info(app):
+
+    header = app.__dict__.get("__readme_header__", "")
+    footer = app.__dict__.get("__readme_footer__", "")
+    cmds = [cmd.name for cmd in app.cli.cmds]
+
+    return header, footer, cmds
+
+
 @click.command()
-@click.argument("path", default="diana-cli", type=click.STRING)
-def cli(path):
+@click.argument("apps", nargs=-1)
+@click.option("--outfile", "-o", type=click.Path())
+def cli(apps, outfile):
 
-    cmds = ["check", "collect", "dcm2im", "findex", "fiup", "guid", "mock", "ofind", "watch"]
+    text = ""
+    for app in apps:
+        _app = __import__(app)
 
-    app = __import__(path)
+        header, footer, cmds = get_app_info(_app)
 
-    text = header
-    text += "```\n" + run_cli_help(app) + "```\n"
+        text += header
+        text += "```\n" + run_cli_help(_app.cli) + "```\n"
 
-    for cmd in cmds:
-        text += "## {}\n\n".format(cmd)
-        text += "```\n" + run_cli_help(app, cmd) + "```\n"
+        for cmd in cmds:
+            text += "## {}\n\n".format(cmd)
+            text += "```\n" + run_cli_help(_app.cli, cmd) + "```\n"
 
-    text += footer
+        text += footer
 
-    with open("README.md", "w") as f:
-        f.write(text)
+    if outfile:
+        with open(outfile, "w") as f:
+            f.write(text)
+    else:
+        click.echo(text)
 
 
 if __name__ == "__main__":

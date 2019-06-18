@@ -6,7 +6,6 @@ from ..dixel import Dixel
 from ..utils.endpoint import Endpoint, Serializable
 from ..utils.dicom import DicomLevel
 from ..utils.gateways import Splunk as SplunkGateway
-# splunk-sdk is 2.7 only, so diana.utils.gateway provides a minimal query/put replacement
 
 # Suppress insecure warning
 import urllib3
@@ -14,16 +13,15 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 @attr.s
 class Splunk(Endpoint, Serializable):
-
     name = attr.ib(default="Splunk")
 
     protocol = attr.ib(default="http")
     host = attr.ib(default="localhost")
-    port = attr.ib(default=8088)
+    port = attr.ib(default=8089)
     path = attr.ib(default=None)
 
     hec_protocol = attr.ib(default="http")
-    hec_port = attr.ib(default=8089)
+    hec_port = attr.ib(default=8088)
     hec_token = attr.ib(default=None)
 
     index = attr.ib(default="dicom")
@@ -45,6 +43,7 @@ class Splunk(Endpoint, Serializable):
             password = self.password,
             hec_port = self.hec_port,
             hec_protocol = self.hec_protocol,
+            hec_token=self.hec_token,
             index = self.index
         )
 
@@ -102,7 +101,7 @@ class Splunk(Endpoint, Serializable):
         logger.debug(hec_token)
 
         # at $time $event was reported by $host for $index with credentials $auth
-        self.gateway.put_event( timestamp=timestamp, event=event,
+        self.gateway.put_event( event=event, timestamp=timestamp,
                                 hostname=hostname, index=index, hec_token=hec_token )
 
         # Real auth description

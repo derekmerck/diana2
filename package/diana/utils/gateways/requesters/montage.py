@@ -65,9 +65,8 @@ class Montage(Requester):
             results += r['objects']
             # logging.debug(r['objects'])
 
-        logging.debug(results)
+        # logging.debug(results)
         return results
-
 
     # ----------------
     # Metadata functions

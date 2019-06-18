@@ -47,7 +47,6 @@ def test_shams():
     assert( d.meta["ShamName"] != f.meta["ShamName"] )
 
 
-
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     test_shams()

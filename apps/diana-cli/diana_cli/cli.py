@@ -1,11 +1,22 @@
 import logging, os
 import yaml
 import click
-import cli_commands
+from . import __version__
 from diana.utils.gateways import supress_urllib_debug
 from diana import __version__ as diana_version
 
-__version__ = "2.1.1"
+from .check import check
+from .epdo import epdo
+from .collect import collect
+from .collect2 import collect2
+from .dcm2im import dcm2im, dcm2json
+from .file_index import findex, fiup
+from .guid import guid
+from .mock import mock
+from .mfind import mfind
+from .ofind import ofind
+from .verify import verify
+from .watch import watch
 
 epilog = """
 SERVICES is a required platform endpoint description in yaml format.
@@ -25,7 +36,7 @@ redis:
 @click.group(name="diana-cli", epilog=epilog)
 @click.option('--verbose/--no-verbose', default=False)
 @click.version_option(version=(__version__, diana_version),
-                      prog_name=("diana-cli.py", "python-diana"))
+                      prog_name=("diana-cli", "python-diana"))
 @click.option('-s', '--services', type=click.STRING,
               help="Diana service desc as yaml format string")
 @click.option('-S', '--services_path', type=click.Path(exists=True),
@@ -62,19 +73,23 @@ def cli(ctx, verbose, services, services_path):
     ctx.obj['services'] = _services
 
 
-coms = [
-    cli_commands.check,
-    cli_commands.collect,
-    cli_commands.dcm2im,
-    cli_commands.findex,
-    cli_commands.fiup,
-    cli_commands.guid,
-    cli_commands.mock,
-    cli_commands.ofind,
-    cli_commands.watch
+cmds = [
+    check,
+    collect,
+    collect2,
+    dcm2im,
+    dcm2json,
+    epdo,
+    findex,
+    fiup,
+    guid,
+    mock,
+    mfind,
+    ofind,
+    verify,
+    watch,
 ]
-
-for c in coms:
+for c in cmds:
     cli.add_command(c)
 
 

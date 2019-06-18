@@ -6,33 +6,36 @@ networks:
   admin_proxy_network:
     external: true   # Created by admin-stack
 
-  cirr2_default_network:
-    external: true   # Created by cirr_v2-stack
-
+  cirr_service_network:
+    external: true   # Created by (old) cirr data-stack
 
 services:
 
-  orthanc-project1:
-    image: derekmerck/orthanc-confd:latest-amd64
+  orthanc-review01:
+    image: derekmerck/orthanc-wbv:latest-amd64
     networks:
       - admin_proxy_network
-      - cirr2_default_network
+      - cirr_service_network
     environment:
-      ORTHANC_NAME:             CIRR Project 1
+      ORTHANC_NAME:             Archive
+      ORTHANC_AET:              ARCHIVE
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
-      ORTHANC_USER_0:           ${PROJECT1_USER_0}
       ORTHANC_STORE_COMPRESSED: "true"
       ORTHANC_PG_ENABLED:       "true"
       ORTHANC_PG_STORE_DICOM:   "true"
-      ORTHANC_PG_DATABASE:      ${ORTHANC_PG_DATABASE}-project1
+#      ORTHANC_PG_DATABASE:      ${ORTHANC_PG_DATABASE}_review01
+      ORTHANC_PG_DATABASE:      review01
       ORTHANC_PG_HOST:          postgres
-      ORTHANC_PG_USER:          postgres
+      ORTHANC_PG_USER:          orthanc
       ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
+      ORTHANC_WBV_ENABLED:      "true"
+      ORTHANC_WBV_STORE_ANNOTATIONS:  "true"
       ORTHANC_VERBOSE:          "true"
+      ORTHANC_USER_0:           "review,${REVIEW01_PASS}"
       TZ:                       "America/New_York"
     deploy:
       replicas: 2  # Multiple nodes, PG provides data persistence
       labels:
         - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8042"
-        - "traefik.frontend.rule=PathPrefixStrip:/project1/"
+        - "traefik.frontend.rule=PathPrefixStrip:/review-01/"

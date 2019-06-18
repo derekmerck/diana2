@@ -1,4 +1,5 @@
 import logging, os
+from pathlib import Path
 from glob import glob
 import attr
 
@@ -22,7 +23,7 @@ class FileHandler(object):
 
     def get_files(self, rex="*"):
         fp = self.get_path(rex)
-        return [os.path.basename(x) for x in glob(fp)]
+        return [os.path.basename(x) for x in glob(fp) if Path(x).is_file()]
 
     def write_file(self, fn: str, fdata):
         """Write binary file data"""
@@ -56,6 +57,14 @@ class FileHandler(object):
         logger = logging.getLogger(self.name)
         logger.debug("Checking exists {}".format(fp))
         return os.path.exists(fp)  # Better than exists
+
+    def exists_re(self, fnre: str):
+        fpre = self.get_path(fnre)
+        logger = logging.getLogger(self.name)
+        logger.debug("Checking exists {}".format(fpre))
+        # logger.debug(glob(fpre))
+        # return glob(fpre)
+        return len(glob(fpre)) > 0
 
     def delete(self, fn: str):
         fp = self.get_path(fn)

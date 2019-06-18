@@ -4,6 +4,7 @@ from scipy.ndimage.filters import gaussian_filter
 
 from diana.dixel import Dixel
 
+
 def resize_image(img, size, smooth=None, verbose=True):
     """
     Resizes image to new_length x new_length and pads with black.
@@ -31,6 +32,7 @@ def resize_image(img, size, smooth=None, verbose=True):
     assert size == resized_img.shape[0] == resized_img.shape[1]
     return resized_img.astype("uint8")
 
+
 def get_pixels(dixel: Dixel, imsize=224):
 
     pixels = dixel.get_pixels()
@@ -51,6 +53,7 @@ from .models import MobileNet
 from keras.layers import Dense, Dropout, GlobalMaxPooling2D, GlobalAveragePooling2D, Flatten
 from keras.engine import Model
 from keras import optimizers
+
 
 def get_mobilenet(layer, lr=1e-3, input_shape=(224,224,1), dropout=None,
                   pooling="avg", weights=None):

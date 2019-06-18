@@ -1,0 +1,59 @@
+version: '3.0'
+
+
+networks:
+
+  admin_proxy_network:
+    external: true   # Created by admin-stack
+
+  service_network:
+    driver: overlay
+
+
+volumes:
+  postgres_data:
+    driver_opts:
+        type: none
+        device: ${DATA_DIR}/${POSTGRES_DATA_DIR}
+        o: bind
+
+
+services:
+  postgres:
+    image: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - service_network
+    environment:
+      POSTGRES_PASSWORD:        ${POSTGRES_PASSWORD}
+      TZ: "America/New_York"
+
+  orthanc-christianson:
+    image: derekmerck/orthanc-wbv:latest-amd64
+    ports:
+      - 4242:42421
+    networks:
+      - admin_proxy_network
+      - service_network
+    environment:
+      ORTHANC_NAME:             Christianson Image Registry
+      ORTHANC_AET:              CHRISTIANSON
+      ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
+      ORTHANC_STORE_COMPRESSED: "true"
+      ORTHANC_PG_ENABLED:       "true"
+      ORTHANC_PG_STORE_DICOM:   "true"
+      ORTHANC_PG_DATABASE:      orthanc_christianson
+      ORTHANC_PG_HOST:          postgres
+      ORTHANC_PG_USER:          postgres
+      ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
+      ORTHANC_VERBOSE:          "true"
+      ORTHANC_WBV_ENABLED:      "true"
+      ORTHANC_USER_0:           "user,${CHRISTIANSON_USER_PW}"
+      TZ:                       "America/New_York"
+    deploy:
+      replicas: 2  # Multiple nodes, PG provides data persistence
+      labels:
+        - "traefik.docker.network=admin_proxy_network"
+        - "traefik.port=8042"
+        - "traefik.frontend.rule=PathPrefixStrip:/christianson/"
