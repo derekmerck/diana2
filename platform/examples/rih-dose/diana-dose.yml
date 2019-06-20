@@ -28,7 +28,7 @@ services:
 
 
   splunk:
-    image: splunk/splunk
+    image: splunk/splunk:6.6.3
     volumes:
       - ${DATA_DIR}/splunk/etc:/opt/splunk/etc
       - ${DATA_DIR}/splunk/var:/opt/splunk/var
