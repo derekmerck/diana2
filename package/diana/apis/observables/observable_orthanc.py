@@ -27,8 +27,8 @@ class ObservableOrthanc(Orthanc, ObservableMixin):
     def set_persist_file(self):
         return "/tmp/diana-" + slugify(self.gateway.base_url) + "-changes.pik"
 
-    current_change = attr.ib(type=int, convert=int)
-    @current_change.default
+    _current_change = attr.ib(type=int, convert=int, init=False)
+    @_current_change.default
     def set_current_change(self):
         if self.persist_file.is_file():
             try:
@@ -43,18 +43,18 @@ class ObservableOrthanc(Orthanc, ObservableMixin):
 
     def persist_current_change(self):
         with self.persist_file.open("wb") as f:
-            pickle.dump(self.current_change, f)
+            pickle.dump(self._current_change, f)
 
     def persist_last_change(self):
 
         done = False
         while not done:
-            r = self.gateway.changes(current=self.current_change, limit=10000)
-            self.current_change = r['Last']
+            r = self.gateway.changes(current=self._current_change, limit=10000)
+            self._current_change = r['Last']
             done = r['Done']
 
         logger = logging.getLogger(self.name)
-        logger.info("Last change was {}".format(self.current_change))
+        logger.info("Last change was {}".format(self._current_change))
         self.persist_current_change()
 
     def changes(self, **kwargs):
@@ -63,7 +63,7 @@ class ObservableOrthanc(Orthanc, ObservableMixin):
         event_queue = []
 
         while not done:
-            r = self.gateway.changes(current=self.current_change)
+            r = self.gateway.changes(current=self._current_change)
             for change in r['Changes']:
                 if change['ChangeType'] == 'NewInstance':
                     e = Event(
@@ -73,6 +73,7 @@ class ObservableOrthanc(Orthanc, ObservableMixin):
                     )
                     event_queue.append(e)
                     logging.debug("Made a new instance event for source: {}".format(self.epid))
+                    logging.debug(self)
                 elif change['ChangeType'] == 'StableSeries':
                     e = Event(
                         evtype=DicomEventType.SERIES_ADDED,
@@ -90,7 +91,7 @@ class ObservableOrthanc(Orthanc, ObservableMixin):
                 else:
                     logging.debug("Found unhandled change type: {}".format( change['ChangeType']))
                     pass
-            self.current_change = r['Last']
+            self._current_change = r['Last']
             done = r['Done']
 
         self.persist_current_change()
