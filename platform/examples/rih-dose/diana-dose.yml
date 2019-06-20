@@ -63,6 +63,8 @@ services:
 
   diana-indexer:
     image: derekmerck/diana2
+    volumes:
+      - /tmp/diana-changes.pik:/tmp/diana-httporthanc-dose8042-changes.pik
     # command: sh -c "git pull && diana-cli watch -r index_instances dose splunk"
     command: diana-cli watch -r index_instances dose splunk
     networks:
