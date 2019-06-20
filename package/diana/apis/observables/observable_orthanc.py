@@ -72,8 +72,8 @@ class ObservableOrthanc(Orthanc, ObservableMixin):
                         data={"oid": change['ID']}
                     )
                     event_queue.append(e)
-                    logging.debug("Made a new instance event for source: {}".format(self.epid))
-                    logging.debug(self)
+                    # logging.debug("Made a new instance event for source: {}".format(self.epid))
+                    # logging.debug(self)
                 elif change['ChangeType'] == 'StableSeries':
                     e = Event(
                         evtype=DicomEventType.SERIES_ADDED,
@@ -89,7 +89,7 @@ class ObservableOrthanc(Orthanc, ObservableMixin):
                     )
                     event_queue.append(e)
                 else:
-                    logging.debug("Found unhandled change type: {}".format( change['ChangeType']))
+                    # logging.debug("Found unhandled change type: {}".format( change['ChangeType']))
                     pass
             self._current_change = r['Last']
             done = r['Done']
