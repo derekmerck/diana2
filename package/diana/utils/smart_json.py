@@ -1,9 +1,10 @@
 import json
 from datetime import timedelta
+from pathlib import PosixPath
 
 # Add any serializing functions here
 def stringify(obj):
-    if isinstance(obj, str):
+    if isinstance(obj, str) or isinstance(obj, PosixPath):
         return obj
 
     # Handle DateTime objects
