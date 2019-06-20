@@ -28,7 +28,7 @@ services:
 
 
   splunk:
-    image: splunk/splunk:6.6.3
+    image: splunk/splunk:latest
     volumes:
       - ${DATA_DIR}/splunk/etc:/opt/splunk/etc
       - ${DATA_DIR}/splunk/var:/opt/splunk/var
@@ -39,7 +39,7 @@ services:
     networks:
       - service_network
     environment:
-      SPLUNK_START_ARGS: "--accept-license"
+      SPLUNK_START_ARGS: "--accept-license --answer-yes"
       SPLUNK_PASSWORD:  ${SPLUNK_PASSWORD}
       TZ:               "America/New_York"
 
