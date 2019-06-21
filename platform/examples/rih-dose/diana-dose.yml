@@ -27,21 +27,28 @@ services:
       TZ: "America/New_York"
 
 
+
+  # Assumes pre-existing data in /splunk/etc, /splunk/var, and
+  # license file at /splunk/splunk.license
+  #
+  # If upgrading, may need to add splunk_start_arg "--answer-yes"
   splunk:
-    image: splunk/splunk:6.6.3
+    image: splunk/splunk:7.3
     volumes:
       - ${DATA_DIR}/splunk/etc:/opt/splunk/etc
       - ${DATA_DIR}/splunk/var:/opt/splunk/var
+      - ${DATA_DIR}/splunk/splunk.license:/splunk.license
     ports:
-      - "8100:8000"
-      - "8188:8088"
-      - "8189:8089"
+      - "8000:8000"
+      - "8088:8088"
+      - "8089:8089"
     networks:
       - service_network
     environment:
-      SPLUNK_START_ARGS: "--accept-license --answer-yes"
-      SPLUNK_PASSWORD:  ${SPLUNK_PASSWORD}
-      TZ:               "America/New_York"
+      SPLUNK_START_ARGS:  "--accept-license --answer-yes"
+      SPLUNK_PASSWORD:    ${SPLUNK_PASSWORD}
+      SPLUNK_LICENSE_URI: "/splunk.license"
+      TZ:                 "America/New_York"
 
 
   orthanc-dose:
