@@ -179,6 +179,10 @@ def mk_route(hname, source_desc, dest_desc=None):
         func = partial(upload_item,
                        source=source, dest=dest)
 
+    elif hname == "say_files":
+        evtype = DicomEventType.FILE_ADDED
+        func = partial(say)
+
     elif hname == "index_series":
         evtype = DicomEventType.SERIES_ADDED
         func = partial(index_item,
