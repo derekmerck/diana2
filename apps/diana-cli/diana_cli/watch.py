@@ -67,7 +67,13 @@ def watch(ctx, route, routes_path):
 
     for rt in routes:
 
-        source_desc = services[rt['source']]
+        if rt["source"].startswith("path:"):
+            source_desc = {
+                "ctype": "ObservableDcmDir",
+                "path": r["source"][5:]
+            }
+        else:
+            source_desc = services[rt['source']]
         if services.get( rt['dest'] ):
             dest_desc = services[rt['dest']]
         else:

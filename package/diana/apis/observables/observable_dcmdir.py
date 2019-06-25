@@ -60,9 +60,12 @@ class ObservableDcmDir(DcmDir, ObservableMixin):
                     source_id=self.source.epid,
                     data={event_data}
                 )
-                self.source.event_queue.append(e)
+                logger.debug('Accepting file event {}'.format(event_data))
+                self.source.event_queue.put(e)
 
-            logger.debug('Rejecting non-creation event {}'.format(wd_event))
+            else:
+                logger.debug('Rejecting non-creation event {}'.format(wd_event))
+
 
     def poll_events(self):
 
