@@ -98,6 +98,9 @@ def upload_item(item: Mapping, source: DcmDir, dest: Orthanc, anonymizing=False)
 
         fn = item.get("fn", "")
 
+        logger.debug("fn: {}".format(fn))
+        logger.debug("ext: {}".format(os.path.splitext(fn)[1]))
+
         if os.path.splitext(fn)[1] == "zip":
             worklist = source.get_zipped(fn)
             for item in worklist:
