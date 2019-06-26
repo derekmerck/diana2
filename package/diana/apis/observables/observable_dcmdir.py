@@ -61,7 +61,7 @@ class ObservableDcmDir(DcmDir, ObservableMixin):
                 e = Event(
                     evtype=event_type,
                     source_id=self.source.epid,
-                    data={event_data}
+                    data={"fn": event_data}
                 )
                 logger.debug('Accepting file event {}'.format(event_data))
                 self.source.event_queue.put(e)

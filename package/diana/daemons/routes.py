@@ -83,25 +83,35 @@ def pull_and_save_item(item: Dixel, source: ProxiedDicom,
     return "COMPLETED"
 
 
-def upload_item(fn: str, source: DcmDir, dest: Orthanc, anonymizing=False):
-
-    def _upload(item):
-        dest.put(item)
-        if anonymizing:
-            dest.anonymize(item, level=DicomLevel.INSTANCES)
+def upload_item(item: Mapping, source: DcmDir, dest: Orthanc, anonymizing=False):
 
     logger = logging.getLogger("upload_item")
-    logger.debug(fn)
+    logger.debug("Trying to upload {}".format(item))
 
-    if os.path.splitext(fn)[1] == "zip":
-        worklist = source.get_zipped(fn)
-        for item in worklist:
+    try:
+
+        def _upload(item):
+            dest.put(item)
+            if anonymizing:
+                dest.anonymize(item, level=DicomLevel.INSTANCES)
+
+        fn = item.get("fn", "")
+
+        if os.path.splitext(fn)[1] == "zip":
+            worklist = source.get_zipped(fn)
+            for item in worklist:
+                _upload(item)
+
+        else:
+            item = source.get(fn, file=True)
+            dest.put(item)
             _upload(item)
 
-    else:
-        item = source.get(fn, file=True)
-        dest.put(item)
-        _upload(item)
+    except FileNotFoundError as e:
+        logging.warning("Skipping {}".format(e))
+        pass
+
+
 
 
 def index_item(item: Mapping, level: DicomLevel, source: Endpoint,
