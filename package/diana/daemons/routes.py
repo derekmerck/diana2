@@ -90,6 +90,9 @@ def upload_item(fn: str, source: DcmDir, dest: Orthanc, anonymizing=False):
         if anonymizing:
             dest.anonymize(item, level=DicomLevel.INSTANCES)
 
+    logger = logging.getLogger("upload_item")
+    logger.debug(fn)
+
     if os.path.splitext(fn)[1] == "zip":
         worklist = source.get_zipped(fn)
         for item in worklist:
