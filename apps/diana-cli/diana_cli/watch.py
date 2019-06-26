@@ -74,6 +74,7 @@ def watch(ctx, route, routes_path):
             }
         else:
             source_desc = services[rt['source']]
+
         if services.get( rt['dest'] ):
             dest_desc = services[rt['dest']]
         else:

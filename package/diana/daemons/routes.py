@@ -154,6 +154,10 @@ def mk_route(hname, source_desc, dest_desc=None):
     if dest_desc:
         dest = Serializable.Factory.create(**dest_desc)
 
+    logger = logging.getLogger("mk_route")
+    logger.debug("Source: {}".format(source))
+    logger.debug("Dest: {}".format(dest))
+
     # TESTING HANDLERS
     if hname == "say_instances":
         evtype = DicomEventType.INSTANCE_ADDED
