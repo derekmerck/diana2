@@ -1,4 +1,6 @@
-version: '3.0'
+# $ docker stack deploy -c siren.yml siren
+
+version: '3.2'
 
 
 networks:
