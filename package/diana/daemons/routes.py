@@ -103,7 +103,7 @@ def upload_item(item: Mapping, source: DcmDir, dest: Orthanc, anonymizing=False)
                 _upload(item)
 
         else:
-            item = source.get(fn, file=True)
+            item = source.get(fn, view=DixelView.TAGS_FILE)
             dest.put(item)
             _upload(item)
 
