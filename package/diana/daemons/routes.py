@@ -2,7 +2,7 @@ import os, logging
 from pprint import pprint
 from typing import Union, Mapping
 from functools import partial
-from ..dixel import Dixel, DixelView
+from ..dixel import Dixel, DixelView, ShamDixel
 from ..apis import *
 from ..utils import DicomLevel, DicomEventType
 from ..utils.endpoint import Endpoint, Serializable, Trigger
@@ -93,7 +93,8 @@ def upload_item(item: Mapping, source: DcmDir, dest: Orthanc, anonymizing=False)
         def _upload(item):
             dest.put(item)
             if anonymizing:
-                dest.anonymize(item, level=DicomLevel.INSTANCES)
+                map = ShamDixel.orthanc_sham_map(item)
+                dest.anonymize(item, level=DicomLevel.INSTANCES, map=map)
 
         fn = item.get("fn", "")
 
