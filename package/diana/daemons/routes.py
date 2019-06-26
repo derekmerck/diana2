@@ -83,15 +83,22 @@ def pull_and_save_item(item: Dixel, source: ProxiedDicom,
     return "COMPLETED"
 
 
-def upload_item(fn: str, source: DcmDir, dest: Orthanc):
+def upload_item(fn: str, source: DcmDir, dest: Orthanc, anonymizing=False):
+
+    def _upload(item):
+        dest.put(item)
+        if anonymizing:
+            dest.anonymize(item, level=DicomLevel.INSTANCES)
 
     if os.path.splitext(fn)[1] == "zip":
         worklist = source.get_zipped(fn)
         for item in worklist:
-            dest.put(item)
+            _upload(item)
+
     else:
         item = source.get(fn, file=True)
         dest.put(item)
+        _upload(item)
 
 
 def index_item(item: Mapping, level: DicomLevel, source: Endpoint,
@@ -178,6 +185,11 @@ def mk_route(hname, source_desc, dest_desc=None):
         evtype = DicomEventType.FILE_ADDED
         func = partial(upload_item,
                        source=source, dest=dest)
+
+    elif hname == "upload_and_anonymize_files":
+        evtype = DicomEventType.FILE_ADDED
+        func = partial(upload_item,
+                       source=source, dest=dest, anonymizing=True)
 
     elif hname == "say_files":
         evtype = DicomEventType.FILE_ADDED

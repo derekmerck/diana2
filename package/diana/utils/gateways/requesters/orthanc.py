@@ -4,8 +4,21 @@ from hashlib import sha1
 from enum import Enum
 import attr
 from .requester import Requester
+from ..exceptions import GatewayConnectionError
 from ...dicom import DicomLevel
 
+orthanc_metadata_keys = [
+    "LastUpdate",
+    "AnonymizedFrom",
+    "ReceptionDate",
+    "RemoteAet",
+    "ModifiedFrom"
+    "Origin",
+    "TransferSyntax",
+    "SopClassUid",
+    "IndexInSeries", # instance level only
+    "ExpectedNumberOfInstances"  # series level only
+]
 
 def orthanc_hash(PatientID: str, StudyInstanceUID: str, SeriesInstanceUID=None, SOPInstanceUID=None) -> sha1:
     if not SeriesInstanceUID:
@@ -87,6 +100,16 @@ class Orthanc(Requester):
                 resource = "{!s}/{}/shared-tags?simplify".format(level, oid)
         elif view == "meta":
             resource = "{!s}/{}".format(level, oid)
+        elif view == "metakv":
+            r = {}
+            for k in orthanc_metadata_keys:
+                try:
+                    v = self.get_metadata(oid, level, k)
+                except GatewayConnectionError:
+                    v = None
+                r[k] = v
+            return r
+
         elif view == "file":
             if level == DicomLevel.INSTANCES:
                 resource = "{!s}/{}/file".format(level, oid)
