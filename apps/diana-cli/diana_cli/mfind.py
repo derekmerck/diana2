@@ -22,6 +22,8 @@ $ diana-cli -S .secrets/lifespan_services.yml mfind -a 52xxxxxx -e lungrads -e r
 @click.argument('source')
 @click.option('--accession_number', '-a', help="Link multiple a/ns with ' | ', requires PHI privileges on Montage")
 @click.option('--accessions_path',  '-A', help="Path to text file with study ids")
+@click.option('--start_date', default="2003-01-01", help="Starting date query bound")
+@click.option('--end_date', default=datetime.today().strftime("%Y-%m-%d"), help="Ending date query bound")
 @click.option('--today', is_flag=True, default=False)
 @click.option('--query', '-q', "_query", help="Query string", default="")
 @click.option('--extraction', '-e', multiple=True,
@@ -33,6 +35,8 @@ def mfind(ctx,
           source,
           accession_number,
           accessions_path,
+          start_date,
+          end_date,
           today,
           _query,
           extraction,
@@ -66,6 +70,8 @@ def mfind(ctx,
 
     if _query:
         query["q"] = _query
+        query["start_date"] = start_date
+        query["end_date"] = end_date
         result = do_query(query)
 
     elif accession_number:
@@ -84,8 +90,8 @@ def mfind(ctx,
     elif today:
         dt = datetime.today()
 
-        query["start_date"] = dt.isoformat()
-        query["end_date"] = dt.isoformat()
+        query["start_date"] = dt.strftime("%Y-%m-%d")
+        query["end_date"] = dt.strftime("%Y-%m-%d")
         result = do_query(query)
 
     else:
@@ -99,4 +105,3 @@ def mfind(ctx,
         result = pformat(result)
 
     click.echo(result)
-
