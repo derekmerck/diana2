@@ -95,6 +95,8 @@ class Orthanc(Endpoint, Serializable):
 
         self.gateway.send(oid, dest, "peers")
 
+    # TODO: Need a view for orthanc-metadata, ie, AnonymizedFrom
+
     def get(self, item: Union[str, Dixel],
             level: DicomLevel = DicomLevel.STUDIES,
             view: DixelView = DixelView.TAGS, **kwargs):
@@ -119,6 +121,8 @@ class Orthanc(Endpoint, Serializable):
                 elif DixelView.FILE in view:
                     item.file = r
                 elif DixelView.META in view:
+                    item.meta.update(r)
+                elif DixelView.METAKV in view:
                     item.meta.update(r)
                 return item
             else:

@@ -1,4 +1,6 @@
-version: '3.0'
+# $ docker stack deploy -c siren.yml siren
+
+version: '3.2'
 
 
 networks:
@@ -8,7 +10,7 @@ networks:
 
   service_network:
     driver: overlay
-
+    attachable: true
 
 volumes:
   postgres_data:
@@ -19,6 +21,31 @@ volumes:
 
 
 services:
+
+  diana-transport:
+
+    # Need git pull
+    # Need upload files or (2 routes, one for studies/zips)
+    # Need route for anonymize_instances orthanc-hobit (in place)
+    # command: diana-cli watch -r upload_instances path:/data/incoming orthanc-hobit
+
+    image: derekmerck/diana2
+    networks:
+      - service_network
+    volumes:
+      - ${DATA_DIR}:/data
+      - ${DATA_DIR}/tmp:/tmp
+    environment:
+      PYTHONUNBUFFERED: "true"
+      ORTHANC_PASSWORD: ${ORTHANC_PASSWORD}
+      DIANA_SERVICES: >
+        { "hobit": {"ctype": "ObservableOrthanc",
+                "host": "orthanc-hobit",
+                "password": "${ORTHANC_PASSWORD}",
+                "polling_interval": 30 }}
+      TZ:               "America/New_York"
+
+
   postgres:
     image: postgres
     volumes:
@@ -29,8 +56,9 @@ services:
       POSTGRES_PASSWORD:        ${POSTGRES_PASSWORD}
       TZ: "America/New_York"
 
+
   orthanc-hobit:
-    image: derekmerck/orthanc-confd:latest-amd64
+    image: derekmerck/orthanc-wbv:latest-amd64
     ports:
       - 4242:42421
     networks:

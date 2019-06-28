@@ -20,9 +20,20 @@ data_dir = r"D:\Google Drive\Brown\Research\Raw_Data\thyroid_bx_path"
 data0_dir = "usbx"
 data1_dir = "path"
 target_distance = timedelta(days=3)
+# data_dir = "/Users/derek/Desktop/thyroid"
+# data0_dir = "usbx"
+# data1_dir = "path"
+# target_distance = timedelta(days=14)
+
+# data_dir = "/Users/derek/Desktop/prostate"
+# data0_dir = "mr"
+# data1_dir = "path"
+# target_distance = timedelta(days=180)
 
 
 def parse_date(s: str) -> date:
+    if not s:
+        return
     parser = DateParser()
     dt = parser.parse(s).date()
 
@@ -64,7 +75,7 @@ class Patient(object):
                 # logging.debug("   but {} not equal to {}".format(self.sex, other.sex))
                 return False
 
-            elif (abs(self.age - other.age) > 3):
+            elif self.age > 0 and other.age > 0 and (abs(self.age - other.age) > 3):
                 # logging.debug("-> {} matches".format(self.last))
                 # logging.debug("   and {} equal to {}".format(self.first, other.first))
                 # logging.debug("   and {} equal to {}".format(self.sex, other.sex))
@@ -80,6 +91,7 @@ class SemiIdentifiedStudy(object):
     study_date = attr.ib(type=date, converter=parse_date)
     patient = attr.ib(type=Patient)
     cancer_status = attr.ib(default=None)
+    result = attr.ib(default=None)
 
     # usbx, path
     def proximal(self, other: "SemiIdentifiedStudy"):
@@ -95,24 +107,29 @@ class SemiIdentifiedStudy(object):
         @classmethod
         def create(cls, **kwargs):
 
-            study_id = kwargs.get("Accession Number") or kwargs.get("CASE")
-            study_date = kwargs.get("Exam Completed Date") or kwargs.get("ACCESSION DATE")
+            study_id = kwargs.get("Accession Number") or kwargs.get("AccessionNumber") or kwargs.get("CASE") or kwargs.get("Case Number")
+            study_date = kwargs.get("Exam Completed Date") or kwargs.get("ACCESSION DATE") or kwargs.get("StudyDate")
             cancer_status = kwargs.get("Cancer Status")
+            result = kwargs.get("Result")
 
             pfirst = kwargs.get("Patient First Name") or kwargs.get("FIRST")
             plast = kwargs.get("Patient Last Name") or kwargs.get("LAST")
-            psex = kwargs.get("Patient Sex") or kwargs.get("SEX")
-            mrn = kwargs.get("Patient MRN")
+            psex = kwargs.get("Patient Sex") or kwargs.get("SEX") or "Unknown"
+            mrn = kwargs.get("Patient MRN") or kwargs.get("PatientID")
 
             age = kwargs.get("Patient Age")
             if not age:
                 pdob = parse_date( kwargs.get("DOB") )
-                sdt = parse_date( study_date )
-                age = (sdt - pdob).days / 365
+                if pdob:
+                    sdt = parse_date( study_date )
+                    age = (sdt - pdob).days / 365
+                else:
+                    age = -1
 
             patient = Patient(first=pfirst, last=plast, age=age, sex=psex, mrn=mrn)
             study = SemiIdentifiedStudy(study_id=study_id, study_date=study_date,
-                                        patient=patient, cancer_status=cancer_status)
+                                        patient=patient, cancer_status=cancer_status,
+                                        result=result)
 
             return study
 
@@ -126,6 +143,10 @@ def read_folder(path) -> Collection:
         with open(fp, 'r', newline='', encoding='ISO-8859-1') as f:
             reader = csv.DictReader(f)
             for line in reader:
+
+                if line.get("PatientName"):
+                    line["Patient First Name"] = line.get("PatientName").split("^")[1]
+                    line["Patient Last Name"] = line.get("PatientName").split("^")[0]
 
                 if "neg" in fp.lower():
                     line["Cancer Status"] = "negative"
@@ -165,10 +186,11 @@ if __name__ == "__main__":
                 pair = {
                     "MRN": item0.patient.mrn,
                     "Accession Number": item0.study_id,
-                    "Bx Date": item0.study_date,
+                    "Image Date": item0.study_date,
                     "Path Case": item1.study_id,
                     "Path Date": item1.study_date,
-                    "Cancer Status": item1.cancer_status
+                    "Cancer Status": item1.cancer_status,
+                    "Path Result": item1.result
                 }
 
                 results.append(pair)
@@ -177,8 +199,8 @@ if __name__ == "__main__":
 
     logging.info("Num pairs: {}".format(len(results)))
 
-    fieldnames = ["MRN", "Accession Number", "Bx Date", "Path Case",
-                  "Path Date", "Cancer Status"]
+    fieldnames = ["MRN", "Accession Number", "Image Date", "Path Case",
+                  "Path Date", "Cancer Status", "Path Result"]
 
     with open("output_{}daymatch_unrestricted.csv".format(target_distance.days), "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)

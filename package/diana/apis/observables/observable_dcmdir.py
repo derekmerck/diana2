@@ -34,14 +34,17 @@ class ObservableDcmDir(DcmDir, ObservableMixin):
             event_type = None
             sleep_time = 1.0
 
+            # TODO: Should actually create multiple events, or
+            #  include multiple tyupes for each: study/series added and instance added
+
             if wd_event.event_type == "created" and event_data.endswith(".zip"):
                 logger.debug("Found a zipped archive")
-                event_type = DicomEventType.STUDY_ADDED
+                event_type = DicomEventType.FILE_ADDED
                 sleep_time = 1.0  # Wait 1 sec for file to settle
 
             elif wd_event.event_type == "created":
                 logger.debug("Found a possible dcm instance")
-                event_type = DicomEventType.INSTANCE_ADDED
+                event_type = DicomEventType.FILE_ADDED
                 sleep_time = 0.2  # Wait 0.2 secs for file to settle
 
             if event_type:
@@ -58,11 +61,14 @@ class ObservableDcmDir(DcmDir, ObservableMixin):
                 e = Event(
                     evtype=event_type,
                     source_id=self.source.epid,
-                    data={event_data}
+                    data={"fn": event_data}
                 )
-                self.source.event_queue.append(e)
+                logger.debug('Accepting file event {}'.format(event_data))
+                self.source.event_queue.put(e)
 
-            logger.debug('Rejecting non-creation event {}'.format(wd_event))
+            else:
+                logger.debug('Rejecting non-creation event {}'.format(wd_event))
+
 
     def poll_events(self):
 

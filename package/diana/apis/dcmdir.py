@@ -71,7 +71,7 @@ class DcmDir(Endpoint, Serializable):
         else:
             result = Dixel(level=DicomLevel.INSTANCES, meta={"FileName": fn})
 
-        get_file = DixelView.FILE in view
+        get_file = DixelView.FILE in view or kwargs.get("file")
         if get_file:
             result.file = self.gateway.read_file(fn)
 

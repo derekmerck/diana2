@@ -17,6 +17,20 @@ def say(self, data):
 ObservableOrthanc.say = say
 
 
+def test_obs_orth_changes():
+
+    obs = ObservableOrthanc(current_change=0)
+
+    assert obs.current_change == 0
+
+    obs.current_change = 100
+    obs.persist_current_change()
+
+    obs2 = ObservableOrthanc()
+    assert obs2.current_change == 100
+
+
+
 def orth_test_runner():
     O = Orthanc()
     dicom_dir = find_resource("resources/dcm")
@@ -66,6 +80,8 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     from conftest import mk_orthanc
 
-    O = mk_orthanc()
-    logging.debug(O.dkr_container.status)
-    test_orthanc_watcher(None, None)
+    test_obs_orth_changes()
+
+    # O = mk_orthanc()
+    # logging.debug(O.dkr_container.status)
+    # test_orthanc_watcher(None, None)

@@ -2,7 +2,7 @@ import os, logging
 from pprint import pprint
 from typing import Union, Mapping
 from functools import partial
-from ..dixel import Dixel, DixelView
+from ..dixel import Dixel, DixelView, ShamDixel
 from ..apis import *
 from ..utils import DicomLevel, DicomEventType
 from ..utils.endpoint import Endpoint, Serializable, Trigger
@@ -83,15 +83,39 @@ def pull_and_save_item(item: Dixel, source: ProxiedDicom,
     return "COMPLETED"
 
 
-def upload_item(fn: str, source: DcmDir, dest: Orthanc):
+def upload_item(item: Mapping, source: DcmDir, dest: Orthanc, anonymizing=False):
 
-    if os.path.splitext(fn)[1] == "zip":
-        worklist = source.get_zipped(fn)
-        for item in worklist:
+    logger = logging.getLogger("upload_item")
+    logger.debug("Trying to upload {}".format(item))
+
+    try:
+
+        def _upload(item):
             dest.put(item)
-    else:
-        item = source.get(fn, file=True)
-        dest.put(item)
+            if anonymizing:
+                map = ShamDixel.orthanc_sham_map(item)
+                dest.anonymize(item, level=DicomLevel.INSTANCES, map=map)
+
+        fn = item.get("fn", "")
+
+        logger.debug("fn: {}".format(fn))
+        logger.debug("ext: {}".format(os.path.splitext(fn)[1]))
+
+        if os.path.splitext(fn)[1] == ".zip":
+            worklist = source.get_zipped(fn)
+            for item in worklist:
+                _upload(item)
+
+        else:
+            item = source.get(fn, view=DixelView.TAGS_FILE)
+            dest.put(item)
+            _upload(item)
+
+    except FileNotFoundError as e:
+        logging.warning("Skipping {}".format(e))
+        pass
+
+
 
 
 def index_item(item: Mapping, level: DicomLevel, source: Endpoint,
@@ -133,6 +157,10 @@ def mk_route(hname, source_desc, dest_desc=None):
     dest = None
     if dest_desc:
         dest = Serializable.Factory.create(**dest_desc)
+
+    logger = logging.getLogger("mk_route")
+    logger.debug("Source: {}".format(source))
+    logger.debug("Dest: {}".format(dest))
 
     # TESTING HANDLERS
     if hname == "say_instances":
@@ -178,6 +206,15 @@ def mk_route(hname, source_desc, dest_desc=None):
         evtype = DicomEventType.FILE_ADDED
         func = partial(upload_item,
                        source=source, dest=dest)
+
+    elif hname == "upload_and_anonymize_files":
+        evtype = DicomEventType.FILE_ADDED
+        func = partial(upload_item,
+                       source=source, dest=dest, anonymizing=True)
+
+    elif hname == "say_files":
+        evtype = DicomEventType.FILE_ADDED
+        func = partial(say)
 
     elif hname == "index_series":
         evtype = DicomEventType.SERIES_ADDED
