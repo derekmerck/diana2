@@ -92,9 +92,11 @@ def upload_item(item: Mapping, source: DcmDir, dest: Orthanc, anonymizing=False)
 
         def _upload(item):
             dest.put(item)
+            # Todo tag item with source metadata/make sure it persists on anonymized
             if anonymizing:
                 map = ShamDixel.orthanc_sham_map(item)
                 dest.anonymize(item, level=DicomLevel.INSTANCES, map=map)
+                dest.delete(item)
 
         fn = item.get("fn", "")
 

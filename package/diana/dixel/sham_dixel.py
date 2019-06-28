@@ -95,7 +95,7 @@ class ShamDixel(Dixel):
 
         if self.level >= DicomLevel.INSTANCES and \
                 self.tags.get("InstanceDateTime"):
-            self.meta["ShamInstanceCreationDateTime"] = self.tags.get("InstanceDateTime") + \
+            self.meta["ShamInstanceCreationDateTime"] = self.meta.get("InstanceDateTime") + \
                                                         self.sham_info['TimeOffset']
     def ShamStudyDate(self):
         if self.meta.get("ShamStudyDateTime"):
@@ -165,7 +165,8 @@ class ShamDixel(Dixel):
         # base-class Dixel, as long as _Sham_ meta exists...
 
         if self.level == DicomLevel.INSTANCES:
-            # TODO: Validate instance creation time maps
+            # TODO: Validate instance creation time maps -- should create
+            # something valid in "simplify_dicom" and just need to call it
             raise NotImplementedError("Validate instance creation time mapping")
 
         replace = {
