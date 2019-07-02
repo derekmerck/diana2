@@ -1,4 +1,6 @@
+import csv
 import logging
+import os
 from pprint import pformat
 from typing import Mapping
 from dateutil import parser as DatetimeParser
@@ -56,6 +58,25 @@ class Dixel(Serializable):
         for tag, value in self.tags.items():
             if tag.endswith("DateTime"):
                 self.meta[tag] = value
+
+    def to_csv(self, filepath, mode='a+'):
+        write_headers = False if os.path.exists(filepath) else True
+        with open(filepath, mode, newline="") as csvFile:
+            writer = csv.writer(csvFile)
+
+            if write_headers:
+                writer.writerow(list(self.meta.keys()) + list(self.tags.keys()))
+
+            row = []
+            for k, v in self.meta.items():
+                if k == "ReportText":
+                    row.append(self.report)
+                else:
+                    row.append(v)
+            for k, v in self.tags.items():
+                row.append(v)
+
+            writer.writerow(row)
 
     @staticmethod
     def from_pydicom(ds: pydicom.Dataset, fn: str=None, file=None):
@@ -151,51 +172,74 @@ class Dixel(Serializable):
 
         # TODO: Check event flags for various event types to get ordering, study, and reading
 
-        referring_physician = data['events'][0].get('provider')
-        if referring_physician:
-            referring_physician = referring_physician.get('name')
+        try:
+            referring_physician = data['events'][0].get('provider')
+            if referring_physician:
+                referring_physician = referring_physician.get('name')
 
-        study_datetime = None
-        if len(data['events']) > 1:
-            # Last event is usually read I think, take event _before_ last one
-            study_event = data['events'][-2]
-            if study_event.get('date'):
-                study_datetime = DatetimeParser.parse(study_event['date'])
-        else:
-            # Otherwise just take whatever is last
-            study_event = data['events'][-1]
-            if study_event.get('date'):
-                study_datetime = DatetimeParser.parse(study_event['date'])
+            study_datetime = None
+            if len(data['events']) > 1:
+                # Last event is usually read I think, take event _before_ last one
+                study_event = data['events'][-2]
+                if study_event.get('date'):
+                    study_datetime = DatetimeParser.parse(study_event['date'])
+            else:
+                # Otherwise just take whatever is last
+                study_event = data['events'][-1]
+                if study_event.get('date'):
+                    study_datetime = DatetimeParser.parse(study_event['date'])
 
-        montage_cpts = []
-        for resource in data["exam_type"]["cpts"]:
-            code = resource.split("/")[-2]
-            montage_cpts.append(code)
+            montage_cpts = []
+            for resource in data["exam_type"]["cpts"]:
+                code = resource.split("/")[-2]
+                montage_cpts.append(code)
 
-        tags = {
-            "AccessionNumber": data["accession_number"],
-            "PatientID": data["patient_mrn"],
-            'StudyDescription': data['exam_type']['description'],
-            'ReferringPhysicianName': referring_physician,
-            'PatientSex': data['patient_sex'],
-            'Organization': data['organization']['label'],
-            "Modality": data['exam_type']['modality']['label']
-        }
+            tags = {
+                "AccessionNumber": data["accession_number"],
+                "PatientID": data["patient_mrn"],
+                'StudyDescription': data['exam_type']['description'],
+                'ReferringPhysicianName': referring_physician,
+                'PatientSex': data['patient_sex'],
+                'Organization': data['organization']['label'],
+                "Modality": data['exam_type']['modality']['label']
+            }
 
-        meta = {
-            'BodyParts': None,  # Placeholder for meta
-            'CPTCodes': None,   # Placeholder for meta
-            'PatientName': "{}^{}".format(
-                data["patient_last_name"].upper(),
-                data["patient_first_name"].upper()),
-            'PatientAge': data['patient_age'],
-            "OrderCode": data["exam_type"]["code"],
-            "PatientStatus": data["patient_status"],
-            "ReportText": Montage.clean_text(data['text']),
-            "ReadingPhysiciansName": data['events'][-1]['provider']['name'],
-            'StudyDateTime': study_datetime,
-            "MontageCPTCodes": montage_cpts
-        }
+            meta = {
+                'BodyParts': None,  # Placeholder for meta
+                'CPTCodes': None,   # Placeholder for meta
+                'PatientName': "{}^{}".format(
+                    data["patient_last_name"].upper(),
+                    data["patient_first_name"].upper()),
+                'PatientAge': data['patient_age'],
+                "OrderCode": data["exam_type"]["code"],
+                "PatientStatus": data["patient_status"],
+                "ReportText": Montage.clean_text(data['text']),
+                "ReadingPhysiciansName": data['events'][-1]['provider']['name'],
+                'StudyDateTime': study_datetime,
+                "MontageCPTCodes": montage_cpts
+            }
+        except KeyError:
+            meta = {
+                "BodyParts": None,
+                "CPTCodes": None,
+                "MontageCPTCodes": data['meta']['MontageCPTCodes'],
+                "OrderCode": data['meta']['OrderCode'],
+                "PatientAge": data['meta']['PatientAge'],
+                "PatientName": data['meta']['PatientName'],
+                "PatientStatus": data['meta']['PatientStatus'],
+                "ReadingPhysiciansName": data['meta']['ReadingPhysiciansName'],
+                "ReportText": data['meta']['ReportText'],
+                "StudyDateTime": data['meta']['StudyDateTime']
+            }
+            tags = {
+                "AccessionNumber": data['tags']['AccessionNumber'],
+                "Modality": data['tags']['Modality'],
+                "Organization": data['tags']['Organization'],
+                "PatientID": data['tags']['PatientID'],
+                "PatientSex": data['tags']['PatientSex'],
+                "ReferringPhysicianName": data['tags']['ReferringPhysicianName'],
+                "StudyDescription": data['tags']['StudyDescription']
+            }
 
         d = Dixel(meta=meta,
                   tags=tags,
