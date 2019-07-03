@@ -22,6 +22,13 @@ def parse_timestamps(tags, ignore_errors):
     if tags.get("SeriesDate"):
         tags["SeriesDateTime"] = mk_time(tags.get("SeriesDate"), tags.get("SeriesTime"))
 
+    if not tags.get("SeriesDateTime"):
+        tags["SeriesDateTime"] = tags.get("StudyDateTime")
+
+    if not tags.get("InstanceCreationDateTime"):
+        err = "No series creation time identified"
+        handle_errors(err, ignore_errors)
+
     if tags.get("InstanceCreationDate"):
         tags["InstanceCreationDateTime"] = mk_time(tags.get("InstanceCreationDate"),
                                                    tags.get("InstanceCreationTime"))

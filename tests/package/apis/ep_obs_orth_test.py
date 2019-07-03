@@ -1,3 +1,5 @@
+import tempfile
+import os
 import time
 import logging
 from multiprocessing import Process
@@ -19,16 +21,25 @@ ObservableOrthanc.say = say
 
 def test_obs_orth_changes():
 
-    obs = ObservableOrthanc(current_change=0)
+    tmpf = tempfile.NamedTemporaryFile(delete=False)
 
-    assert obs.current_change == 0
+    # This will initially throw an error b/c the file exists but is not a pickle
+    obs = ObservableOrthanc(persist_file=tmpf.name)
 
-    obs.current_change = 100
+    logging.debug("Testing new 0")
+    assert obs._current_change == 0
+
+    obs._current_change = 100
     obs.persist_current_change()
 
-    obs2 = ObservableOrthanc()
-    assert obs2.current_change == 100
+    logging.debug("Testing 100")
+    assert obs._current_change == 100
 
+    logging.debug("Testing new 100")
+    obs2 = ObservableOrthanc(persist_file=tmpf.name)
+    assert obs2._current_change == 100
+
+    os.remove(tmpf.name)
 
 
 def orth_test_runner():
@@ -46,9 +57,10 @@ def orth_test_runner():
 
 def test_orthanc_watcher(setup_orthanc0, capfd):
 
-    print("Starting")
+    print("Starting watcher test")
 
     obs = ObservableOrthanc()
+    obs.clear()
     watcher = Watcher()
 
     trigger0 = Trigger(
@@ -82,6 +94,6 @@ if __name__ == "__main__":
 
     test_obs_orth_changes()
 
-    # O = mk_orthanc()
-    # logging.debug(O.dkr_container.status)
-    # test_orthanc_watcher(None, None)
+    O = mk_orthanc()
+    logging.debug(O.dkr_container.status)
+    test_orthanc_watcher(None, None)

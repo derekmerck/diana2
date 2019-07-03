@@ -1,7 +1,75 @@
 import logging, datetime
 from diana.dixel import Dixel, ShamDixel
+from diana.utils.dicom import DicomLevel
+from pprint import pformat
 
-def test_shams():
+def test_dt_shams_at_levels():
+
+    tags = {
+        "PatientName": "FOOABC^BAR^Z",
+        "PatientBirthDate": "20000101",
+        "StudyDate": "20180102",
+        "StudyTime": "120001",
+        "AccessionNumber": "12345678"
+    }
+
+    expected_meta = {
+         'ShamAccessionNumber': '25d55ad283aa400af464c76d713c07ad',
+         'ShamBirthDate': '19991009',
+         'ShamID': 'NTE3OTYH32XNES3LPNKR2U6CVOCZXDIL',
+         'ShamName': 'NADERMAN^TRACY^E',
+
+         'StudyDateTime': datetime.datetime(2018, 1, 2, 12, 0, 1),
+         'ShamStudyDateTime': datetime.datetime(2017, 10, 10, 12, 15, 3)
+    }
+
+    d = ShamDixel(tags=tags, level=DicomLevel.STUDIES)
+    logging.debug(pformat(d.meta))
+
+    assert( expected_meta.items() <= d.meta.items() )
+
+    # check for imputing missing series dt tags
+    d = ShamDixel(tags=tags, level=DicomLevel.SERIES)
+    logging.debug(pformat(d.meta))
+    assert d.meta["ShamStudyDateTime"] == d.meta["ShamSeriesDateTime"]
+
+    # check for imputing missing instance dt tags
+    d = ShamDixel(tags=tags, level=DicomLevel.INSTANCES)
+    logging.debug(pformat(d.meta))
+    assert d.meta["ShamInstanceCreationDateTime"] == d.meta["ShamSeriesDateTime"] == d.meta["ShamStudyDateTime"]
+
+    tags.update({
+        "SeriesDate": "20180102",
+        "SeriesTime": "120101"
+    })
+
+    expected_meta.update({
+         'SeriesDateTime': datetime.datetime(2018, 1, 2, 12, 1, 1),
+         'ShamSeriesDateTime': datetime.datetime(2017, 10, 10, 12, 16, 3)
+    })
+
+    d = ShamDixel(tags=tags, level=DicomLevel.SERIES)
+    logging.debug(pformat(d.meta))
+
+    assert( expected_meta.items() <= d.meta.items() )
+
+    tags.update({
+        "InstanceCreationDate": "20180102",
+        "InstanceCreationTime": "120101"
+    })
+
+    expected_meta.update({
+        'InstanceCreationDateTime': datetime.datetime(2018, 1, 2, 12, 1, 1),
+        'ShamInstanceCreationDateTime': datetime.datetime(2017, 10, 10, 12, 16, 3)
+    })
+
+    d = ShamDixel(tags=tags, level=DicomLevel.INSTANCES)
+    logging.debug(pformat(d.meta))
+
+    assert( expected_meta.items() <= d.meta.items() )
+
+
+def test_study_shams():
 
     tags = {
         "PatientName": "FOOABC^BAR^Z",
@@ -49,4 +117,5 @@ def test_shams():
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
-    test_shams()
+    test_study_shams()
+    test_dt_shams_at_levels()

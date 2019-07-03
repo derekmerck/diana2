@@ -3,6 +3,8 @@ from pprint import pformat
 from diana.utils.endpoint import Containerized
 
 
+import pytest
+@pytest.mark.skip(reason="Missing docker credentials?")
 def test_swarm():
     Containerized.start_swarm()
 

@@ -25,7 +25,10 @@ services = {
     }
 }
 
+import pytest
 
+
+@pytest.mark.skip(reason="Need to refactor for automated testing")
 def test_collector_cli():
 
     runner = CliRunner()
@@ -41,7 +44,8 @@ def test_collector_cli():
     print(result.exception)
 
 
-def test_collector(anonymize):
+@pytest.mark.skip(reason="Need to refactor for automated testing")
+def test_collector(setup_orthanc0, setup_orthanc1, anonymize):
 
     pacs = Serializable.Factory.create(**services.get("pacs"))
     proxy = Serializable.Factory.create(**services.get("proxy"))

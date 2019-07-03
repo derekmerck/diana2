@@ -11,6 +11,9 @@ from ..utils.dicom.uid_mint import hash_str
 
 
 def mktime(datestr, timestr=""):
+    """
+    Convert a dicom date string or date string time string pair to a proper dt
+    """
     if not datestr and not timestr:
         return
     # Parser does not like fractional seconds
@@ -19,6 +22,17 @@ def mktime(datestr, timestr=""):
     # logging.debug(dt_str)
     dt = DatetimeParser.parse(dt_str)
     return dt
+
+def as_ddt(dt_value):
+    """
+    Check that dt_value is a proper datetime object
+    Return as dicom pair (dicom date, dicom time)
+    """
+    if not dt_value:
+        raise ValueError("No dt available")
+    if not isinstance(dt_value, datetime):
+        dt_value = mktime(dt_value)
+    return dicom_datetime(dt_value)
 
 # TODO: Minor reformat to handle pre-shammed Dixels, ie, don't assume sham_info must be created
 
@@ -90,38 +104,51 @@ class ShamDixel(Dixel):
            self.meta["ShamStudyDateTime"] = self.meta.get("StudyDateTime") + self.sham_info['TimeOffset']
 
         if self.level >= DicomLevel.SERIES and \
-                self.meta.get("SeriesDatetime"):
+                self.meta.get("SeriesDateTime"):
             self.meta["ShamSeriesDateTime"] = self.meta.get("SeriesDateTime") + self.sham_info['TimeOffset']
 
         if self.level >= DicomLevel.INSTANCES and \
-                self.tags.get("InstanceDateTime"):
-            self.meta["ShamInstanceCreationDateTime"] = self.meta.get("InstanceDateTime") + \
+                self.tags.get("InstanceCreationDateTime"):
+            self.meta["ShamInstanceCreationDateTime"] = self.meta.get("InstanceCreationDateTime") + \
                                                         self.sham_info['TimeOffset']
+
     def ShamStudyDate(self):
         if self.meta.get("ShamStudyDateTime"):
-            ssdt = self.meta.get("ShamStudyDateTime")
-            # print(ssdt)
-            if not isinstance(ssdt, datetime):
-                ssdt = mktime(ssdt)
-            # print(ssdt)
-            return dicom_datetime(ssdt)[0]
+            ddt = as_ddt(self.meta.get("ShamStudyDateTime"))
+            return ddt[0]
 
     def ShamStudyTime(self):
         if self.meta.get("ShamStudyDateTime"):
-            ssdt = self.meta.get("ShamStudyDateTime")
-            # print(ssdt)
-            if not isinstance(ssdt, datetime):
-                ssdt = mktime(ssdt)
-            # print(ssdt)
-            return dicom_datetime(ssdt)[1]
+            ddt = as_ddt(self.meta.get("ShamStudyDateTime"))
+            return ddt[1]
 
     def ShamSeriesDate(self):
         if self.meta.get("ShamSeriesDateTime"):
-            return dicom_datetime(self.meta["ShamSeriesDateTime"])[0]
+            ddt = as_ddt(self.meta.get("ShamSeriesDateTime"))
+            return ddt[0]
+        else:
+            return self.ShamStudyDate()
 
     def ShamSeriesTime(self):
-        if self.meta.get("ShamStudyDateTime"):
-            return dicom_datetime(self.meta["ShamSeriesDateTime"])[1]
+        if self.meta.get("ShamSeriesDateTime"):
+            ddt = as_ddt(self.meta.get("ShamSeriesDateTime"))
+            return ddt[1]
+        else:
+            return self.ShamStudyTime()
+
+    def ShamInstanceDate(self):
+        if self.meta.get("ShamInstanceCreationDateTime"):
+            ddt = as_ddt(self.meta.get("ShamInstanceCreationDateTime"))
+            return ddt[0]
+        else:
+            return self.ShamSeriesDate()
+
+    def ShamInstanceTime(self):
+        if self.meta.get("ShamInstanceCreationDateTime"):
+            ddt = as_ddt(self.meta.get("ShamInstanceCreationDateTime"))
+            return ddt[1]
+        else:
+            return self.ShamSeriesTime()
 
     def ShamStudyUID(self):
         return ShamDixel.ShamUID.uid(PatientID=self.meta["ShamID"],
@@ -164,10 +191,10 @@ class ShamDixel(Dixel):
         # Formatted calls to invoke ShamDixel methods even when called with a
         # base-class Dixel, as long as _Sham_ meta exists...
 
-        if self.level == DicomLevel.INSTANCES:
-            # TODO: Validate instance creation time maps -- should create
-            # something valid in "simplify_dicom" and just need to call it
-            raise NotImplementedError("Validate instance creation time mapping")
+        # if self.level == DicomLevel.INSTANCES:
+        #     # TODO: Validate instance creation time maps -- should create
+        #     # something valid in "simplify_dicom" and just need to call it
+        #     raise NotImplementedError("Validate instance creation time mapping")
 
         replace = {
                 "PatientName": self.meta["ShamName"],

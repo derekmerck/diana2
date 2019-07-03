@@ -22,14 +22,19 @@ class ObservableOrthanc(Orthanc, ObservableMixin):
 
     name = attr.ib(default="ObsOrthanc")
 
-    persist_file = attr.ib(type=Path, convert=Path)
+    start_from_change = attr.ib(type=int, default=None)
+
+    persist_file = attr.ib(type=Path, converter=Path)
     @persist_file.default
     def set_persist_file(self):
         return "/tmp/diana-" + slugify(self.gateway.base_url) + "-changes.pik"
 
-    _current_change = attr.ib(type=int, convert=int, init=False)
+    _current_change = attr.ib(type=int, converter=int, init=False)
     @_current_change.default
     def set_current_change(self):
+        if self.start_from_change:
+            return self.start_from_change
+
         if self.persist_file.is_file():
             try:
                 with self.persist_file.open("rb") as f:
