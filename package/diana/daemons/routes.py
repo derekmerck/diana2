@@ -98,7 +98,7 @@ def upload_item(item: Mapping, source: DcmDir, dest: Orthanc, anonymizing=False)
                 map = ShamDixel.orthanc_sham_map(shammed)
                 f = dest.anonymize(item, level=DicomLevel.INSTANCES, replacement_map=map)
                 dest.delete(item)
-                F = Dixel()
+                F = Dixel(level=DicomLevel.INSTANCES)
                 F.file = f
                 dest.put(F)
 
