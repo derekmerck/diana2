@@ -127,7 +127,7 @@ class Orthanc(Requester):
     def anonymize(self, oid, level, replacement_map):
         resource = "{!s}/{}/anonymize".format(level, oid)
         response = self._post(resource, json=replacement_map)
-        if level >= DicomLevel.SERIES:
+        if level <= DicomLevel.SERIES:
             return response.get("ID")
         else:
             # Returns entire file as bytes
