@@ -157,13 +157,13 @@ class ShamDixel(Dixel):
     def ShamSeriesUID(self):
         return ShamDixel.ShamUID.uid(PatientID=self.meta["ShamID"],
                          StudyInstanceUID=self.meta["ShamAccessionNumber"],
-                         SeriesInstanceUID=self.meta["ShamSeriesNumber"])
+                         SeriesInstanceUID=self.meta["SeriesInstanceUID"])
 
     def ShamInstanceUID(self):
         return ShamDixel.ShamUID.uid(PatientID=self.meta["ShamID"],
                          StudyInstanceUID=self.meta["ShamAccessionNumber"],
-                         SeriesInstanceUID=self.meta["ShamSeriesNumber"],
-                         SOPInstanceUID=self.tags["InstanceNumber"])
+                         SeriesInstanceUID=self.meta["SeriesInstanceUID"],
+                         SOPInstanceUID=self.tags["SOPInstanceUID"])
 
     # orthanc id
     def sham_oid(self):
