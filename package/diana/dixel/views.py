@@ -1,5 +1,6 @@
 from enum import Flag, auto
 
+
 class DixelView(Flag):
     """
     Some endpoints can only generate certain DixelViews, others can

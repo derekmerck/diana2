@@ -11,10 +11,13 @@ from diana.utils.dicom import DicomLevel, dicom_date, dicom_time, dicom_name, Di
 from diana.utils.guid import GUIDMint
 
 _R = random.Random()
+dcm_mint = DicomUIDMint("diana-mock")
+
+
 def reset_mock_seed():
     """Reset the mock seed and mock id for testing"""
     _R.seed("diana-mock")
-dcm_mint = DicomUIDMint("diana-mock")
+
 
 @attr.s(hash=False)
 class MockInstance(Dixel):
@@ -64,7 +67,6 @@ class MockInstance(Dixel):
             self.tags["StudyDescription"],
             self.tags["SeriesDescription"]
         )
-
 
     def as_pydicom_ds(self):
         """

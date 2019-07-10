@@ -6,6 +6,7 @@
 import re, logging
 import attr
 
+
 @attr.s
 class RadiologyReport(object):
     text = attr.ib(converter=str)

@@ -98,7 +98,8 @@ def mfind(ctx,
         result = []
 
     if as_json:
-        result = json.dumps([d.asdict() for d in result], cls=SmartJSONEncoder, sort_keys=True,
+        result = json.dumps([d.asdict() for d in result],
+                            cls=SmartJSONEncoder, sort_keys=True,
                             indent=4, separators=(',', ': '))
 
     else:

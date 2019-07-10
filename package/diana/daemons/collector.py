@@ -217,9 +217,9 @@ class Collector(object):
 
             if not source.exists(d):
                 source.rfind(mkq(d),
-                        domain,
-                        level=DicomLevel.STUDIES,
-                        retrieve=True)
+                             domain,
+                             level=DicomLevel.STUDIES,
+                             retrieve=True)
             else:
                 logging.debug("SKIPPING PULL for {}".format(d.tags["PatientName"]))
 
