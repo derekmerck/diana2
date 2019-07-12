@@ -133,11 +133,11 @@ class Orthanc(Requester):
             return response
 
     def get_metadata(self, oid: str, level: DicomLevel, key: str ):
-        resource = "{}/{}/metadata/{}".format(level, oid, key)
+        resource = "{!s}/{}/metadata/{}".format(level, oid, key)
         return self._get(resource)
 
     def put_metadata(self, oid: str, level: DicomLevel, key: str, value: str):
-        resource = "{}/{}/metadata/{}".format(level, oid, key)
+        resource = "{!s}/{}/metadata/{}".format(level, oid, key)
         data = value
         return self._put(resource, data=data)
 
