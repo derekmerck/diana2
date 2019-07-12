@@ -167,7 +167,7 @@ class ShamDixel(Dixel):
 
     # orthanc id
     def sham_oid(self):
-        if not self.meta.get('ID'):
+        if not self.meta.get('ShamOID'):
             if self.level == DicomLevel.PATIENTS:
                 self.meta['ShamOID'] = orthanc_id(self.meta.get('ShamID'))
             elif self.level == DicomLevel.STUDIES:

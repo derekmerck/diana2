@@ -103,7 +103,7 @@ def upload_item(item: Mapping, source: DcmDir, dest: Orthanc, anonymizing=False)
                 dest.delete(item)
                 shammed.file = _file
                 dest.put(shammed)
-                if not dest.exists(shammed):
+                if not dest.exists(shammed.sham_info(), level=DicomLevel.INSTANCES):
                     raise ValueError("Unable to upload sham dixel {}".format(shammed.oid()))
                 dest.gateway.put_metadata(shammed.oid(), DicomLevel.INSTANCES, "Source", source_fn)
 
