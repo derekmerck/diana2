@@ -178,7 +178,7 @@ class ShamDixel(Dixel):
                                                   ShamDixel.ShamStudyUID(self),
                                                   ShamDixel.ShamSeriesUID(self))
             elif self.level == DicomLevel.INSTANCES:
-                self.meta['ShamOID'] = orthanc_id(self.tags.get('ShamID'),
+                self.meta['ShamOID'] = orthanc_id(self.meta.get('ShamID'),
                                                   ShamDixel.ShamStudyUID(self),
                                                   ShamDixel.ShamSeriesUID(self),
                                                   ShamDixel.ShamInstanceUID(self))
