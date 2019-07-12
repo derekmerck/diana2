@@ -94,7 +94,7 @@ def upload_item(item: Mapping, source: DcmDir, dest: Orthanc, anonymizing=False)
             dest.put(item)
             if not dest.exists(item):
                 raise ValueError("Missing Dixel {}".format(item.oid()))
-            dest.gateway.put_metadata(item.oid(), DicomLevel.INSTANCES, "source", source.path)
+            dest.gateway.put_metadata(item.oid(), DicomLevel.INSTANCES, "Source", source.path)
             # Todo tag item with source metadata/make sure it persists on anonymized
             if anonymizing:
                 shammed = ShamDixel.from_dixel(item)

@@ -7,6 +7,9 @@ from ..utils import Endpoint, Serializable
 from ..utils.gateways import Orthanc as OrthancGateway, GatewayConnectionError
 from ..utils.dicom import DicomLevel, dicom_simplify
 
+# Special metadata:
+# $ export ORTHANC_METADATA_0=Source,9876
+
 
 def sham_map(d: ShamDixel):
 
