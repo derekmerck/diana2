@@ -24,6 +24,11 @@ class Trigger(object):
                                           self.evtype,
                                           self.action)
 
+
+def suppress_watcher_debug():
+    logging.getLogger("Watcher").setLevel(logging.WARNING)
+
+
 @attr.s
 class Watcher(object):
     """

@@ -18,7 +18,7 @@ LARGE_TIMEOUT  = (6.1, 360.1) # Use large timeout on <1Gb connections
 TIMEOUTS = LARGE_TIMEOUT
 
 
-def supress_urllib_debug():
+def suppress_urllib_debug():
     logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 

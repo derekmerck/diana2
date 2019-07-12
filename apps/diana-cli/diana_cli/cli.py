@@ -2,7 +2,8 @@ import logging, os
 import yaml
 import click
 from . import __version__
-from diana.utils.gateways import supress_urllib_debug
+from diana.utils.gateways import suppress_urllib_debug
+from diana.utils.endpoint import suppress_watcher_debug
 from diana import __version__ as diana_version
 
 from .check import check
@@ -49,6 +50,7 @@ def cli(ctx, verbose, services, services_path):
         logging.basicConfig(level=logging.DEBUG)
         # suppress_urllib_debug()
         click.echo('Verbose mode is %s' % ('on' if verbose else 'off'))
+        supress_watcher_debug()
     else:
         logging.basicConfig(level=logging.WARNING)
         supress_urllib_debug()
