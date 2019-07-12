@@ -93,17 +93,19 @@ def upload_item(item: Mapping, source: DcmDir, dest: Orthanc, anonymizing=False)
         def _upload_instance(item):  # Should be all instances
             dest.put(item)
             if not dest.exists(item):
-                raise ValueError("Missing Dixel {}".format(item.oid()))
-            dest.gateway.put_metadata(item.oid(), DicomLevel.INSTANCES, "Source", source.path)
-            # Todo tag item with source metadata/make sure it persists on anonymized
+                raise ValueError("Unable to upload dixel {}".format(item.oid()))
+            source_fn = os.path.join(source.path, item.fn)
+            dest.gateway.put_metadata(item.oid(), DicomLevel.INSTANCES, "Source", source_fn)
             if anonymizing:
                 shammed = ShamDixel.from_dixel(item)
                 map = ShamDixel.orthanc_sham_map(shammed)
-                f = dest.anonymize(item, level=DicomLevel.INSTANCES, replacement_map=map)
+                _file = dest.anonymize(item, level=DicomLevel.INSTANCES, replacement_map=map)
                 dest.delete(item)
-                F = Dixel(level=DicomLevel.INSTANCES)
-                F.file = f
-                dest.put(F)
+                shammed.file = _file
+                dest.put(shammed)
+                if not dest.exists(shammed):
+                    raise ValueError("Unable to upload sham dixel {}".format(shammed.oid()))
+                dest.gateway.put_metadata(shammed.oid(), DicomLevel.INSTANCES, "Source", source_fn)
 
 
         fn = item.get("fn", "")
