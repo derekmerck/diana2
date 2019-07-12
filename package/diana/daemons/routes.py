@@ -90,11 +90,11 @@ def upload_item(item: Mapping, source: DcmDir, dest: Orthanc, anonymizing=False)
 
     try:
 
-        def _upload(item):
+        def _upload_instance(item):  # Should be all instances
             dest.put(item)
             if not dest.exists(item):
                 raise ValueError("Missing Dixel {}".format(item.oid))
-            dest.put_metadata(item, source)
+            dest.gateway.put_metadata(item.oid, DicomLevel.INSTANCES, "source", source.path)
             # Todo tag item with source metadata/make sure it persists on anonymized
             if anonymizing:
                 shammed = ShamDixel.from_dixel(item)
@@ -114,12 +114,12 @@ def upload_item(item: Mapping, source: DcmDir, dest: Orthanc, anonymizing=False)
         if os.path.splitext(fn)[1] == ".zip":
             worklist = source.get_zipped(fn)
             for item in worklist:
-                _upload(item)
+                _upload_instance(item)
 
         else:
             item = source.get(fn, view=DixelView.TAGS_FILE)
             dest.put(item)
-            _upload(item)
+            _upload_instance(item)
 
     except FileNotFoundError as e:
         logging.warning("Skipping {}".format(e))
