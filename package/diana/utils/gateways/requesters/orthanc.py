@@ -1,7 +1,6 @@
 import logging
 from pprint import pformat
 from hashlib import sha1
-from enum import Enum
 import attr
 from .requester import Requester
 from ..exceptions import GatewayConnectionError
@@ -16,7 +15,7 @@ orthanc_metadata_keys = [
     "Origin",
     "TransferSyntax",
     "SopClassUid",
-    "IndexInSeries", # instance level only
+    "IndexInSeries",             # instance level only
     "ExpectedNumberOfInstances"  # series level only
 ]
 
