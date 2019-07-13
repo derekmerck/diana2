@@ -117,8 +117,7 @@ class DcmDir(Endpoint, Serializable):
         for fn, f in files:
             try:
                 ds = pydicom.dcmread(BytesIO(f), stop_before_pixels=True)
-                d = Dixel.from_pydicom(ds, fn)
-                d.file = f
+                d = Dixel.from_pydicom(ds, fn, file=BytesIO(f))
                 result.add(d)
             except pydicom.errors.InvalidDicomError as e:
                 logging.warning("Failed to parse with {}".format(e))
