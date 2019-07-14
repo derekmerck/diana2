@@ -1,6 +1,7 @@
 import logging, json
 from pprint import pformat
 from diana.apis import DcmDir
+from diana.dixel import DixelView
 from diana.utils import Serializable
 
 from test_utils import find_resource
@@ -60,9 +61,38 @@ def test_subdirs():
     assert( len(subdirs) >= 8 )
 
 
+def test_zip_reader():
+
+    p = find_resource("resources")
+    D = DcmDir(path=p)
+
+    f = D.get("dcm/IM2263", view=DixelView.TAGS_FILE)
+
+    gs = D.get_zipped("dcm_zip/test.zip")
+
+    for _g in gs:
+        if "2263" in _g.meta["FileName"]:
+            g = _g
+            break
+
+    logging.debug(f)
+    logging.debug(g)
+
+    assert(f.tags["StudyInstanceUID"] == g.tags["StudyInstanceUID"])
+
+    from binascii import hexlify
+
+    logging.debug("f file:")
+    logging.debug( hexlify(f.file[1024:2048]) )
+    logging.debug("g file:")
+    logging.debug( hexlify(g.file[1024:2048]) )
+
+    assert f.file == g.file
+
 
 if __name__=="__main__":
 
     logging. basicConfig(level=logging.DEBUG)
-    test_exists()
-    test_subdirs()
+    # test_exists()
+    # test_subdirs()
+    test_zip_reader()
