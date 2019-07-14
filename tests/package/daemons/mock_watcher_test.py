@@ -8,7 +8,7 @@ from diana.utils.dicom import DicomEventType
 from diana.utils.endpoint import Watcher, Trigger
 
 from interruptingcow import timeout
-from diana.utils.gateways.requesters import supress_urllib_debug
+from diana.utils.gateways.requesters import suppress_urllib_debug
 
 
 site_desc = """
@@ -64,10 +64,11 @@ def test_mock_watcher(setup_orthanc0, setup_orthanc1, capfd):
         assert "AccessionNumber" in captured.out
         assert "SeriesInstanceUID" not in captured.out
 
+
 if __name__ == "__main__":
 
     logging.basicConfig(level=logging.DEBUG)
-    supress_urllib_debug()
+    suppress_urllib_debug()
 
     for (i,j) in zip(setup_orthanc(), setup_orthanc2()):
         test_mock_watcher(None, None, None)
