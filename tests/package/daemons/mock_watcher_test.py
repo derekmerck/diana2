@@ -70,8 +70,10 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     suppress_urllib_debug()
 
-    for (i,j) in zip(setup_orthanc(), setup_orthanc2()):
-        test_mock_watcher(None, None, None)
-        i.stop_container()
-        j.stop_container()
+    from conftest import setup_orthanc0, setup_orthanc1
+
+    setup_orthanc0()
+    setup_orthanc1()
+
+    test_mock_watcher(None, None, None)
 

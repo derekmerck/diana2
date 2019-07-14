@@ -77,11 +77,12 @@ def test_site_submission(setup_orthanc0):
     # At least 500 new instances arrived in the last 15 seconds
     assert( n_instances > n_instances_init + 500 )
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     logging.basicConfig(level=logging.WARNING)
     test_mock_site()
 
-    from conftest import setup_orthanc
+    from conftest import setup_orthanc0
 
-    for i in setup_orthanc():
+    for i in setup_orthanc0():
         test_site_submission(None)
