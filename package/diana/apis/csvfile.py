@@ -1,6 +1,6 @@
-import csv, logging, json
+import csv, logging
 import attr
-from ..dixel import Dixel, ShamDixel
+from ..dixel import Dixel
 from ..utils import Endpoint, Serializable
 from ..utils.dicom import DicomLevel
 
@@ -54,7 +54,7 @@ class CsvFile(Endpoint, Serializable):
         # if not fp:
         #     raise ValueError("No file provided")
 
-        if fieldnames=="ALL":
+        if fieldnames == "ALL":
             sample = list(self.dixels)[0]
             data = {("_" + k): v for (k, v) in sample.meta.items()}
             data.update(sample.tags)

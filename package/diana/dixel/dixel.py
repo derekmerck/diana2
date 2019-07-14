@@ -16,8 +16,9 @@ from ..utils.gateways import orthanc_id, Montage
 @attr.s(cmp=False, hash=False)
 class Dixel(Serializable):
     """
-    "Dixels" are DICOM-elements (following pixels, voxels, and texels).  They
-    have metadata, tags, and a DicomLevel (study, series, or instance).
+    "Dixels" are DICOMish-elements (following pixels, voxels, and texels).  They
+    may include metadata, tags, a file, and a pixel array.  All Dixels have an id,
+    typically following the Orthanc format, and a DicomLevel (study, series, or instance).
 
     DIANA endpoints handle and store dixel instances.  Some functions may
     take a dixel identifier and return the dixel instance.
@@ -54,7 +55,7 @@ class Dixel(Serializable):
 
     def simplify_tags(self):
         self.tags = dicom_simplify(self.tags)
-        # Copy all datetimes into meta
+        # Copy all simplified datetimes into meta
         for tag, value in self.tags.items():
             if tag.endswith("DateTime"):
                 self.meta[tag] = value
@@ -80,7 +81,7 @@ class Dixel(Serializable):
 
     @staticmethod
     def from_pydicom(ds: pydicom.Dataset, fn: str=None, file=None):
-        """Generate a dixel from a pydicom dataset"""
+        """Generate a Dixel from a pydicom dataset"""
 
         meta = {
             'FileName': fn,
@@ -282,7 +283,7 @@ class Dixel(Serializable):
         return self.meta.get('ID')
 
     def sid(self):
-        """Serializer id alias for meta['AccessionNumber']"""
+        """Serializer id alias to tags['AccessionNumber']"""
         return self.tags.get('AccessionNumber')
 
     def __cmp__(self, other):
