@@ -95,10 +95,7 @@ def upload_item(item: Mapping, source: DcmDir, dest: Orthanc, anonymizing=False)
             if not dest.exists(item):
                 raise ValueError("Failed to upload dixel {}".format(item.oid()))
             source_fn = os.path.join(source.path, item.fn)
-            # This will write to study level way too much, but it is just as
-            # expensive to check if it is already written
-            dest.gateway.put_metadata(item.parent_oid(DicomLevel.STUDIES),
-                                      DicomLevel.INSTANCES, "Source", source_fn)
+            dest.gateway.put_metadata(item.oid(),DicomLevel.INSTANCES, "Source", source_fn)
             if anonymizing:
                 shammed = ShamDixel.from_dixel(item)
                 map = ShamDixel.orthanc_sham_map(shammed)
@@ -108,8 +105,7 @@ def upload_item(item: Mapping, source: DcmDir, dest: Orthanc, anonymizing=False)
                 dest.put(shammed)
                 if not dest.exists(shammed.sham_oid(), level=DicomLevel.INSTANCES):
                     raise ValueError("Failed to upload shammed dixel {}".format(shammed.oid()))
-                dest.gateway.put_metadata(shammed.sham_parent_oid(DicomLevel.STUDIES),
-                                          DicomLevel.INSTANCES, "Source", source_fn)
+                dest.gateway.put_metadata(shammed.sham_oid(), DicomLevel.INSTANCES, "Source", source_fn)
 
         fn = item.get("fn", "")
 
