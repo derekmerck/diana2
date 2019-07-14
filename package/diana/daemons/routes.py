@@ -115,6 +115,8 @@ def upload_item(item: Mapping, source: DcmDir, dest: Orthanc, anonymizing=False)
         if os.path.splitext(fn)[1] == ".zip":
             worklist = source.get_zipped(fn)
             for item in worklist:
+                # Add path to zip file to item filename
+                item.meta["FileName"] = os.path.join(fn, item.meta["FileName"])
                 _upload_instance(item)
 
         else:
