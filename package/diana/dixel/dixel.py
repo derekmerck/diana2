@@ -263,6 +263,17 @@ class Dixel(Serializable):
 
         return d
 
+    def parent_oid(self, level=DicomLevel.STUDIES):
+        if level == DicomLevel.STUDIES:
+            return orthanc_id(self.tags.get('PatientID'),
+                                         self.tags.get('StudyInstanceUID'))
+        elif level == DicomLevel.SERIES:
+            return orthanc_id(self.tags.get('PatientID'),
+                                         self.tags.get('StudyInstanceUID'),
+                                         self.tags.get('SeriesInstanceUID'))
+
+        raise ValueError("Unknown parent level requested {}".format(level))
+
     def oid(self):
         """Compute Orthanc ID"""
         if not self.meta.get('ID'):

@@ -165,6 +165,18 @@ class ShamDixel(Dixel):
                          SeriesInstanceUID=self.tags["SeriesInstanceUID"],
                          SOPInstanceUID=self.tags["SOPInstanceUID"])
 
+    def sham_parent_oid(self, level=DicomLevel.STUDIES):
+        if level == DicomLevel.STUDIES:
+            return orthanc_id(self.meta.get('ShamID'),
+                              ShamDixel.ShamStudyUID(self))
+
+        elif level == DicomLevel.SERIES:
+            return orthanc_id(self.meta.get('ShamID'),
+                              ShamDixel.ShamStudyUID(self),
+                              ShamDixel.ShamSeriesUID(self))
+
+        raise ValueError("Unknown parent level requested {}".format(level))
+
     # orthanc id
     def sham_oid(self):
         if not self.meta.get('ShamOID'):
