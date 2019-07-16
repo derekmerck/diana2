@@ -4,8 +4,16 @@ from pprint import pformat
 from typing import Mapping, List
 from datetime import datetime
 import attr
+<<<<<<< HEAD:package/crud/endpoints/splunk.py
 from ..abc import Endpoint, Serializable, Item
 from ..gateways import SplunkGateway
+=======
+# from requests.auth import HTTPBasicAuth
+from ..dixel import Dixel
+from ..utils.endpoint import Endpoint, Serializable
+from ..utils.dicom import DicomLevel
+from ..utils.gateways import Splunk as SplunkGateway
+>>>>>>> Providing splunk auth:package/diana/apis/splunk.py
 
 # Suppress insecure warning
 import urllib3
@@ -45,7 +53,8 @@ class Splunk(Endpoint, Serializable):
             hec_port = self.hec_port,
             hec_protocol = self.hec_protocol,
             hec_token=self.hec_token,
-            index = self.index
+            index = self.index,
+            auth = (self.user, self.password)
         )
 
     def find(self,
