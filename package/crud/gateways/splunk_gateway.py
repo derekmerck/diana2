@@ -33,8 +33,7 @@ class SplunkGateway(Requester):
     def info(self):
         r = self._get("services/server/info", params={'output_mode': 'json'})
         return r
-
-    def find_events(self, q, time_range=None):
+    def find_events(self, q, timerange=None, verify=False):
         logger = logging.getLogger(self.name)
 
         if not time_range:
@@ -49,7 +48,8 @@ class SplunkGateway(Requester):
         response = self._post('services/search/jobs',
                              data = {'search': q,
                                      'earliest_time': earliest,
-                                     'latest_time': latest})
+                                     'latest_time': latest},
+                              verify=verify)
 
         soup = BeautifulSoup(response, 'xml')  # Should have returned xml
         sid = soup.find('sid').string  # If it returns multiple sids, it didn't parse the request and did a "GET"
