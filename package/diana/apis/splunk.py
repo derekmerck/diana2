@@ -2,7 +2,6 @@ import logging
 from typing import Mapping
 from datetime import datetime
 import attr
-from requests.auth import HTTPBasicAuth
 from ..dixel import Dixel
 from ..utils.endpoint import Endpoint, Serializable
 from ..utils.dicom import DicomLevel
@@ -34,7 +33,6 @@ class Splunk(Endpoint, Serializable):
 
     @gateway.default
     def setup_gateway(self):
-        print("Should be object: {}".format(HTTPBasicAuth(self.user, self.password)))
         return SplunkGateway(
             name = "SplunkGateway",
             protocol = self.protocol,
@@ -47,7 +45,7 @@ class Splunk(Endpoint, Serializable):
             hec_protocol = self.hec_protocol,
             hec_token=self.hec_token,
             index = self.index,
-            auth = HTTPBasicAuth(self.user, self.password)
+            auth = (self.user, self.password)
         )
 
 

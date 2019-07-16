@@ -1,6 +1,7 @@
 import os, logging, json as _json
 import requests
 import attr
+from requests.auth import HTTPBasicAuth
 from ..exceptions import GatewayConnectionError
 from ...smart_json import SmartJSONEncoder
 
@@ -117,9 +118,9 @@ class Requester(object):
             data = _json.dumps(json, cls=SmartJSONEncoder)
         try:
             if USE_SESSIONS:
-                result = self.session.post(url, data=data, headers=headers, timeout=TIMEOUTS, verify=verify)
+                result = self.session.post(url, data=data, headers=headers, auth=HTTPBasicAuth(self.auth[0], self.auth[1]), timeout=TIMEOUTS, verify=verify)
             else:
-                result = requests.post(url, data=data, headers=headers, auth=self.auth, timeout=TIMEOUTS, verify=verify)
+                result = requests.post(url, data=data, headers=headers, auth=HTTPBasicAuth(self.auth[0], self.auth[1]), timeout=TIMEOUTS, verify=verify)
         except requests.exceptions.Timeout as e:
             raise GatewayConnectionError("Response timed out")
         except (requests.exceptions.ConnectionError,
