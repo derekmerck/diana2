@@ -64,7 +64,7 @@ class ObservableProxiedDicom(ProxiedDicom, ObservableMixin):
 
         q = mk_recent_query()
         logger.debug(q)
-        ret = self.find(query=q, level=self.qlevel)
+        ret = self.find(item=q, level=self.qlevel)
         if not ret:
             return
 
@@ -93,7 +93,3 @@ class ObservableProxiedDicom(ProxiedDicom, ObservableMixin):
 
         if event_queue:
             return event_queue
-
-
-
-
