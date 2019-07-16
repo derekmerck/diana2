@@ -16,9 +16,9 @@ from typing import Collection
 import attr
 from dateutil.parser import parser as DateParser
 
-data_dir = r"D:\Google Drive\Brown\Research\Raw_Data\thyroid_bx_path"
+data_dir = r"D:\Brown\Research\Raw_Data\thyroid_bx_path"
 data0_dir = "usbx"
-data1_dir = "path"
+data1_dir = "path2"
 target_distance = timedelta(days=3)
 # data_dir = "/Users/derek/Desktop/thyroid"
 # data0_dir = "usbx"
@@ -117,7 +117,7 @@ class SemiIdentifiedStudy(object):
             psex = kwargs.get("Patient Sex") or kwargs.get("SEX") or "Unknown"
             mrn = kwargs.get("Patient MRN") or kwargs.get("PatientID")
 
-            age = kwargs.get("Patient Age")
+            age = kwargs.get("Patient Age") or kwargs.get("AGE")
             if not age:
                 pdob = parse_date( kwargs.get("DOB") )
                 if pdob:
@@ -202,7 +202,7 @@ if __name__ == "__main__":
     fieldnames = ["MRN", "Accession Number", "Image Date", "Path Case",
                   "Path Date", "Cancer Status", "Path Result"]
 
-    with open("output_{}daymatch_unrestricted.csv".format(target_distance.days), "w", newline="") as f:
+    with open("extrathyroids_output_{}daymatch_unrestricted.csv".format(target_distance.days), "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(results)
