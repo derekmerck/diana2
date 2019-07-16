@@ -61,6 +61,9 @@ class Splunk(Endpoint, Serializable):
         if results:
             worklist = set()
             for d in results:
+                print('Levels...')
+                print(d['level'])
+                print('end levels')
                 worklist.add( Dixel(meta=d, level=DicomLevel.of( d['level'] ) ) )
 
             # logging.debug(worklist)
