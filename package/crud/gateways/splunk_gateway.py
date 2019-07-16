@@ -35,7 +35,6 @@ class SplunkGateway(Requester):
         r = self._get("services/server/info", params={'output_mode': 'json'})
         return r
     def find_events(self, q, timerange=None, verify=False):
-        print("Find events auth: {}".format(self.auth))
         logger = logging.getLogger(self.name)
 
         if not time_range:

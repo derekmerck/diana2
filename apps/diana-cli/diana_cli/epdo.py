@@ -22,6 +22,7 @@ def epdo(ctx, endpoint, method, args, map_arg, kwargs, anonymize, subpath_depth)
      $ diana-cli epdo orthanc info
      $ diana-cli epdo ipath:/data/images exists my_file_name
      $ diana-cli epdo montage find --map_arg '{"q": "<accession_number>"}'
+     $ diana-cli epdo splunk find_items --args "search index=dose_reports1 AccessionNumber=12345"
     """
     services = ctx.obj.get('services')
 
