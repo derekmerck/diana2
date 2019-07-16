@@ -117,7 +117,7 @@ class Requester(object):
             data = _json.dumps(json, cls=SmartJSONEncoder)
         try:
             if USE_SESSIONS:
-                result = self.session.post(url, data=data, headers=headers, auth=self.auth, timeout=TIMEOUTS, verify=verify)
+                result = self.session.post(url, data=data, headers=headers, timeout=TIMEOUTS, verify=verify)
             else:
                 result = requests.post(url, data=data, headers=headers, auth=self.auth, timeout=TIMEOUTS, verify=verify)
         except requests.exceptions.Timeout as e:

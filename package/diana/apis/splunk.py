@@ -34,6 +34,7 @@ class Splunk(Endpoint, Serializable):
 
     @gateway.default
     def setup_gateway(self):
+        print("Should be object: {}".format(HTTPBasicAuth(self.user, self.password)))
         return SplunkGateway(
             name = "SplunkGateway",
             protocol = self.protocol,
@@ -51,8 +52,8 @@ class Splunk(Endpoint, Serializable):
 
 
     def find_items(self,
-            query: Mapping,
-            time_interval=None):
+                   query: Mapping,
+                   time_interval=None):
 
         results = self.gateway.find_events(query, time_interval)
 

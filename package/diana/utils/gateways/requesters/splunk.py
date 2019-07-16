@@ -22,7 +22,7 @@ class Splunk(Requester):
     port = attr.ib( default="8088")
     user = attr.ib( default="admin" )
     password = attr.ib( default="passw0rd!" )
-    auth = attr.ib(default=None)
+    auth = attr.ib( init=False, default=None )
     hec_protocol = attr.ib( default="http" )
     hec_port = attr.ib( default="8089" )
     hec_token = attr.ib( default=None, type=str )
