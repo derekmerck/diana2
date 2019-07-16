@@ -111,7 +111,6 @@ class Requester(object):
 
     def _post(self, resource, json=None, data=None, headers=None, verify=True):
         print("Testing: {}".format(self.auth))
-        print("Also {}".format(HTTPBasicAuth(self.auth[0], self.auth[1])))
         logger = logging.getLogger(self.name)
         logger.debug("Calling post")
         url = self.make_url(resource)
@@ -120,7 +119,7 @@ class Requester(object):
         try:
             if USE_SESSIONS:
                 print("session")
-                result = self.session.post(url, data=data, headers=headers, auth=HTTPBasicAuth(str(self.auth[0]), str(self.auth[1])), timeout=TIMEOUTS)
+                result = self.session.post(url, data=data, headers=headers, auth=HTTPBasicAuth(self.auth[0], self.auth[1]), timeout=TIMEOUTS, verify=verify)
             else:
                 result = requests.post(url, data=data, headers=headers, auth=HTTPBasicAuth(self.auth[0], self.auth[1]), timeout=TIMEOUTS)
         except requests.exceptions.Timeout as e:
