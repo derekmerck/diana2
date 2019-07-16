@@ -33,27 +33,26 @@ def test_conversion(tmp_path):
     os.remove(fp)
 
 
-# TODO: Fix these tests - both in-memory unzip and from-disk unzip
-@pytest.mark.skip(reason="Don't want to break in-memory zip unpacking, need to test both")
-def test_unzip(tmp_path):
-
-    resources_dir = find_resource("resources/dcm_zip")
-    fp = resources_dir / "test.zip"
-
-    E = ImageDir(path=tmp_path, anonymizing=True)
-
-    with open(fp, 'rb') as f:
-        E.put_zipped(f)
-
-    fn = "6ee6f414e4c779c8bb1f90baf45c000c-0004-0002.png"
-    fp = Path( tmp_path / fn )
-    assert( fp.is_file() )
-    os.remove(fp)
-
-    fn = "78496388f522585b71b90f374051f552-0016-0001.png"
-    fp = Path( tmp_path / fn )
-    assert( fp.is_file() )
-    os.remove(fp)
+# @pytest.mark.skip(reason="Don't want to break in-memory zip unpacking, need to test both")
+# def test_unzip(tmp_path):
+#
+#     resources_dir = find_resource("resources/dcm_zip")
+#     fp = resources_dir / "test.zip"
+#
+#     E = ImageDir(path=tmp_path, anonymizing=True)
+#
+#     with open(fp, 'rb') as f:
+#         E.put_zipped(f)
+#
+#     fn = "6ee6f414e4c779c8bb1f90baf45c000c-0004-0002.png"
+#     fp = Path( tmp_path / fn )
+#     assert( fp.is_file() )
+#     os.remove(fp)
+#
+#     fn = "78496388f522585b71b90f374051f552-0016-0001.png"
+#     fp = Path( tmp_path / fn )
+#     assert( fp.is_file() )
+#     os.remove(fp)
 
 
 if __name__ == "__main__":
@@ -62,4 +61,4 @@ if __name__ == "__main__":
     tmp_path = Path("/Users/derek/tmp")
 
     test_conversion(tmp_path)
-    test_unzip(tmp_path)
+    # test_unzip(tmp_path)

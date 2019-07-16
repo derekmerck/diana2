@@ -147,7 +147,6 @@ class MockInstance(Dixel):
             # print(self.file)
 
 
-
 @attr.s(hash=False)
 class MockSeries(Dixel):
 

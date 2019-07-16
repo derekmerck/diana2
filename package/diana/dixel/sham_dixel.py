@@ -203,11 +203,6 @@ class ShamDixel(Dixel):
         # Formatted calls to invoke ShamDixel methods even when called with a
         # base-class Dixel, as long as _Sham_ meta exists...
 
-        # if self.level == DicomLevel.INSTANCES:
-        #     # TODO: Validate instance creation time maps -- should create
-        #     # something valid in "simplify_dicom" and just need to call it
-        #     raise NotImplementedError("Validate instance creation time mapping")
-
         replace = {
                 "PatientName": self.meta["ShamName"],
                 "PatientID": self.meta["ShamID"],

@@ -262,19 +262,3 @@ class ImageDir(DcmDir):
 
         fn = "{}.{}".format(item.image_base_fn, self.format.value)
         self.gateway.put(fn, item.get_pixels())
-
-    def put_zipped(self, item: str):
-
-        gateway = ZipFileHandler(path=self.path)
-        files = gateway.unpack(io.BytesIO(item))  # Returns files as bytes
-        for f in files:
-            if not DcmFileHandler.is_dicom(io.BytesIO(f)):
-                continue
-            ds = pydicom.dcmread(io.BytesIO(f), stop_before_pixels=False)
-            d = Dixel.from_pydicom(ds)
-
-            try:
-                self.put(d)
-            except ValueError as e:
-                logging.error(e)
-                continue
