@@ -119,9 +119,10 @@ class Requester(object):
             data = _json.dumps(json, cls=SmartJSONEncoder)
         try:
             if USE_SESSIONS:
-                result = self.session.post(url, data=data, headers=headers, auth=HTTPBasicAuth(self.auth[0], self.auth[1]), timeout=TIMEOUTS, verify=verify)
+                print("session")
+                result = self.session.post(url, data=data, headers=headers, auth=HTTPBasicAuth(str(self.auth[0]), str(self.auth[1])), timeout=TIMEOUTS)
             else:
-                result = requests.post(url, data=data, headers=headers, auth=HTTPBasicAuth(self.auth[0], self.auth[1]), timeout=TIMEOUTS, verify=verify)
+                result = requests.post(url, data=data, headers=headers, auth=HTTPBasicAuth(self.auth[0], self.auth[1]), timeout=TIMEOUTS)
         except requests.exceptions.Timeout as e:
             raise GatewayConnectionError("Response timed out")
         except (requests.exceptions.ConnectionError,
