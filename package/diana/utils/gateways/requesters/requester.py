@@ -35,7 +35,7 @@ class Requester(object):
     password = attr.ib(default="passw0rd!")
 
     base_url = attr.ib(init=False, repr=False)
-    auth = attr.ib(init=False, default=None)
+    auth = attr.ib(default=None)
 
     session = attr.ib(init=False, factory=requests.Session)
 
