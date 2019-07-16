@@ -34,7 +34,6 @@ class Splunk(Requester):
         return socket.gethostname()
 
     def find_events(self, q, timerange=None, verify=False):
-        print("Find events auth: {}".format(self.auth))
         logger = logging.getLogger(self.name)
 
         if not timerange:
