@@ -39,6 +39,7 @@ class Splunk(Endpoint, Serializable):
 
     @gateway.default
     def setup_gateway(self):
+        print("Should be object: {}".format(HTTPBasicAuth(self.user, self.password)))
         return SplunkGateway(
             name = "SplunkGateway",
             protocol = self.protocol,
