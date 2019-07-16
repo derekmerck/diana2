@@ -6,7 +6,6 @@
 import re, logging
 import attr
 
-
 @attr.s
 class RadiologyReport(object):
     text = attr.ib(converter=str)
@@ -30,6 +29,8 @@ class RadiologyReport(object):
 
         # Anonymize and blind to RADCAT
         anon_text = self.text
+        while "                                       " in anon_text:
+            anon_text = anon_text.replace("                                       ", ' ')
         anon_text = RadiologyReport.PHI_RE.sub(u"", anon_text, 0)
         anon_text = RadiologyReport.FINDINGS_RE.sub(u"", anon_text, 0)
         anon_text = RadiologyReport.RADCAT_RE.sub(u"", anon_text, 0)
