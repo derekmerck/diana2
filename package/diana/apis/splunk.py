@@ -54,7 +54,7 @@ class Splunk(Endpoint, Serializable):
             query: Mapping,
             time_interval=None):
 
-        results = self.gateway.find_events(query, time_interval, self.user, self.password)
+        results = self.gateway.find_events(query, time_interval)
 
         # logging.debug("Splunk query: {}".format(query))
         # logging.debug("Splunk results: {}".format(results))
