@@ -14,6 +14,7 @@ def parse_results(results, fn):
 
 for i, fn in enumerate(os.listdir(directory)):
     if fn.endswith(".json"):
+        print(fn)
         file_path = os.path.join(directory, fn)
         with open(file_path, 'r') as data_file:
             json_data = data_file.read()[12:]
