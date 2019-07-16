@@ -8,6 +8,7 @@ from typing import Mapping
 import attr
 from bs4 import BeautifulSoup
 import requests
+from requests.auth import HTTPBasicAuth
 from .requester import Requester
 from ..exceptions import GatewayConnectionError
 from ..utils.smart_json import SmartJSONEncoder
@@ -20,7 +21,7 @@ class SplunkGateway(Requester):
     port = attr.ib( default="8089")
     user = attr.ib( default="admin" )
     password = attr.ib( default="passw0rd!" )
-    auth = attr.ib(default=None)
+    auth = attr.ib(default=HTTPBasicAuth(user, password))
     hec_protocol = attr.ib( default="http" )
     hec_port = attr.ib( default="8088" )
     hec_token = attr.ib( default=None, type=str )
