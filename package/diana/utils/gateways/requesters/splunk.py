@@ -32,7 +32,7 @@ class Splunk(Requester):
     def set_hostname(self):
         return socket.gethostname()
 
-    def find_events(self, q, timerange=None):
+    def find_events(self, q, timerange=None, verify=False):
         logger = logging.getLogger(self.name)
 
         if not timerange:
@@ -47,7 +47,8 @@ class Splunk(Requester):
         response = self._post('services/search/jobs',
                              data = {'search': q,
                                      'earliest_time': earliest,
-                                     'latest_time': latest})
+                                     'latest_time': latest},
+                              verify=verify)
 
         soup = BeautifulSoup(response, 'xml')  # Should have returned xml
         sid = soup.find('sid').string  # If it returns multiple sids, it didn't parse the request and did a "GET"

@@ -108,7 +108,7 @@ class Requester(object):
             raise GatewayConnectionError(e)
         return self.handle_result(result)
 
-    def _post(self, resource, json=None, data=None, headers=None):
+    def _post(self, resource, json=None, data=None, headers=None, verify=True):
         logger = logging.getLogger(self.name)
         logger.debug("Calling post")
         url = self.make_url(resource)
@@ -116,9 +116,9 @@ class Requester(object):
             data = _json.dumps(json, cls=SmartJSONEncoder)
         try:
             if USE_SESSIONS:
-                result = self.session.post(url, data=data, headers=headers,timeout=TIMEOUTS)
+                result = self.session.post(url, data=data, headers=headers,timeout=TIMEOUTS, verify=verify)
             else:
-                result = requests.post(url, data=data, headers=headers, auth=self.auth, timeout=TIMEOUTS)
+                result = requests.post(url, data=data, headers=headers, auth=self.auth, timeout=TIMEOUTS, verify=verify)
         except requests.exceptions.Timeout as e:
             raise GatewayConnectionError("Response timed out")
         except (requests.exceptions.ConnectionError,
