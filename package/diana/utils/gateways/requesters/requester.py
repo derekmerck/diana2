@@ -115,7 +115,7 @@ class Requester(object):
 
     def _post(self, resource, json=None, data=None, headers=None, verify=True):
         print("Testing: {}".format(self.auth))
-        USE_SESSIONS=False
+        print("Also {}".format(HTTPBasicAuth(self.auth[0], self.auth[1])))
         logger = logging.getLogger(self.name)
         logger.debug("Calling post")
         url = self.make_url(resource)
