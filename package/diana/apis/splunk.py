@@ -2,6 +2,7 @@ import logging
 from typing import Mapping
 from datetime import datetime
 import attr
+# from requests.auth import HTTPBasicAuth
 from ..dixel import Dixel
 from ..utils.endpoint import Endpoint, Serializable
 from ..utils.dicom import DicomLevel
@@ -44,7 +45,8 @@ class Splunk(Endpoint, Serializable):
             hec_port = self.hec_port,
             hec_protocol = self.hec_protocol,
             hec_token=self.hec_token,
-            index = self.index
+            index = self.index,
+            auth = (self.user, self.password)
         )
 
 
@@ -52,7 +54,7 @@ class Splunk(Endpoint, Serializable):
             query: Mapping,
             time_interval=None):
 
-        results = self.gateway.find_events(query, time_interval)
+        results = self.gateway.find_events(query, time_interval, self.user, self.password)
 
         # logging.debug("Splunk query: {}".format(query))
         # logging.debug("Splunk results: {}".format(results))
