@@ -58,9 +58,6 @@ class Splunk(Endpoint, Serializable):
         # logging.debug("Splunk query: {}".format(query))
         # logging.debug("Splunk results: {}".format(results))
 
-
-        print("RESULTS:")
-        print(results)
         if results:
             worklist = set()
             for d in results:

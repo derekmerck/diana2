@@ -58,7 +58,7 @@ class ObservableProxiedDicom(ProxiedDicom, ObservableMixin):
                 q['SeriesDate'] = ""
                 q['SeriesTime'] = ""
             q['StudyDate'] = de if de==dl else "{}-{}".format(de, dl)
-            q['StudyTime'] = "{}-{}".format(te, tl)
+            # q['StudyTime'] = "{}-{}".format(te, tl)
 
             return q
 
