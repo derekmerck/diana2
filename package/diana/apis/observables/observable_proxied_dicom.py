@@ -65,6 +65,9 @@ class ObservableProxiedDicom(ProxiedDicom, ObservableMixin):
         q = mk_recent_query()
         logger.debug(q)
         ret = self.find(item=q, level=self.qlevel)
+        print("RETURN")
+        print(ret)
+        print("END RETURN")
         if not ret:
             return
 
