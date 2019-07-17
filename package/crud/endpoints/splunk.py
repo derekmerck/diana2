@@ -10,7 +10,7 @@ from ..gateways import SplunkGateway
 from ..dixel import Dixel
 from ..utils.endpoint import Endpoint, Serializable
 from ..utils.dicom import DicomLevel
-from ..utils.gateways import Splunk as SplunkGateway
+from ..utils.gateways import Splunk as SplunkGateway, GatewayConnectionError
 
 # Suppress insecure warning
 import urllib3
@@ -108,6 +108,7 @@ class Splunk(Endpoint, Serializable):
         # Real auth description
         # headers = {'Authorization': 'Splunk {0}'.format(self.hec_tok[hec])}
 
+<<<<<<< HEAD:package/crud/endpoints/splunk.py
     def check(self):
 
         logger = logging.getLogger(self.name)
@@ -124,3 +125,16 @@ class Splunk(Endpoint, Serializable):
 
 
 Splunk.register()
+=======
+    # def check(self):
+    #     logger = logging.getLogger(self.name)
+    #     logger.debug("Check")
+    #
+    #     try:
+    #         return self.gateway.find_events() is not None
+    #     except GatewayConnectionError as e:
+    #         logger.warning("Failed to connect to Endpoint")
+    #         logger.error(type(e))
+    #         logger.error(e)
+    #         return False
+>>>>>>> Splunk response debug:package/diana/apis/splunk.py
