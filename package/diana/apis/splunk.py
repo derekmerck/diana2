@@ -108,14 +108,14 @@ class Splunk(Endpoint, Serializable):
         # Real auth description
         # headers = {'Authorization': 'Splunk {0}'.format(self.hec_tok[hec])}
 
-    # def check(self):
-    #     logger = logging.getLogger(self.name)
-    #     logger.debug("Check")
-    #
-    #     try:
-    #         return self.gateway.find_events() is not None
-    #     except GatewayConnectionError as e:
-    #         logger.warning("Failed to connect to Endpoint")
-    #         logger.error(type(e))
-    #         logger.error(e)
-    #         return False
+    def check(self):
+        logger = logging.getLogger(self.name)
+        logger.debug("Check")
+
+        try:
+            return self.gateway.find_events(q="search ") is not None
+        except GatewayConnectionError as e:
+            logger.warning("Failed to connect to Endpoint")
+            logger.error(type(e))
+            logger.error(e)
+            return False
