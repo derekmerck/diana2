@@ -126,15 +126,15 @@ class Splunk(Endpoint, Serializable):
 
 Splunk.register()
 =======
-    # def check(self):
-    #     logger = logging.getLogger(self.name)
-    #     logger.debug("Check")
-    #
-    #     try:
-    #         return self.gateway.find_events() is not None
-    #     except GatewayConnectionError as e:
-    #         logger.warning("Failed to connect to Endpoint")
-    #         logger.error(type(e))
-    #         logger.error(e)
-    #         return False
->>>>>>> Splunk response debug:package/diana/apis/splunk.py
+    def check(self):
+        logger = logging.getLogger(self.name)
+        logger.debug("Check")
+
+        try:
+            return self.gateway.find_events(q="search ") is not None
+        except GatewayConnectionError as e:
+            logger.warning("Failed to connect to Endpoint")
+            logger.error(type(e))
+            logger.error(e)
+            return False
+>>>>>>> Splunk healthcheck:package/diana/apis/splunk.py
