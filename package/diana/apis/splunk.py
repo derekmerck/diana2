@@ -5,7 +5,7 @@ import attr
 from ..dixel import Dixel
 from ..utils.endpoint import Endpoint, Serializable
 from ..utils.dicom import DicomLevel
-from ..utils.gateways import Splunk as SplunkGateway
+from ..utils.gateways import Splunk as SplunkGateway, GatewayConnectionError
 
 # Suppress insecure warning
 import urllib3
@@ -58,6 +58,9 @@ class Splunk(Endpoint, Serializable):
         # logging.debug("Splunk query: {}".format(query))
         # logging.debug("Splunk results: {}".format(results))
 
+
+        print("RESULTS:")
+        print(results)
         if results:
             worklist = set()
             for d in results:
@@ -107,3 +110,15 @@ class Splunk(Endpoint, Serializable):
 
         # Real auth description
         # headers = {'Authorization': 'Splunk {0}'.format(self.hec_tok[hec])}
+
+    # def check(self):
+    #     logger = logging.getLogger(self.name)
+    #     logger.debug("Check")
+    #
+    #     try:
+    #         return self.gateway.find_events() is not None
+    #     except GatewayConnectionError as e:
+    #         logger.warning("Failed to connect to Endpoint")
+    #         logger.error(type(e))
+    #         logger.error(e)
+    #         return False
