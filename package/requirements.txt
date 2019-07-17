@@ -1,6 +1,7 @@
 attrs >= 18.1.0
 bs4
 docker
+lxml
 numpy
 pydicom
 pyyaml
