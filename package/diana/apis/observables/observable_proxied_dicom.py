@@ -28,7 +28,8 @@ class ObservableProxiedDicom(ProxiedDicom, ObservableMixin):
                  "StudyInstanceUID": "",
                  "PatientName": "",
                  "PatientID": "",
-                 "PatientBirthDate": ""}
+                 "PatientBirthDate": "",
+                 "StudyDescription": ""}
     qlevel = attr.ib(default=DicomLevel.STUDIES, converter=DicomLevel.from_label)
     qperiod = attr.ib( default=600, converter=int)  #: Check last 10 mins by default
 
@@ -65,9 +66,7 @@ class ObservableProxiedDicom(ProxiedDicom, ObservableMixin):
         q = mk_recent_query()
         logger.debug(q)
         ret = self.find(item=q, level=self.qlevel)
-        print("RETURN")
-        print(ret)
-        print("END RETURN")
+
         if not ret:
             return
 
