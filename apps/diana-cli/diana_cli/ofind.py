@@ -24,7 +24,10 @@ def ofind(ctx,
           query, level,
           domain, retrieve):
     """Find studies matching yaml/json QUERY in SOURCE Orthanc or ProxiedDicom service.
-     The optional proxy DOMAIN issues a remote-find to a manually proxied DICOM endpoint."""
+     The optional proxy DOMAIN issues a remote-find to a manually proxied DICOM endpoint.
+
+     $ diana-cli ofind -q "{'StudyDescription': ''}" -d radarch sticky_bridge
+     """
     services = ctx.obj.get('services')
 
     click.echo(click.style('Orthanc Find', underline=True, bold=True))
