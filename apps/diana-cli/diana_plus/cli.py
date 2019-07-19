@@ -1,6 +1,6 @@
 import logging
 import click
-from diana.utils.gateways import supress_urllib_debug
+from diana.utils.gateways import suppress_urllib_debug
 from diana_cli import __version__
 from diana import __version__ as diana_version
 
@@ -19,7 +19,7 @@ def cli(verbose):
 
     if verbose:
         logging.basicConfig(level=logging.DEBUG)
-        supress_urllib_debug()
+        suppress_urllib_debug()
         click.echo('Verbose mode is %s' % ('on' if verbose else 'off'))
     else:
         logging.basicConfig(level=logging.WARNING)

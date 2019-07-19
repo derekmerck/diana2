@@ -31,14 +31,16 @@ diana-cli
    Commands:
      check     Check endpoint status
      collect   Collect and handle studies
+     collect2  Collect and handle studies v2
      dcm2im    Convert DICOM to image
      dcm2json  Convert DICOM header to json
      epdo      Call endpoint method
      findex    Create a persistent DICOM file index
      fiup      Upload indexed DICOM files
      guid      Generate a GUID
+     mfind     Find item in Montage by query
      mock      Generate mock DICOM traffic
-     ofind     Find item by query
+     ofind     Find item in Orthanc by query
      verify    Verify DIANA source code against public gist signature
      watch     Watch sources and route events
 
@@ -76,8 +78,44 @@ collect
      DEST.
 
    Options:
-     -b, --subpath_depth INTEGER  Number of sub-directories to use
+     -a, --anonymize
+     -b, --subpath_depth INTEGER  Number of sub-directories to use  (if dest is
+                                  directory)
      --help                       Show this message and exit.
+
+collect2
+--------
+
+::
+
+   Usage: diana-cli collect2 [OPTIONS] SOURCE DEST [WORKLIST]...
+
+     Pull data from SOURCE and save/send to DEST.  If source is a service, a
+     QUERY must be provided, and a time range can be optionally provided for
+     retrospective data collection (otherwise defaulting to real-time
+     monitoring).
+
+   Options:
+     -W, --worklist_source TEXT      file or service
+     -q, --query TEXT                worklist query (json)
+     -Q, --query_source TEXT         json file with worklist query
+     -t, --time_range TEXT           run query over time range
+     -a, --anonymize
+     -i, --image_dest TEXT           Specify image dest
+     -m, --meta_dest TEXT            Specify meta dest
+     -r, --report_dest TEXT          Specify report dest
+     -I, --image_format [d|i|c|o|m]  Convert images to format
+     -M, --meta_format [c|s|v]
+     -R, --report_format [i|n|l|i|n|e]
+     -b, --subfolders <INTEGER INTEGER>...
+     -B, --split_meta INTEGER
+     -p, --pool INTEGER              Pool size for multi-threading
+     -P, --pause FLOAT               Pause between threads
+     -d, --dryrun                    Process worklist and create keys without PACS
+                                     pulls
+     --help                          Show this message and exit.
+
+     $ diana-cli -S /services.yml collect pacs path:/data 9999999 ...
 
 dcm2im
 ------
@@ -100,7 +138,7 @@ dcm2json
    Usage: diana-cli dcm2json [OPTIONS] INPATH [OUTPATH]
 
      Convert a DICOM file or directory of files at INPATH into dictionaries and
-     save result in text image format at OUTPATH.
+     save result in json format at OUTPATH.
 
    Options:
      --help  Show this message and exit.
@@ -113,11 +151,15 @@ epdo
    Usage: diana-cli epdo [OPTIONS] ENDPOINT METHOD
 
      Call ENDPOINT METHOD with *args and **kwargs. Use "path:" for a DcmDir ep
-     and "ipath:" for an ImageDir epp.    $ diana-cli epdo orthanc info  $
-     diana-cli epdo ipath:/data/images exists -g my_file_name
+     and "ipath:" for an ImageDir epp.
+
+       $ diana-cli epdo orthanc info
+       $ diana-cli epdo ipath:/data/images exists my_file_name
+       $ diana-cli epdo montage find --map_arg '{"q": "<accession_number>"}'
 
    Options:
      -g, --args TEXT
+     -m, --map_arg TEXT
      -k, --kwargs TEXT
      -a, --anonymize              (ImageDir only)
      -b, --subpath_depth INTEGER  Number of sub-directories to use (*Dir Only)
@@ -146,8 +188,8 @@ fiup
 
    Usage: diana-cli fiup [OPTIONS] COLLECTION PATH REGISTRY DEST
 
-     Collect files in a study by COLLECTION (accession number) using a PATH
-     REGISTRY, and send to DEST.
+     Collect files in a study by COLLECTION (accession number or "ALL") using a
+     PATH REGISTRY, and send to DEST.
 
    Options:
      -p, --pool_size INTEGER  Worker threads
@@ -206,6 +248,28 @@ mock
          devices: 2
          studies_per_hour: 4
      ...
+
+mfind
+-----
+
+::
+
+   Usage: diana-cli mfind [OPTIONS] SOURCE
+
+     Find studies matching QUERY string in SOURCE Montage service.
+
+   Options:
+     -a, --accession_number TEXT     Link multiple a/ns with ' | ', requires PHI
+                                     privileges on Montage
+     -A, --accessions_path TEXT      Path to text file with study ids
+     --start_date TEXT               Starting date query bound
+     --end_date TEXT                 Ending date query bound
+     --today
+     -q, --query TEXT                Query string
+     -e, --extraction [radcat|lungrads]
+                                     Perform a data extraction on each report
+     -j, --json                      Output as json
+     --help                          Show this message and exit.
 
 ofind
 -----
@@ -308,14 +372,16 @@ diana-plus
      check     Check endpoint status
      classify  Classify DICOM files
      collect   Collect and handle studies
+     collect2  Collect and handle studies v2
      dcm2im    Convert DICOM to image
      dcm2json  Convert DICOM header to json
      epdo      Call endpoint method
      findex    Create a persistent DICOM file index
      fiup      Upload indexed DICOM files
      guid      Generate a GUID
+     mfind     Find item in Montage by query
      mock      Generate mock DICOM traffic
-     ofind     Find item by query
+     ofind     Find item in Orthanc by query
      ssde      Estimate patient size from localizer
      verify    Verify DIANA source code against public gist signature
      watch     Watch sources and route events
@@ -325,46 +391,10 @@ ssde
 
 ::
 
-   Usage: diana-plus ssde [OPTIONS] PATH [IMAGES]...
-
-     Estimate patient dimensions from CT-localizer IMAGES for size-specific dose
-     estimation.
-
-   Options:
-     --help  Show this message and exit.
-
-     Basic algorithm is to use a 2-element Guassian mixture model to find a
-     threshold that separates air from tissue across breadth of the image.  Known
-     to fail when  patients do not fit in the scout field of view.
-
-     Returns image orientation and estimated distance in centimeters.  These
-     measurements can be converted into equivalent water volumes using AAPM-
-     published tables.
-
-     $ diana-plus ssde tests/resources/scouts ct_scout_01.dcm ct_scout_02.dcm
-     Measuring scout images
-     ------------------------
-     ct_scout_01.dcm (AP): 28.0cm
-     ct_scout_02.dcm (LATERAL): 43.0cm
-
 classify
 --------
 
 ::
-
-   Usage: diana-plus classify [OPTIONS] MODEL PATH [IMAGES]...
-
-     Apply a classification MODEL to PATH with IMAGES
-
-   Options:
-     -p, --positive TEXT  Positive class
-     -n, --negative TEXT  Negative class
-     --help               Show this message and exit.
-
-     $ diana-plus classify resources/models/view_classifier/view_classifier.h5 tests/resources/dcm IM2263
-     Classifying images
-     ------------------
-     Predicted: negative (0.88)
 
 License
 -------

@@ -24,7 +24,7 @@ Setup
 .. code:: bash
 
    $ source sample.env
-   $ docker-stack -f admin/admin-stack.yml
+   $ docker-stack deploy -f admin/admin-stack.yml admin
 
 Exposes
 ~~~~~~~

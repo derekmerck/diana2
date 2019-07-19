@@ -83,6 +83,12 @@ Splunk
 .. autoclass:: diana.apis.Splunk
    :members:
 
+SMTP Messenger
+...................
+
+.. autoclass:: diana.apis.SMPTMessenger
+   :members:
+
 
 Daemon APIs
 ------------------------------------

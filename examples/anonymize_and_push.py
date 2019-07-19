@@ -2,8 +2,8 @@ import logging
 from diana.dixel import ShamDixel
 from diana.apis import get_service
 
-services_path = ".secrets/christianson.yml"
-oid = "802d6dcb-baf06419-375e594c-d49ff6c4-255baf87"
+services_path = "my_services.yml"
+oid = "802d6dcb-baf06419-375e594c-yyyyyyyy-xxxxxxxx"
 
 logging.basicConfig(level=logging.DEBUG)
 

@@ -1,5 +1,5 @@
-DICOM Image Analysis and Archive
-================================
+|logo| DICOM Image Analysis and Archive
+=======================================
 
 | Derek Merck
 | derek_merck@brown.edu
@@ -102,6 +102,7 @@ License
 
 MIT
 
+.. |logo| image:: resources/images/diana_logo_sm.png
 .. |Build Status| image:: https://travis-ci.org/derekmerck/diana2.svg?branch=master
    :target: https://travis-ci.org/derekmerck/diana2
 .. |Coverage Status| image:: https://codecov.io/gh/derekmerck/diana2/branch/master/graph/badge.svg

@@ -6,9 +6,8 @@ inappropriate series like scanned dose reports with PHI.
 This script filters a set of zipped studies and removes
 unwanted items.
 
-Folder structure is destroyed since filtering is done at
-the Dixel-set level, not the file-set data level.
-
+Any zip internal folder structure is destroyed since filtering
+is done at the Dixel-set level, not the file-set data level.
 """
 
 import os, logging
