@@ -19,7 +19,7 @@ def extend(ctx,
     """
 
     click.echo(click.style('Beginning AI analytics extension', underline=True, bold=True))
-    subprocess.Popen(["nohup", "diana-cli watch -r say_studies radarch None > /diana_direct/{}/{}_results.json".format(ml, ml)], shell=True, stdout=subprocess.PIPE)
+    subprocess.Popen("nohup diana-cli watch -r say_studies radarch None > /diana_direct/{}/{}_results.json".format(ml, ml), shell=True, stdout=subprocess.PIPE)
     if not os.path.isfile("/diana_direct/{}/{}_scores.txt".format(ml, ml)):
         open("/diana_direct/{}/{}_scores.txt".format(ml, ml), 'a').close()
 
