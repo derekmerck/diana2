@@ -1,4 +1,5 @@
-import logging, os
+import os
+import logging
 import yaml
 import click
 from . import __version__
@@ -7,10 +8,11 @@ from diana.utils.endpoint import suppress_watcher_debug
 from diana import __version__ as diana_version
 
 from .check import check
-from .epdo import epdo
 from .collect import collect
 from .collect2 import collect2
 from .dcm2im import dcm2im, dcm2json
+from .epdo import epdo
+from .extend import extend
 from .file_index import findex, fiup
 from .guid import guid
 from .mock import mock
@@ -82,6 +84,7 @@ cmds = [
     dcm2im,
     dcm2json,
     epdo,
+    extend,
     findex,
     fiup,
     guid,

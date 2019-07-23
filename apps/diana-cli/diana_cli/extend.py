@@ -7,7 +7,7 @@ import time
 import zipfile
 
 epilog = """
-
+Examples:
 $ diana-cli extend bone_age
 
 """
