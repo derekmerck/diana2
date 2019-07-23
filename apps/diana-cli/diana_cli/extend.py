@@ -29,7 +29,7 @@ def extend(ctx,
             time.sleep(5)
 
         with open("/diana_direct/{}/{}_results.json".format(ml, ml), 'r') as data_file:
-            json_data = data_file.read()[32:].replace("\'", "\"")
+            json_data = "[" + data_file.read()[32:].replace("\'", "\"").replace("}", "},") + "]"
         accession_nums = parse_results(json.loads(json_data))
         os.remove("/diana_direct/{}/{}_results.json".format(ml, ml))
 
