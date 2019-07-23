@@ -29,8 +29,8 @@ def extend(ctx,
             time.sleep(5)
 
         with open("/diana_direct/{}/{}_results.json".format(ml, ml), 'r') as data_file:
-            json_data = data_file.read()[32:]
-        accession_nums = parse_results(json.loads(json_data).replace("\'", "\""))
+            json_data = data_file.read()[32:].replace("\'", "\"")
+        accession_nums = parse_results(json.loads(json_data))
         os.remove("/diana_direct/{}/{}_results.json".format(ml, ml))
 
         if os.path.isfile("/diana_direct/{}/{}.key.csv"):
