@@ -117,12 +117,6 @@ class Requester(object):
             data = _json.dumps(json, cls=SmartJSONEncoder)
         try:
             if USE_SESSIONS:
-                print("data")
-                print(data)
-                print("end data")
-                print("headers")
-                print(headers)
-                print("end headers")
                 result = self.session.post(url, data=data, headers=headers, auth=HTTPBasicAuth(self.auth[0], self.auth[1]), timeout=TIMEOUTS, verify=verify)
             else:
                 result = requests.post(url, data=data, headers=headers, auth=HTTPBasicAuth(self.auth[0], self.auth[1]), timeout=TIMEOUTS)
