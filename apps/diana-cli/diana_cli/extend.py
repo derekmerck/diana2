@@ -15,10 +15,9 @@ $ diana-cli extend bone_age
 
 @click.command(short_help="Extend images to an ML analytics package", epilog=epilog)
 @click.argument('ML', type=click.STRING)
-@click.option('--kwargs', '-k', type=click.STRING, default=None)
 @click.option('--anonymize', '-a', is_flag=True, default=False, help="(ImageDir only)")
 @click.pass_context
-def extend(ML):
+def extend(ctx, ML, anonymize):
     subprocess.Popen(["nohup", "diana-cli watch -r say_studies radarch None > /diana_direct/{}/{}_results.json".format(ML, ML)], shell=True, stdout=subprocess.PIPE)
     if not os.path.isfile("/diana_direct/{}/{}_scores.txt".format(ML, ML)):
         open("/diana_direct/{}/{}_scores.txt".format(ML, ML), 'a').close()
