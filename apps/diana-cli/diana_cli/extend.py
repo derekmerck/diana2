@@ -25,6 +25,7 @@ def extend(ctx,
 
     while True:
         print("Query {}".format(datetime.now()))
+        time.sleep(5)  # give json time to finish writing
         while not os.path.isfile("/diana_direct/{}/{}_results.json".format(ml, ml)):
             time.sleep(5)
 
@@ -33,12 +34,14 @@ def extend(ctx,
         with open("/diana_direct/{}/{}_results.json".format(ml, ml), 'w') as data_file:
             for line in lines:
                 if ":" in line:
+                    if line[-1] != ",":
+                        line = line + ","
                     data_file.write(line)
         with open("/diana_direct/{}/{}_results.json".format(ml, ml), 'r') as data_file:
             json_data = data_file.read()
             print("raw read")
             print(json_data)
-            json_data = "[" + json_data[32:].replace("\'", "\"").replace("}", "},") + "]"
+            json_data = "[" + json_data[32:].replace("\'", "\"")[:-1] + "]"
         print("after [")
         print(json_data)
         print("BREAK")
