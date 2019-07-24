@@ -44,7 +44,7 @@ def extend(ctx,
         print(json_data[:100])
         print("BREAK")
 
-        accession_nums = parse_results(json.loads(json_data))
+        accession_nums = parse_results(json.loads(json_data), ml)
         os.remove("/diana_direct/{}/{}_results.json".format(ml, ml))
 
         if os.path.isfile("/diana_direct/{}/{}.key.csv"):
