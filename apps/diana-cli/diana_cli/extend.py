@@ -82,7 +82,7 @@ def parse_results(json_lines, ml):
     print("in parse results")
     accession_nums = []
     for line in json_lines:
-        entry = json.loads(line)
+        entry = json.loads(line.replace("\'", "\""))
         print("entry")
         print(entry)
         print("a/n")
