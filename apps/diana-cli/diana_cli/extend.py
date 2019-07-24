@@ -74,7 +74,6 @@ def extend(ctx,
             p_collect.send_signal(signal.SIGINT)
             p_predict.send_signal(signal.SIGINT)
         except UnboundLocalError:
-            print("Error with KeyboardInterrupt...check ps and pkill if needed")
             pass
 
 
@@ -83,10 +82,6 @@ def parse_results(json_lines, ml):
     accession_nums = []
     for line in json_lines:
         entry = json.loads(line.replace("\'", "\""))
-        print("entry")
-        print(entry)
-        print("a/n")
-        print(entry["AccessionNumber"])
         if ml == "bone_age" and entry['StudyDescription'] != 'X-Ray for Bone Age Study':
             continue
         else:
