@@ -19,13 +19,13 @@ def extend(ctx,
     """
 
     click.echo(click.style('Beginning AI analytics extension', underline=True, bold=True))
-    subprocess.Popen("diana-cli watch -r say_studies radarch None > /diana_direct/{}/{}_results.json".format(ml, ml), shell=True, stdout=subprocess.PIPE)
+    subprocess.Popen("diana-cli watch -r say_studies radarch None > /diana_direct/{}/{}_results.json".format(ml, ml), shell=False, stdout=subprocess.PIPE)
     if not os.path.isfile("/diana_direct/{}/{}_scores.txt".format(ml, ml)):
         open("/diana_direct/{}/{}_scores.txt".format(ml, ml), 'a').close()
 
     while True:
         print("Query {}".format(datetime.now()))
-        time.sleep(10)  # give json time to finish writing
+        time.sleep(5)  # give json time to finish writing
         while not os.path.isfile("/diana_direct/{}/{}_results.json".format(ml, ml)):
             time.sleep(5)
 
@@ -41,7 +41,7 @@ def extend(ctx,
             print(json_data)
             json_data = "[" + json_data[32:].replace("\'", "\"").replace("}", "},")[:-1] + "]"
         print("after [")
-        print(json_data)
+        print(json_data[:100])
         print("BREAK")
 
         accession_nums = parse_results(json.loads(json_data))
@@ -49,7 +49,7 @@ def extend(ctx,
 
         if os.path.isfile("/diana_direct/{}/{}.key.csv"):
             os.remove("/diana_direct/{}/{}.key.csv")
-        subprocess.Popen("diana-cli collect {} /diana_direct/{} sticky_bridge radarch".format(ml, ml), shell=True)
+        subprocess.Popen("diana-cli collect {} /diana_direct/{} sticky_bridge radarch".format(ml, ml), shell=False)
 
         for i, an in enumerate(accession_nums):
             with open("/diana_direct/{}/{}_scores.txt".format(ml, ml)) as f:
@@ -66,7 +66,7 @@ def extend(ctx,
             for fn in subdirs:
                 if an in fn:
                     dcmdir_name = fn
-            subprocess.Popen("python3 predict.py /diana_direct/{}/data/{} > /diana_direct/{}/temp_predict.txt".format(ml, dcmdir_name, ml), shell=True, cwd="/diana_direct/{}/package/src/".format(ml))
+            subprocess.Popen("python3 predict.py /diana_direct/{}/data/{} > /diana_direct/{}/temp_predict.txt".format(ml, dcmdir_name, ml), shell=False, cwd="/diana_direct/{}/package/src/".format(ml))
 
             with open("/diana_direct/{}/temp_predict".format(ml)) as f:
                 pred_bone_age = f.read().split(">>PREDICTED BONE AGE: ")[1]

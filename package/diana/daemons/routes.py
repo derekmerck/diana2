@@ -157,6 +157,9 @@ def say(item: str, suffix: str=None):
         item = item + suffix
     pprint(item)
 
+def write(item: str):
+    with open("/diana_direct/{}/{}_results.json".format(ml, ml), 'a+') as data_file:
+        data_file.write(item)
 
 def mk_route(hname, source_desc, dest_desc=None):
 
@@ -247,4 +250,3 @@ def mk_route(hname, source_desc, dest_desc=None):
     return Trigger(source=source,
                    evtype=evtype,
                    action=func)
-
