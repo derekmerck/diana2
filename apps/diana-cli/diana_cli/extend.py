@@ -28,17 +28,22 @@ def extend(ctx,
         while not os.path.isfile("/diana_direct/{}/{}_results.json".format(ml, ml)):
             time.sleep(5)
 
+        with open("/diana_direct/{}/{}_results.json".format(ml, ml), 'r+') as data_file:
+            d = data_file.readlines()
+            data_file.seek(0)
+            for line in d:
+                if ":" in line:
+                    data_file.write(line)
+            data_file.truncate()
         with open("/diana_direct/{}/{}_results.json".format(ml, ml), 'r') as data_file:
             json_data = data_file.read()
             print("raw read")
             print(json_data)
-            json_data = "[" + json_data[32:].replace("\'", "\"").replace("}", "},") + "]"
+            json_data = "[" + json_data[32:].replace("\'", "\"").replace("}", "},")[:-1] + "]"
         print("after [")
         print(json_data)
         print("BREAK")
-        for line in json_data:
-            print(line)
-        stop
+
         accession_nums = parse_results(json.loads(json_data))
         os.remove("/diana_direct/{}/{}_results.json".format(ml, ml))
 
