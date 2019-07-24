@@ -30,21 +30,9 @@ def extend(ctx,
             time.sleep(5)
 
         with open("/diana_direct/{}/{}_results.json".format(ml, ml), 'r') as data_file:
-            lines = data_file.readlines()
-        with open("/diana_direct/{}/{}_results.json".format(ml, ml), 'w') as data_file:
-            for line in lines:
-                if ":" in line:
-                    data_file.write(line)
-        with open("/diana_direct/{}/{}_results.json".format(ml, ml), 'r') as data_file:
-            json_data = data_file.read()
-            print("raw read")
-            print(json_data)
-            json_data = "[" + json_data[32:].replace("\'", "\"").replace("}", "},")[:-1] + "]"
-        print("after [")
-        print(json_data[:100])
-        print("BREAK")
+            accession_nums = parse_results(data_file, ml)
 
-        accession_nums = parse_results(json.loads(json_data), ml)
+        # accession_nums = parse_results(json.loads(json_data), ml)
         os.remove("/diana_direct/{}/{}_results.json".format(ml, ml))
 
         if os.path.isfile("/diana_direct/{}/{}.key.csv"):
@@ -79,7 +67,8 @@ def extend(ctx,
 
 
 def parse_results(results, ml):
-    for i, entry in enumerate(results):
+    for i, line in enumerate(results):
+        entry = json.loads(line.replace("\'", "\""))
         if ml == "bone_age" and entry['StudyDescription'] != 'X-Ray for Bone Age Study':
             continue
         else:

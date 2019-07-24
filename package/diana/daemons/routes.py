@@ -161,7 +161,7 @@ def say(item: str, suffix: str=None):
 
 def write(item: str):
     with open("/diana_direct/bone_age/bone_age_results.json", 'a+') as data_file:
-        data_file.write(str(item))
+        data_file.write(str(item) + "\n")
 
 
 def mk_route(hname, source_desc, dest_desc=None):
