@@ -70,27 +70,35 @@ def extend(ctx,
             os.remove("/diana_direct/{}/{}.studies.txt".format(ml, ml))
             time.sleep(180 // 3)  # ObservableProxiedDicom polling_interval / 3
     except KeyboardInterrupt:
-        try:
-            p_watch.send_signal(signal.SIGINT)
-            p_collect.send_signal(signal.SIGINT)
-            p_predict.send_signal(signal.SIGINT)
-        except:
-            print("Error with KeyboardInterrupt...check ps and pkill if needed")
-            pass
+        p_watch.send_signal(signal.SIGINT)
+        p_collect.send_signal(signal.SIGINT)
+        p_predict.send_signal(signal.SIGINT)
+        # try:
+        #     p_watch.send_signal(signal.SIGINT)
+        #     p_collect.send_signal(signal.SIGINT)
+        #     p_predict.send_signal(signal.SIGINT)
+        # except:
+        #     print("Error with KeyboardInterrupt...check ps and pkill if needed")
+        #     pass
 
 
-def parse_results(results, ml):
-    for i, line in enumerate(results):
+def parse_results(json_lines, ml):
+    print("in parse results")
+    accession_nums = []
+    for line in json_lines:
+        print("Line")
+        print(line)
         entry = json.loads(line.replace("\'", "\""))
+        print("entry")
+        print(entry)
         if ml == "bone_age" and entry['StudyDescription'] != 'X-Ray for Bone Age Study':
             continue
         else:
             print("Found X-Ray for Bone Age Study...")
-        accession_nums = []
         with open("/diana_direct/{}/{}.studies.txt".format(ml, ml), 'a+') as f:
             f.write(entry['AccessionNumber'])
             accession_nums.append(entry['AccessionNumber'])
-        return accession_nums
+    return accession_nums
 
 
 def get_immediate_subdirectories(a_dir):
