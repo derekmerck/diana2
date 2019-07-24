@@ -27,11 +27,10 @@ def extend(ctx,
             open("/diana_direct/{}/{}_scores.txt".format(ml, ml), 'a').close()
 
         while True:
-            print("Query {}".format(datetime.now()))
             time.sleep(5)  # give json time to finish writing
             while not os.path.isfile("/diana_direct/{}/{}_results.json".format(ml, ml)):
                 time.sleep(5)
-
+            print("Query {}".format(datetime.now()))
             with open("/diana_direct/{}/{}_results.json".format(ml, ml), 'r') as data_file:
                 accession_nums = parse_results(data_file, ml)
             os.remove("/diana_direct/{}/{}_results.json".format(ml, ml))
@@ -70,27 +69,24 @@ def extend(ctx,
             os.remove("/diana_direct/{}/{}.studies.txt".format(ml, ml))
             time.sleep(180 // 3)  # ObservableProxiedDicom polling_interval / 3
     except KeyboardInterrupt:
-        p_watch.send_signal(signal.SIGINT)
-        p_collect.send_signal(signal.SIGINT)
-        p_predict.send_signal(signal.SIGINT)
-        # try:
-        #     p_watch.send_signal(signal.SIGINT)
-        #     p_collect.send_signal(signal.SIGINT)
-        #     p_predict.send_signal(signal.SIGINT)
-        # except:
-        #     print("Error with KeyboardInterrupt...check ps and pkill if needed")
-        #     pass
+        try:
+            p_watch.send_signal(signal.SIGINT)
+            p_collect.send_signal(signal.SIGINT)
+            p_predict.send_signal(signal.SIGINT)
+        except UnboundLocalError:
+            print("Error with KeyboardInterrupt...check ps and pkill if needed")
+            pass
 
 
 def parse_results(json_lines, ml):
     print("in parse results")
     accession_nums = []
     for line in json_lines:
-        print("Line")
-        print(line)
-        entry = json.loads(line.replace("\'", "\""))
+        entry = json.loads(line)
         print("entry")
         print(entry)
+        print("a/n")
+        print(entry["AccessionNumber"])
         if ml == "bone_age" and entry['StudyDescription'] != 'X-Ray for Bone Age Study':
             continue
         else:
