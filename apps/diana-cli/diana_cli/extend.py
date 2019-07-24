@@ -30,6 +30,11 @@ def extend(ctx,
 
         with open("/diana_direct/{}/{}_results.json".format(ml, ml), 'r') as data_file:
             json_data = "[" + data_file.read()[32:].replace("\'", "\"").replace("}", "},") + "]"
+        print(json_data)
+        print("BREAK")
+        for line in json_data:
+            print(line)
+        stop
         accession_nums = parse_results(json.loads(json_data))
         os.remove("/diana_direct/{}/{}_results.json".format(ml, ml))
 
