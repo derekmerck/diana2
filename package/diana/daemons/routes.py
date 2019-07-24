@@ -158,9 +158,11 @@ def say(item: str, suffix: str=None):
         item = item + suffix
     pprint(item)
 
+
 def write(item: str):
-    with open("/diana_direct/{}/{}_results.json".format(ml, ml), 'a+') as data_file:
+    with open("/diana_direct/bone_age/bone_age_results.json", 'a+') as data_file:
         data_file.write(item)
+
 
 def mk_route(hname, source_desc, dest_desc=None):
 
@@ -199,6 +201,10 @@ def mk_route(hname, source_desc, dest_desc=None):
     elif hname == "say_studies":
         evtype = DicomEventType.STUDY_ADDED
         func = partial(say)
+
+    elif hname == "write_studies":
+        evtype = DicomEventType.STUDY_ADDED
+        func = partial(write)
 
     elif hname == "say_hello_studies":
         evtype = DicomEventType.STUDY_ADDED
