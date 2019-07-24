@@ -68,7 +68,7 @@ def extend(ctx,
 
             os.remove("/diana_direct/{}/{}.studies.txt".format(ml, ml))
             time.sleep(180 // 3)  # ObservableProxiedDicom polling_interval / 3
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, json.decoder.JSONDecodeError):
         try:
             p_watch.send_signal(signal.SIGINT)
             p_collect.send_signal(signal.SIGINT)
