@@ -2,6 +2,7 @@ import click
 from datetime import datetime
 import json
 import os
+import signal
 import subprocess
 import time
 import zipfile
@@ -19,51 +20,63 @@ def extend(ctx,
     """
 
     click.echo(click.style('Beginning AI analytics extension', underline=True, bold=True))
-    subprocess.Popen("diana-cli watch -r write_studies radarch None", shell=True, stdout=subprocess.PIPE)
-    if not os.path.isfile("/diana_direct/{}/{}_scores.txt".format(ml, ml)):
-        open("/diana_direct/{}/{}_scores.txt".format(ml, ml), 'a').close()
 
-    while True:
-        print("Query {}".format(datetime.now()))
-        time.sleep(5)  # give json time to finish writing
-        while not os.path.isfile("/diana_direct/{}/{}_results.json".format(ml, ml)):
-            time.sleep(5)
+    try:
+        p_watch = subprocess.Popen("diana-cli watch -r write_studies radarch None", shell=True, stdout=subprocess.PIPE)
+        if not os.path.isfile("/diana_direct/{}/{}_scores.txt".format(ml, ml)):
+            open("/diana_direct/{}/{}_scores.txt".format(ml, ml), 'a').close()
 
-        with open("/diana_direct/{}/{}_results.json".format(ml, ml), 'r') as data_file:
-            accession_nums = parse_results(data_file, ml)
+        while True:
+            print("Query {}".format(datetime.now()))
+            time.sleep(5)  # give json time to finish writing
+            while not os.path.isfile("/diana_direct/{}/{}_results.json".format(ml, ml)):
+                time.sleep(5)
 
-        # accession_nums = parse_results(json.loads(json_data), ml)
-        os.remove("/diana_direct/{}/{}_results.json".format(ml, ml))
+            with open("/diana_direct/{}/{}_results.json".format(ml, ml), 'r') as data_file:
+                accession_nums = parse_results(data_file, ml)
+            os.remove("/diana_direct/{}/{}_results.json".format(ml, ml))
 
-        if os.path.isfile("/diana_direct/{}/{}.key.csv"):
-            os.remove("/diana_direct/{}/{}.key.csv")
-        subprocess.Popen("diana-cli collect {} /diana_direct/{} sticky_bridge radarch".format(ml, ml), shell=True)
+            if len(accession_nums) == 0:
+                continue
 
-        for i, an in enumerate(accession_nums):
-            with open("/diana_direct/{}/{}_scores.txt".format(ml, ml)) as f:
-                if an in f.read():
-                    print("...duplicate a/n.")
-                    continue
+            if os.path.isfile("/diana_direct/{}/{}.key.csv"):
+                os.remove("/diana_direct/{}/{}.key.csv")
+            p_collect = subprocess.Popen("diana-cli collect {} /diana_direct/{} sticky_bridge radarch".format(ml, ml), shell=True)
+            p_collect.wait()
 
-            print("Processing unique a/n: {}".format(an))
-            os.rename("/diana_direct/{}/data/{}".format(ml, an), "/diana_direct/{}/data/{}.zip".format(ml, an))
-            with zipfile.ZipFile("/diana_direct/{}/data/{}.zip".format(ml, an), 'r') as zip_ref:
-                zip_ref.extractall("/diana_direct/{}/data/{}".format(ml, an))
+            for i, an in enumerate(accession_nums):
+                with open("/diana_direct/{}/{}_scores.txt".format(ml, ml)) as f:
+                    if an in f.read():
+                        print("...duplicate a/n.")
+                        continue
 
-            subdirs = get_immediate_subdirectories("/diana_direct/{}/data/{}".format(ml, an))
-            for fn in subdirs:
-                if an in fn:
-                    dcmdir_name = fn
-            subprocess.Popen("python3 predict.py /diana_direct/{}/data/{} > /diana_direct/{}/temp_predict.txt".format(ml, dcmdir_name, ml), shell=True, cwd="/diana_direct/{}/package/src/".format(ml))
+                print("Processing unique a/n: {}".format(an))
+                os.rename("/diana_direct/{}/data/{}".format(ml, an), "/diana_direct/{}/data/{}.zip".format(ml, an))
+                with zipfile.ZipFile("/diana_direct/{}/data/{}.zip".format(ml, an), 'r') as zip_ref:
+                    zip_ref.extractall("/diana_direct/{}/data/{}".format(ml, an))
 
-            with open("/diana_direct/{}/temp_predict".format(ml)) as f:
-                pred_bone_age = f.read().split(">>PREDICTED BONE AGE: ")[1]
+                subdirs = get_immediate_subdirectories("/diana_direct/{}/data/{}".format(ml, an))
+                for fn in subdirs:
+                    if an in fn:
+                        dcmdir_name = fn
+                p_predict = subprocess.Popen("python3 predict.py /diana_direct/{}/data/{} > /diana_direct/{}/temp_predict.txt".format(ml, dcmdir_name, ml), shell=True, cwd="/diana_direct/{}/package/src/".format(ml))
 
-            with open("/diana_direct/{}/{}_scores.txt", "a+") as f:
-                f.write("{}, {}".format(an, pred_bone_age))
+                with open("/diana_direct/{}/temp_predict".format(ml)) as f:
+                    pred_bone_age = f.read().split(">>PREDICTED BONE AGE: ")[1]
 
-        os.remove("/diana_direct/{}/{}.studies.txt".format(ml, ml))
-        time.sleep(180 // 3)  # ObservableProxiedDicom polling_interval / 3
+                with open("/diana_direct/{}/{}_scores.txt", "a+") as f:
+                    f.write("{}, {}".format(an, pred_bone_age))
+
+            os.remove("/diana_direct/{}/{}.studies.txt".format(ml, ml))
+            time.sleep(180 // 3)  # ObservableProxiedDicom polling_interval / 3
+    except KeyboardInterrupt:
+        try:
+            p_watch.send_signal(signal.SIGINT)
+            p_collect.send_signal(signal.SIGINT)
+            p_predict.send_signal(signal.SIGINT)
+        except:
+            print("Error with KeyboardInterrupt...check ps and pkill if needed")
+            pass
 
 
 def parse_results(results, ml):
