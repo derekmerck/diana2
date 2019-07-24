@@ -29,7 +29,11 @@ def extend(ctx,
             time.sleep(5)
 
         with open("/diana_direct/{}/{}_results.json".format(ml, ml), 'r') as data_file:
-            json_data = "[" + data_file.read()[32:].replace("\'", "\"").replace("}", "},") + "]"
+            json_data = data_file.read()
+            print("raw read")
+            print(json_data)
+            json_data = "[" + json_data[32:].replace("\'", "\"").replace("}", "},") + "]"
+        print("after [")
         print(json_data)
         print("BREAK")
         for line in json_data:
