@@ -36,7 +36,7 @@ def extend(ctx,
             os.remove("/diana_direct/{}/{}_results.json".format(ml, ml))
 
             # Validating second half of pipeline
-            accession_nums = [53144722]
+            # accession_nums = [53144722]
 
             if len(accession_nums) == 0:
                 continue
@@ -51,7 +51,7 @@ def extend(ctx,
 
             for i, an in enumerate(accession_nums):
                 with open("/diana_direct/{}/{}_scores.txt".format(ml, ml)) as f:
-                    if an in f.read():
+                    if str(an) in f.read():
                         print("...duplicate a/n.")
                         continue
 
@@ -62,7 +62,7 @@ def extend(ctx,
 
                 subdirs = get_immediate_subdirectories("/diana_direct/{}/data/{}".format(ml, an))
                 for fn in subdirs:
-                    if an in fn:
+                    if str(an) in fn:
                         dcmdir_name = fn
                 p_predict = subprocess.Popen("python3 predict.py /diana_direct/{}/data/{} > /diana_direct/{}/temp_predict.txt".format(ml, dcmdir_name, ml), shell=True, cwd="/diana_direct/{}/package/src/".format(ml))
 
