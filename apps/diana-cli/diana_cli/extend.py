@@ -3,6 +3,7 @@ from datetime import datetime
 import json
 import os
 import signal
+import slack
 import subprocess
 import time
 import zipfile
@@ -22,6 +23,7 @@ def extend(ctx,
     click.echo(click.style('Beginning AI analytics extension', underline=True, bold=True))
 
     try:
+        sl_client = slack.WebClient(token=os.environ['SLACK_BOT_TOKEN'])
         p_watch = subprocess.Popen("diana-cli watch -r write_studies radarch None", shell=True, stdout=subprocess.PIPE)
         if not os.path.isfile("/diana_direct/{}/{}_scores.txt".format(ml, ml)):
             open("/diana_direct/{}/{}_scores.txt".format(ml, ml), 'a').close()
@@ -73,6 +75,17 @@ def extend(ctx,
 
                 with open("/diana_direct/{}/{}_scores.txt".format(ml, ml), "a+") as f:
                     f.write("{}, {}".format(an, pred_bone_age))
+
+                # Post to Slack
+                sl_response = sl_client.chat_postMessage(
+                    channel="DLEL863D0",
+                    text="""Accession Number: {},\n
+                            Bone Age Prediction (months): {}""".format(an, pred_bone_age)
+                )
+                try:
+                    assert(sl_response["ok"])
+                except:
+                    print("Error in Slack communication")
 
             os.remove("/diana_direct/{}/{}.studies.txt".format(ml, ml))
             time.sleep(180 // 3)  # ObservableProxiedDicom polling_interval / 3
