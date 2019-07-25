@@ -41,8 +41,8 @@ def extend(ctx,
             if len(accession_nums) == 0:
                 continue
 
-            if os.path.isfile("/diana_direct/{}/{}.key.csv"):
-                os.remove("/diana_direct/{}/{}.key.csv")
+            if os.path.isfile("/diana_direct/{}/{}.key.csv".format(ml, ml)):
+                os.remove("/diana_direct/{}/{}.key.csv".format(ml, ml))
             p_collect = subprocess.Popen("diana-cli collect {} /diana_direct/{} sticky_bridge radarch".format(ml, ml), shell=True)
             p_collect.wait()
             time.sleep(10)
