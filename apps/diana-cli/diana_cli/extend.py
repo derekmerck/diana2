@@ -35,11 +35,17 @@ def extend(ctx,
                 accession_nums = parse_results(data_file, ml)
             os.remove("/diana_direct/{}/{}_results.json".format(ml, ml))
 
+            # Validating second half of pipeline
+            accession_nums = [53144722]
+
             if len(accession_nums) == 0:
                 continue
 
             if os.path.isfile("/diana_direct/{}/{}.key.csv"):
                 os.remove("/diana_direct/{}/{}.key.csv")
+            p_collect = subprocess.Popen("diana-cli collect {} /diana_direct/{} sticky_bridge radarch".format(ml, ml), shell=True)
+            p_collect.wait()
+            time.sleep(10)
             p_collect = subprocess.Popen("diana-cli collect {} /diana_direct/{} sticky_bridge radarch".format(ml, ml), shell=True)
             p_collect.wait()
 
@@ -68,17 +74,20 @@ def extend(ctx,
 
             os.remove("/diana_direct/{}/{}.studies.txt".format(ml, ml))
             time.sleep(180 // 3)  # ObservableProxiedDicom polling_interval / 3
-    except (KeyboardInterrupt, json.decoder.JSONDecodeError):
+    except (KeyboardInterrupt, json.decoder.JSONDecodeError, FileNotFoundError) as e:
         try:
             p_watch.send_signal(signal.SIGINT)
             p_collect.send_signal(signal.SIGINT)
             p_predict.send_signal(signal.SIGINT)
         except UnboundLocalError:
             pass
+        if type(e) is json.decoder.JSONDecodeError:
+            print("Excepted error: {}".format(e))
+        elif type(e) is FileNotFoundError:
+            print("Excepted error: {}".format(e))
 
 
 def parse_results(json_lines, ml):
-    print("in parse results")
     accession_nums = []
     for line in json_lines:
         entry = json.loads(line.replace("\'", "\""))
