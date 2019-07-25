@@ -99,6 +99,8 @@ def parse_results(json_lines, ml):
         else:
             print("Found X-Ray for Bone Age Study...")
         with open("/diana_direct/{}/{}.studies.txt".format(ml, ml), 'a+') as f:
+            if entry['AccessionNumber'] in accession_nums:
+                continue
             f.write(entry['AccessionNumber'] + "\n")
             accession_nums.append(entry['AccessionNumber'])
     return accession_nums
