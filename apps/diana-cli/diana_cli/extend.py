@@ -70,6 +70,7 @@ def extend(ctx,
                     if "{}".format(an) in fn:
                         dcmdir_name = fn
                 p_predict = subprocess.Popen("python3 predict.py /diana_direct/{}/data/{}".format(ml, dcmdir_name, ml), shell=True, cwd="/diana_direct/{}/package/src/".format(ml))
+                p_predict.wait()
 
                 with open("/opt/diana/{}_temp_predict".format(ml)) as f:
                     pred_bone_age = f.read()
