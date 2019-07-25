@@ -56,9 +56,11 @@ def extend(ctx,
                         continue
 
                 print("Processing unique a/n: {}".format(an))
-                os.rename("/diana_direct/{}/data/{}".format(ml, an), "/diana_direct/{}/data/{}.zip".format(ml, an))
-                with zipfile.ZipFile("/diana_direct/{}/data/{}.zip".format(ml, an), 'r') as zip_ref:
-                    zip_ref.extractall("/diana_direct/{}/data/{}".format(ml, an))
+
+                if not os.path.isdir("/diana_direct/{}/data/{}".format(ml, an)):
+                    os.rename("/diana_direct/{}/data/{}".format(ml, an), "/diana_direct/{}/data/{}.zip".format(ml, an))
+                    with zipfile.ZipFile("/diana_direct/{}/data/{}.zip".format(ml, an), 'r') as zip_ref:
+                        zip_ref.extractall("/diana_direct/{}/data/{}".format(ml, an))
 
                 subdirs = get_immediate_subdirectories("/diana_direct/{}/data/{}".format(ml, an))
                 for fn in subdirs:
