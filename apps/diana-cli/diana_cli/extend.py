@@ -63,9 +63,9 @@ def extend(ctx,
                         zip_ref.extractall("/diana_direct/{}/data/{}_process".format(ml, an))
                     os.remove("/diana_direct/{}/data/{}.zip".format(ml, an))
 
-                subdirs = get_immediate_subdirectories("/diana_direct/{}/data/{}".format(ml, an))
+                subdirs = get_immediate_subdirectories("/diana_direct/{}/data/{}_process".format(ml, an))
                 for fn in subdirs:
-                    if "{}_process".format(an) in fn:
+                    if "{}".format(an) in fn:
                         dcmdir_name = fn
                 p_predict = subprocess.Popen("python3 predict.py /diana_direct/{}/data/{} > /diana_direct/{}/temp_predict.txt".format(ml, dcmdir_name, ml), shell=True, cwd="/diana_direct/{}/package/src/".format(ml))
 
@@ -100,6 +100,7 @@ def parse_results(json_lines, ml):
             print("Found X-Ray for Bone Age Study...")
         with open("/diana_direct/{}/{}.studies.txt".format(ml, ml), 'a+') as f:
             if entry['AccessionNumber'] in accession_nums:
+                print("...duplicate a/n")
                 continue
             f.write(entry['AccessionNumber'] + "\n")
             accession_nums.append(entry['AccessionNumber'])
