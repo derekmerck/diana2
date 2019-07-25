@@ -52,10 +52,6 @@ def extend(ctx,
             p_collect.wait()
 
             for i, an in enumerate(accession_nums):
-                with open("/diana_direct/{}/{}_scores.txt".format(ml, ml)) as f:
-                    if str(an) in f.read():
-                        print("...duplicate a/n.")
-                        continue
 
                 print("Processing unique a/n: {}".format(an))
 
@@ -69,13 +65,13 @@ def extend(ctx,
                 for fn in subdirs:
                     if "{}".format(an) in fn:
                         dcmdir_name = fn
-                p_predict = subprocess.Popen("python3 predict.py /diana_direct/{}/data/{}".format(ml, dcmdir_name, ml), shell=True, cwd="/diana_direct/{}/package/src/".format(ml))
+                p_predict = subprocess.Popen("python3 predict.py '{}'".format(dcmdir_name), shell=True, cwd="/diana_direct/{}/package/src/".format(ml))
                 p_predict.wait()
 
                 with open("/opt/diana/{}_temp_predict".format(ml)) as f:
                     pred_bone_age = f.read()
 
-                with open("/diana_direct/{}/{}_scores.txt", "a+") as f:
+                with open("/diana_direct/{}/{}_scores.txt".format(ml, ml), "a+") as f:
                     f.write("{}, {}".format(an, pred_bone_age))
 
             os.remove("/diana_direct/{}/{}.studies.txt".format(ml, ml))
@@ -105,6 +101,11 @@ def parse_results(json_lines, ml):
             if entry['AccessionNumber'] in accession_nums:
                 print("...duplicate a/n")
                 continue
+
+            with open("/diana_direct/{}/{}_scores.txt".format(ml, ml)) as f:
+                if str(an) in f.read():
+                    print("...duplicate a/n.")
+                    continue
             f.write(entry['AccessionNumber'] + "\n")
             accession_nums.append(entry['AccessionNumber'])
     return accession_nums
