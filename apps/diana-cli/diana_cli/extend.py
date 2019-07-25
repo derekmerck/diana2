@@ -57,14 +57,15 @@ def extend(ctx,
 
                 print("Processing unique a/n: {}".format(an))
 
-                if not os.path.isdir("/diana_direct/{}/data/{}".format(ml, an)):
+                if not os.path.isdir("/diana_direct/{}/data/{}_process".format(ml, an)):
                     os.rename("/diana_direct/{}/data/{}".format(ml, an), "/diana_direct/{}/data/{}.zip".format(ml, an))
                     with zipfile.ZipFile("/diana_direct/{}/data/{}.zip".format(ml, an), 'r') as zip_ref:
-                        zip_ref.extractall("/diana_direct/{}/data/{}".format(ml, an))
+                        zip_ref.extractall("/diana_direct/{}/data/{}_process".format(ml, an))
+                    os.remove("/diana_direct/{}/data/{}.zip".format(ml, an))
 
                 subdirs = get_immediate_subdirectories("/diana_direct/{}/data/{}".format(ml, an))
                 for fn in subdirs:
-                    if str(an) in fn:
+                    if "{}_process".format(an) in fn:
                         dcmdir_name = fn
                 p_predict = subprocess.Popen("python3 predict.py /diana_direct/{}/data/{} > /diana_direct/{}/temp_predict.txt".format(ml, dcmdir_name, ml), shell=True, cwd="/diana_direct/{}/package/src/".format(ml))
 
