@@ -115,8 +115,8 @@ def parse_results(json_lines, ml):
                 print("...duplicate a/n")
                 continue
 
-            with open("/diana_direct/{}/{}_scores.txt".format(ml, ml)) as f:
-                if str(entry['AccessionNumber']) in f.read():
+            with open("/diana_direct/{}/{}_scores.txt".format(ml, ml)) as score_file:
+                if str(entry['AccessionNumber']) in score_file.read():
                     print("...duplicate a/n.")
                     continue
             f.write(entry['AccessionNumber'] + "\n")
