@@ -79,8 +79,8 @@ def extend(ctx,
                 # Post to Slack
                 sl_response = sl_client.chat_postMessage(
                     channel="DLEL863D0",
-                    text="""Accession Number: {},\n
-                            Bone Age Prediction (months): {}""".format(an, pred_bone_age)
+                    text="Accession Number: {},\n".format(an) +
+                         "Bone Age Prediction (months): {}".format(pred_bone_age)
                 )
                 try:
                     assert(sl_response["ok"])
