@@ -41,6 +41,8 @@ def extend(ctx,
             if len(accession_nums) == 0:
                 continue
 
+            if os.path.isfile("diana_direct/{}/{}.studies.txt".format(ml, ml)):
+                os.remove("/diana_direct/{}/{}.studies.txt".format(ml, ml))
             if os.path.isfile("/diana_direct/{}/{}.key.csv".format(ml, ml)):
                 os.remove("/diana_direct/{}/{}.key.csv".format(ml, ml))
             p_collect = subprocess.Popen("diana-cli collect {} /diana_direct/{} sticky_bridge radarch".format(ml, ml), shell=True)
@@ -63,7 +65,7 @@ def extend(ctx,
                         zip_ref.extractall("/diana_direct/{}/data/{}_process".format(ml, an))
                     os.remove("/diana_direct/{}/data/{}.zip".format(ml, an))
 
-                subdirs = get_immediate_subdirectories("/diana_direct/{}/data/{}_process".format(ml, an))
+                subdirs = get_subdirectories("/diana_direct/{}/data/{}_process".format(ml, an))
                 for fn in subdirs:
                     if "{}".format(an) in fn:
                         dcmdir_name = fn
@@ -110,3 +112,6 @@ def parse_results(json_lines, ml):
 def get_immediate_subdirectories(a_dir):
     return [name for name in os.listdir(a_dir)
             if os.path.isdir(os.path.join(a_dir, name))]
+
+def get_subdirectories(a_dir):
+    return [f.path for f in os.scandir(a_dir) if f.is_dir()]
