@@ -69,10 +69,10 @@ def extend(ctx,
                 for fn in subdirs:
                     if "{}".format(an) in fn:
                         dcmdir_name = fn
-                p_predict = subprocess.Popen("python3 predict.py /diana_direct/{}/data/{} > /diana_direct/{}/temp_predict.txt".format(ml, dcmdir_name, ml), shell=True, cwd="/diana_direct/{}/package/src/".format(ml))
+                p_predict = subprocess.Popen("python3 predict.py /diana_direct/{}/data/{}".format(ml, dcmdir_name, ml), shell=True, cwd="/diana_direct/{}/package/src/".format(ml))
 
-                with open("/diana_direct/{}/temp_predict".format(ml)) as f:
-                    pred_bone_age = f.read().split(">>PREDICTED BONE AGE: ")[1]
+                with open("/opt/diana/{}_temp_predict".format(ml)) as f:
+                    pred_bone_age = f.read()
 
                 with open("/diana_direct/{}/{}_scores.txt", "a+") as f:
                     f.write("{}, {}".format(an, pred_bone_age))
