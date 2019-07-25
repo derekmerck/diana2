@@ -116,7 +116,7 @@ def parse_results(json_lines, ml):
                 continue
 
             with open("/diana_direct/{}/{}_scores.txt".format(ml, ml)) as f:
-                if str(an) in f.read():
+                if str(entry['AccessionNumber']) in f.read():
                     print("...duplicate a/n.")
                     continue
             f.write(entry['AccessionNumber'] + "\n")
@@ -124,9 +124,10 @@ def parse_results(json_lines, ml):
     return accession_nums
 
 
-def get_immediate_subdirectories(a_dir):
-    return [name for name in os.listdir(a_dir)
-            if os.path.isdir(os.path.join(a_dir, name))]
+# def get_immediate_subdirectories(a_dir):
+#     return [name for name in os.listdir(a_dir)
+#             if os.path.isdir(os.path.join(a_dir, name))]
+
 
 def get_subdirectories(a_dir):
     return [f.path for f in os.scandir(a_dir) if f.is_dir()]
