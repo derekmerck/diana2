@@ -39,7 +39,7 @@ def extend(ctx,
 
             if os.path.isfile("/diana_direct/{}/{}_slack_an.txt".format(ml, ml)):
                 with open("/diana_direct/{}/{}_slack_an.txt".format(ml, ml)) as f:
-                    accession_nums = [str(f.readlines())]
+                    accession_nums = [f.read().strip()]
                 os.remove("/diana_direct/{}/{}_slack_an.txt".format(ml, ml))
 
             # Validating second half of pipeline
