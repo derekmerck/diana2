@@ -36,17 +36,18 @@ def extend(ctx,
             print("Query {}".format(datetime.now()))
             with open("/diana_direct/{}/{}_results.json".format(ml, ml), 'r') as data_file:
                 accession_nums = parse_results(data_file, ml)
-            os.remove("/diana_direct/{}/{}_results.json".format(ml, ml))
 
             if os.path.isfile("/diana_direct/{}/{}_slack_an.txt".format(ml, ml)):
                 with open("/diana_direct/{}/{}_slack_an.txt".format(ml, ml)) as f:
                     accession_nums = [str(f.readlines())]
                 os.remove("/diana_direct/{}/{}_slack_an.txt".format(ml, ml))
+
             # Validating second half of pipeline
             # accession_nums = [53144722]
 
             if len(accession_nums) == 0:
                 continue
+            os.remove("/diana_direct/{}/{}_results.json".format(ml, ml))
 
             if os.path.isfile("diana_direct/{}/{}.studies.txt".format(ml, ml)):
                 os.remove("/diana_direct/{}/{}.studies.txt".format(ml, ml))
