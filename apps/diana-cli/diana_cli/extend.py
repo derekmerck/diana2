@@ -33,6 +33,7 @@ def extend(ctx,
         sl_bot_client = slack.WebClient(token=os.environ['SLACK_BOT_TOKEN'])
 
         loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         rtm_client = slack.RTMClient(token=os.environ["SLACK_BOT_TOKEN"], run_async=True, loop=loop)
         loop.run_until_complete(rtm_client.start())
 
