@@ -1,9 +1,7 @@
 import click
-import concurrent
 from datetime import datetime
 import json
 import os
-from multiprocessing import Process
 import signal
 import slack
 import subprocess
@@ -82,7 +80,7 @@ def extend(ctx,
                     pred_bone_age = f.read()
 
                 with open("/diana_direct/{}/{}_scores.txt".format(ml, ml), "a+") as f:
-                    f.write("{}, {}".format(an, pred_bone_age))
+                    f.write("{}, {}\n".format(an, pred_bone_age))
 
                 # Post to Slack
                 sl_response = sl_bot_client.chat_postMessage(
