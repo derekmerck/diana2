@@ -1,3 +1,4 @@
+import asyncio
 import click
 from datetime import datetime
 import json
@@ -30,8 +31,11 @@ def extend(ctx,
     try:
         ML = ml
         sl_bot_client = slack.WebClient(token=os.environ['SLACK_BOT_TOKEN'])
-        rtm_client = slack.RTMClient(token=os.environ["SLACK_API_TOKEN"])
-        rtm_client.start()
+
+        loop = asyncio.new_event_loop()
+        rtm_client = slack.RTMClient(token=os.environ["SLACK_BOT_TOKEN"], run_async=True, loop=loop)
+        loop.run_until_complete(rtm_client.start())
+
         p_watch = subprocess.Popen("diana-cli watch -r write_studies radarch None", shell=True, stdout=subprocess.PIPE)
         if not os.path.isfile("/diana_direct/{}/{}_scores.txt".format(ml, ml)):
             open("/diana_direct/{}/{}_scores.txt".format(ml, ml), 'a').close()
@@ -141,23 +145,26 @@ def get_subdirectories(a_dir):
 
 
 @slack.RTMClient.run_on(event='message')
-def process_slack_message(**payload):
+async def process_slack_message(**payload):
     print("Received Slack Message")
     data = payload['data']
     web_client = payload['web_client']
     channel_id = data['channel']
     thread_ts = data['ts']
+    if "user" not in list(data.keys()):
+        return
     user = data['user']
+
     if '/last' in data['text']:
         web_client.chat_postMessage(
             channel=channel_id,
-            text=f"Recent bone age study requested by <@{user}>!",
+            text=f"Recent bone age study requested - <@{user}>",
             thread_ts=thread_ts
         )
     elif '/flush' in data['text']:
         web_client.chat_postMessage(
             channel=channel_id,
-            text=f"Flush requested by <@{user}>!",
+            text=f"Flush requested - <@{user}>",
             thread_ts=thread_ts
         )
     elif '/process' in data['text']:
@@ -171,6 +178,6 @@ def process_slack_message(**payload):
         ACCESSION_NUMS = [an]
         web_client.chat_postMessage(
             channel=channel_id,
-            text=f"Processing accession number {an} requested by <@{user}>!",
+            text=f"Processing accession number {an} requested - <@{user}>",
             thread_ts=thread_ts
         )
