@@ -2,10 +2,7 @@ import os
 import slack
 import sys
 
-ML = sys.argv[1]
-rtm_client = slack.RTMClient(token=os.environ["SLACK_BOT_TOKEN"])
-rtm_client.start()
-
+ML = None
 
 @slack.RTMClient.run_on(event='message')
 def process_slack_message(**payload):
@@ -46,3 +43,11 @@ def process_slack_message(**payload):
             text=f"Processing of accession number {an} requested - <@{user}>",
             thread_ts=thread_ts
         )
+
+
+if __name__ == "__main__":
+    global ML
+    ML = sys.argv[1]
+    print(ML)
+    rtm_client = slack.RTMClient(token=os.environ["SLACK_BOT_TOKEN"])
+    rtm_client.start()
