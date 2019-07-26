@@ -8,6 +8,11 @@ import subprocess
 import time
 import zipfile
 
+# eh
+SLACK_COMMAND = False
+ACCESSION_NUMS = []
+ML = None
+
 
 @click.command(short_help="Extend images to an AI analytics package")
 @click.argument('ml', type=click.STRING)
@@ -23,7 +28,10 @@ def extend(ctx,
     click.echo(click.style('Beginning AI analytics extension', underline=True, bold=True))
 
     try:
-        sl_client = slack.WebClient(token=os.environ['SLACK_BOT_TOKEN'])
+        ML = ml
+        sl_bot_client = slack.WebClient(token=os.environ['SLACK_BOT_TOKEN'])
+        rtm_client = slack.RTMClient(token=os.environ["SLACK_API_TOKEN"])
+        rtm_client.start()
         p_watch = subprocess.Popen("diana-cli watch -r write_studies radarch None", shell=True, stdout=subprocess.PIPE)
         if not os.path.isfile("/diana_direct/{}/{}_scores.txt".format(ml, ml)):
             open("/diana_direct/{}/{}_scores.txt".format(ml, ml), 'a').close()
@@ -34,13 +42,13 @@ def extend(ctx,
                 time.sleep(5)
             print("Query {}".format(datetime.now()))
             with open("/diana_direct/{}/{}_results.json".format(ml, ml), 'r') as data_file:
-                accession_nums = parse_results(data_file, ml)
+                ACCESSION_NUMS = parse_results(data_file, ml)
             os.remove("/diana_direct/{}/{}_results.json".format(ml, ml))
 
             # Validating second half of pipeline
             # accession_nums = [53144722]
 
-            if len(accession_nums) == 0:
+            if len(ACCESSION_NUMS) == 0:
                 continue
 
             if os.path.isfile("diana_direct/{}/{}.studies.txt".format(ml, ml)):
@@ -53,8 +61,7 @@ def extend(ctx,
             p_collect = subprocess.Popen("diana-cli collect {} /diana_direct/{} sticky_bridge radarch".format(ml, ml), shell=True)
             p_collect.wait()
 
-            for i, an in enumerate(accession_nums):
-
+            for i, an in enumerate(ACCESSION_NUMS):
                 print("Processing unique a/n: {}".format(an))
 
                 if not os.path.isdir("/diana_direct/{}/data/{}_process".format(ml, an)):
@@ -77,7 +84,7 @@ def extend(ctx,
                     f.write("{}, {}".format(an, pred_bone_age))
 
                 # Post to Slack
-                sl_response = sl_client.chat_postMessage(
+                sl_response = sl_bot_client.chat_postMessage(
                     channel="DLEL863D0",
                     text="Accession Number: {},\n".format(an) +
                          "Bone Age Prediction (months): {}".format(pred_bone_age)
@@ -88,7 +95,7 @@ def extend(ctx,
                     print("Error in Slack communication")
 
             os.remove("/diana_direct/{}/{}.studies.txt".format(ml, ml))
-            time.sleep(180 // 3)  # ObservableProxiedDicom polling_interval / 3
+            time.sleep(2)  # slightly wait for ObservableProxiedDicom polling_interval
     except (KeyboardInterrupt, json.decoder.JSONDecodeError, FileNotFoundError) as e:
         try:
             p_watch.send_signal(signal.SIGINT)
@@ -131,3 +138,38 @@ def parse_results(json_lines, ml):
 
 def get_subdirectories(a_dir):
     return [f.path for f in os.scandir(a_dir) if f.is_dir()]
+
+
+@slack.RTMClient.run_on(event='message')
+def process_slack_message(**payload):
+    data = payload['data']
+    web_client = payload['web_client']
+    channel_id = data['channel']
+    thread_ts = data['ts']
+    user = data['user']
+    if '/last' in data['text']:
+        web_client.chat_postMessage(
+            channel=channel_id,
+            text=f"Recent bone age study requested by <@{user}>!",
+            thread_ts=thread_ts
+        )
+    elif '/flush' in data['text']:
+        web_client.chat_postMessage(
+            channel=channel_id,
+            text=f"Flush requested by <@{user}>!",
+            thread_ts=thread_ts
+        )
+    elif '/process' in data['text']:
+        an = data['text'].split(" ")[1]
+        with open("/diana_direct/{}/{}_scores.txt".format(ML, ML), "r") as f:
+            lines = f.readlines()
+        with open("/diana_direct/{}/{}_scores.txt".format(ML, ML), "w") as f:
+            for line in lines:
+                if an not in line:
+                    f.write(line)
+        ACCESSION_NUMS = [an]
+        web_client.chat_postMessage(
+            channel=channel_id,
+            text=f"Processing accession number {an} requested by <@{user}>!",
+            thread_ts=thread_ts
+        )
