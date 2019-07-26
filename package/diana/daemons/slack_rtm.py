@@ -15,10 +15,14 @@ def process_slack_message(**payload):
     user = data['user']
 
     if '//last' in data['text']:
+        with open("/diana_direct/{}/{}_scores.txt".format(ML, ML), "r") as f:
+            last_line = list(f)[-1].split(',')
+        an = last_line[0]
+        ba_score = last_line[1].strip()
         web_client.chat_postMessage(
             channel=channel_id,
-            text=f"Recent bone age study requested - <@{user}>",
-            thread_ts=thread_ts
+            text=f"Last Accession Number: {an}\n" +
+                 f"Last Bone Age Score: {ba_score}"
         )
     elif '//flush' in data['text']:
         web_client.chat_postMessage(
