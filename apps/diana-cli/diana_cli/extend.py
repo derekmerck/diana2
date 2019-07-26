@@ -170,19 +170,19 @@ async def process_slack_message(**payload):
         return
     user = data['user']
 
-    if '/last' in data['text']:
+    if '//last' in data['text']:
         web_client.chat_postMessage(
             channel=channel_id,
             text=f"Recent bone age study requested - <@{user}>",
             thread_ts=thread_ts
         )
-    elif '/flush' in data['text']:
+    elif '//flush' in data['text']:
         web_client.chat_postMessage(
             channel=channel_id,
             text=f"Flush requested - <@{user}>",
             thread_ts=thread_ts
         )
-    elif '/process' in data['text']:
+    elif '//process' in data['text']:
         an = data['text'].split(" ")[1]
         with open("/diana_direct/{}/{}_scores.txt".format(ML, ML), "r") as f:
             lines = f.readlines()
