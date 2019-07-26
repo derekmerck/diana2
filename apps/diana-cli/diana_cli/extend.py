@@ -142,6 +142,7 @@ def get_subdirectories(a_dir):
 
 @slack.RTMClient.run_on(event='message')
 def process_slack_message(**payload):
+    print("Received Slack Message")
     data = payload['data']
     web_client = payload['web_client']
     channel_id = data['channel']
