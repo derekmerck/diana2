@@ -1,5 +1,6 @@
 import asyncio
 import click
+import concurrent
 from datetime import datetime
 import json
 import os
@@ -27,15 +28,13 @@ def extend(ctx,
     """
 
     click.echo(click.style('Beginning AI analytics extension', underline=True, bold=True))
+    asyncio.run(main_async(ml))
 
+
+def extend_async(ml):
     try:
         ML = ml
         sl_bot_client = slack.WebClient(token=os.environ['SLACK_BOT_TOKEN'])
-
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        rtm_client = slack.RTMClient(token=os.environ["SLACK_BOT_TOKEN"], run_async=True, loop=loop)
-        loop.run_until_complete(rtm_client.start())
 
         p_watch = subprocess.Popen("diana-cli watch -r write_studies radarch None", shell=True, stdout=subprocess.PIPE)
         if not os.path.isfile("/diana_direct/{}/{}_scores.txt".format(ml, ml)):
@@ -114,6 +113,16 @@ def extend(ctx,
             print("Excepted error: {}".format(e))
 
 
+async def main_async(ml):
+    loop = asyncio.new_event_loop()
+    rtm_client = slack.RTMClient(token=os.environ["SLACK_BOT_TOKEN"], run_async=True, loop=loop)
+    executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
+    await asyncio.gather(
+        loop.run_in_executor(executor, extend_async),
+        rtm_client.start()
+    )
+
+
 def parse_results(json_lines, ml):
     accession_nums = []
     for line in json_lines:
@@ -179,6 +188,6 @@ async def process_slack_message(**payload):
         ACCESSION_NUMS = [an]
         web_client.chat_postMessage(
             channel=channel_id,
-            text=f"Processing accession number {an} requested - <@{user}>",
+            text=f"Processing of accession number {an} requested - <@{user}>",
             thread_ts=thread_ts
         )
