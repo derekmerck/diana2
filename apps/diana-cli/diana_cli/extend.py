@@ -26,14 +26,18 @@ def extend(ctx,
     """Examples:
     $ diana-cli extend bone_age
     """
-
+    global ML
     click.echo(click.style('Beginning AI analytics extension', underline=True, bold=True))
-    asyncio.run(main_async(ml))
+    ML = ml
+    asyncio.run(main_async())
 
 
-def extend_async(ml):
+
+def extend_async():
+    global ML
+    global ACCESSION_NUMS
     try:
-        ML = ml
+        ml = ML
         sl_bot_client = slack.WebClient(token=os.environ['SLACK_BOT_TOKEN'])
 
         p_watch = subprocess.Popen("diana-cli watch -r write_studies radarch None", shell=True, stdout=subprocess.PIPE)
@@ -113,8 +117,8 @@ def extend_async(ml):
             print("Excepted error: {}".format(e))
 
 
-async def main_async(ml):
-    loop = asyncio.new_event_loop()
+async def main_async():
+    loop = asyncio.get_event_loop()
     rtm_client = slack.RTMClient(token=os.environ["SLACK_BOT_TOKEN"], run_async=True, loop=loop)
     executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
     await asyncio.gather(
@@ -156,6 +160,7 @@ def get_subdirectories(a_dir):
 
 @slack.RTMClient.run_on(event='message')
 async def process_slack_message(**payload):
+    global ACCESSION_NUMS
     print("Received Slack Message")
     data = payload['data']
     web_client = payload['web_client']
