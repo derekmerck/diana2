@@ -84,7 +84,7 @@ def extend(ctx,
 
                 # Post to Slack
                 sl_response = sl_bot_client.chat_postMessage(
-                    channel="DLEL863D0",
+                    channel="CLHKN3W3V",
                     text="Accession Number: {},\n".format(an) +
                          "Bone Age Prediction (months): {}".format(pred_bone_age)
                 )
