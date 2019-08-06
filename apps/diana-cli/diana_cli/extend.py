@@ -1,7 +1,10 @@
+import ast
 import click
 from datetime import datetime
-import json
+import glob
 import os
+import pydicom
+from scipy.misc import imsave
 import signal
 import slack
 import subprocess
@@ -22,6 +25,7 @@ def extend(ctx,
     click.echo(click.style('Beginning AI analytics extension', underline=True, bold=True))
     try:
         sl_bot_client = slack.WebClient(token=os.environ['SLACK_BOT_TOKEN'])
+        ba_channel = "CLHKN3W3V"
         p_slack_rtm = subprocess.Popen("python /opt/diana/package/diana/daemons/slack_rtm.py {}".format(ml), shell=True, stdout=subprocess.PIPE)
         p_watch = subprocess.Popen("diana-cli watch -r write_studies radarch None", shell=True, stdout=subprocess.PIPE)
         if not os.path.isfile("/diana_direct/{}/{}_scores.txt".format(ml, ml)):
@@ -73,6 +77,7 @@ def extend(ctx,
                 for fn in subdirs:
                     if "{}".format(an) in fn:
                         dcmdir_name = fn
+                        break
                 p_predict = subprocess.Popen("python3 predict.py '{}'".format(dcmdir_name), shell=True, cwd="/diana_direct/{}/package/src/".format(ml))
                 p_predict.wait()
 
@@ -83,19 +88,33 @@ def extend(ctx,
                     f.write("{}, {}\n".format(an, pred_bone_age))
 
                 # Post to Slack
-                sl_response = sl_bot_client.chat_postMessage(
-                    channel="CLHKN3W3V",
+                sl_msg_response = sl_bot_client.chat_postMessage(
+                    channel=ba_channel,
                     text="Accession Number: {},\n".format(an) +
                          "Bone Age Prediction (months): {}".format(pred_bone_age)
                 )
                 try:
-                    assert(sl_response["ok"])
+                    assert(sl_msg_response["ok"])
                 except:
-                    print("Error in Slack communication")
+                    print("Error in Slack message post")
+                # ba_image = glob.glob(dcmdir_name+"/**/*.dcm", recursive=True)[0]
+                # ds = pydicom.dcmread(ba_image)
+                # imsave("/opt/diana/{}.png".format(an), ds.pixel_array)
+                # sl_fiup_response = sl_bot_client.files_upload(
+                #     channels=ba_channel,  # WARNING: keep an eye on parameter spelling in updates
+                #     file="/opt/diana/{}.png".format(an),
+                #     initial_comment="Accession Number: {},\n".format(an) +
+                #          "Bone Age Prediction (months): {}".format(pred_bone_age)
+                # )
+                # try:
+                #     assert(sl_fiup_response["ok"])
+                # except:
+                #     print("Error in Slack fiup")
+                # os.remove("/opt/diana/{}.png".format(an))
 
             os.remove("/diana_direct/{}/{}.studies.txt".format(ml, ml))
             time.sleep(2)  # slightly wait for ObservableProxiedDicom polling_interval
-    except (KeyboardInterrupt, json.decoder.JSONDecodeError, FileNotFoundError) as e:
+    except (KeyboardInterrupt, FileNotFoundError) as e:
         try:
             p_slack_rtm.send_signal(signal.SIGINT)
             p_watch.send_signal(signal.SIGINT)
@@ -103,16 +122,14 @@ def extend(ctx,
             p_predict.send_signal(signal.SIGINT)
         except UnboundLocalError:
             pass
-        if type(e) is json.decoder.JSONDecodeError:
-            print("Excepted error: {}".format(e))
-        elif type(e) is FileNotFoundError:
+        if type(e) is FileNotFoundError:
             print("Excepted error: {}".format(e))
 
 
 def parse_results(json_lines, ml):
     accession_nums = []
     for line in json_lines:
-        entry = json.loads(line.replace("\'", "\""))
+        entry = ast.literal_eval(line)
         if ml == "bone_age" and entry['StudyDescription'] != 'X-Ray for Bone Age Study':
             continue
         else:
