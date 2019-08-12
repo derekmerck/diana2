@@ -18,6 +18,7 @@ def process_slack_message(**payload):
         with open("/diana_direct/{}/{}_scores.txt".format(ML, ML), "r") as f:
             last_line = list(f)[-1].split(',')
         an = last_line[0]
+        an = "XXXX" + an[-4:]
         ba_score = last_line[1].strip()
         web_client.chat_postMessage(
             channel=channel_id,
@@ -32,6 +33,8 @@ def process_slack_message(**payload):
         )
     elif '//process' in data['text']:
         an = data['text'].split(" ")[1]
+        # validate a/n
+        
         with open("/diana_direct/{}/{}_scores.txt".format(ML, ML), "r") as f:
             lines = f.readlines()
         with open("/diana_direct/{}/{}_scores.txt".format(ML, ML), "w") as f:
