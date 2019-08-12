@@ -1,20 +1,13 @@
-
 import ast
 import click
 from datetime import datetime
 import glob
-import imageio
 import os
-import pydicom
 import signal
 import slack
-import sys
 import subprocess
 import time
 import zipfile
-
-sys.path.insert(0, "/root/anaconda3/lib/python3.7/site-packages/")
-import gdcm
 
 
 @click.command(short_help="Extend images to an AI analytics package")
@@ -104,12 +97,8 @@ def extend(ctx,
                     print("Error in Slack message post")
 
                 ba_image = glob.glob(dcmdir_name+"/**/*.dcm", recursive=True)[0]
-                ds = pydicom.dcmread(ba_image)
-                ds.decompress()
-                xyz = ds.pixel_array
-                print("xyz")
-                print(xyz)
-                imageio.imwrite("/opt/diana/{}.png".format(an), ds.pixel_array)
+                p_gdcm = subprocess.Popen("python /opt/diana/package/diana/utils/gdcmpdcm.py {} {}".format(ba_image, an), shell=True)
+                p_gdcm.wait()
                 sl_fiup_response = sl_bot_client.files_upload(
                     channels="GLU6LQL86",  # WARNING: check param spelling in updates
                     file="/opt/diana/{}.png".format(an),
