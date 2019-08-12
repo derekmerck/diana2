@@ -25,7 +25,7 @@ def extend(ctx,
     click.echo(click.style('Beginning AI analytics extension', underline=True, bold=True))
     try:
         sl_bot_client = slack.WebClient(token=os.environ['SLACK_BOT_TOKEN'])
-        ba_channel = "CLHKN3W3V"
+        ba_channel = "CM2BV81DX"
         p_slack_rtm = subprocess.Popen("python /opt/diana/package/diana/daemons/slack_rtm.py {}".format(ml), shell=True, stdout=subprocess.PIPE)
         p_watch = subprocess.Popen("diana-cli watch -r write_studies radarch None", shell=True, stdout=subprocess.PIPE)
         if not os.path.isfile("/diana_direct/{}/{}_scores.txt".format(ml, ml)):
@@ -90,27 +90,28 @@ def extend(ctx,
                 # Post to Slack
                 sl_msg_response = sl_bot_client.chat_postMessage(
                     channel=ba_channel,
-                    text="Accession Number: {},\n".format(an) +
+                    text="Accession Number: {},\n".format("XXXX" + an[-4:]) +
                          "Bone Age Prediction (months): {}".format(pred_bone_age)
                 )
                 try:
                     assert(sl_msg_response["ok"])
-                except:
+                except AssertionError:
                     print("Error in Slack message post")
-                # ba_image = glob.glob(dcmdir_name+"/**/*.dcm", recursive=True)[0]
-                # ds = pydicom.dcmread(ba_image)
-                # imsave("/opt/diana/{}.png".format(an), ds.pixel_array)
-                # sl_fiup_response = sl_bot_client.files_upload(
-                #     channels=ba_channel,  # WARNING: keep an eye on parameter spelling in updates
-                #     file="/opt/diana/{}.png".format(an),
-                #     initial_comment="Accession Number: {},\n".format(an) +
-                #          "Bone Age Prediction (months): {}".format(pred_bone_age)
-                # )
-                # try:
-                #     assert(sl_fiup_response["ok"])
-                # except:
-                #     print("Error in Slack fiup")
-                # os.remove("/opt/diana/{}.png".format(an))
+
+                ba_image = glob.glob(dcmdir_name+"/**/*.dcm", recursive=True)[0]
+                ds = pydicom.dcmread(ba_image)
+                imsave("/opt/diana/{}.png".format(an), ds.pixel_array)
+                sl_fiup_response = sl_bot_client.files_upload(
+                    channels="DE3M6K9FW",  # WARNING: check param spelling in updates
+                    file="/opt/diana/{}.png".format(an),
+                    initial_comment="Accession Number: {},\n".format("XXXX" + an[-4:]) +
+                         "Bone Age Prediction (months): {}".format(pred_bone_age)
+                )
+                try:
+                    assert(sl_fiup_response["ok"])
+                except AssertionError:
+                    print("Error in Slack fiup")
+                os.remove("/opt/diana/{}.png".format(an))
 
             os.remove("/diana_direct/{}/{}.studies.txt".format(ml, ml))
             time.sleep(2)  # slightly wait for ObservableProxiedDicom polling_interval
