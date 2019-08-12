@@ -76,6 +76,7 @@ def extend(ctx,
                     if "{}".format(an) in fn:
                         dcmdir_name = fn
                         break
+
                 p_predict = subprocess.Popen("python3 predict.py '{}'".format(dcmdir_name), shell=True, cwd="/diana_direct/{}/package/src/".format(ml))
                 p_predict.wait()
 
@@ -97,7 +98,7 @@ def extend(ctx,
                     print("Error in Slack message post")
 
                 ba_image = glob.glob(dcmdir_name+"/**/*.dcm", recursive=True)[0]
-                p_gdcm = subprocess.Popen("python /opt/diana/package/diana/utils/gdcmpdcm.py {} {}".format(ba_image, an), shell=True)
+                p_gdcm = subprocess.Popen("python3 /opt/diana/package/diana/utils/gdcmpdcm.py '{}' {}".format(ba_image, an), shell=True)
                 p_gdcm.wait()
                 sl_fiup_response = sl_bot_client.files_upload(
                     channels="GLU6LQL86",  # WARNING: check param spelling in updates
