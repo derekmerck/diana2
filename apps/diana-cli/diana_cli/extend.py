@@ -23,7 +23,7 @@ def extend(ctx,
     click.echo(click.style('Beginning AI analytics extension', underline=True, bold=True))
     try:
         sl_bot_client = slack.WebClient(token=os.environ['SLACK_BOT_TOKEN'])
-        ba_channel = "CM2BV81DX"
+        ba_channels = ["CM2BV81DX", "CLHKN3W3V"]
         p_slack_rtm = subprocess.Popen("python /opt/diana/package/diana/daemons/slack_rtm.py {}".format(ml), shell=True, stdout=subprocess.PIPE)
         p_watch = subprocess.Popen("diana-cli watch -r write_studies radarch None", shell=True, stdout=subprocess.PIPE)
         if not os.path.isfile("/diana_direct/{}/{}_scores.txt".format(ml, ml)):
@@ -100,16 +100,17 @@ def extend(ctx,
                 ba_image = glob.glob(dcmdir_name+"/**/*.dcm", recursive=True)[0]
                 p_gdcm = subprocess.Popen("python3 /opt/diana/package/diana/utils/gdcmpdcm.py '{}' {}".format(ba_image, an), shell=True)
                 p_gdcm.wait()
-                sl_fiup_response = sl_bot_client.files_upload(
-                    channels=ba_channel,  # WARNING: check param spelling in updates
-                    file="/opt/diana/{}.png".format(an),
-                    initial_comment="Accession Number: {},\n".format("XXXX" + an[-4:]) +
-                         "Bone Age Prediction (months): {}".format(pred_bone_age)
-                )
-                try:
-                    assert(sl_fiup_response["ok"])
-                except AssertionError:
-                    print("Error in Slack fiup")
+                for ba_channel in ba_channels:
+                    sl_fiup_response = sl_bot_client.files_upload(
+                        channels=ba_channel,  # WARNING: check param spelling in updates
+                        file="/opt/diana/{}.png".format(an),
+                        initial_comment="Accession Number: {},\n".format("XXXX" + an[-4:]) +
+                             "Bone Age Prediction (months): {}".format(pred_bone_age)
+                    )
+                    try:
+                        assert(sl_fiup_response["ok"])
+                    except AssertionError:
+                        print("Error in Slack fiup")
                 os.remove("/opt/diana/{}.png".format(an))
 
             os.remove("/diana_direct/{}/{}.studies.txt".format(ml, ml))
@@ -120,6 +121,7 @@ def extend(ctx,
             p_watch.send_signal(signal.SIGINT)
             p_collect.send_signal(signal.SIGINT)
             p_predict.send_signal(signal.SIGINT)
+            p_gdcm.send_signal(signal.SIGINT)
         except UnboundLocalError:
             pass
         if type(e) is FileNotFoundError:
