@@ -1,3 +1,4 @@
+
 import ast
 import click
 from datetime import datetime
@@ -7,11 +8,14 @@ import os
 import pydicom
 import signal
 import slack
+import sys
 import subprocess
 import time
 import zipfile
 
+sys.path.insert(0, "/root/anaconda3/lib/python3.7/site-packages/")
 import gdcm
+
 
 @click.command(short_help="Extend images to an AI analytics package")
 @click.argument('ml', type=click.STRING)
