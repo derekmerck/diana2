@@ -2,15 +2,16 @@ import ast
 import click
 from datetime import datetime
 import glob
+import imageio
 import os
 import pydicom
-from scipy.misc import imsave
 import signal
 import slack
 import subprocess
 import time
 import zipfile
 
+import gdcm
 
 @click.command(short_help="Extend images to an AI analytics package")
 @click.argument('ml', type=click.STRING)
@@ -89,7 +90,7 @@ def extend(ctx,
 
                 # Post to Slack
                 sl_msg_response = sl_bot_client.chat_postMessage(
-                    channel=ba_channel,
+                    channel="GLU6LQL86",
                     text="Accession Number: {},\n".format("XXXX" + an[-4:]) +
                          "Bone Age Prediction (months): {}".format(pred_bone_age)
                 )
@@ -100,9 +101,13 @@ def extend(ctx,
 
                 ba_image = glob.glob(dcmdir_name+"/**/*.dcm", recursive=True)[0]
                 ds = pydicom.dcmread(ba_image)
-                imsave("/opt/diana/{}.png".format(an), ds.pixel_array)
+                ds.decompress()
+                xyz = ds.pixel_array
+                print("xyz")
+                print(xyz)
+                imageio.imwrite("/opt/diana/{}.png".format(an), ds.pixel_array)
                 sl_fiup_response = sl_bot_client.files_upload(
-                    channels="DE3M6K9FW",  # WARNING: check param spelling in updates
+                    channels="GLU6LQL86",  # WARNING: check param spelling in updates
                     file="/opt/diana/{}.png".format(an),
                     initial_comment="Accession Number: {},\n".format("XXXX" + an[-4:]) +
                          "Bone Age Prediction (months): {}".format(pred_bone_age)
