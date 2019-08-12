@@ -87,21 +87,21 @@ def extend(ctx,
                     f.write("{}, {}\n".format(an, pred_bone_age))
 
                 # Post to Slack
-                sl_msg_response = sl_bot_client.chat_postMessage(
-                    channel="GLU6LQL86",
-                    text="Accession Number: {},\n".format("XXXX" + an[-4:]) +
-                         "Bone Age Prediction (months): {}".format(pred_bone_age)
-                )
-                try:
-                    assert(sl_msg_response["ok"])
-                except AssertionError:
-                    print("Error in Slack message post")
+                # sl_msg_response = sl_bot_client.chat_postMessage(
+                #     channel="GLU6LQL86",
+                #     text="Accession Number: {},\n".format("XXXX" + an[-4:]) +
+                #          "Bone Age Prediction (months): {}".format(pred_bone_age)
+                # )
+                # try:
+                #     assert(sl_msg_response["ok"])
+                # except AssertionError:
+                #     print("Error in Slack message post")
 
                 ba_image = glob.glob(dcmdir_name+"/**/*.dcm", recursive=True)[0]
                 p_gdcm = subprocess.Popen("python3 /opt/diana/package/diana/utils/gdcmpdcm.py '{}' {}".format(ba_image, an), shell=True)
                 p_gdcm.wait()
                 sl_fiup_response = sl_bot_client.files_upload(
-                    channels="GLU6LQL86",  # WARNING: check param spelling in updates
+                    channels=ba_channel,  # WARNING: check param spelling in updates
                     file="/opt/diana/{}.png".format(an),
                     initial_comment="Accession Number: {},\n".format("XXXX" + an[-4:]) +
                          "Bone Age Prediction (months): {}".format(pred_bone_age)
