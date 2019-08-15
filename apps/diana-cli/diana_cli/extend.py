@@ -97,13 +97,15 @@ def extend(ctx,
                 # except AssertionError:
                 #     print("Error in Slack message post")
 
-                ba_image = glob.glob(dcmdir_name+"/**/*.dcm", recursive=True)[0]
-                p_gdcm = subprocess.Popen("python3 /opt/diana/package/diana/utils/gdcmpdcm.py '{}' {}".format(ba_image, an), shell=True)
-                p_gdcm.wait()
+                # Using image thumb from bone age predictor instead
+                # ba_image = glob.glob(dcmdir_name+"/**/*.dcm", recursive=True)[0]
+                # p_gdcm = subprocess.Popen("python3 /opt/diana/package/diana/utils/gdcmpdcm.py '{}' {}".format(ba_image, an), shell=True)
+                # p_gdcm.wait()
+
                 for ba_channel in ba_channels:
                     sl_fiup_response = sl_bot_client.files_upload(
                         channels=ba_channel,  # WARNING: check param spelling in updates
-                        file="/opt/diana/{}.png".format(an),
+                        file="/opt/diana/ba_thumb.png",
                         initial_comment="Accession Number: {},\n".format("XXXX" + an[-4:]) +
                              "Bone Age Prediction (months): {}".format(pred_bone_age)
                     )
@@ -111,7 +113,6 @@ def extend(ctx,
                         assert(sl_fiup_response["ok"])
                     except AssertionError:
                         print("Error in Slack fiup")
-                os.remove("/opt/diana/{}.png".format(an))
 
             os.remove("/diana_direct/{}/{}.studies.txt".format(ml, ml))
             time.sleep(2)  # slightly wait for ObservableProxiedDicom polling_interval
@@ -121,7 +122,7 @@ def extend(ctx,
             p_watch.send_signal(signal.SIGINT)
             p_collect.send_signal(signal.SIGINT)
             p_predict.send_signal(signal.SIGINT)
-            p_gdcm.send_signal(signal.SIGINT)
+            # p_gdcm.send_signal(signal.SIGINT)
         except UnboundLocalError:
             pass
         if type(e) is FileNotFoundError:
