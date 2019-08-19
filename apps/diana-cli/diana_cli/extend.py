@@ -133,7 +133,8 @@ def parse_results(json_lines, ml):
     accession_nums = []
     for line in json_lines:
         entry = ast.literal_eval(line)
-        if ml == "bone_age" and entry['StudyDescription'] != 'X-Ray for Bone Age Study':
+        study_desc = entry['StudyDescription'].lower()
+        if ml == "bone_age" and ('x-ray' not in study_desc or 'bone' not in study_desc or 'age' not in study_desc):
             continue
         else:
             print("Found X-Ray for Bone Age Study...")
