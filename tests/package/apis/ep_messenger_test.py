@@ -3,7 +3,7 @@ import datetime
 import os
 import pytest
 from diana.apis import SMPTMessenger
-from diana.apis.smpt_messenger import sample_msg
+from diana.apis.smtp_messenger import sample_msg
 
 exp0 = "To: abc@example.com\nFrom: admin@smtp.example.com\nSubject: Sample message generated on {}".format(datetime.datetime.now().date())
 exp1 = "The message is: \"Hello world\""

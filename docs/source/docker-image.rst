@@ -98,7 +98,7 @@ image processing on medical image data. It is currently only available
 for ``amd64`` and ``arm32v7`` because tensorflow is hard to compile for
 ``arm64v8``. For ``amd64``, DIANA-Plus uses the ``tf-nightly`` package
 (currently 1.13) and for ``arm32v7`` we compile our own wheel (currently
-1.12, see `TF on arm32 note <./TF_on_arm32v7.rst>`__)
+1.12, see `TF on arm32 note <./TF_on_arm32v7.md>`__)
 
 The DIANA-Plus Docker image is much heavier at 700MB, compared to 300MB
 for the vanilla image.

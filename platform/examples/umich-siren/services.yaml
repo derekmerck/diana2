@@ -1,0 +1,13 @@
+DIANA_SERVICES:
+
+  hobit:
+    ctype: ObservableOrthanc
+    host: orthanc-hobit
+    password: "${ORTHANC_PASSWORD}"
+    polling_interval": 30
+
+  smtp:
+    ctype: "SMTPMessenger"
+    host:  "${SMTP_HOST}"
+    user:  "${SMTP_USER}"
+    msg_t: @/msg_t

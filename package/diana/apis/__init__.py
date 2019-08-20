@@ -5,7 +5,7 @@ from .dcmdir import DcmDir, ImageDir, ReportDir
 from .montage import Montage
 from .orthanc import Orthanc, sham_map
 from .splunk import Splunk
-from .smpt_messenger import SMPTMessenger
+from .smtp_messenger import SMTPMessenger
 
 from .proxied_dicom import ProxiedDicom
 

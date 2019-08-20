@@ -17,7 +17,7 @@ The message is: "{{ msg_text }}"
 
 
 @attr.s
-class SMPTMessenger(Endpoint):
+class SMTPMessenger(Endpoint):
 
     host = attr.ib(default="smtp.example.com")
     port = attr.ib(default=22)

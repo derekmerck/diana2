@@ -40,11 +40,15 @@ services:
     environment:
       PYTHONUNBUFFERED: "true"
       ORTHANC_PASSWORD: ${ORTHANC_PASSWORD}
-      DIANA_SERVICES: >
-        { "hobit": {"ctype": "ObservableOrthanc",
-                "host": "orthanc-hobit",
-                "password": "${ORTHANC_PASSWORD}",
-                "polling_interval": 30 }}
+      SMTP_HOST:        ${SMTP_PASSWORD}
+      SMPT_USER:        ${SMPT_USER}
+
+#      DIANA_SERVICES: >
+#        { "hobit": {"ctype": "ObservableOrthanc",
+#                "host": "orthanc-hobit",
+#                "password": "${ORTHANC_PASSWORD}",
+#                "polling_interval": 30 }}
+
 #      DIANA_SERVICES: >
 #        { "hobit": {"ctype": "ObservableOrthanc",
 #                "host": "orthanc-hobit",
@@ -58,6 +62,16 @@ services:
 #          [ "send_anonymized_studies", "hobit", "smpt" ] }
       TZ:               "America/New_York"
 
+    configs:
+      - source: ./notify_default_tmpl.txt.j2
+        target: /msg_t
+        mode: 444
+      - source: ./services.yaml
+        target: /services.yaml
+        mode: 444
+      - source: ./project.yaml
+        target: /project.yaml
+        mode: 444
 
   postgres:
     image: postgres
