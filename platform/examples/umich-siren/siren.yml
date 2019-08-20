@@ -29,6 +29,8 @@ services:
     # Need route for anonymize_instances orthanc-hobit (in place)
     # command: diana-cli watch -r upload_instances path:/data/incoming orthanc-hobit
 
+    # command: diana-cli watch
+
     image: derekmerck/diana2
     networks:
       - service_network
@@ -43,6 +45,17 @@ services:
                 "host": "orthanc-hobit",
                 "password": "${ORTHANC_PASSWORD}",
                 "polling_interval": 30 }}
+#      DIANA_SERVICES: >
+#        { "hobit": {"ctype": "ObservableOrthanc",
+#                "host": "orthanc-hobit",
+#                "password": "${ORTHANC_PASSWORD}",
+#                "polling_interval": 30 },
+#          "smtp": {"ctype": "SMTPMessenger",
+#                "host": "${SMTP_HOST}",
+#                "msg_t": "@/msg_t"}}
+#      DIANA_ROUTES: >
+#        { [ "upload_and_anonymize_files", "path:/data/incoming", "hobit" ],
+#          [ "send_anonymized_studies", "hobit", "smpt" ] }
       TZ:               "America/New_York"
 
 

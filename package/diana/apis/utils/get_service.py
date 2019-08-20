@@ -1,6 +1,10 @@
+"""
+Utility function to instantiate an endpoint
+"""
+
 import os, yaml, logging
 from diana.utils.endpoint import Serializable
-from . import *
+from diana.apis import *
 
 
 def get_service(services_path, service_name, check=False):

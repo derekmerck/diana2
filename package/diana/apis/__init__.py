@@ -11,4 +11,4 @@ from .proxied_dicom import ProxiedDicom
 
 from .observables import ObservableOrthanc, ObservableDcmDir, ObservableProxiedDicom
 
-from .get_service import get_service
+from diana.apis.utils.get_service import get_service

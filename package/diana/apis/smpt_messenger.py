@@ -2,7 +2,6 @@
 Render a message from item.meta using Jinja templates and send via smtp
 """
 import logging
-from typing import Mapping, Union
 import smtplib
 import attr
 from ..utils.endpoint import Endpoint
@@ -77,3 +76,5 @@ class SMPTMessenger(Endpoint):
             gateway.set_debuglevel(1)
             gateway.sendmail(from_addr, to_addrs, msg)
             gateway.close()
+        else:
+            logger.info("Declining to submit message to gateway (dryrun)")

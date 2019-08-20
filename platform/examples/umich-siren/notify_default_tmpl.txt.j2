@@ -1,0 +1,9 @@
+{{ project.site.coordinator.name }}, {{ project.site.name }}
+
+SIREN/{{ project.name }} Study Received {{ now.date() }}
+ 
+{{ tags["modality"] }} scan images from Central University Hospital that were uploaded at {{ now() }} has been received and anonymized (or re-anonymized) at the University of Michigan SIREN/{{ project.name }} image registry. 
+ 
+The study that was timestamped {{ tags["StudyDateTime"] }} has been added to the unique registry subject jacket for "{{ tags["PatientName"] }}.  The study has been assigned the unique image identifier "{{ tags["AccessionNumber"] }}.  Please save this information with your trial records.  You will be responsible for associating this registry assigned unique image identifier with your subject enrollment in the WEBDCU database.
+ 
+If imaging for this subject has previously been submitted to the SIREN/HOBIT image registry, the unique registry subject jacket should be the same, however, the unique image identifier will be different.  If this study has been filed under the wrong subject jacket, please ensure that any pre-anonymized data from your fileroom includes a consistent subject name, gender, and birthdate (i.e., "Subject 1", "Male", "1/1/2000"), and email the image registry administration team at {{ project.admin.email }}.
