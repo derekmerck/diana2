@@ -53,7 +53,6 @@ class Orthanc(Endpoint, Serializable):
     password = attr.ib(default="passw0rd!")
 
     gateway = attr.ib(init=False, type=OrthancGateway, repr=False)
-
     @gateway.default
     def setup_gateway(self):
         return OrthancGateway(
@@ -66,6 +65,9 @@ class Orthanc(Endpoint, Serializable):
             user = self.user,
             password = self.password
         )
+
+    # Valid keys for metadata kv store
+    meta_keys = attr.ib(default=list)
 
     def put(self, item: Dixel, **kwargs):
         logger = logging.getLogger(self.name)
