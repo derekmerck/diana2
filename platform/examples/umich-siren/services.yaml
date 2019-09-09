@@ -10,4 +10,5 @@ DIANA_SERVICES:
     ctype: "SMTPMessenger"
     host:  "${SMTP_HOST}"
     user:  "${SMTP_USER}"
+    password: "${SMTP_PASSWORD}"
     msg_t: @/msg_t

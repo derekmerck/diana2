@@ -1,4 +1,6 @@
 """
+SIREN Trial Network upload monitor
+
 Desired process:
 
 1. As each new PHI, partial-anon, or anon study arrives in folder proj/site
@@ -78,14 +80,17 @@ dispatcher:
   
 """
 
-salt = "SiReN+SaLt+123!"
+# Parameters
+salt = "SiReN+SaLt+123!"           # Unique subject anonymization namespace
 # fernet_key = Fernet.generate_key()
-fernet_key = b'Y8m2LL3poi1rA7NYwDSYHsaItIF7_sGM8TR5Ah5criE='
+fernet_key = b'Y8m2LL3poi1rA7NYwDSYHsaItIF7_sGM8TR5Ah5criE=' # Example
+base_dir_name = "/incoming"        # disp channels are relative paths to here
+
+# Globals
 tagged_studies = deque(maxlen=50)  # history
-base_dir_name = "/incoming"
 
 
-def pack_siren_info(d: Dixel, source: str, salt=None) -> str:
+def pack_siren_info(d: Dixel, source: str) -> str:
 
     res = {
         "PatientName": d.tags["PatientName"],
@@ -108,7 +113,7 @@ def unpack_siren_info(token: str) -> Mapping:
     return res
 
 
-def _handle_instance_in_dcm_dir(item, orth, salt):
+def _handle_instance_in_dcm_dir(item: Dixel, orth: Orthanc, salt: str):
 
     orth.put(item)
     anon = ShamDixel(item, salt=salt)
@@ -180,7 +185,7 @@ if __name__ == "__main__":
     Watcher.add_route = add_route
     w = Watcher()
 
-    w.add_route(d, DCMEv.INSTANCE_ADDED, handle_study_arrived_in_dcm_dir, dest=o, salt=salt)
+    w.add_route(d, DCMEv.STUDY_ADDED, handle_study_arrived_in_dcm_dir, dest=o, salt=salt)
     w.add_route(d, DCMEv.INSTANCE_ADDED, handle_instance_arrived_in_dcm_dir, dest=o, salt=salt)
     w.add_route(o, DCMEv.STUDY_ADDED, handle_study_arrived_at_orthanc, dest=p)
 

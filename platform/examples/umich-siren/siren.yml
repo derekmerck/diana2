@@ -40,23 +40,10 @@ services:
     environment:
       PYTHONUNBUFFERED: "true"
       ORTHANC_PASSWORD: ${ORTHANC_PASSWORD}
-      SMTP_HOST:        ${SMTP_PASSWORD}
-      SMPT_USER:        ${SMPT_USER}
+      SMTP_HOST:        ${SMTP_HOST}
+      SMTP_USER:        ${SMTP_USER}
+      SMTP_PASSWORD:    ${SMTP_PASSWORD}
 
-#      DIANA_SERVICES: >
-#        { "hobit": {"ctype": "ObservableOrthanc",
-#                "host": "orthanc-hobit",
-#                "password": "${ORTHANC_PASSWORD}",
-#                "polling_interval": 30 }}
-
-#      DIANA_SERVICES: >
-#        { "hobit": {"ctype": "ObservableOrthanc",
-#                "host": "orthanc-hobit",
-#                "password": "${ORTHANC_PASSWORD}",
-#                "polling_interval": 30 },
-#          "smtp": {"ctype": "SMTPMessenger",
-#                "host": "${SMTP_HOST}",
-#                "msg_t": "@/msg_t"}}
 #      DIANA_ROUTES: >
 #        { [ "upload_and_anonymize_files", "path:/data/incoming", "hobit" ],
 #          [ "send_anonymized_studies", "hobit", "smpt" ] }
@@ -68,9 +55,6 @@ services:
         mode: 444
       - source: ./services.yaml
         target: /services.yaml
-        mode: 444
-      - source: ./project.yaml
-        target: /project.yaml
         mode: 444
 
   postgres:
