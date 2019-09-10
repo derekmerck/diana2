@@ -26,7 +26,7 @@ import yaml
 import json
 from cryptography.fernet import Fernet
 from crud.abc import Endpoint
-from diana.apis import ObservableDcmDir, ObservableOrthanc
+from diana.apis import DcmDir, Orthanc, ObservableDcmDir, ObservableOrthanc
 from diana.dixel import Dixel, ShamDixel
 from diana.utils.endpoint import Watcher, Trigger
 from diana.utils.dicom import DicomLevel as DCMLv
