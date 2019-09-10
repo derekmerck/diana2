@@ -125,7 +125,7 @@ $ docker run -d \
 salt = os.environ.get("PROJECT_SALT") # Unique subject anonymization namespace
 # fernet_key = Fernet.generate_key()
 fernet_key = os.environ.get("PROJECT_FERNET_KEY").encode("UTF8")
-base_dir_name = "/incoming"  # dispatcher channels are relative paths to here
+base_dir_name = "/data/incoming"  # dispatcher channels are relative paths to here
 
 # Globals
 tagged_studies = deque(maxlen=50)  # history
