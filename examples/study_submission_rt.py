@@ -16,6 +16,7 @@ Desired process:
 
 """
 
+import os
 from pathlib import Path
 from collections import deque
 from functools import partial
@@ -35,56 +36,84 @@ from wuphf.daemons import Dispatcher
 service_descs = """
 
 incoming_dir:
-  ctype: DicomDir
-  path: "/incoming"
+  ctype:     DicomDir
+  path:      "/incoming"
   
 dicom_arch:
-  ctype: ObservableOrthanc
-  host: localhost
-  port: 8080
-  user: blah
-  password: blah
+  ctype:     ObservableOrthanc
+  user:      orthanc
+  password:  $ORTHANC_PASSWORD
   meta_keys: siren_info
+  
+splunk_index:
+  ctype:     Splunk
+  user:      admin
+  password:  $SPLUNK_PASSWORD
+  hec_token: $SPLUNK_HEC_TOKEN
 
-smtp_server:  &SMTP_SERVER
-  ctype: SmtpMessenger
-  host: localhost
-  user: blah
-  password: blah
+smtp_server: &SMTP_SERVER
+  ctype:     SmtpMessenger
+  host:      smtp.gmail.com
+  user:      $SMTP_USER
+  password:  $SMTP_PASSWORD
+  tls:       True
+  port:      587
 
 subscriptions: &SUBSCRIPTIONS
-- channel: hobit
+- channel: project
   subscribers:
-    - name: someone
-      email: someone@umich.hosp
+    - name: Central Reader
+      email: $TEST_EMAIL_RCV0
 
-- channel: hobit/hennepin
+- channel: project/site1
   subscribers:
-    - name: abc
-      email: abc@hennepin.hosp
+    - name: Site 1 PI
+      email: $TEST_EMAIL_RCV1
       role: pi  
-    - name: xyz
-      email: xyz@hennepin.hosp
+    - name: Site 1 Coord
+      email: $TEST_EMAIL_RCV2
       role: coord
   
-- channel: hobit/detroit
+- channel: project/site2
   subscribers:
-    - name: def
-      email: def@detroit.hosp
+    - name: Site 2 PI
+      email: $TEST_EMAIL_RCV3
       role: pi
       
 dispatcher:
   ctype: Dispatcher
   smtp_messenger_desc: *SMTP_SERVER
-  subscriptions_desc: *SUBSCRIPTIONS
+  subscriptions_desc:  *SUBSCRIPTIONS
   
 """
 
+"""
+$ docker run -d -p 8042:8042 \
+  -e ORTHANC_PASSWORD=$ORTHANC_PASSWORD \
+  -e ORTHANC_METADATA_0=siren_info,9875 \
+  --name orthanc derekmerck/orthanc-wbv:latest-amd64
+  
+$ docker run -d -p 8000:8000 -p 8088:8088 -p 8089:8089 \
+   -e SPLUNK_START_ARGS=--accept-license \
+   -e SPLUNK_PASSWORD=$SPLUNK_PASSWORD \
+   -e SPLUNK_HEC_TOKEN=$SPLUNK_HEC_TOKEN \
+   --name splunk splunk/splunk:latest
+   
+$ docker run -d \
+   -v /data/incoming:/incoming \
+   --name diana derekmerck/diana2
+"""
+
+# 1. Create orthanc container w/meta for siren_info
+# 2. Create and configure splunk container
+# 3. Create /incoming directory
+# 4. Create diana2 container with map to /incoming
+
 # Parameters
-salt = "SiReN+SaLt+123!"           # Unique subject anonymization namespace
+salt = os.environ.get("PROJECT_SALT") # Unique subject anonymization namespace
 # fernet_key = Fernet.generate_key()
-fernet_key = b'Y8m2LL3poi1rA7NYwDSYHsaItIF7_sGM8TR5Ah5criE=' # Example
-base_dir_name = "/incoming"        # disp channels are relative paths to here
+fernet_key = os.environ.get("PROJECT_FERNET_KEY").encode("UTF8")
+base_dir_name = "/incoming"  # dispatcher channels are relative paths to here
 
 # Globals
 tagged_studies = deque(maxlen=50)  # history
