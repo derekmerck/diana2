@@ -183,37 +183,39 @@ def _handle_instance_in_dcm_dir(item: Dixel, orth: Orthanc, salt: str):
 #     _handle_instance_in_dcm_dir(item, dest, salt)
 
 
-def handle_file_arrived_in_dcm_dir(filename, source: DcmDir, dest: Orthanc, salt=None):
+def handle_file_arrived_in_dcm_dir(item, source: DcmDir, dest: Orthanc, salt=None):
 
     dcm_dir = source
-    if filename.endswith(".zip"):
-        items = dcm_dir.get_zipped(filename)
+    fn = item.get("fn")
+    if fn.endswith(".zip"):
+        items = dcm_dir.get_zipped(fn)
         for item in items:
             _handle_instance_in_dcm_dir(item, dest, salt)
     else:
-        item = dcm_dir.get(filename)
+        item = dcm_dir.get(fn)
         _handle_instance_in_dcm_dir(item, dest, salt)
 
 
-def handle_study_arrived_at_orthanc(oid, source: Orthanc, dest: Dispatcher):
+def handle_study_arrived_at_orthanc(item, source: Orthanc, dest: Dispatcher):
 
     orth = source
     disp = dest
+    oid = item.get("oid")
 
-    item = orth.get(oid)
+    _item = orth.get(oid)
     siren_info = orth.gateway.get_metadata(oid, DCMLv.STUDIES, "siren_info")
     if not siren_info:
         # This is not an anonymized study
         return
 
-    item.meta["siren_info"] = unpack_siren_info(siren_info)
+    _item.meta["siren_info"] = unpack_siren_info(siren_info)
 
     fp = Path(item.meta["siren_info"]["filename"]).relative_to(base_dir_name)
     channels = [
         fp.parents[0], # ie, hobit/hennepin
         fp.parents[1]  # ie, hobit
     ]
-    disp.put(item, channels=channels)  # Will put multiple messages on the queue
+    disp.put(_item, channels=channels)  # Will put multiple messages on the queue
     disp.handle_queue()
 
 
@@ -239,7 +241,7 @@ if __name__ == "__main__":
     Watcher.add_route = add_route
     w = Watcher()
 
-    w.add_route(d, DCMEv.FILE_ADDED, handle_file_arrived_in_dcm_dir, dest=o, salt=salt)
+    w.add_route(d, DCMEv.FILE_ADDED,  handle_file_arrived_in_dcm_dir,  dest=o, salt=salt)
     w.add_route(o, DCMEv.STUDY_ADDED, handle_study_arrived_at_orthanc, dest=p)
 
     print(w.triggers)
