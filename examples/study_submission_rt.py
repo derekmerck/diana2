@@ -26,7 +26,7 @@ import yaml
 import json
 from cryptography.fernet import Fernet
 from crud.abc import Endpoint
-from diana.apis import DcmDir, Orthanc
+from diana.apis import ObservableDcmDir, ObservableOrthanc
 from diana.dixel import Dixel, ShamDixel
 from diana.utils.endpoint import Watcher, Trigger
 from diana.utils.dicom import DicomLevel as DCMLv
@@ -38,7 +38,7 @@ service_descs = """
 ---
 incoming_dir:
   ctype:     DicomDir
-  path:      "/incoming"
+  path:      "/data/incoming"
   
 dicom_arch:
   ctype:     ObservableOrthanc
@@ -102,7 +102,7 @@ $ docker run -d -p 8000:8000 -p 8088:8088 -p 8089:8089 \
    --name splunk splunk/splunk:latest
    
 $ docker run -d \
-   -v /data/incoming:/incoming \
+   -v /data:/data \
    -v `pwd`/services.yaml:/services.yaml:ro \
    --env-file .env \
    -e DIANA_SERVICES_PATH=/services.yaml \
@@ -208,8 +208,8 @@ if __name__ == "__main__":
 
     services = yaml.load(service_descs)
 
-    d = DcmDir(**services["incoming_dir"])
-    o = Orthanc(**services["dicom_arch"])
+    d = ObservableDcmDir(**services["incoming_dir"])
+    o = ObservableOrthanc(**services["dicom_arch"])
     p = Dispatcher(**services["dispatcher"])
 
     def add_route(self: Watcher, source: Endpoint, event_type, func, **kwargs):
@@ -229,4 +229,4 @@ if __name__ == "__main__":
 
     print(w.triggers)
 
-    # w.run()
+    w.run()
