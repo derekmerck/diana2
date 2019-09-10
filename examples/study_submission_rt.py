@@ -144,7 +144,7 @@ def pack_siren_info(d: Dixel) -> str:
     }
     clear_text = json.dumps(res, cls=SmartJSONEncoder)
     f = Fernet(fernet_key)
-    token = f.encrypt(clear_text)
+    token = f.encrypt(clear_text.encode("utf8"))
     return token
 
 
@@ -152,7 +152,7 @@ def unpack_siren_info(token: str) -> Mapping:
 
     f = Fernet(fernet_key)
     clear_text = f.decrypt(token)
-    res = json.loads(clear_text)
+    res = json.loads(clear_text.decode("utf8"))
     return res
 
 
