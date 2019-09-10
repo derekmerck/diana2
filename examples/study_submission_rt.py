@@ -31,22 +31,24 @@ from diana.dixel import Dixel, ShamDixel
 from diana.utils.endpoint import Watcher, Trigger
 from diana.utils.dicom import DicomLevel as DCMLv
 from diana.utils.dicom.events import DicomEventType as DCMEv
+# from wuphf.endpoints import SmtpMessenger
 from wuphf.daemons import Dispatcher
 
 service_descs = """
-
+---
 incoming_dir:
   ctype:     DicomDir
   path:      "/incoming"
   
 dicom_arch:
   ctype:     ObservableOrthanc
+  host:      orthanc
   user:      orthanc
   password:  $ORTHANC_PASSWORD
-  meta_keys: siren_info
   
 splunk_index:
   ctype:     Splunk
+  host:      splunk
   user:      admin
   password:  $SPLUNK_PASSWORD
   hec_token: $SPLUNK_HEC_TOKEN
@@ -89,25 +91,32 @@ dispatcher:
 
 """
 $ docker run -d -p 8042:8042 \
-  -e ORTHANC_PASSWORD=$ORTHANC_PASSWORD \
+  -e ORTHANC_PASSWORD \
   -e ORTHANC_METADATA_0=siren_info,9875 \
   --name orthanc derekmerck/orthanc-wbv:latest-amd64
   
 $ docker run -d -p 8000:8000 -p 8088:8088 -p 8089:8089 \
    -e SPLUNK_START_ARGS=--accept-license \
-   -e SPLUNK_PASSWORD=$SPLUNK_PASSWORD \
-   -e SPLUNK_HEC_TOKEN=$SPLUNK_HEC_TOKEN \
+   -e SPLUNK_PASSWORD \
+   -e SPLUNK_HEC_TOKEN \
    --name splunk splunk/splunk:latest
    
 $ docker run -d \
    -v /data/incoming:/incoming \
+   -v `pwd`/services.yaml:/services.yaml:ro \
+   --env-file .env \
+   -e DIANA_SERVICES_PATH=/services.yaml \
+   --link splunk --link orthanc \
    --name diana derekmerck/diana2
 """
 
-# 1. Create orthanc container w/meta for siren_info
-# 2. Create and configure splunk container
-# 3. Create /incoming directory
-# 4. Create diana2 container with map to /incoming
+# 1. Create .env file
+# 2. Create orthanc container w/meta for siren_info
+# 3. Create and configure splunk container
+# 4. Create /incoming directory\
+# 5. Create services.yaml file (as above)
+# 5. Create diana2 container with map to /incoming, /services.yaml,
+#    and links to splunk, orthanc
 
 # Parameters
 salt = os.environ.get("PROJECT_SALT") # Unique subject anonymization namespace
