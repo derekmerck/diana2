@@ -133,9 +133,12 @@ tagged_studies = deque(maxlen=50)  # history
 def pack_siren_info(d: Dixel) -> str:
 
     res = {
-        "PatientName": d.tags["PatientName"],
-        "ShamPatientName": d.meta["ShamPatientName"],
-        "filename": d.meta["FileName"],
+        "ShamID": d.meta["ShamID"],
+        "PatientID": d.tags.get("PatientID"),
+        "PatientName": d.tags.get("PatientName"),
+        "DateOfBirth": d.tags.get("PatientBirthday"),
+        "StudyDateTime": d.meta["StudyDateTime"],
+        "FileName": d.meta["FileName"],
         "timestamp": datetime.now()
     }
     clear_text = json.dumps(res)
