@@ -130,14 +130,13 @@ base_dir_name = "/incoming"  # dispatcher channels are relative paths to here
 tagged_studies = deque(maxlen=50)  # history
 
 
-def pack_siren_info(d: Dixel, source: str) -> str:
+def pack_siren_info(d: Dixel) -> str:
 
     res = {
         "PatientName": d.tags["PatientName"],
         "ShamPatientName": d.meta["ShamPatientName"],
-        "filename": d.fn,
-        "timestamp": datetime.now(),
-        "source": source
+        "filename": d.meta["FileName"],
+        "timestamp": datetime.now()
     }
     clear_text = json.dumps(res)
     f = Fernet(fernet_key)
