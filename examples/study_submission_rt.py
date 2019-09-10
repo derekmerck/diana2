@@ -215,7 +215,7 @@ def handle_study_arrived_at_orthanc(item, source: Orthanc, dest: Dispatcher):
 
     _item.meta["siren_info"] = unpack_siren_info(siren_info)
 
-    fp = Path(item.meta["siren_info"]["filename"]).relative_to(base_dir_name)
+    fp = Path(_item.meta["siren_info"]["filename"]).relative_to(base_dir_name)
     channels = [
         fp.parents[0], # ie, hobit/hennepin
         fp.parents[1]  # ie, hobit
