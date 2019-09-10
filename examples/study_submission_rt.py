@@ -32,6 +32,7 @@ from diana.dixel import Dixel, ShamDixel
 from diana.utils.endpoint import Watcher, Trigger
 from diana.utils.dicom import DicomLevel as DCMLv
 from diana.utils.dicom.events import DicomEventType as DCMEv
+from diana.utils import SmartJSONEncoder
 # from wuphf.endpoints import SmtpMessenger
 from wuphf.daemons import Dispatcher
 
@@ -136,12 +137,12 @@ def pack_siren_info(d: Dixel) -> str:
         "ShamID": d.meta["ShamID"],
         "PatientID": d.tags.get("PatientID"),
         "PatientName": d.tags.get("PatientName"),
-        "DateOfBirth": d.tags.get("PatientBirthday"),
+        "BirthDate": d.tags.get("PatientBirthDate"),
         "StudyDateTime": d.meta["StudyDateTime"],
         "FileName": d.meta["FileName"],
         "timestamp": datetime.now()
     }
-    clear_text = json.dumps(res)
+    clear_text = json.dumps(res, cls=SmartJSONEncoder)
     f = Fernet(fernet_key)
     token = f.encrypt(clear_text)
     return token
