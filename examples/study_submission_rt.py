@@ -157,7 +157,7 @@ def _handle_instance_in_dcm_dir(item: Dixel, orth: Orthanc, salt: str):
 
     orth.put(item)
     anon = ShamDixel.from_dixel(item, salt=salt)
-    afile = orth.anonymize(anon)
+    afile = orth.anonymize(anon, map=anon.orthanc_sham_map())
     anon.file = afile
     orth.put(anon)
     orth.delete(item)
