@@ -239,8 +239,7 @@ if __name__ == "__main__":
     Watcher.add_route = add_route
     w = Watcher()
 
-    w.add_route(d, DCMEv.STUDY_ADDED, handle_study_arrived_in_dcm_dir, dest=o, salt=salt)
-    w.add_route(d, DCMEv.INSTANCE_ADDED, handle_instance_arrived_in_dcm_dir, dest=o, salt=salt)
+    w.add_route(d, DCMEv.FILE_ADDED, handle_file_arrived_in_dcm_dir, dest=o, salt=salt)
     w.add_route(o, DCMEv.STUDY_ADDED, handle_study_arrived_at_orthanc, dest=p)
 
     print(w.triggers)
