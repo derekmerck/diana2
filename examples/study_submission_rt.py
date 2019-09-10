@@ -155,7 +155,7 @@ def unpack_siren_info(token: str) -> Mapping:
 def _handle_instance_in_dcm_dir(item: Dixel, orth: Orthanc, salt: str):
 
     orth.put(item)
-    anon = ShamDixel(item, salt=salt)
+    anon = ShamDixel.from_dixel(item, salt=salt)
     afile = orth.anonymize(anon)
     anon.file = afile
     orth.put(anon)
