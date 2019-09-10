@@ -230,6 +230,7 @@ if __name__ == "__main__":
 
     d = ObservableDcmDir(**services["incoming_dir"])
     o = ObservableOrthanc(**services["dicom_arch"])
+    o.clear()
     p = Dispatcher(**services["dispatcher"])
 
     def add_route(self: Watcher, source: Endpoint, event_type, func, **kwargs):
