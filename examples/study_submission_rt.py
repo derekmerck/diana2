@@ -167,20 +167,32 @@ def _handle_instance_in_dcm_dir(item: Dixel, orth: Orthanc, salt: str):
         orth.gateway.put_metadata(anon_study_id, DCMLv.STUDIES, "siren_info", siren_info)
         tagged_studies.append(anon_study_id)
 
+#
+# def handle_study_arrived_in_dcm_dir(filename, source: DcmDir, dest: Orthanc, salt=None):
+#
+#     dcm_dir = source
+#     items = dcm_dir.get_zipped(filename)
+#     for item in items:
+#         _handle_instance_in_dcm_dir(item, dest, salt)
+#
+#
+# def handle_instance_arrived_in_dcm_dir(filename, source: DcmDir, dest: Orthanc, salt=None):
+#
+#     dcm_dir = source
+#     item = dcm_dir.get(filename)
+#     _handle_instance_in_dcm_dir(item, dest, salt)
 
-def handle_study_arrived_in_dcm_dir(filename, source: DcmDir, dest: Orthanc, salt=None):
+
+def handle_file_arrived_in_dcm_dir(filename, source: DcmDir, dest: Orthanc, salt=None):
 
     dcm_dir = source
-    items = dcm_dir.get_zipped(filename)
-    for item in items:
+    if filename.endswith(".zip"):
+        items = dcm_dir.get_zipped(filename)
+        for item in items:
+            _handle_instance_in_dcm_dir(item, dest, salt)
+    else:
+        item = dcm_dir.get(filename)
         _handle_instance_in_dcm_dir(item, dest, salt)
-
-
-def handle_instance_arrived_in_dcm_dir(filename, source: DcmDir, dest: Orthanc, salt=None):
-
-    dcm_dir = source
-    item = dcm_dir.get(filename)
-    _handle_instance_in_dcm_dir(item, dest, salt)
 
 
 def handle_study_arrived_at_orthanc(oid, source: Orthanc, dest: Dispatcher):
@@ -209,7 +221,8 @@ if __name__ == "__main__":
 
     logging.basicConfig(level=logging.DEBUG)
 
-    services = yaml.load(service_descs)
+    _service_descs = os.path.expandvars(service_descs)
+    services = yaml.load(_service_descs)
 
     d = ObservableDcmDir(**services["incoming_dir"])
     o = ObservableOrthanc(**services["dicom_arch"])
