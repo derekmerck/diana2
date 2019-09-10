@@ -94,6 +94,7 @@ dispatcher:
 $ docker run -d -p 8042:8042 \
   -e ORTHANC_PASSWORD \
   -e ORTHANC_METADATA_0=siren_info,9875 \
+  -e ORTHANC_WBV_ENABLED=true \
   --name orthanc derekmerck/orthanc-wbv:latest-amd64
   
 $ docker run -d -p 8000:8000 -p 8088:8088 -p 8089:8089 \
@@ -161,8 +162,9 @@ def _handle_instance_in_dcm_dir(item: Dixel, orth: Orthanc, salt: str):
     orth.put(anon)
     orth.delete(item)
 
-    anon_study_id = anon.parent_oid(DCMLv.STUDIES)
+    anon_study_id = anon.sham_parent_oid(DCMLv.STUDIES)
     if anon_study_id not in tagged_studies:
+        logging.debug("Tagging parent study: {}".format(anon_study_id))
         siren_info = pack_siren_info(anon)
         orth.gateway.put_metadata(anon_study_id, DCMLv.STUDIES, "siren_info", siren_info)
         tagged_studies.append(anon_study_id)
