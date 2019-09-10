@@ -192,7 +192,7 @@ def handle_file_arrived_in_dcm_dir(item, source: DcmDir, dest: Orthanc, salt=Non
         for item in items:
             _handle_instance_in_dcm_dir(item, dest, salt)
     else:
-        item = dcm_dir.get(fn)
+        item = dcm_dir.get(fn, file=True)
         _handle_instance_in_dcm_dir(item, dest, salt)
 
 
