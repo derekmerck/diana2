@@ -10,6 +10,8 @@ python-dateutil
 redis
 requests
 watchdog
+lxml
+jinja2
 
 # APP REQS
 # -----------------

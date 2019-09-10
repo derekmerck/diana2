@@ -107,7 +107,7 @@ $ docker run -d \
    --env-file .env \
    -e DIANA_SERVICES_PATH=/services.yaml \
    --link splunk --link orthanc \
-   --name diana derekmerck/diana2
+   --name diana diana2.1
 """
 
 # 1. Create .env file

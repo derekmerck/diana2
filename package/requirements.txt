@@ -1,5 +1,7 @@
 attrs >= 18.1.0
 bs4
+lxml
+jinja2
 docker
 numpy
 pydicom
