@@ -17,6 +17,7 @@ Desired process:
 """
 
 import os
+import logging
 from pathlib import Path
 from collections import deque
 from functools import partial
@@ -205,6 +206,8 @@ def handle_study_arrived_at_orthanc(oid, source: Orthanc, dest: Dispatcher):
 
 
 if __name__ == "__main__":
+
+    logging.basicConfig(level=logging.DEBUG)
 
     services = yaml.load(service_descs)
 
