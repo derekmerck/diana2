@@ -28,6 +28,7 @@ from datetime import datetime
 from pprint import pformat
 import yaml
 import json
+from dateutil import parser as DateTimeParser
 from cryptography.fernet import Fernet
 from crud.abc import Endpoint
 from diana.apis import DcmDir, Orthanc, ObservableDcmDir, ObservableOrthanc
@@ -93,6 +94,25 @@ dispatcher:
   subscriptions_desc:  *SUBSCRIPTIONS
   
 """
+
+channel_lu={
+    "project": "Project",
+    "site1":   "Site 1",
+    "site2":   "Site 2"
+}
+
+msg_t="""
+Subject: SIREN/{{ Project }} Study Received {{ now() }}
+
+{{ recipient.name }}, {{ Site }}
+ 
+{{ Modality }} scan images from {{ Site }} that were uploaded at {{ now() }} have been received and anonymized (or re-anonymized) at the University of Michigan SIREN/{{ Project }} image registry.
+ 
+The anonymized study originally performed on {{ OriginalStudyDate }} has been added to the unique registry subject jacket for "{{ PatientName }}.  The study has been assigned the unique image identifier "{{ AccessionNumber[0:8] }}.  Please save this information with your trial records.  You will be responsible for associating this registry assigned unique image identifier with your subject enrollment in the WEBDCU database.
+ 
+If imaging for this subject has previously been submitted to the SIREN/HOBIT image registry, the unique registry subject jacket should be the same, however, the unique image identifier will be different.  If this study has been filed under the wrong subject jacket, please ensure that any pre-anonymized data from your fileroom includes a consistent subject name, gender, and birthdate (i.e., "Subject 1", "Male", "1/1/2000"), and email the contact the registry administration team.
+"""
+
 
 """
 $ docker run -d -p 8042:8042 \
@@ -211,8 +231,21 @@ def handle_study_arrived_at_orthanc(item, source: Orthanc, dest: Dispatcher):
         "/".join(fp.parts[0:2])   # ie, hobit/hennepin
     ]
     logging.debug(channels)
-    disp.put(_item, channels=channels)  # Will put multiple messages on the queue
-    disp.handle_queue()
+
+    original_study_date = DateTimeParser.parse(_item.meta["siren_info"]["StudyDateTime"]).date()
+    project = fp.parts[0]
+    if channel_lu.get(project):
+        project = channel_lu.get(project)
+    site = fp.parts[1]
+    if channel_lu.get(site):
+        site = channel_lu.get(site)
+
+    data = {**_item.tags, **_item.meta,
+            "OriginalStudyDate": original_study_date,
+            "Project": project,
+            "Site": site}
+    disp.put(data, channels=channels)  # Will put multiple messages on the queue
+    disp.handle_queue(dryrun=True)
 
 
 if __name__ == "__main__":
@@ -225,6 +258,7 @@ if __name__ == "__main__":
     d = ObservableDcmDir(**services["incoming_dir"])
     o = ObservableOrthanc(**services["dicom_arch"])
     p = Dispatcher(**services["dispatcher"])
+    p.smtp_messenger.msg_t = msg_t
 
     def add_route(self: Watcher, source: Endpoint, event_type, func, **kwargs):
 
