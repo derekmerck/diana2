@@ -17,10 +17,10 @@ setuptools.setup(
     version=metadata.get("version"),
     author=metadata.get("author"),
     author_email=metadata.get("author_email"),
-    description="Command line interface for DIANA",
+    description=metadata.get("desc"),
+    url=metadata.get("url"),
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/derekmerck/diana2",
     packages=setuptools.find_packages(),
     classifiers=(
         'Development Status :: 3 - Alpha',

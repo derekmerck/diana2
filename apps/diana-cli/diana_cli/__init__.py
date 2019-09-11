@@ -3,6 +3,8 @@ __version__ = "2.1.7"
 __author__ = "Derek Merck"
 __author_email__ = "derek.merck@ufl.edu"
 __gistsig__ = "4b0bfbca0a415655d97f36489629e1cc"
+__desc__ = "Command line interface for DIANA",
+__url__ = "https://github.com/derekmerck/diana2",
 
 from .cli import cli as app
 

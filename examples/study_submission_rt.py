@@ -8,13 +8,16 @@ Desired process:
 2.   Each instance is uploaded
 3.   Each uploaded instance is anonymized and deleted (instance-by-instance to
      create serial instance times, if possible)
-3. As each anonymized study becomes stable:
-4.   Meta for each study is pulled, including pre-anon meta + source directory
-5.   Meta is forwarded to indexer for logging
-6.   Meta is forwarded to the dispatcher along with source dir (channel)
-7.   Meta is multiplexed from subscription roster to produce messages
-8.     Each message is submitted to the appropriate transport mechanism
-9.     Each message forwarded to indexer to be logged
+4. As each anonymized study becomes stable:
+5.   Meta for each study is pulled, including pre-anon meta + source directory
+6.   Meta is forwarded to indexer for logging
+7.   Meta is forwarded to the dispatcher along with source dir (channel)
+8.   Meta is multiplexed from subscription roster to produce messages
+9.     Each message is submitted to the appropriate transport mechanism
+10.    Each message forwarded to indexer to be logged
+
+Works on my computer
+Doesn't work when installed on
 
 """
 
