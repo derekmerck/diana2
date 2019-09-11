@@ -3,10 +3,12 @@ SIREN Trial Network upload monitor
 
 Desired process:
 
-1. As each new PHI, partial-anon, or anon study arrives in folder proj/site
-2.   Each instance is uploaded and anonymized (instance-by-instance to
-     create serial instance times if possible)
-3. As each anonymized study becomes stable
+1. As each new PHI, partial-anon, or anon study arrives in the folder
+   "/incoming/proj/site":
+2.   Each instance is uploaded
+3.   Each uploaded instance is anonymized and deleted (instance-by-instance to
+     create serial instance times, if possible)
+3. As each anonymized study becomes stable:
 4.   Meta for each study is pulled, including pre-anon meta + source directory
 5.   Meta is forwarded to indexer for logging
 6.   Meta is forwarded to the dispatcher along with source dir (channel)
@@ -23,6 +25,7 @@ from collections import deque
 from functools import partial
 from typing import Mapping
 from datetime import datetime
+from pprint import pformat
 import yaml
 import json
 from cryptography.fernet import Fernet
@@ -33,7 +36,6 @@ from diana.utils.endpoint import Watcher, Trigger
 from diana.utils.dicom import DicomLevel as DCMLv
 from diana.utils.dicom.events import DicomEventType as DCMEv
 from diana.utils import SmartJSONEncoder
-# from wuphf.endpoints import SmtpMessenger
 from wuphf.daemons import Dispatcher
 
 service_descs = """
@@ -44,7 +46,8 @@ incoming_dir:
   
 dicom_arch:
   ctype:     ObservableOrthanc
-  host:      orthanc
+  # host:      orthanc
+  host:      debian-testing
   user:      orthanc
   password:  $ORTHANC_PASSWORD
   
@@ -93,15 +96,16 @@ dispatcher:
 
 """
 $ docker run -d -p 8042:8042 \
-  -e ORTHANC_PASSWORD \
+  -e ORTHANC_PASSWORD=$ORTHANC_PASSWORD \
   -e ORTHANC_METADATA_0=siren_info,9875 \
   -e ORTHANC_WBV_ENABLED=true \
+  --tmpfs /etc/orthanc \
   --name orthanc derekmerck/orthanc-wbv:latest-amd64
   
 $ docker run -d -p 8000:8000 -p 8088:8088 -p 8089:8089 \
    -e SPLUNK_START_ARGS=--accept-license \
-   -e SPLUNK_PASSWORD \
-   -e SPLUNK_HEC_TOKEN \
+   -e SPLUNK_PASSWORD=$SPLUNK_PASSWORD \
+   -e SPLUNK_HEC_TOKEN=$SPLUNK_HEC_TOKEN \
    --name splunk splunk/splunk:latest
    
 $ docker run -d \
@@ -113,12 +117,12 @@ $ docker run -d \
    --name diana diana2.1
 """
 
-# 1. Create .env file
+# 1. Create and source .env file
 # 2. Create orthanc container w/meta for siren_info
 # 3. Create and configure splunk container
-# 4. Create /incoming directory\
-# 5. Create services.yaml file (as above)
-# 5. Create diana2 container with map to /incoming, /services.yaml,
+# 4. Create /data/incoming directory\
+# 5. Create services.yaml file (from services_desc)
+# 6. Create diana2 container with map to /data, /services.yaml,
 #    and links to splunk, orthanc
 
 # Parameters
@@ -172,21 +176,6 @@ def _handle_instance_in_dcm_dir(item: Dixel, orth: Orthanc, salt: str):
         orth.gateway.put_metadata(anon_study_id, DCMLv.STUDIES, "siren_info", siren_info)
         tagged_studies.append(anon_study_id)
 
-#
-# def handle_study_arrived_in_dcm_dir(filename, source: DcmDir, dest: Orthanc, salt=None):
-#
-#     dcm_dir = source
-#     items = dcm_dir.get_zipped(filename)
-#     for item in items:
-#         _handle_instance_in_dcm_dir(item, dest, salt)
-#
-#
-# def handle_instance_arrived_in_dcm_dir(filename, source: DcmDir, dest: Orthanc, salt=None):
-#
-#     dcm_dir = source
-#     item = dcm_dir.get(filename)
-#     _handle_instance_in_dcm_dir(item, dest, salt)
-
 
 def handle_file_arrived_in_dcm_dir(item, source: DcmDir, dest: Orthanc, salt=None):
 
@@ -214,12 +203,14 @@ def handle_study_arrived_at_orthanc(item, source: Orthanc, dest: Dispatcher):
         return
 
     _item.meta["siren_info"] = unpack_siren_info(siren_info)
+    logging.debug(pformat(_item.meta["siren_info"]))
 
     fp = Path(_item.meta["siren_info"]["FileName"]).relative_to(base_dir_name)
     channels = [
-        fp.parents[0], # ie, hobit/hennepin
-        fp.parents[1]  # ie, hobit
+        fp.parts[0],              # ie, hobit
+        "/".join(fp.parts[0:2])   # ie, hobit/hennepin
     ]
+    logging.debug(channels)
     disp.put(_item, channels=channels)  # Will put multiple messages on the queue
     disp.handle_queue()
 
@@ -233,7 +224,6 @@ if __name__ == "__main__":
 
     d = ObservableDcmDir(**services["incoming_dir"])
     o = ObservableOrthanc(**services["dicom_arch"])
-    o.clear()
     p = Dispatcher(**services["dispatcher"])
 
     def add_route(self: Watcher, source: Endpoint, event_type, func, **kwargs):
@@ -250,6 +240,10 @@ if __name__ == "__main__":
     w.add_route(d, DCMEv.FILE_ADDED,  handle_file_arrived_in_dcm_dir,  dest=o, salt=salt)
     w.add_route(o, DCMEv.STUDY_ADDED, handle_study_arrived_at_orthanc, dest=p)
 
-    print(w.triggers)
+    # print(w.triggers)
 
-    w.run()
+    # o.clear()
+    # w.run()
+
+    item = {"oid": "91499a9e-abbc193d-fb780cbb-5fd054d3-46a4e2fe"}
+    handle_study_arrived_at_orthanc(item, o, p)
