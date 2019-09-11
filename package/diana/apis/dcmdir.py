@@ -113,11 +113,13 @@ class DcmDir(Endpoint, Serializable):
         logger.debug("EP GET ZIPPED")
         gateway = ZipFileHandler(path=self.path)
         files = gateway.unzip(item)
+        _fp = gateway.get_path(item)
         result = set()
         for fn, f in files:
             try:
                 ds = pydicom.dcmread(BytesIO(f), stop_before_pixels=True)
-                d = Dixel.from_pydicom(ds, fn, file=f)
+                fp = os.path.join(_fp, fn)
+                d = Dixel.from_pydicom(ds, fp, file=f)
                 result.add(d)
             except pydicom.errors.InvalidDicomError as e:
                 logging.warning("Failed to parse with {}".format(e))

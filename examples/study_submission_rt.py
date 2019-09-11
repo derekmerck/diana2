@@ -279,5 +279,9 @@ if __name__ == "__main__":
     # o.clear()
     # w.run()
 
-    item = {"oid": "91499a9e-abbc193d-fb780cbb-5fd054d3-46a4e2fe"}
-    handle_study_arrived_at_orthanc(item, o, p)
+    # item = {"oid": "91499a9e-abbc193d-fb780cbb-5fd054d3-46a4e2fe"}
+    # handle_study_arrived_at_orthanc(item, o, p)
+
+    items = DcmDir(path="/Users/derek.merck/Desktop").get_zipped("006dfa27cc5c6c4e.zip")
+    for item in items:
+        print(item.fn)
