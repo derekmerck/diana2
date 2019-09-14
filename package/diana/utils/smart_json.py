@@ -1,6 +1,10 @@
 import json
+import logging
 from datetime import timedelta
 from pathlib import PosixPath
+
+logger = logging.getLogger("SmartJSONEnc")
+logger.setLevel(level=logging.ERROR)
 
 # Add any serializing functions here
 def stringify(obj):
@@ -21,6 +25,9 @@ def stringify(obj):
     if hasattr(obj, 'hexdigest'):
         return obj.hexdigest()
 
+    # Handle bytes from pydicom
+    if isinstance(obj, bytes):
+        return obj.decode("utf8", "ignore")
 
 
 class SmartJSONEncoder(json.JSONEncoder):
@@ -29,6 +36,13 @@ class SmartJSONEncoder(json.JSONEncoder):
         if out:
             return out
 
-        return json.JSONEncoder.default(self, obj)
+        try:
+            return json.JSONEncoder.default(self, obj)
+        except TypeError as e:
+            logger = logging.getLogger("SmartJSONEnc")
+            logger.warning(e)
+            logger.warning("Failed to encode {}; skipping".format(obj))
+
+
 
 

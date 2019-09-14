@@ -120,6 +120,12 @@ class Dixel(Serializable):
                   level=DicomLevel.INSTANCES)
         d.simplify_tags()
 
+        if not d.tags.get('PatientID') or \
+           not d.tags.get('StudyInstanceUID') or \
+           not d.tags.get('SeriesInstanceUID') or \
+           not d.tags.get('SOPInstanceUID'):
+            raise DicomFormatError("File is missing required tags")
+
         if file:
             d.file = file
 

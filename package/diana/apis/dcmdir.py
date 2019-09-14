@@ -6,12 +6,8 @@ import attr
 import pydicom
 from ..dixel import Dixel, DixelView, ShamDixel
 from ..utils import Endpoint, Serializable
-from ..utils.dicom import DicomLevel
+from ..utils.dicom import DicomLevel, DicomFormatError
 from ..utils.gateways import DcmFileHandler, ZipFileHandler, ImageFileHandler, ImageFileFormat, TextFileHandler
-
-
-
-import pydicom
 
 
 @attr.s
@@ -121,7 +117,7 @@ class DcmDir(Endpoint, Serializable):
                 fp = os.path.join(_fp, fn)
                 d = Dixel.from_pydicom(ds, fp, file=f)
                 result.add(d)
-            except pydicom.errors.InvalidDicomError as e:
+            except (pydicom.errors.InvalidDicomError, DicomFormatError) as e:
                 logging.warning("Failed to parse with {}".format(e))
         return result
 

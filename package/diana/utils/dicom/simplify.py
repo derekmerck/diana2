@@ -2,6 +2,9 @@ import logging
 from . import parse_dicom_datetime as mk_time
 from .exceptions import DicomFormatError
 
+logger = logging.getLogger("DcmSimplify")
+logger.setLevel(logging.ERROR)
+
 
 def handle_errors(err, ignore_errors):
 
@@ -234,5 +237,4 @@ def dicom_simplify(tags, ignore_errors=True):
     # logger.info(pformat(tags))
 
     return tags
-
 

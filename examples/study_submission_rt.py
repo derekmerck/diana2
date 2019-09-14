@@ -49,8 +49,8 @@ incoming_dir:
   
 dicom_arch:
   ctype:     ObservableOrthanc
-  host:      orthanc
-  # host:      debian-testing
+  # host:      orthanc
+  host:      debian-testing
   user:      orthanc
   password:  $ORTHANC_PASSWORD
   
@@ -257,7 +257,8 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
 
     from crud.manager import EndpointManager as Manager
-    m = Manager(file="/services.yaml")
+    m = Manager(yaml=service_descs)
+#file="/services.yaml",
 
     # _service_descs = os.path.expandvars(service_descs)
     # services = yaml.load(_service_descs)
@@ -284,8 +285,8 @@ if __name__ == "__main__":
     w.add_route(d, DCMEv.FILE_ADDED,  handle_file_arrived_in_dcm_dir,  dest=o, salt=salt)
     w.add_route(o, DCMEv.STUDY_ADDED, handle_study_arrived_at_orthanc, dest=p)
 
-    # o.clear()
-    w.run()
+    #o.clear()
+    # w.run()
 
     # item = {"oid": "91499a9e-abbc193d-fb780cbb-5fd054d3-46a4e2fe"}
     # handle_study_arrived_at_orthanc(item, o, p)
@@ -293,3 +294,13 @@ if __name__ == "__main__":
     # items = DcmDir(path="/Users/derek.merck/Desktop").get_zipped("006dfa27cc5c6c4e.zip")
     # for item in items:
     #     print(item.fn)
+
+    f0 = "006dfa27cc5c6c4e.zip"
+    f1 = "anon.left_arm_ct_angio.zip"
+    D = DcmDir(path="/Users/derek.merck/vms/debian").get_zipped(f1)
+    for d in D:
+        o.put(d)
+        dd = ShamDixel.from_dixel(d)
+        afile = o.anonymize(d, replacement_map=dd.orthanc_sham_map())
+        dd.file = afile
+        o.put(dd)

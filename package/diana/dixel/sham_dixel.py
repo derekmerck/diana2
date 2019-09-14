@@ -1,6 +1,7 @@
 import logging
 import hashlib
-from datetime import datetime
+import random
+from datetime import datetime, timedelta
 from dateutil import parser as DatetimeParser
 import attr
 from . import Dixel
@@ -8,6 +9,16 @@ from ..utils.gateways import orthanc_id
 from ..utils.guid import GUIDMint
 from ..utils.dicom import dicom_date, dicom_name, dicom_datetime, DicomLevel, DicomUIDMint
 from ..utils.dicom.uid_mint import hash_str
+
+def random_dob(seed, min=18, max=80):
+    R = random.Random()
+    R.seed(seed)
+    min_days = min*365
+    max_days = max*365
+    days = R.randint(min_days, max_days)
+    td = timedelta(days=days)
+    dob = datetime.today() - td
+    return dob.isoformat()
 
 
 def mktime(datestr, timestr=""):
@@ -60,7 +71,6 @@ class ShamDixel(Dixel):
             sh.pixels = dixel.pixels
         return sh
 
-
     salt = attr.ib(default=None, type=str)
     sham_info = attr.ib(init=False, repr=False)
 
@@ -70,12 +80,20 @@ class ShamDixel(Dixel):
         logging.debug(self)
 
         name = self.tags.get("PatientName")
+        if not name:
+            name = self.tags.get("PatientID")
+        if not name:
+            name = self.tags.get("StudyInstanceUID")
         if self.salt:
             name = "{}+{}".format(name, self.salt)
 
+        dob = self.tags.get("PatientBirthDate")
+        if not dob:
+            dob = random_dob(name)
+
         sham_info = GUIDMint.get_sham_id(
             name=name,
-            dob=self.tags.get("PatientBirthDate"),
+            dob=dob,
             age=self.meta.get("Age"),
             gender=self.tags.get("PatientSex", "U"),
             reference_date=self.REFERENCE_DATE
