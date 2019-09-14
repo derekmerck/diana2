@@ -16,9 +16,6 @@ Desired process:
 9.     Each message is submitted to the appropriate transport mechanism
 10.    Each message forwarded to indexer to be logged
 
-Works on my computer
-Doesn't work when installed on
-
 """
 
 import os
@@ -42,6 +39,8 @@ from diana.utils.dicom.events import DicomEventType as DCMEv
 from diana.utils import SmartJSONEncoder
 from wuphf.daemons import Dispatcher
 
+DRYRUN=False
+
 service_descs = """
 ---
 incoming_dir:
@@ -50,8 +49,8 @@ incoming_dir:
   
 dicom_arch:
   ctype:     ObservableOrthanc
-  # host:      orthanc
-  host:      debian-testing
+  host:      orthanc
+  # host:      debian-testing
   user:      orthanc
   password:  $ORTHANC_PASSWORD
   
@@ -113,11 +112,14 @@ Subject: SIREN/{{ Project }} Study Received {{ now() }}
  
 The anonymized study originally performed on {{ OriginalStudyDate }} has been added to the unique registry subject jacket for "{{ PatientName }}.  The study has been assigned the unique image identifier "{{ AccessionNumber[0:8] }}.  Please save this information with your trial records.  You will be responsible for associating this registry assigned unique image identifier with your subject enrollment in the WEBDCU database.
  
-If imaging for this subject has previously been submitted to the SIREN/HOBIT image registry, the unique registry subject jacket should be the same, however, the unique image identifier will be different.  If this study has been filed under the wrong subject jacket, please ensure that any pre-anonymized data from your fileroom includes a consistent subject name, gender, and birthdate (i.e., "Subject 1", "Male", "1/1/2000"), and email the contact the registry administration team.
+If imaging for this subject has previously been submitted to the SIREN/{{ Project }} image registry, the unique registry subject jacket should be the same, however, the unique image identifier will be different.  If this study has been filed under the wrong subject jacket, please ensure that any pre-anonymized data from your fileroom includes a consistent subject name, gender, and birthdate (i.e., "Subject 1", "Male", "1/1/2000"), and email the contact the registry administration team.
 """
 
 
 """
+1. Create and source .env file
+2. Create orthanc container w/meta for siren_info
+
 $ docker run -d -p 8042:8042 \
   -e ORTHANC_PASSWORD=$ORTHANC_PASSWORD \
   -e ORTHANC_METADATA_0=siren_info,9875 \
@@ -125,11 +127,18 @@ $ docker run -d -p 8042:8042 \
   --tmpfs /etc/orthanc \
   --name orthanc derekmerck/orthanc-wbv:latest-amd64
   
+3. Create and configure splunk container
+
 $ docker run -d -p 8000:8000 -p 8088:8088 -p 8089:8089 \
    -e SPLUNK_START_ARGS=--accept-license \
    -e SPLUNK_PASSWORD=$SPLUNK_PASSWORD \
    -e SPLUNK_HEC_TOKEN=$SPLUNK_HEC_TOKEN \
    --name splunk splunk/splunk:latest
+
+4. Create /data/incoming directory\
+5. Create services.yaml file (from services_desc)
+6. Create diana2 container with map to /data, /services.yaml,
+   and links to splunk, orthanc and run this file
    
 $ docker run -d \
    -v /data:/data \
@@ -137,16 +146,8 @@ $ docker run -d \
    --env-file .env \
    -e DIANA_SERVICES_PATH=/services.yaml \
    --link splunk --link orthanc \
-   --name diana diana2.1
+   --name diana diana2.1 python3 examples/study_submission_rt.py
 """
-
-# 1. Create and source .env file
-# 2. Create orthanc container w/meta for siren_info
-# 3. Create and configure splunk container
-# 4. Create /data/incoming directory\
-# 5. Create services.yaml file (from services_desc)
-# 6. Create diana2 container with map to /data, /services.yaml,
-#    and links to splunk, orthanc
 
 # Parameters
 salt = os.environ.get("PROJECT_SALT") # Unique subject anonymization namespace
@@ -248,19 +249,25 @@ def handle_study_arrived_at_orthanc(item, source: Orthanc, dest: Dispatcher):
             "Project": project,
             "Site": site}
     disp.put(data, channels=channels)  # Will put multiple messages on the queue
-    disp.handle_queue(dryrun=True)
+    disp.handle_queue(dryrun=DRYRUN)
 
 
 if __name__ == "__main__":
 
     logging.basicConfig(level=logging.DEBUG)
 
-    _service_descs = os.path.expandvars(service_descs)
-    services = yaml.load(_service_descs)
+    from crud.manager import EndpointManager as Manager
+    m = Manager(file="/services.yaml")
 
-    d = ObservableDcmDir(**services["incoming_dir"])
-    o = ObservableOrthanc(**services["dicom_arch"])
-    p = Dispatcher(**services["dispatcher"])
+    # _service_descs = os.path.expandvars(service_descs)
+    # services = yaml.load(_service_descs)
+
+    d = ObservableDcmDir(**m.service_descs["incoming_dir"])
+    o = ObservableOrthanc(**m.service_descs["dicom_arch"])
+    p = Dispatcher(**m.service_descs["dispatcher"])
+
+    # with open("/msg_t.txt.j2") as f:
+    #     msg_t = f.read()
     p.smtp_messenger.msg_t = msg_t
 
     def add_route(self: Watcher, source: Endpoint, event_type, func, **kwargs):
@@ -277,13 +284,11 @@ if __name__ == "__main__":
     w.add_route(d, DCMEv.FILE_ADDED,  handle_file_arrived_in_dcm_dir,  dest=o, salt=salt)
     w.add_route(o, DCMEv.STUDY_ADDED, handle_study_arrived_at_orthanc, dest=p)
 
-    # print(w.triggers)
-
     # o.clear()
-    # w.run()
+    w.run()
 
-    item = {"oid": "91499a9e-abbc193d-fb780cbb-5fd054d3-46a4e2fe"}
-    handle_study_arrived_at_orthanc(item, o, p)
+    # item = {"oid": "91499a9e-abbc193d-fb780cbb-5fd054d3-46a4e2fe"}
+    # handle_study_arrived_at_orthanc(item, o, p)
 
     # items = DcmDir(path="/Users/derek.merck/Desktop").get_zipped("006dfa27cc5c6c4e.zip")
     # for item in items:
