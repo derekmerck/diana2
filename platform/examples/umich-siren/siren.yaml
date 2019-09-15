@@ -3,7 +3,7 @@
 # $ docker stack deploy -c admin/splunk-service.yaml admin
 # Note -- $SPLUNK_HOST must be the swarm IP addr, not localhost
 # $ docker stack deploy -c backend/postgres-service.yaml backend
-# $ docker stack deploy -c examples/umich-siren/siren.yml siren
+# $ docker stack deploy -c siren.yaml siren
 
 version: '3.2'
 
@@ -21,6 +21,17 @@ networks:
   service_network:
     driver: overlay
     attachable: true
+
+
+configs:
+  notify_default:
+    source: ./notify_default.txt.j2
+    target: /notify_default.txt.j2
+    mode:   444
+  services:
+    source: ./services.yaml
+    target: /services.yaml
+    mode:   444
 
 
 services:
@@ -41,14 +52,9 @@ services:
       TZ:               "America/New_York"
     env_file:
       - ~/siren.env
-
     configs:
-      - source: ./notify_default.txt.j2
-        target: /notify_default.txt.j2
-        mode:   444
-      - source: ./services.yaml
-        target: /services.yaml
-        mode:   444
+      - notify_default
+      - services
 
     logging:
       driver: splunk
@@ -58,6 +64,7 @@ services:
         splunk-format:  json
         splunk-index:   logging
         tag:            "{{.Name}}/{{.ID}}"
+
 
 #  postgres:
 #    image: postgres
