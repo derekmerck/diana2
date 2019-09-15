@@ -1,8 +1,7 @@
-# $ docker stack deploy -c platform/docker-stacks/admin/admin-stack.yaml admin
-# $ docker stack deploy -c platform/docker-stacks/admin/splunk-service.yaml admin
-# $ docker-stack deploy -c platform/docker-stacks/backend/postgres-service.yaml backend
-# $ cd platform/examples/umich-siren
-# $ ln -s .env ../../../siren.env
+# $ mkdir -p /data/{splunk,postgres,incoming}
+# $ docker stack deploy -c admin/admin-stack.yaml admin
+# $ docker stack deploy -c admin/splunk-service.yaml admin
+# $ docker-stack deploy -c backend/postgres-service.yaml backend
 # $ docker stack deploy -c examples/umich-siren/siren.yml siren
 
 version: '3.2'
@@ -40,7 +39,7 @@ services:
       - service_network
     volumes:
       - type: bind
-        source: $DATA_DIR
+        source: $DATA_DIR/incoming
         target: /data
     environment:
       PYTHONUNBUFFERED: "true"

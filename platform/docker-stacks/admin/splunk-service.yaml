@@ -25,8 +25,8 @@ services:
         target: /opt/splunk/etc
     environment:
       SPLUNK_START_ARGS: "--accept-license"
-      SPLUNK_PASSWORD:  ${SPLUNK_PASSWORD}
-      SPLUNK_HEC_TOKEN: ${SPLUNK_HEC_TOKEN}
+      SPLUNK_PASSWORD:   ${SPLUNK_PASSWORD}
+      SPLUNK_HEC_TOKEN:  ${SPLUNK_HEC_TOKEN}
       TZ: "America/New_York"
     deploy:
       replicas: 1

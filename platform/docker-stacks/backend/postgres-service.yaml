@@ -32,7 +32,7 @@ services:
     logging:
       driver: splunk
       options:
-        splunk-address: "http://${SPLUNK_HOST}:8088"
+        splunk-url:     "http://${SPLUNK_HOST}:8088"
         splunk-token:   ${SPLUNK_HEC_TOKEN}
         splunk-format:  json
         splunk-index:   logging
