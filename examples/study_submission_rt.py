@@ -26,38 +26,43 @@ from functools import partial
 from typing import Mapping
 from datetime import datetime
 from pprint import pformat
-import yaml
 import json
 from dateutil import parser as DateTimeParser
 from cryptography.fernet import Fernet
 from crud.abc import Endpoint
-from diana.apis import DcmDir, Orthanc, ObservableDcmDir, ObservableOrthanc
+from diana.apis import DcmDir, Orthanc, ObservableDcmDir, ObservableOrthanc, Splunk
 from diana.dixel import Dixel, ShamDixel
 from diana.utils.endpoint import Watcher, Trigger
 from diana.utils.dicom import DicomLevel as DCMLv
 from diana.utils.dicom.events import DicomEventType as DCMEv
 from diana.utils import SmartJSONEncoder
+from diana.utils.gateways import GatewayConnectionError
 from wuphf.daemons import Dispatcher
 
-DRYRUN=False
+DRYRUN = False
+CLEAR_DCM_ARCH = False
+LOCAL_FILES = "/Users/derek.merck/vms/debian"
 
 service_descs = """
 ---
 incoming_dir:
   ctype:     DicomDir
-  path:      "/data/incoming"
+  # path:      "/data/incoming"
+  path:      /Users/derek.merck/vms/debian
   
 dicom_arch:
   ctype:     ObservableOrthanc
-  # host:      orthanc
+  # host:      orthanc-hobit
   host:      debian-testing
   user:      orthanc
   password:  $ORTHANC_PASSWORD
   
 splunk_index:
   ctype:     Splunk
-  host:      splunk
+  # host:      splunk
+  host:      debian-testing
   user:      admin
+  index:     dicom
   password:  $SPLUNK_PASSWORD
   hec_token: $SPLUNK_HEC_TOKEN
 
@@ -97,6 +102,7 @@ dispatcher:
   
 """
 
+# Remap channel names to formal site names
 channel_lu={
     "project": "Project",
     "site1":   "Site 1",
@@ -117,23 +123,35 @@ If imaging for this subject has previously been submitted to the SIREN/{{ Projec
 
 
 """
-1. Create and source .env file
-2. Create orthanc container w/meta for siren_info
+SETUP
+---------------
 
-$ docker run -d -p 8042:8042 \
-  -e ORTHANC_PASSWORD=$ORTHANC_PASSWORD \
-  -e ORTHANC_METADATA_0=siren_info,9875 \
-  -e ORTHANC_WBV_ENABLED=true \
-  --tmpfs /etc/orthanc \
-  --name orthanc derekmerck/orthanc-wbv:latest-amd64
-  
-3. Create and configure splunk container
+1. Create and source .env file
+
+2. Create and configure splunk container (admin stack, create dicom 
+   and logging indices)
 
 $ docker run -d -p 8000:8000 -p 8088:8088 -p 8089:8089 \
    -e SPLUNK_START_ARGS=--accept-license \
    -e SPLUNK_PASSWORD=$SPLUNK_PASSWORD \
    -e SPLUNK_HEC_TOKEN=$SPLUNK_HEC_TOKEN \
    --name splunk splunk/splunk:latest
+
+3. Create orthanc container w/meta for siren_info that logs to splunk
+
+$ docker run -d -p 8042:8042 \
+  -e ORTHANC_PASSWORD=$ORTHANC_PASSWORD \
+  -e ORTHANC_METADATA_0=siren_info,9875 \
+  -e ORTHANC_WBV_ENABLED=true \
+  --tmpfs /etc/orthanc \
+  --log-driver=splunk \
+  --log-opt splunk-token=$SPLUNK_HEC_TOKEN \
+  --log-opt splunk-url=http://localhost:8088 \
+  --log-opt splunk-format=json \
+  --log-opt splunk-source=orthanc \
+  --log-opt tag="{{.Name}}/{{.ID}}" \
+  --log-opt splunk-index=logging \
+  --name orthanc-hobit derekmerck/orthanc-wbv:latest-amd64
 
 4. Create /data/incoming directory\
 5. Create services.yaml file (from services_desc)
@@ -146,14 +164,20 @@ $ docker run -d \
    --env-file .env \
    -e DIANA_SERVICES_PATH=/services.yaml \
    --link splunk --link orthanc \
+   --log-driver=splunk \
+   --log-opt splunk-token=$SPLUNK_HEC_TOKEN \
+   --log-opt splunk-url=http://localhost:8088 \
+   --log-opt splunk-format=json \
+   --log-opt splunk-source=orthanc \
+   --log-opt tag="{{.Name}}/{{.ID}}" \
+   --log-opt splunk-index=logging \
    --name diana diana2.1 python3 examples/study_submission_rt.py
 """
 
 # Parameters
 salt = os.environ.get("PROJECT_SALT") # Unique subject anonymization namespace
 # fernet_key = Fernet.generate_key()
-fernet_key = os.environ.get("PROJECT_FERNET_KEY").encode("UTF8")
-base_dir_name = "/data/incoming"  # dispatcher channels are relative paths to here
+fernet_key = os.environ.get("PROJECT_FERNET_KEY").encode("utf8")
 
 # Globals
 tagged_studies = deque(maxlen=50)  # history
@@ -162,10 +186,11 @@ tagged_studies = deque(maxlen=50)  # history
 def pack_siren_info(d: Dixel) -> str:
 
     res = {
-        "ShamID": d.meta["ShamID"],
+        "ShamID": d.meta["ShamID"],  # Just for tracking
+        "AccessionNumber": d.tags.get("AccessionNumber"),
         "PatientID": d.tags.get("PatientID"),
         "PatientName": d.tags.get("PatientName"),
-        "BirthDate": d.tags.get("PatientBirthDate"),
+        "PatientBirthDate": d.tags.get("PatientBirthDate"),
         "StudyDateTime": d.meta["StudyDateTime"],
         "FileName": d.meta["FileName"],
         "timestamp": datetime.now()
@@ -194,6 +219,8 @@ def _handle_instance_in_dcm_dir(item: Dixel, orth: Orthanc, salt: str):
     orth.delete(item)
 
     anon_study_id = anon.sham_parent_oid(DCMLv.STUDIES)
+    logging.debug(anon_study_id)
+    logging.debug(tagged_studies)
     if anon_study_id not in tagged_studies:
         logging.debug("Tagging parent study: {}".format(anon_study_id))
         siren_info = pack_siren_info(anon)
@@ -214,22 +241,25 @@ def handle_file_arrived_in_dcm_dir(item, source: DcmDir, dest: Orthanc, salt=Non
         _handle_instance_in_dcm_dir(item, dest, salt)
 
 
-def handle_study_arrived_at_orthanc(item, source: Orthanc, dest: Dispatcher):
+def handle_study_arrived_at_orthanc(item, source: Orthanc, dest: Dispatcher, splunk: Splunk = None, base_path = "/data/incomimg"):
 
     orth = source
     disp = dest
     oid = item.get("oid")
 
     _item = orth.get(oid)
-    siren_info = orth.gateway.get_metadata(oid, DCMLv.STUDIES, "siren_info")
-    if not siren_info:
+    try:
+        siren_info_tok = orth.gateway.get_metadata(oid, DCMLv.STUDIES, "siren_info")
+    except GatewayConnectionError:
         # This is not an anonymized study
+        logging.warning("Found non-anonymized study: {}".format(oid))
         return
 
-    _item.meta["siren_info"] = unpack_siren_info(siren_info)
+    _item.meta["siren_info_tok"] = siren_info_tok
+    _item.meta["siren_info"] = unpack_siren_info(siren_info_tok)
     logging.debug(pformat(_item.meta["siren_info"]))
 
-    fp = Path(_item.meta["siren_info"]["FileName"]).relative_to(base_dir_name)
+    fp = Path(_item.meta["siren_info"]["FileName"]).relative_to(base_path)
     channels = [
         fp.parts[0],              # ie, hobit
         "/".join(fp.parts[0:2])   # ie, hobit/hennepin
@@ -239,37 +269,44 @@ def handle_study_arrived_at_orthanc(item, source: Orthanc, dest: Dispatcher):
     original_study_date = DateTimeParser.parse(_item.meta["siren_info"]["StudyDateTime"]).date()
     project = fp.parts[0]
     if channel_lu.get(project):
-        project = channel_lu.get(project)
+        project = channel_lu.get(project, project)
     site = fp.parts[1]
     if channel_lu.get(site):
-        site = channel_lu.get(site)
+        site = channel_lu.get(site, site)
 
-    data = {**_item.tags, **_item.meta,
-            "OriginalStudyDate": original_study_date,
-            "Project": project,
-            "Site": site}
+    _item.meta.update(
+        {"OriginalStudyDate": original_study_date,
+         "Project": project,
+         "Site": site}
+    )
+
+    data = {**_item.tags, **_item.meta}
     disp.put(data, channels=channels)  # Will put multiple messages on the queue
     disp.handle_queue(dryrun=DRYRUN)
 
+    if splunk:
+        del(_item.meta["siren_info"])
+        splunk.put(_item)
 
-if __name__ == "__main__":
 
-    logging.basicConfig(level=logging.DEBUG)
+def test_upload_zipfile(dcmdir: DcmDir, orth: Orthanc):
 
-    from crud.manager import EndpointManager as Manager
-    m = Manager(yaml=service_descs)
-#file="/services.yaml",
+    f0 = "006dfa27cc5c6c4e.zip"        # Small CR
+    f1 = "anon.left_arm_ct_angio.zip"  # Large CT
+    item = {"fn": f0}
+    handle_file_arrived_in_dcm_dir(item, dcmdir, orth)
 
-    # _service_descs = os.path.expandvars(service_descs)
-    # services = yaml.load(_service_descs)
 
-    d = ObservableDcmDir(**m.service_descs["incoming_dir"])
-    o = ObservableOrthanc(**m.service_descs["dicom_arch"])
-    p = Dispatcher(**m.service_descs["dispatcher"])
+def test_study_alert(orth: Orthanc, disp: Dispatcher,
+                     splunk: Splunk = None,
+                     base_path: str = "/data/incoming"):
 
-    # with open("/msg_t.txt.j2") as f:
-    #     msg_t = f.read()
-    p.smtp_messenger.msg_t = msg_t
+    item = {"oid": "097968b5-d8a998fd-b8ef712a-9ff7cba8-023e0212"}
+    handle_study_arrived_at_orthanc(item, orth, disp, splunk=splunk, base_path=base_path)
+
+
+def main(dcmdir: ObservableDcmDir, orth: ObservableOrthanc,
+         disp: Dispatcher, splunk: Splunk):
 
     def add_route(self: Watcher, source: Endpoint, event_type, func, **kwargs):
 
@@ -282,25 +319,37 @@ if __name__ == "__main__":
     Watcher.add_route = add_route
     w = Watcher()
 
-    w.add_route(d, DCMEv.FILE_ADDED,  handle_file_arrived_in_dcm_dir,  dest=o, salt=salt)
-    w.add_route(o, DCMEv.STUDY_ADDED, handle_study_arrived_at_orthanc, dest=p)
+    w.add_route(dcmdir, DCMEv.FILE_ADDED,  handle_file_arrived_in_dcm_dir,  dest=orth, salt=salt)
+    w.add_route(orth, DCMEv.STUDY_ADDED, handle_study_arrived_at_orthanc, dest=disp, splunk=splunk, base_path=dcmdir.path)
 
-    #o.clear()
-    # w.run()
+    w.run()
 
-    # item = {"oid": "91499a9e-abbc193d-fb780cbb-5fd054d3-46a4e2fe"}
-    # handle_study_arrived_at_orthanc(item, o, p)
 
-    # items = DcmDir(path="/Users/derek.merck/Desktop").get_zipped("006dfa27cc5c6c4e.zip")
-    # for item in items:
-    #     print(item.fn)
+if __name__ == "__main__":
 
-    f0 = "006dfa27cc5c6c4e.zip"
-    f1 = "anon.left_arm_ct_angio.zip"
-    D = DcmDir(path="/Users/derek.merck/vms/debian").get_zipped(f1)
-    for d in D:
-        o.put(d)
-        dd = ShamDixel.from_dixel(d)
-        afile = o.anonymize(d, replacement_map=dd.orthanc_sham_map())
-        dd.file = afile
-        o.put(dd)
+    logging.basicConfig(level=logging.DEBUG)
+    from crud.manager import EndpointManager as Manager
+
+    m = Manager(yaml=service_descs)
+    # m = Manager(file="/services.yaml")
+
+    # _service_descs = os.path.expandvars(service_descs)
+    # services = yaml.load(_service_descs)
+
+    dcmdir = ObservableDcmDir(**m.service_descs["incoming_dir"])
+    orth = ObservableOrthanc(**m.service_descs["dicom_arch"])
+    if CLEAR_DCM_ARCH:
+        orth.clear()
+
+    disp = Dispatcher(**m.service_descs["dispatcher"])
+
+    # with open("/msg_t.txt.j2") as f:
+    #     msg_t = f.read()
+    disp.smtp_messenger.msg_t = msg_t
+
+    splunk = Splunk(**m.service_descs["splunk_index"])
+
+    # main(dcmdir, orth, disp, splunk)
+
+    #test_upload_zipfile(dcmdir, orth)
+    test_study_alert(orth, disp, splunk=splunk, base_path=dcmdir.path)

@@ -2,13 +2,20 @@ DIANA_SERVICES:
 
   hobit:
     ctype: ObservableOrthanc
-    host: orthanc-hobit
+    host:  orthanc-hobit
     password: "${ORTHANC_PASSWORD}"
     polling_interval": 30
 
+  splunk:
+    ctype: Splunk
+    host:  splunk
+    password:  "${SPLUNK_PASSWORD}"
+    hec_token: "${SPLUNK_HEC_TOKEN}"
+
+
   smtp:
-    ctype: "SMTPMessenger"
-    host:  "${SMTP_HOST}"
-    user:  "${SMTP_USER}"
+    ctype:    "SmtpMessenger"
+    host:     "${SMTP_HOST}"
+    user:     "${SMTP_USER}"
     password: "${SMTP_PASSWORD}"
-    msg_t: @/msg_t
+    msg_t: @/notify_default.txt.j2

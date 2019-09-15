@@ -85,6 +85,7 @@ class Splunk(Endpoint, Serializable):
             timestamp = datetime.now()
 
         event = item.tags
+        event["meta"] = item.meta
 
         event['level'] = str(item.level)
         event['oid'] = item.oid()

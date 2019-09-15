@@ -1,4 +1,6 @@
-# $ docker stack deploy -c siren.yml siren
+# $ docker stack deploy -c docker-stacks/admin/admin-stack admin
+# $ docker stack deploy -c docker-stacks/admin/splunk-service admin
+# $ docker stack deploy -c examples/umich-siren/siren.yml siren
 
 version: '3.2'
 
@@ -6,6 +8,9 @@ version: '3.2'
 networks:
 
   admin_proxy_network:
+    external: true   # Created by admin-stack
+
+  admin_logging_network:
     external: true   # Created by admin-stack
 
   service_network:
@@ -24,16 +29,10 @@ services:
 
   diana-transport:
 
-    # Need git pull
-    # Need upload files or (2 routes, one for studies/zips)
-    # Need route for anonymize_instances orthanc-hobit (in place)
-    # command: diana-cli watch -r upload_instances path:/data/incoming orthanc-hobit
-
-    # command: diana-cli watch
-
     image: derekmerck/diana2
     networks:
       - service_network
+      - admin_logging_network
     volumes:
       - ${DATA_DIR}:/data
       - ${DATA_DIR}/tmp:/tmp
@@ -43,19 +42,24 @@ services:
       SMTP_HOST:        ${SMTP_HOST}
       SMTP_USER:        ${SMTP_USER}
       SMTP_PASSWORD:    ${SMTP_PASSWORD}
-
-#      DIANA_ROUTES: >
-#        { [ "upload_and_anonymize_files", "path:/data/incoming", "hobit" ],
-#          [ "send_anonymized_studies", "hobit", "smpt" ] }
       TZ:               "America/New_York"
 
     configs:
-      - source: ./notify_default_tmpl.txt.j2
-        target: /msg_t
+      - source: ./notify_default.txt.j2
+        target: /notify_default.txt.j2
         mode: 444
       - source: ./services.yaml
         target: /services.yaml
         mode: 444
+
+    logging:
+      driver: splunk
+      options:
+        splunk-address: "http://localhost:8088"
+        splunk-token:   ${SPLUNK_HEC_TOKEN}
+        splunk-format:  json
+        splunk-index:   logging
+        tag:            "{{.Name}}/{{.ID}}"
 
   postgres:
     image: postgres
@@ -63,6 +67,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - service_network
+      - admin_logging_network
     environment:
       POSTGRES_PASSWORD:        ${POSTGRES_PASSWORD}
       TZ: "America/New_York"
@@ -74,6 +79,7 @@ services:
       - 4242:42421
     networks:
       - admin_proxy_network
+      - admin_logging_network
       - service_network
     environment:
       ORTHANC_NAME:             HOBIT Image Registry
@@ -89,9 +95,19 @@ services:
       ORTHANC_VERBOSE:          "true"
       ORTHANC_WBV_ENABLED:      "true"
       TZ:                       "America/New_York"
+
     deploy:
       replicas: 2  # Multiple nodes, PG provides data persistence
       labels:
         - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/hobit/"
+
+    logging:
+      driver: splunk
+      options:
+        splunk-address: "http://admin_splunk:8088"
+        splunk-token:   ${SPLUNK_HEC_TOKEN}
+        splunk-format:  json
+        splunk-index:   logging
+        tag:            "{{.Name}}/{{.ID}}"

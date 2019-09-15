@@ -4,11 +4,9 @@ networks:
   admin_proxy_network:
     external: true   # Created by admin-stack
 
-  cirr_service_network:
-    external: true
-
-  cirr1_service_network:
-    external: true
+  logging_network:
+    driver: overlay
+    attachable: true
 
 volumes:
   splunk_data:
@@ -26,8 +24,7 @@ services:
       - "8089:8089"
     networks:
       - admin_proxy_network
-      - cirr_default
-      - cirr2_default
+      - logging_network
     volumes:
       - splunk_data:/opt/splunk/etc
     environment:
@@ -41,6 +38,6 @@ services:
         constraints:
           - node.labels.storage==true
       labels:
-        - "traefik.docker.network=cirr_proxy_network"
+        - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8000"
         - "traefik.frontend.rule=PathPrefixStrip:/splunk/"
