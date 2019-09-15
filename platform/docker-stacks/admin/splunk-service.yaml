@@ -1,5 +1,3 @@
-# Provides a splunk service for data indexing and logging
-
 version: '3.2'
 
 networks:
@@ -10,12 +8,6 @@ networks:
     driver: overlay
     attachable: true
 
-volumes:
-  splunk_data:
-    driver_opts:
-        type: none
-        device: ${DATA_DIR}/splunk
-        o: bind
 
 services:
   splunk:
@@ -28,7 +20,9 @@ services:
       - admin_proxy_network
       - logging_network
     volumes:
-      - splunk_data:/opt/splunk/etc
+      - type: bind
+        source: ${DATA_DIR}/splunk
+        target: /opt/splunk/etc
     environment:
       SPLUNK_START_ARGS: "--accept-license"
       SPLUNK_PASSWORD:  ${SPLUNK_PASSWORD}
@@ -36,9 +30,9 @@ services:
       TZ: "America/New_York"
     deploy:
       replicas: 1
-      placement:
-        constraints:
-          - node.labels.storage==true
+#      placement:
+#        constraints:
+#          - node.labels.storage==true
       labels:
         - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8000"

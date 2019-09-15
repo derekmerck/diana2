@@ -1,9 +1,11 @@
-# $ docker stack deploy -c docker-stacks/admin/admin-stack.yaml admin
-# $ docker stack deploy -c docker-stacks/admin/splunk-service.yaml admin
+# $ docker stack deploy -c platform/docker-stacks/admin/admin-stack.yaml admin
+# $ docker stack deploy -c platform/docker-stacks/admin/splunk-service.yaml admin
+# $ docker-stack deploy -c platform/docker-stacks/backend/postgres-service.yaml backend
+# $ cd platform/examples/umich-siren
+# $ ln -s .env ../../../siren.env
 # $ docker stack deploy -c examples/umich-siren/siren.yml siren
 
 version: '3.2'
-
 
 networks:
 
@@ -13,16 +15,19 @@ networks:
   admin_logging_network:
     external: true   # Created by admin-stack
 
+  backend_data_network:
+    external: true   # Created by postgres
+
   service_network:
     driver: overlay
     attachable: true
 
-volumes:
-  postgres_data:
-    driver_opts:
-        type: none
-        device: ${DATA_DIR}/${POSTGRES_DATA_DIR}
-        o: bind
+#volumes:
+#  postgres_data:
+#    driver_opts:
+#        type: none
+#        device: ${DATA_DIR}/${POSTGRES_DATA_DIR}
+#        o: bind
 
 
 services:
@@ -31,18 +36,17 @@ services:
 
     image: derekmerck/diana2
     networks:
-      - service_network
       - admin_logging_network
+      - service_network
     volumes:
-      - ${DATA_DIR}:/data
-      - ${DATA_DIR}/tmp:/tmp
+      - type: bind
+        source: $DATA_DIR
+        target: /data
     environment:
       PYTHONUNBUFFERED: "true"
-      ORTHANC_PASSWORD: ${ORTHANC_PASSWORD}
-      SMTP_HOST:        ${SMTP_HOST}
-      SMTP_USER:        ${SMTP_USER}
-      SMTP_PASSWORD:    ${SMTP_PASSWORD}
       TZ:               "America/New_York"
+    env_file:
+      - ~/siren.env
 
     configs:
       - source: ./notify_default.txt.j2
@@ -61,16 +65,16 @@ services:
         splunk-index:   logging
         tag:            "{{.Name}}/{{.ID}}"
 
-  postgres:
-    image: postgres
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - service_network
-      - admin_logging_network
-    environment:
-      POSTGRES_PASSWORD:        ${POSTGRES_PASSWORD}
-      TZ: "America/New_York"
+#  postgres:
+#    image: postgres
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data
+#    networks:
+#      - service_network
+#      - admin_logging_network
+#    environment:
+#      POSTGRES_PASSWORD:        ${POSTGRES_PASSWORD}
+#      TZ: "America/New_York"
 
 
   orthanc-hobit:
@@ -80,6 +84,7 @@ services:
     networks:
       - admin_proxy_network
       - admin_logging_network
+      - backend_data_network
       - service_network
     environment:
       ORTHANC_NAME:             HOBIT Image Registry

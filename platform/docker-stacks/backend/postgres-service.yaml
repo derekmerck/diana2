@@ -1,0 +1,39 @@
+version: '3.2'
+
+networks:
+
+  data_network:
+    driver: overlay
+    attachable: true
+
+  admin_logging_network:
+    external: true
+
+services:
+  postgres:
+    image: postgres
+    networks:
+      - data_network
+      - admin_logging_network
+    volumes:
+      - type:   bind
+        source: ${DATA_DIR}/postgres
+        target: /var/lib/postgresql/data
+    environment:
+      POSTGRES_USER:            postgres
+      POSTGRES_PASSWORD:        ${POSTGRES_PASSWORD}
+      TZ: "America/New_York"
+    deploy:
+      replicas: 1
+#      placement:
+#        constraints:
+#          - node.labels.storage==true
+
+    logging:
+      driver: splunk
+      options:
+        splunk-address: "http://${SPLUNK_HOST}:8088"
+        splunk-token:   ${SPLUNK_HEC_TOKEN}
+        splunk-format:  json
+        splunk-index:   logging
+        tag:            "{{.Name}}/{{.ID}}"

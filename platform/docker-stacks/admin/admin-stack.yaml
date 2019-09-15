@@ -1,5 +1,3 @@
-# Provides Portainer and Traefik services and networks
-
 version: '3.2'
 
 networks:
@@ -26,7 +24,7 @@ services:
       mode: global
 
   # create your portainer password:
-  # $ docker run --rm httpd:2.4-alpine htpasswd -nbB admin <password> | cut -d ":" -f 2
+  # $ docker run --rm httpd:2.4-alpine htpasswd -nbB admin $PORTAINER_PASSWORD_CLEAR | cut -d ":" -f 2
   portainer:
     image: portainer/portainer
     command: -H tcp://tasks.portainer-agent:9001 --tlsskipverify --admin-password ${PORTAINER_PASSWORD}
