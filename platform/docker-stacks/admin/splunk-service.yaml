@@ -1,4 +1,6 @@
-version: '3.0'
+# Provides a splunk service for data indexing and logging
+
+version: '3.2'
 
 networks:
   admin_proxy_network:

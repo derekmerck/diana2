@@ -1,5 +1,5 @@
-# $ docker stack deploy -c docker-stacks/admin/admin-stack admin
-# $ docker stack deploy -c docker-stacks/admin/splunk-service admin
+# $ docker stack deploy -c docker-stacks/admin/admin-stack.yaml admin
+# $ docker stack deploy -c docker-stacks/admin/splunk-service.yaml admin
 # $ docker stack deploy -c examples/umich-siren/siren.yml siren
 
 version: '3.2'
