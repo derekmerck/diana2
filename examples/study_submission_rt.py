@@ -146,7 +146,7 @@ $ docker run -d -p 8042:8042 \
   --tmpfs /etc/orthanc \
   --log-driver=splunk \
   --log-opt splunk-token=$SPLUNK_HEC_TOKEN \
-  --log-opt splunk-url=http://localhost:8088 \
+  --log-opt splunk-url=http://$SPLUNK_HOST:8088 \
   --log-opt splunk-format=json \
   --log-opt splunk-source=orthanc \
   --log-opt tag="{{.Name}}/{{.ID}}" \

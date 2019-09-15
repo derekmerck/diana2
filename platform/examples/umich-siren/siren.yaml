@@ -1,7 +1,7 @@
 # $ mkdir -p /data/{splunk,postgres,incoming}
 # $ docker stack deploy -c admin/admin-stack.yaml admin
 # $ docker stack deploy -c admin/splunk-service.yaml admin
-# $ docker-stack deploy -c backend/postgres-service.yaml backend
+# $ docker stack deploy -c backend/postgres-service.yaml backend
 # $ docker stack deploy -c examples/umich-siren/siren.yml siren
 
 version: '3.2'
@@ -20,13 +20,6 @@ networks:
   service_network:
     driver: overlay
     attachable: true
-
-#volumes:
-#  postgres_data:
-#    driver_opts:
-#        type: none
-#        device: ${DATA_DIR}/${POSTGRES_DATA_DIR}
-#        o: bind
 
 
 services:
@@ -50,15 +43,15 @@ services:
     configs:
       - source: ./notify_default.txt.j2
         target: /notify_default.txt.j2
-        mode: 444
+        mode:   444
       - source: ./services.yaml
         target: /services.yaml
-        mode: 444
+        mode:   444
 
     logging:
       driver: splunk
       options:
-        splunk-address: "http://localhost:8088"
+        splunk-url:     "http://${SPLUNK_HOST}:8088"
         splunk-token:   ${SPLUNK_HEC_TOKEN}
         splunk-format:  json
         splunk-index:   logging
@@ -110,7 +103,7 @@ services:
     logging:
       driver: splunk
       options:
-        splunk-address: "http://admin_splunk:8088"
+        splunk-url:     "http://${SPLUNK_HOST}:8088"
         splunk-token:   ${SPLUNK_HEC_TOKEN}
         splunk-format:  json
         splunk-index:   logging
