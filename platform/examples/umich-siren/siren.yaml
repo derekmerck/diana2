@@ -23,17 +23,6 @@ networks:
     attachable: true
 
 
-configs:
-  notify_default:
-    source: ./notify_default.txt.j2
-    target: /notify_default.txt.j2
-    mode:   444
-  services:
-    source: ./services.yaml
-    target: /services.yaml
-    mode:   444
-
-
 services:
 
   diana-transport:
@@ -52,9 +41,14 @@ services:
       TZ:               "America/New_York"
     env_file:
       - ~/siren.env
+
     configs:
-      - notify_default
-      - services
+      - source: ./notify_default.txt.j2
+        target: /notify_default.txt.j2
+        mode:   444
+      - source: ./services.yaml
+        target: /services.yaml
+        mode:   444
 
     logging:
       driver: splunk
@@ -64,7 +58,6 @@ services:
         splunk-format:  json
         splunk-index:   logging
         tag:            "{{.Name}}/{{.ID}}"
-
 
 #  postgres:
 #    image: postgres
