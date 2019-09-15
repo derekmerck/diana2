@@ -22,6 +22,15 @@ networks:
     driver: overlay
     attachable: true
 
+configs:
+  notify_default:
+    file: ./notify_default.txt.j2
+    target: /notify_default.txt.j2
+    mode:   444
+  services:
+    file: ./services.yaml
+    target: /services.yaml
+    mode:   444
 
 services:
 
@@ -43,12 +52,8 @@ services:
       - ~/siren.env
 
     configs:
-      - source: ./notify_default.txt.j2
-        target: /notify_default.txt.j2
-        mode:   444
-      - source: ./services.yaml
-        target: /services.yaml
-        mode:   444
+      - notify_default
+      - services
 
     logging:
       driver: splunk
