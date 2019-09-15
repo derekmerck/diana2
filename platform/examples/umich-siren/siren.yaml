@@ -1,6 +1,7 @@
 # $ mkdir -p /data/{splunk,postgres,incoming}
 # $ docker stack deploy -c admin/admin-stack.yaml admin
 # $ docker stack deploy -c admin/splunk-service.yaml admin
+# Note -- $SPLUNK_HOST must be the swarm IP addr, not localhost
 # $ docker stack deploy -c backend/postgres-service.yaml backend
 # $ docker stack deploy -c examples/umich-siren/siren.yml siren
 
@@ -27,6 +28,7 @@ services:
   diana-transport:
 
     image: derekmerck/diana2
+#    command: python3 examples/study_submission_rt.py
     networks:
       - admin_logging_network
       - service_network
@@ -78,6 +80,9 @@ services:
       - admin_logging_network
       - backend_data_network
       - service_network
+    volumes:
+      - type: tmpfs
+        target: /etc/orthanc
     environment:
       ORTHANC_NAME:             HOBIT Image Registry
       ORTHANC_AET:              HOBIT
