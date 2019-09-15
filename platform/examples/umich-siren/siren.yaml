@@ -5,7 +5,7 @@
 # $ docker stack deploy -c backend/postgres-service.yaml backend
 # $ docker stack deploy -c siren.yaml siren
 
-version: '3.2'
+version: '3.3'
 
 networks:
 
