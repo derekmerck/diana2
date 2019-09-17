@@ -328,27 +328,16 @@ if __name__ == "__main__":
 
     logging.basicConfig(level=logging.DEBUG)
     from crud.manager import EndpointManager as Manager
-
-    # m = Manager(yaml=service_descs)
-    m = Manager(file="/services.yaml")
-
-    # _service_descs = os.path.expandvars(service_descs)
-    # services = yaml.load(_service_descs)
-
+    m = Manager(file=os.environ.get("DIANA_SERVICES_PATH"))
     dcmdir = ObservableDcmDir(**m.service_descs["dcm_incoming"])
     orth = ObservableOrthanc(**m.service_descs["hobit"])
+    disp = Dispatcher(**m.service_descs["dispatcher"])
+    splunk = Splunk(**m.service_descs["splunk"])
+
     if CLEAR_DCM_ARCH:
         orth.clear()
 
-    disp = Dispatcher(**m.service_descs["dispatcher"])
+    main(dcmdir, orth, disp, splunk)
 
-    # with open("/msg_t.txt.j2") as f:
-    #     msg_t = f.read()
-    # disp.smtp_messenger.msg_t = msg_t
-
-    splunk = Splunk(**m.service_descs["splunk"])
-
-    # main(dcmdir, orth, disp, splunk)
-
-    #test_upload_zipfile(dcmdir, orth)
-    test_study_alert(orth, disp, splunk=splunk, base_path=dcmdir.path)
+    # test_upload_zipfile(dcmdir, orth)
+    # test_study_alert(orth, disp, splunk=splunk, base_path=dcmdir.path)
