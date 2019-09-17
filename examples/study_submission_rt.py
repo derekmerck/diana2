@@ -41,7 +41,6 @@ from wuphf.daemons import Dispatcher
 
 DRYRUN = False
 CLEAR_DCM_ARCH = False
-LOCAL_FILES = "/Users/derek.merck/vms/debian"
 
 service_descs = """
 ---
@@ -330,14 +329,14 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     from crud.manager import EndpointManager as Manager
 
-    m = Manager(yaml=service_descs)
-    # m = Manager(file="/services.yaml")
+    # m = Manager(yaml=service_descs)
+    m = Manager(file="/services.yaml")
 
     # _service_descs = os.path.expandvars(service_descs)
     # services = yaml.load(_service_descs)
 
-    dcmdir = ObservableDcmDir(**m.service_descs["incoming_dir"])
-    orth = ObservableOrthanc(**m.service_descs["dicom_arch"])
+    dcmdir = ObservableDcmDir(**m.service_descs["dcm_incoming"])
+    orth = ObservableOrthanc(**m.service_descs["hobit"])
     if CLEAR_DCM_ARCH:
         orth.clear()
 
@@ -345,9 +344,9 @@ if __name__ == "__main__":
 
     # with open("/msg_t.txt.j2") as f:
     #     msg_t = f.read()
-    disp.smtp_messenger.msg_t = msg_t
+    # disp.smtp_messenger.msg_t = msg_t
 
-    splunk = Splunk(**m.service_descs["splunk_index"])
+    splunk = Splunk(**m.service_descs["splunk"])
 
     # main(dcmdir, orth, disp, splunk)
 

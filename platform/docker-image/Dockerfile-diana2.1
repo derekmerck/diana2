@@ -1,14 +1,12 @@
 # cd platform/docker-image
-# docker build -t diana2.1 -f Dockerfile-diana2.1 .
+# docker build -t diana2:v21 -f Dockerfile-diana2.1 .
 
 FROM derekmerck/diana2
 
+RUN git pull
 WORKDIR /opt
 RUN git clone https://github.com/derekmerck/pycrud
 RUN git clone https://github.com/derekmerck/python-wuphf
-WORKDIR /opt/pycrud/package
-RUN pip3 install -e .
-WORKDIR /opt/python-wuphf/package
-RUN pip3 install -e .
-WORKDIR /opt/diana
-RUN git pull
+RUN pip3 install -e pycrud/package
+RUN pip3 install -e python-wuphf/package
+RUN pip3 install -e python-wuphf/apps/wuphf-cli
