@@ -298,7 +298,7 @@ def test_upload_zipfile(dcmdir: DcmDir, orth: Orthanc):
 
 def test_study_alert(orth: Orthanc, disp: Dispatcher,
                      splunk: Splunk = None,
-                     base_path: str = "/data/incoming"):
+                     base_path: str = "/data"):
 
     item = {"oid": "097968b5-d8a998fd-b8ef712a-9ff7cba8-023e0212"}
     handle_study_arrived_at_orthanc(item, orth, disp, splunk=splunk, base_path=base_path)

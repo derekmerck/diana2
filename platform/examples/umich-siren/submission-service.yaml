@@ -89,6 +89,7 @@ services:
       ORTHANC_NAME:             HOBIT Image Registry
       ORTHANC_AET:              HOBIT
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
+      ORTHANC_METADATA_0:       siren_info,9875
       ORTHANC_STORE_COMPRESSED: "true"
       ORTHANC_PG_ENABLED:       "true"
       ORTHANC_PG_STORE_DICOM:   "true"
