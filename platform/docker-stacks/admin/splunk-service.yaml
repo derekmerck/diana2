@@ -27,6 +27,7 @@ services:
       SPLUNK_START_ARGS: "--accept-license"
       SPLUNK_PASSWORD:   ${SPLUNK_PASSWORD}
       SPLUNK_HEC_TOKEN:  ${SPLUNK_HEC_TOKEN}
+      SPLUNK_ROOT_ENDPOINT: "/splunk"   # For use with traefik
       TZ: "America/New_York"
     deploy:
       replicas: 1
@@ -34,6 +35,7 @@ services:
 #        constraints:
 #          - node.labels.storage==true
       labels:
-        - "traefik.docker.network=admin_proxy_network"
-        - "traefik.port=8000"
-        - "traefik.frontend.rule=PathPrefixStrip:/splunk/"
+        - traefik.enable=true
+        - traefik.docker.network=admin_proxy_network
+        - traefik.http.routers.portainer.rule=PathPrefix("/splunk")
+        - traefik.http.services.portainer-service.loadbalancer.server.port=8000
