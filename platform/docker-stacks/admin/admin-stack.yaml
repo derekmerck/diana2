@@ -47,9 +47,10 @@ services:
   traefik:
     image: traefik
     command:
-      - --api
-      - --docker
-      - --docker.swarmmode
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
     ports:
       - "80:80"
       - "433:433"
