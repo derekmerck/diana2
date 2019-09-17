@@ -40,18 +40,22 @@ services:
         constraints:
           - node.role==manager
       labels:
-        - "traefik.enable=true"
-        - "traefik.docker.network=admin_proxy_network"
-        - "traefik.port=9000"
-        - "traefik.http.routers.portainer.rule=PathPrefixStrip:/portainer"
+        - traefik.enable=true
+        - traefik.docker.network=admin_proxy_network
+        - traefik.port=9000
+        - traefik.http.routers.portainer.rule=PathPrefixStrip:/portainer
 
   traefik:
-    image: traefik
-    command:
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
+    image: traefik:v2.0
+    command: >
+      --accesslog
+      --log.loglevel=debug
+      --global.debug
+      --api.insecure=true
+      --providers.docker=true
+      --providers.docker.swarmmode=true
+      --providers.docker.exposedbydefault=false
+      --entrypoints.web.address=:80
     ports:
       - "80:80"
       - "433:433"
