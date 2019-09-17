@@ -37,7 +37,8 @@ services:
 
   diana-transport:
 
-    image: derekmerck/diana2
+#    image: derekmerck/diana2
+    image: diana2:v21
 #    command: python3 examples/study_submission_rt.py
     networks:
       - admin_logging_network
