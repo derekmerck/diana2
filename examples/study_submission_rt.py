@@ -300,7 +300,7 @@ def test_study_alert(orth: Orthanc, disp: Dispatcher,
                      splunk: Splunk = None,
                      base_path: str = "/data"):
 
-    item = {"oid": "097968b5-d8a998fd-b8ef712a-9ff7cba8-023e0212"}
+    item = {"oid": "91499a9e-abbc193d-fb780cbb-5fd054d3-46a4e2fe"}
     handle_study_arrived_at_orthanc(item, orth, disp, splunk=splunk, base_path=base_path)
 
 
@@ -337,7 +337,7 @@ if __name__ == "__main__":
     if CLEAR_DCM_ARCH:
         orth.clear()
 
-    main(dcmdir, orth, disp, splunk)
+    #main(dcmdir, orth, disp, splunk)
 
     # test_upload_zipfile(dcmdir, orth)
-    # test_study_alert(orth, disp, splunk=splunk, base_path=dcmdir.path)
+    test_study_alert(orth, disp, splunk=splunk, base_path=dcmdir.path)
