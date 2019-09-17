@@ -37,5 +37,5 @@ services:
       labels:
         - traefik.enable=true
         - traefik.docker.network=admin_proxy_network
-        - traefik.http.routers.portainer.rule=PathPrefix("/splunk")
-        - traefik.http.services.portainer-service.loadbalancer.server.port=8000
+        - traefik.http.routers.splunk.rule=PathPrefix("/splunk")
+        - traefik.http.services.splunk-service.loadbalancer.server.port=8000
