@@ -1,9 +1,9 @@
-{{ project.site.coordinator.name }}, {{ project.site.name }}
+Subject: SIREN/{{ Project }} Study Received {{ now() }}
 
-SIREN/{{ project.name }} Study Received {{ now.date() }}
- 
-{{ tags["modality"] }} scan images from {{ project.site.name }} that were uploaded at {{ now() }} have been received and anonymized (or re-anonymized) at the University of Michigan SIREN/{{ project.name }} image registry.
- 
-The anonymized study that was timestamped {{ tags["StudyDateTime"] }} has been added to the unique registry subject jacket for "{{ tags["PatientName"] }}.  The study has been assigned the unique image identifier "{{ tags["AccessionNumber"] }}.  Please save this information with your trial records.  You will be responsible for associating this registry assigned unique image identifier with your subject enrollment in the WEBDCU database.
- 
-If imaging for this subject has previously been submitted to the SIREN/HOBIT image registry, the unique registry subject jacket should be the same, however, the unique image identifier will be different.  If this study has been filed under the wrong subject jacket, please ensure that any pre-anonymized data from your fileroom includes a consistent subject name, gender, and birthdate (i.e., "Subject 1", "Male", "1/1/2000"), and email the image registry administration team at {{ project.admin.email }}.
+{{ recipient.name | default( "Project team" ) }}, {{ Site }}
+
+{{ Modality }} scan images from {{ Site }} that were uploaded at {{ now() }} have been received and anonymized (or re-anonymized) at the University of Michigan SIREN/{{ Project }} image registry.
+
+The anonymized study originally performed on {{ OriginalStudyDate }} has been added to the unique registry subject jacket for "{{ PatientName }}.  The study has been assigned the unique image identifier "{{ AccessionNumber[0:8] }}.  Please save this information with your trial records.  You will be responsible for associating this registry assigned unique image identifier with your subject enrollment in the WEBDCU database.
+
+If imaging for this subject has previously been submitted to the SIREN/{{ Project }} image registry, the unique registry subject jacket should be the same, however, the unique image identifier will be different.  If this study has been filed under the wrong subject jacket, please ensure that any pre-anonymized data from your fileroom includes a consistent subject name, gender, and birthdate (i.e., "Subject 1", "Male", "1/1/2000"), and contact the registry administration team.
