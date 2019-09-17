@@ -43,7 +43,7 @@ services:
         - "traefik.enable=true"
         - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=9000"
-        - "traefik.frontend.rule=PathPrefixStrip:/portainer"
+        - "traefik.http.routers.portainer.rule=PathPrefixStrip:/portainer"
 
   traefik:
     image: traefik
