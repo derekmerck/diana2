@@ -237,7 +237,8 @@ def handle_file_arrived_in_dcm_dir(item, source: DcmDir, dest: Orthanc, salt=Non
             _handle_instance_in_dcm_dir(item, dest, salt)
     else:
         item = dcm_dir.get(fn, file=True)
-        _handle_instance_in_dcm_dir(item, dest, salt)
+        if item:
+            _handle_instance_in_dcm_dir(item, dest, salt)
 
 
 def handle_study_arrived_at_orthanc(item, source: Orthanc, dest: Dispatcher, splunk: Splunk = None, base_path = "/data/incomimg"):
