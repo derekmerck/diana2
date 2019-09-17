@@ -1,12 +1,12 @@
 # $ docker swarm init --advertise-addr=x.x.x.x --data-path-addr=y.y.y.y
-# ## Note -- Datapath-addr should be an Internet connected interface
+# ## Note -- data-path-addr should be an Internet connected interface
 # $ mkdir -p /data/{splunk,postgres,incoming}
 # $ docker stack deploy -c admin/admin-stack.yaml admin
 # $ docker stack deploy -c admin/splunk-service.yaml admin
 # ## Note -- $SPLUNK_HOST must be the swarm IP addr, not localhost
 # $ docker stack deploy -c backend/postgres-service.yaml backend
 # $ ln -s ~/siren.env siren.env
-# $ docker stack deploy -c siren.yaml siren
+# $ docker stack deploy -c submission-service.yaml siren
 ---
 version: '3.3'
 
@@ -49,6 +49,7 @@ services:
     environment:
       PYTHONUNBUFFERED: "true"
       TZ:               "America/New_York"
+      DIANA_SERVICES_PATH: /services.yaml
     env_file:
       - ./siren.env
 
@@ -73,7 +74,8 @@ services:
   orthanc-hobit:
     image: derekmerck/orthanc-wbv:latest-amd64
     ports:
-      - 4242:42421
+      - 8042:8042
+      - 4242:4242
     networks:
       - admin_proxy_network
       - admin_logging_network
@@ -100,9 +102,13 @@ services:
     deploy:
       replicas: 2  # Multiple nodes, PG provides data persistence
       labels:
-        - "traefik.docker.network=admin_proxy_network"
-        - "traefik.port=8042"
-        - "traefik.frontend.rule=PathPrefixStrip:/hobit/"
+        - traefik.enable=true
+        - traefik.docker.network=admin_proxy_network
+        - traefik.http.routers.hobit.rule=PathPrefix("/hobit")
+        - traefik.http.middlewares.hobit-stripprefix.stripprefix.prefixes=/hobit
+        - traefik.http.routers.hobit.middlewares=hobit-stripprefix@docker
+        - traefik.http.services.hobit-service.loadbalancer.server.port=8042
+        - traefik.http.services.hobit-service.loadbalancer.sticky=true
 
     logging:
       driver: splunk

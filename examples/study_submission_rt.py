@@ -129,7 +129,7 @@ SETUP
 1. Create and source .env file
 
 2. Create and configure splunk container (admin stack, create dicom 
-   and logging indices)
+   and logging indices, turn off hec ssl if necc)
 
 $ docker run -d -p 8000:8000 -p 8088:8088 -p 8089:8089 \
    -e SPLUNK_START_ARGS=--accept-license \
