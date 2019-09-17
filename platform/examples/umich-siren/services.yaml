@@ -30,4 +30,4 @@ smtp_server: &SMTP_SERVER
 dispatcher:
   ctype:  Dispatcher
   smtp_messenger_desc: *SMTP_SERVER
-  subscriptions: "@/subscriptions.yaml"
+  subscriptions_desc:  "@/subscriptions.yaml"
