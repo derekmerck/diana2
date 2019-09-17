@@ -40,9 +40,10 @@ services:
         constraints:
           - node.role==manager
       labels:
+        - "traefik.enable=true"
         - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=9000"
-        - "traefik.frontend.rule=PathPrefixStrip:/portainer/"
+        - "traefik.frontend.rule=PathPrefixStrip:/portainer"
 
   traefik:
     image: traefik
