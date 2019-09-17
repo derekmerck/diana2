@@ -48,8 +48,6 @@ services:
   traefik:
     image: traefik:v2.0
     command: >
-      --accesslog
-      --log.loglevel=debug
       --api.insecure=true
       --providers.docker=true
       --providers.docker.swarmmode=true
