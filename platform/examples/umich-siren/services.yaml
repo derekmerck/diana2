@@ -25,9 +25,9 @@ smtp_server: &SMTP_SERVER
   password:  ${SMTP_PASSWORD}
   tls:       ${SMTP_USE_TLS}
   port:      ${SMTP_PORT}
-  msg_t:     @/notify_default.txt.j2
+  msg_t:     "@/notify_default.txt.j2"
 
 dispatcher:
   ctype:         Dispatcher
   smtp_server:   *SMTP_SERVER
-  subscriptions: @/subscriptions.yaml
+  subscriptions: "@/subscriptions.yaml"
