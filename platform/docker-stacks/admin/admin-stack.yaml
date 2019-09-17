@@ -44,6 +44,7 @@ services:
         - traefik.docker.network=admin_proxy_network
         - traefik.http.routers.portainer.rule=PathPrefix("/portainer")
         - traefik.http.middlewares.portainer-stripprefix.stripprefix.prefixes=/portainer
+        - traefik.http.routers.portainer.middlewares=portainer-stripprefix@docker
         - traefik.http.services.portainer-service.loadbalancer.server.port=9000
 
   traefik:
