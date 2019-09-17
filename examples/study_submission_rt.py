@@ -266,6 +266,7 @@ def handle_study_arrived_at_orthanc(item, source: Orthanc, dest: Dispatcher, spl
     logging.debug(channels)
 
     original_study_date = DateTimeParser.parse(_item.meta["siren_info"]["StudyDateTime"]).date()
+    timestamp = DateTimeParser.parse(_item.meta["siren_info"]["timestamp"])
     project = fp.parts[0]
     if channel_lu.get(project):
         project = channel_lu.get(project, project)
@@ -276,7 +277,8 @@ def handle_study_arrived_at_orthanc(item, source: Orthanc, dest: Dispatcher, spl
     _item.meta.update(
         {"OriginalStudyDate": original_study_date,
          "Project": project,
-         "Site": site}
+         "Site": site,
+         "SubmissionTimestamp": timestamp}
     )
 
     data = {**_item.tags, **_item.meta}
