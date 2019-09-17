@@ -50,7 +50,6 @@ services:
     command: >
       --accesslog
       --log.loglevel=debug
-      --global.debug
       --api.insecure=true
       --providers.docker=true
       --providers.docker.swarmmode=true
