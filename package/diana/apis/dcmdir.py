@@ -61,9 +61,13 @@ class DcmDir(Endpoint, Serializable):
         # logger.debug("Pixels: {}".format(get_pixels))
 
         if DixelView.TAGS in view or DixelView.PIXELS in view:
-            ds = self.gateway.get(fn, get_pixels=get_pixels)
-            # logging.debug(ds)
-            result = Dixel.from_pydicom(ds, fn)
+            try:
+                ds = self.gateway.get(fn, get_pixels=get_pixels)
+                # logging.debug(ds)
+                result = Dixel.from_pydicom(ds, fn)
+            except (pydicom.errors.InvalidDicomError, DicomFormatError) as e:
+                logging.warning("Failed to parse with {}".format(e))
+                return
         else:
             result = Dixel(level=DicomLevel.INSTANCES, meta={"FileName": fn})
 
