@@ -1,10 +1,13 @@
+# $ docker swarm init --advertise-addr=x.x.x.x --data-path-addr=y.y.y.y
+# ## Note -- Datapath-addr should be an Internet connected interface
 # $ mkdir -p /data/{splunk,postgres,incoming}
 # $ docker stack deploy -c admin/admin-stack.yaml admin
 # $ docker stack deploy -c admin/splunk-service.yaml admin
-# Note -- $SPLUNK_HOST must be the swarm IP addr, not localhost
+# ## Note -- $SPLUNK_HOST must be the swarm IP addr, not localhost
 # $ docker stack deploy -c backend/postgres-service.yaml backend
+# $ ln -s ~/siren.env siren.env
 # $ docker stack deploy -c siren.yaml siren
-
+---
 version: '3.3'
 
 networks:
@@ -16,7 +19,7 @@ networks:
     external: true   # Created by admin-stack
 
   backend_data_network:
-    external: true   # Created by postgres
+    external: true   # Created by backend-stack
 
   service_network:
     driver: overlay
@@ -27,6 +30,8 @@ configs:
     file: ./notify_default.txt.j2
   services:
     file: ./services.yaml
+  subscriptions:
+    file: ./subscriptions.yaml
 
 services:
 
@@ -38,20 +43,22 @@ services:
       - admin_logging_network
       - service_network
     volumes:
-      - type: bind
+      - type:   bind
         source: $DATA_DIR/incoming
         target: /data
     environment:
       PYTHONUNBUFFERED: "true"
       TZ:               "America/New_York"
     env_file:
-      - ~/siren.env
+      - ./siren.env
 
     configs:
       - source: notify_default
         target: /notify_default.txt.j2
       - source: services
         target: /services.yaml
+      - source: subscriptions
+        target: /subscriptions.yaml
 
     logging:
       driver: splunk
@@ -61,17 +68,6 @@ services:
         splunk-format:  json
         splunk-index:   logging
         tag:            "{{.Name}}/{{.ID}}"
-
-#  postgres:
-#    image: postgres
-#    volumes:
-#      - postgres_data:/var/lib/postgresql/data
-#    networks:
-#      - service_network
-#      - admin_logging_network
-#    environment:
-#      POSTGRES_PASSWORD:        ${POSTGRES_PASSWORD}
-#      TZ: "America/New_York"
 
 
   orthanc-hobit:

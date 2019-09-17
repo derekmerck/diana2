@@ -1,21 +1,33 @@
-DIANA_SERVICES:
+---
+dcm_incoming:
+  ctype:     DicomDir
+  path:      /data
 
-  hobit:
-    ctype: ObservableOrthanc
-    host:  orthanc-hobit
-    password: "${ORTHANC_PASSWORD}"
-    polling_interval": 30
+hobit:
+  ctype:     ObservableOrthanc
+  host:      orthanc-hobit
+  user:      orthanc
+  password:  ${ORTHANC_PASSWORD}
+  polling_interval: 10
 
-  splunk:
-    ctype: Splunk
-    host:  splunk
-    password:  "${SPLUNK_PASSWORD}"
-    hec_token: "${SPLUNK_HEC_TOKEN}"
+splunk:
+  ctype:     Splunk
+  host:      splunk
+  user:      admin
+  index:     dicom
+  password:  ${SPLUNK_PASSWORD}
+  hec_token: ${SPLUNK_HEC_TOKEN}
 
+smtp_server: &SMTP_SERVER
+  ctype:     SmtpMessenger
+  host:      ${SMTP_HOST}
+  user:      ${SMTP_USER}
+  password:  ${SMTP_PASSWORD}
+  tls:       ${SMTP_USE_TLS}
+  port:      ${SMTP_PORT}
+  msg_t:     @/notify_default.txt.j2
 
-  smtp:
-    ctype:    "SmtpMessenger"
-    host:     "${SMTP_HOST}"
-    user:     "${SMTP_USER}"
-    password: "${SMTP_PASSWORD}"
-    msg_t: @/notify_default.txt.j2
+dispatcher:
+  ctype:         Dispatcher
+  smtp_server:   *SMTP_SERVER
+  subscriptions: @/subscriptions.yaml
