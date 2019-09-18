@@ -18,6 +18,9 @@ Desired process:
 
 """
 
+# TODO: Try around orthanc.put -- it fails on duplicate uploads
+# TODO: Logging/secondary target for dispatcher/smtp messages (could do the same for orth put)
+
 import os
 import logging
 from pathlib import Path
