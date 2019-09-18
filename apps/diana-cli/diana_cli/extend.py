@@ -102,7 +102,7 @@ def extend(ctx,
                 # p_gdcm = subprocess.Popen("python3 /opt/diana/package/diana/utils/gdcmpdcm.py '{}' {}".format(ba_image, an), shell=True)
                 # p_gdcm.wait()
 
-                yrs = int(float(pred_bone_age) / 12))
+                yrs = int(float(pred_bone_age) / 12)
                 months = float(pred_bone_age) % 12
                 for ba_channel in ba_channels:
                     sl_fiup_response = sl_bot_client.files_upload(
