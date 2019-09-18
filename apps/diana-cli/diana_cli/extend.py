@@ -102,12 +102,14 @@ def extend(ctx,
                 # p_gdcm = subprocess.Popen("python3 /opt/diana/package/diana/utils/gdcmpdcm.py '{}' {}".format(ba_image, an), shell=True)
                 # p_gdcm.wait()
 
+                yrs = int(float(pred_bone_age) / 12))
+                months = float(pred_bone_age) % 12
                 for ba_channel in ba_channels:
                     sl_fiup_response = sl_bot_client.files_upload(
                         channels=ba_channel,  # WARNING: check param spelling in updates
                         file="/opt/diana/ba_thumb.png",
                         initial_comment="Accession Number: {},\n".format("XXXX" + an[-4:]) +
-                             "Bone Age Prediction (months): {}".format(pred_bone_age)
+                             "Bone Age Prediction: {} year(s) and {} month(s)".format(yrs, months)
                     )
                     try:
                         assert(sl_fiup_response["ok"])

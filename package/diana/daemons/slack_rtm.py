@@ -19,11 +19,14 @@ def process_slack_message(**payload):
             last_line = list(f)[-1].split(',')
         an = last_line[0]
         an = "XXXX" + an[-4:]
-        ba_score = last_line[1].strip()
+        ba_score = float(last_line[1].strip())
+        yrs = int(ba_score / 12)
+        months = ba_score % 12
+
         web_client.chat_postMessage(
             channel=channel_id,
             text=f"Last Accession Number: {an}\n" +
-                 f"Last Bone Age Score: {ba_score}"
+                 f"Last Bone Age Score: {yrs} year(s) and {months} month(s)"
         )
     elif '//flush' in data['text']:
         web_client.chat_postMessage(
@@ -34,7 +37,7 @@ def process_slack_message(**payload):
     elif '//process' in data['text']:
         an = data['text'].split(" ")[1]
         # validate a/n
-        
+
         with open("/diana_direct/{}/{}_scores.txt".format(ML, ML), "r") as f:
             lines = f.readlines()
         with open("/diana_direct/{}/{}_scores.txt".format(ML, ML), "w") as f:
