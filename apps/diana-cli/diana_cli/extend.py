@@ -103,7 +103,7 @@ def extend(ctx,
                 # p_gdcm.wait()
 
                 yrs = int(float(pred_bone_age) / 12)
-                months = float(pred_bone_age) % 12
+                months = round(float(pred_bone_age) % 12, 2)
                 for ba_channel in ba_channels:
                     sl_fiup_response = sl_bot_client.files_upload(
                         channels=ba_channel,  # WARNING: check param spelling in updates

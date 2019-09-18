@@ -21,7 +21,7 @@ def process_slack_message(**payload):
         an = "XXXX" + an[-4:]
         ba_score = float(last_line[1].strip())
         yrs = int(ba_score / 12)
-        months = ba_score % 12
+        months = round(ba_score % 12, 2)
 
         web_client.chat_postMessage(
             channel=channel_id,
