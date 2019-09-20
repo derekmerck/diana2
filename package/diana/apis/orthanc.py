@@ -118,6 +118,7 @@ class Orthanc(Endpoint, Serializable):
             r = None
 
         if r:
+            logging.debug(isinstance(item, Dixel))
             if isinstance(item, Dixel):
                 # Want to update with data
                 if DixelView.TAGS in view:
