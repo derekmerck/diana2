@@ -24,14 +24,15 @@ class ObservableProxiedDicom(ProxiedDicom, ObservableMixin):
     query = attr.ib()
     @query.default
     def setup_query(self):
-        return { "AccessionNumber": "",
-                 "StudyInstanceUID": "",
-                 "PatientName": "",
-                 "PatientID": "",
-                 "PatientBirthDate": "",
-                 "StudyDescription": ""}
+        return {"AccessionNumber": "",
+                "StudyInstanceUID": "",
+                "PatientName": "",
+                "PatientID": "",
+                "PatientBirthDate": "",
+                "StudyDescription": "",
+                "SeriesDescription": ""}
     qlevel = attr.ib(default=DicomLevel.STUDIES, converter=DicomLevel.from_label)
-    qperiod = attr.ib( default=600, converter=int)  #: Check last 10 mins by default
+    qperiod = attr.ib(default=600, converter=int)  #: Check last 10 mins by default
 
     history_len = attr.ib(default=200)              #: Set to at least 10 mins of studies
     history = attr.ib(init=False)

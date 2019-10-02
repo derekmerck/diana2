@@ -159,8 +159,13 @@ def say(item: str, suffix: str=None):
     pprint(item)
 
 
-def write(item: str):
+def write_ba(item: str):
     with open("/diana_direct/bone_age/bone_age_results.json", 'a+') as data_file:
+        data_file.write(str(item) + "\n")
+
+
+def write_bb(item: str):
+    with open("/brain_bleed/brain_bleed_results.json", 'a+') as data_file:
         data_file.write(str(item) + "\n")
 
 
@@ -202,9 +207,13 @@ def mk_route(hname, source_desc, dest_desc=None):
         evtype = DicomEventType.STUDY_ADDED
         func = partial(say)
 
-    elif hname == "write_studies":
+    elif hname == "write_studies_bone_age":
         evtype = DicomEventType.STUDY_ADDED
-        func = partial(write)
+        func = partial(write_ba)
+
+    elif hname == "write_studies_brain_bleed":
+        evtype = DicomEventType.STUDY_ADDED
+        func = partial(write_bb)
 
     elif hname == "say_hello_studies":
         evtype = DicomEventType.STUDY_ADDED

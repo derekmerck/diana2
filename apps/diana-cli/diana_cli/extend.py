@@ -25,7 +25,7 @@ def extend(ctx,
         sl_bot_client = slack.WebClient(token=os.environ['SLACK_BOT_TOKEN'])
         ba_channels = ["CM2BV81DX", "CLHKN3W3V"]
         p_slack_rtm = subprocess.Popen("python /opt/diana/package/diana/daemons/slack_rtm.py {}".format(ml), shell=True, stdout=subprocess.PIPE)
-        p_watch = subprocess.Popen("diana-cli watch -r write_studies radarch None", shell=True, stdout=subprocess.PIPE)
+        p_watch = subprocess.Popen("diana-cli watch -r write_studies_{} radarch None".format(ml), shell=True, stdout=subprocess.PIPE)
         if not os.path.isfile("/diana_direct/{}/{}_scores.txt".format(ml, ml)):
             open("/diana_direct/{}/{}_scores.txt".format(ml, ml), 'a').close()
 
@@ -77,14 +77,20 @@ def extend(ctx,
                         dcmdir_name = fn
                         break
 
-                p_predict = subprocess.Popen("python3 predict.py '{}'".format(dcmdir_name), shell=True, cwd="/diana_direct/{}/package/src/".format(ml))
-                p_predict.wait()
+                if ml == "bone_age":
+                    p_predict = subprocess.Popen("python3 predict.py '{}'".format(dcmdir_name), shell=True, cwd="/diana_direct/{}/package/src/".format(ml))
+                    p_predict.wait()
 
-                with open("/opt/diana/{}_temp_predict".format(ml)) as f:
-                    pred_bone_age = f.read()
+                    with open("/opt/diana/{}_temp_predict".format(ml)) as f:
+                        pred_bone_age = f.read()
 
-                with open("/diana_direct/{}/{}_scores.txt".format(ml, ml), "a+") as f:
-                    f.write("{}, {}\n".format(an, pred_bone_age))
+                    with open("/diana_direct/{}/{}_scores.txt".format(ml, ml), "a+") as f:
+                        f.write("{}, {}\n".format(an, pred_bone_age))
+                elif ml == "brain_bleed":
+                    p_predict = subprocess.Popen("python3 predict.py '{}'".format(dcmdir_name), shell=True, cwd="/diana_direct/{}/package/src/".format(ml))
+                    p_predict.wait()
+                else:
+                    raise NotImplementedError
 
                 # Post to Slack
                 # sl_msg_response = sl_bot_client.chat_postMessage(
@@ -140,6 +146,12 @@ def parse_results(json_lines, ml):
             continue
         else:
             print("Found X-Ray for Bone Age Study...")
+
+        if ml == "brain_bleed" and ('ct' not in study_desc or 'brain' not in study_desc or 'wo' not in study_desc or 'contrast' not in study_desc or 'spine' in study_desc):
+            continue
+        else:
+            print("Found head CT...")
+
         with open("/diana_direct/{}/{}.studies.txt".format(ml, ml), 'a+') as f:
             if entry['AccessionNumber'] in accession_nums:
                 print("...duplicate a/n")
