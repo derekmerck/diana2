@@ -26,7 +26,15 @@ def extend(ctx,
         ba_channels = ["CM2BV81DX", "CLHKN3W3V"]
         bb_channels = ["GP57V327Q"]
         p_slack_rtm = subprocess.Popen("python /opt/diana/package/diana/daemons/slack_rtm.py {}".format(ml), shell=True, stdout=subprocess.PIPE)
-        p_watch = subprocess.Popen("diana-cli watch -r write_studies_{} radarch None".format(ml), shell=True, stdout=subprocess.PIPE)
+
+        if ml == "bone_age":
+            rt = "write_studies_{}".format(ml)
+        elif ml == "brain_bleed":
+            rt = "write_series_{}".format(ml)
+        else:
+            raise NotImplementedError
+
+        p_watch = subprocess.Popen("diana-cli watch -r {} radarch None".format(rt), shell=True, stdout=subprocess.PIPE)
         if not os.path.isfile("/diana_direct/{}/{}_scores.txt".format(ml, ml)):
             open("/diana_direct/{}/{}_scores.txt".format(ml, ml), 'a').close()
 
