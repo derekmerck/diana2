@@ -24,6 +24,7 @@ def extend(ctx,
     try:
         sl_bot_client = slack.WebClient(token=os.environ['SLACK_BOT_TOKEN'])
         ba_channels = ["CM2BV81DX", "CLHKN3W3V"]
+        bb_channels = ["GP57V327Q"]
         p_slack_rtm = subprocess.Popen("python /opt/diana/package/diana/daemons/slack_rtm.py {}".format(ml), shell=True, stdout=subprocess.PIPE)
         p_watch = subprocess.Popen("diana-cli watch -r write_studies_{} radarch None".format(ml), shell=True, stdout=subprocess.PIPE)
         if not os.path.isfile("/diana_direct/{}/{}_scores.txt".format(ml, ml)):
@@ -87,7 +88,7 @@ def extend(ctx,
                     with open("/diana_direct/{}/{}_scores.txt".format(ml, ml), "a+") as f:
                         f.write("{}, {}\n".format(an, pred_bone_age))
                 elif ml == "brain_bleed":
-                    p_predict = subprocess.Popen("python3 predict.py '{}'".format(dcmdir_name), shell=True, cwd="/diana_direct/{}/package/src/".format(ml))
+                    p_predict = subprocess.Popen("python3 run.py '{}'".format(dcmdir_name), shell=True, cwd="/diana_direct/{}/halibut-dm/".format(ml))
                     p_predict.wait()
                 else:
                     raise NotImplementedError
@@ -107,20 +108,23 @@ def extend(ctx,
                 # ba_image = glob.glob(dcmdir_name+"/**/*.dcm", recursive=True)[0]
                 # p_gdcm = subprocess.Popen("python3 /opt/diana/package/diana/utils/gdcmpdcm.py '{}' {}".format(ba_image, an), shell=True)
                 # p_gdcm.wait()
+                if ml == "bone_age":
+                    yrs = int(float(pred_bone_age) / 12)
+                    months = round(float(pred_bone_age) % 12, 2)
+                    for ba_channel in ba_channels:
+                        sl_fiup_response = sl_bot_client.files_upload(
+                            channels=ba_channel,  # WARNING: check param spelling in updates
+                            file="/opt/diana/ba_thumb.png",
+                            initial_comment="Accession Number: {},\n".format("XXXX" + an[-4:]) +
+                                 "Bone Age Prediction: {} year(s) and {} month(s)".format(yrs, months)
+                        )
+                        try:
+                            assert(sl_fiup_response["ok"])
+                        except AssertionError:
+                            print("Error in Slack fiup")
+                elif ml == "brain_bleed":
 
-                yrs = int(float(pred_bone_age) / 12)
-                months = round(float(pred_bone_age) % 12, 2)
-                for ba_channel in ba_channels:
-                    sl_fiup_response = sl_bot_client.files_upload(
-                        channels=ba_channel,  # WARNING: check param spelling in updates
-                        file="/opt/diana/ba_thumb.png",
-                        initial_comment="Accession Number: {},\n".format("XXXX" + an[-4:]) +
-                             "Bone Age Prediction: {} year(s) and {} month(s)".format(yrs, months)
-                    )
-                    try:
-                        assert(sl_fiup_response["ok"])
-                    except AssertionError:
-                        print("Error in Slack fiup")
+
 
             os.remove("/diana_direct/{}/{}.studies.txt".format(ml, ml))
             time.sleep(2)  # slightly wait for ObservableProxiedDicom polling_interval
