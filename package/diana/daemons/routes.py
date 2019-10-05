@@ -211,8 +211,8 @@ def mk_route(hname, source_desc, dest_desc=None):
         evtype = DicomEventType.STUDY_ADDED
         func = partial(write_ba)
 
-    elif hname == "write_studies_brain_bleed":
-        evtype = DicomEventType.STUDY_ADDED
+    elif hname == "write_series_brain_bleed":
+        evtype = DicomEventType.SERIES_ADDED
         func = partial(write_bb)
 
     elif hname == "say_hello_studies":
