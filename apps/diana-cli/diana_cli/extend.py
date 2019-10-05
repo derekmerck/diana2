@@ -33,7 +33,6 @@ def extend(ctx,
             rt = "write_series_{}".format(ml)
         else:
             raise NotImplementedError
-
         p_watch = subprocess.Popen("diana-cli watch -r {} radarch None".format(rt), shell=True, stdout=subprocess.PIPE)
         if not os.path.isfile("/diana_direct/{}/{}_scores.txt".format(ml, ml)):
             open("/diana_direct/{}/{}_scores.txt".format(ml, ml), 'a').close()
@@ -135,7 +134,7 @@ def extend(ctx,
 
             os.remove("/diana_direct/{}/{}.studies.txt".format(ml, ml))
             time.sleep(2)  # slightly wait for ObservableProxiedDicom polling_interval
-    except (KeyboardInterrupt, FileNotFoundError) as e:
+    except (KeyboardInterrupt, FileNotFoundError, KeyError) as e:
         try:
             p_slack_rtm.send_signal(signal.SIGINT)
             p_watch.send_signal(signal.SIGINT)
@@ -145,6 +144,8 @@ def extend(ctx,
             pass
         if type(e) is FileNotFoundError:
             print("Excepted error: {}".format(e))
+        if type(e) is KeyError:
+            print(e)
 
 
 def parse_results(json_lines, ml):
