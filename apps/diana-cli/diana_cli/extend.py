@@ -145,7 +145,7 @@ def extend(ctx,
         if type(e) is FileNotFoundError:
             print("Excepted error: {}".format(e))
         if type(e) is KeyError:
-            print(e)
+            print("Key Error: {}".format(e))
 
 
 def parse_results(json_lines, ml):
