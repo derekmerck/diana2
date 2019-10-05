@@ -84,36 +84,26 @@ def extend(ctx,
 
                     with open("/opt/diana/{}_temp_predict".format(ml)) as f:
                         pred_bone_age = f.read()
-
                     with open("/diana_direct/{}/{}_scores.txt".format(ml, ml), "a+") as f:
                         f.write("{}, {}\n".format(an, pred_bone_age))
                 elif ml == "brain_bleed":
                     p_predict = subprocess.Popen("python3 run.py '{}'".format(dcmdir_name), shell=True, cwd="/diana_direct/{}/halibut-dm/".format(ml))
                     p_predict.wait()
+
+                    with open("/opt/diana/{}_temp_predict".format(ml)) as f:
+                        pred_brain_bleed = f.readlines()
+                    pred_brain_bleed = [_.strip() for _ in pred_brain_bleed]
+                    with open("/diana_direct/{}/{}_scores.txt".format(ml, ml), "a+") as f:
+                        f.write("{}, {}, {}\n".format(an, pred_brain_bleed[0], pred_brain_bleed[1]))
                 else:
                     raise NotImplementedError
 
-                # Post to Slack
-                # sl_msg_response = sl_bot_client.chat_postMessage(
-                #     channel="GLU6LQL86",
-                #     text="Accession Number: {},\n".format("XXXX" + an[-4:]) +
-                #          "Bone Age Prediction (months): {}".format(pred_bone_age)
-                # )
-                # try:
-                #     assert(sl_msg_response["ok"])
-                # except AssertionError:
-                #     print("Error in Slack message post")
-
-                # Using image thumb from bone age predictor instead
-                # ba_image = glob.glob(dcmdir_name+"/**/*.dcm", recursive=True)[0]
-                # p_gdcm = subprocess.Popen("python3 /opt/diana/package/diana/utils/gdcmpdcm.py '{}' {}".format(ba_image, an), shell=True)
-                # p_gdcm.wait()
                 if ml == "bone_age":
                     yrs = int(float(pred_bone_age) / 12)
                     months = round(float(pred_bone_age) % 12, 2)
-                    for ba_channel in ba_channels:
+                    for channel in ba_channels:
                         sl_fiup_response = sl_bot_client.files_upload(
-                            channels=ba_channel,  # WARNING: check param spelling in updates
+                            channels=channel,  # WARNING: check param spelling in updates
                             file="/opt/diana/ba_thumb.png",
                             initial_comment="Accession Number: {},\n".format("XXXX" + an[-4:]) +
                                  "Bone Age Prediction: {} year(s) and {} month(s)".format(yrs, months)
@@ -123,8 +113,17 @@ def extend(ctx,
                         except AssertionError:
                             print("Error in Slack fiup")
                 elif ml == "brain_bleed":
-
-
+                    for channel in bb_channels:
+                        sl_fiup_response = sl_bot_client.files_upload(
+                            channels=channel,  # WARNING: check param spelling in updates
+                            file="/opt/diana/bb_thumb.png",
+                            initial_comment="Accession Number: {},\n".format("XXXX" + an[-4:]) +
+                                 "ICH Prediction: ".format(pred_brain_bleed[-1])
+                        )
+                        try:
+                            assert(sl_fiup_response["ok"])
+                        except AssertionError:
+                            print("Error in Slack fiup")
 
             os.remove("/diana_direct/{}/{}.studies.txt".format(ml, ml))
             time.sleep(2)  # slightly wait for ObservableProxiedDicom polling_interval
@@ -134,7 +133,6 @@ def extend(ctx,
             p_watch.send_signal(signal.SIGINT)
             p_collect.send_signal(signal.SIGINT)
             p_predict.send_signal(signal.SIGINT)
-            # p_gdcm.send_signal(signal.SIGINT)
         except UnboundLocalError:
             pass
         if type(e) is FileNotFoundError:
@@ -146,6 +144,7 @@ def parse_results(json_lines, ml):
     for line in json_lines:
         entry = ast.literal_eval(line)
         study_desc = entry['StudyDescription'].lower()
+        series_desc = entry['SeriesDescription'].lower()
         if ml == "bone_age" and ('x-ray' not in study_desc or 'bone' not in study_desc or 'age' not in study_desc):
             continue
         else:
@@ -153,7 +152,7 @@ def parse_results(json_lines, ml):
 
         if ml == "brain_bleed" and ('ct' not in study_desc or 'brain' not in study_desc or 'wo' not in study_desc or 'contrast' not in study_desc or 'spine' in study_desc):
             continue
-        else:
+        elif ml == "brain_bleed" and (series_desc == "axial brain reformat" or series_desc == "nc axial brain reformat" or series_desc == "thick nc brain volume"):
             print("Found head CT...")
 
         with open("/diana_direct/{}/{}.studies.txt".format(ml, ml), 'a+') as f:
