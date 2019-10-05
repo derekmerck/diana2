@@ -165,7 +165,7 @@ def write_ba(item: str):
 
 
 def write_bb(item: str):
-    with open("/brain_bleed/brain_bleed_results.json", 'a+') as data_file:
+    with open("/diana_direct/brain_bleed/brain_bleed_results.json", 'a+') as data_file:
         data_file.write(str(item) + "\n")
 
 
