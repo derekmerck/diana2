@@ -156,7 +156,7 @@ def parse_results(json_lines, ml):
         series_desc = entry['SeriesDescription'].lower()
         if ml == "bone_age" and ('x-ray' not in study_desc or 'bone' not in study_desc or 'age' not in study_desc):
             continue
-        else:
+        elif ml == "bone_age":
             print("Found X-Ray for Bone Age Study...")
 
         if ml == "brain_bleed" and ('ct' not in study_desc or 'brain' not in study_desc or 'wo' not in study_desc or 'contrast' not in study_desc or 'spine' in study_desc):
