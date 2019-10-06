@@ -28,7 +28,7 @@ def extend(ctx,
         p_slack_rtm = subprocess.Popen("python /opt/diana/package/diana/daemons/slack_rtm.py {}".format(ml), shell=True, stdout=subprocess.PIPE)
 
         if ml == "bone_age":
-            rt = "write_studies_{}".format(ml)
+            rt = "write_series_{}".format(ml)
         elif ml == "brain_bleed":
             rt = "write_series_{}".format(ml)
         else:
