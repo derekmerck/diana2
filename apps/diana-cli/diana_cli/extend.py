@@ -125,7 +125,7 @@ def extend(ctx,
                             channels=channel,  # WARNING: check param spelling in updates
                             file="/opt/diana/bb_thumb.png",
                             initial_comment="Accession Number: {},\n".format("XXXX" + an[-4:]) +
-                                 "ICH Prediction: ".format(pred_brain_bleed[-1])
+                                 "ICH Prediction: {}".format(pred_brain_bleed[-1])
                         )
                         try:
                             assert(sl_fiup_response["ok"])
