@@ -123,27 +123,21 @@ def extend(ctx,
                             initial_comment="Accession Number: {},\n".format("XXXX" + an[-4:]) +
                                  "Bone Age Prediction: {} year(s) and {} month(s)".format(yrs, months)
                         )
-                        try:
-                            assert(sl_fiup_response["ok"])
-                        except AssertionError:
-                            print("Error in Slack fiup")
+                        assert(sl_fiup_response["ok"])
                 elif ml == "brain_bleed":
                     for channel in bb_channels:
                         sl_fiup_response = sl_bot_client.files_upload(
                             channels=channel,  # WARNING: check param spelling in updates
                             file="/opt/diana/bb_thumb.png",
                             initial_comment="Accession Number: {},\n".format("XXXX" + an[-4:]) +
-                                "ICH Prediction: {} - {}%".format(pred_brain_bleed[-1], pred_brain_bleed[1])
+                            "ICH Prediction: {} - {}%".format(pred_brain_bleed[-1], pred_brain_bleed[1])
                         )
-                        try:
-                            assert(sl_fiup_response["ok"])
-                        except AssertionError:
-                            print("Error in Slack fiup")
+                        assert(sl_fiup_response["ok"])
                 shutil.rmtree("/diana_direct/{}/data/{}_process".format(ml, an))
 
             os.remove("/diana_direct/{}/{}.studies.txt".format(ml, ml))
             time.sleep(2)  # slightly wait for ObservableProxiedDicom polling_interval
-    except (KeyboardInterrupt, FileNotFoundError, KeyError) as e:
+    except (KeyboardInterrupt, FileNotFoundError, KeyError, AssertionError) as e:
         try:
             p_slack_rtm.send_signal(signal.SIGINT)
             p_watch.send_signal(signal.SIGINT)
@@ -155,6 +149,8 @@ def extend(ctx,
             print("Excepted error: {}".format(e))
         if type(e) is KeyError:
             print("Key Error: {}".format(e))
+        if type(e) is AssertionError:
+            print("Slack Error: {}".format(e))
 
 
 def parse_results(json_lines, ml):
