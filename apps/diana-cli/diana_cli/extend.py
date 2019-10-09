@@ -1,8 +1,10 @@
 import ast
 import click
 from datetime import datetime
-import glob
 import os
+import glob
+import pydicom
+import shutil
 import signal
 import slack
 import subprocess
@@ -79,13 +81,12 @@ def extend(ctx,
                         zip_ref.extractall("/diana_direct/{}/data/{}_process".format(ml, an))
                     os.remove("/diana_direct/{}/data/{}.zip".format(ml, an))
 
-                subdirs = get_subdirectories("/diana_direct/{}/data/{}_process".format(ml, an))
-                for fn in subdirs:
-                    if "{}".format(an) in fn:
-                        dcmdir_name = fn
-                        break
-
                 if ml == "bone_age":
+                    subdirs = get_subdirectories("/diana_direct/{}/data/{}_process".format(ml, an))
+                    for fn in subdirs:
+                        if "{}".format(an) in fn:
+                            dcmdir_name = fn
+                            break
                     p_predict = subprocess.Popen("python3 predict.py '{}'".format(dcmdir_name), shell=True, cwd="/diana_direct/{}/package/src/".format(ml))
                     p_predict.wait()
 
@@ -94,6 +95,13 @@ def extend(ctx,
                     with open("/diana_direct/{}/{}_scores.txt".format(ml, ml), "a+") as f:
                         f.write("{}, {}\n".format(an, pred_bone_age))
                 elif ml == "brain_bleed":
+                    files = [f for f in glob.glob("/diana_direct/{}/data/{}_process".format(ml, an) + "**/*.dcm", recursive=True)]
+                    for f in files:
+                        temp_dcm = pydicom.dcmread(f)
+                        if temp_dcm.SeriesDescription.lower() in ["axial brain reformat", "nc axial brain reformat", "thick nc brain volume"]:
+                            dcmdir_name = os.path.dirname(temp_dcm)
+                            break
+
                     p_predict = subprocess.Popen("python3 run.py '{}'".format(dcmdir_name), shell=True, cwd="/diana_direct/{}/halibut-dm/".format(ml))
                     p_predict.wait()
 
@@ -131,6 +139,7 @@ def extend(ctx,
                             assert(sl_fiup_response["ok"])
                         except AssertionError:
                             print("Error in Slack fiup")
+                shutil.rmtree("/diana_direct/{}/data/{}_process".format(ml, an))
 
             os.remove("/diana_direct/{}/{}.studies.txt".format(ml, ml))
             time.sleep(2)  # slightly wait for ObservableProxiedDicom polling_interval
@@ -161,8 +170,10 @@ def parse_results(json_lines, ml):
 
         if ml == "brain_bleed" and ('ct' not in study_desc or 'brain' not in study_desc or 'wo' not in study_desc or 'contrast' not in study_desc or 'spine' in study_desc):
             continue
-        elif ml == "brain_bleed" and (series_desc == "axial brain reformat" or series_desc == "nc axial brain reformat" or series_desc == "thick nc brain volume"):
+        elif ml == "brain_bleed" and (series_desc in ["axial brain reformat", "nc axial brain reformat", "thick nc brain volume"]):
             print("Found head CT...")
+        elif ml == "brain_bleed":
+            continue
 
         with open("/diana_direct/{}/{}.studies.txt".format(ml, ml), 'a+') as f:
             if entry['AccessionNumber'] in accession_nums:
