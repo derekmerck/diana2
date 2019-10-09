@@ -22,8 +22,11 @@ services:
       - logging_network
     volumes:
       - type: bind
-        source: ${DATA_DIR}/splunk
+        source: ${DATA_DIR}/splunk/etc
         target: /opt/splunk/etc
+      - type: bind
+        source: ${DATA_DIR}/splunk/var
+        target: /opt/splunk/var
     environment:
       SPLUNK_START_ARGS: "--accept-license"
       SPLUNK_PASSWORD:   ${SPLUNK_PASSWORD}
