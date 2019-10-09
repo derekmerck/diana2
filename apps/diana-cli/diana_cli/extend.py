@@ -95,11 +95,11 @@ def extend(ctx,
                     with open("/diana_direct/{}/{}_scores.txt".format(ml, ml), "a+") as f:
                         f.write("{}, {}\n".format(an, pred_bone_age))
                 elif ml == "brain_bleed":
-                    files = [f for f in glob.glob("/diana_direct/{}/data/{}_process".format(ml, an) + "**/*.dcm", recursive=True)]
+                    files = [f for f in glob.glob("/diana_direct/{}/data/{}_process/".format(ml, an) + "**/*.dcm", recursive=True)]
                     for f in files:
                         temp_dcm = pydicom.dcmread(f)
                         if temp_dcm.SeriesDescription.lower() in ["axial brain reformat", "nc axial brain reformat", "thick nc brain volume"]:
-                            dcmdir_name = os.path.dirname(temp_dcm)
+                            dcmdir_name = os.path.dirname(f)
                             break
 
                     p_predict = subprocess.Popen("python3 run.py '{}'".format(dcmdir_name), shell=True, cwd="/diana_direct/{}/halibut-dm/".format(ml))
@@ -109,7 +109,7 @@ def extend(ctx,
                         pred_brain_bleed = f.readlines()
                     pred_brain_bleed = [_.strip() for _ in pred_brain_bleed]
                     with open("/diana_direct/{}/{}_scores.txt".format(ml, ml), "a+") as f:
-                        f.write("{}, {}, {}\n".format(an, pred_brain_bleed[0], pred_brain_bleed[1]))
+                        f.write("{}, {}, {}, {}\n".format(an, pred_brain_bleed[0], pred_brain_bleed[1], pred_brain_bleed[2]))
                 else:
                     raise NotImplementedError
 
@@ -133,7 +133,7 @@ def extend(ctx,
                             channels=channel,  # WARNING: check param spelling in updates
                             file="/opt/diana/bb_thumb.png",
                             initial_comment="Accession Number: {},\n".format("XXXX" + an[-4:]) +
-                                 "ICH Prediction: {}".format(pred_brain_bleed[-1])
+                                "ICH Prediction: {} - {}%".format(pred_brain_bleed[-1], pred_brain_bleed[1])
                         )
                         try:
                             assert(sl_fiup_response["ok"])
