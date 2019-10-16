@@ -105,6 +105,8 @@ def extend(ctx,
                     p_predict = subprocess.Popen("python3 run.py '{}'".format(dcmdir_name), shell=True, cwd="/diana_direct/{}/halibut-dm/".format(ml))
                     p_predict.wait()
 
+                    os.rename("/diana_direct/{}/data/output.npy".format(ml), "/diana_direct/{}/data/{}_output.npy".format(ml, an))
+
                     with open("/opt/diana/{}_temp_predict".format(ml)) as f:
                         pred_brain_bleed = f.readlines()
                     pred_brain_bleed = [_.strip() for _ in pred_brain_bleed]
