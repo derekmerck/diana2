@@ -98,7 +98,7 @@ def extend(ctx,
                     files = [f for f in glob.glob("/diana_direct/{}/data/{}_process/".format(ml, an) + "**/*.dcm", recursive=True)]
                     for f in files:
                         temp_dcm = pydicom.dcmread(f)
-                        if temp_dcm.SeriesDescription.lower() in ["axial brain reformat", "nc axial brain reformat", "thick nc brain volume"]:
+                        if temp_dcm.SeriesDescription.lower() in ["axial brain reformat", "axial nc brain reformat", "nc axial brain reformat", "thick nc brain volume"]:
                             dcmdir_name = os.path.dirname(f)
                             break
 
