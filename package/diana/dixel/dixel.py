@@ -7,9 +7,11 @@ from dateutil import parser as DatetimeParser
 import attr
 import pydicom
 import numpy as np
+import json
+from cryptography.fernet import Fernet
 from .report import RadiologyReport
 from ..utils.dicom import DicomLevel, DicomFormatError
-from ..utils import Serializable, dicom_simplify
+from ..utils import Serializable, dicom_simplify, SmartJSONEncoder, pack_data, unpack_data
 from ..utils.gateways import orthanc_id, Montage
 
 
@@ -372,3 +374,14 @@ class Dixel(Serializable):
             "StudyDate": "",
             "StudyTime": "",
         }
+
+    def pack_fields(self, fkey, fields=None):
+        rv = pack_data({**self.tags, **self.meta}, fkey, fields)
+        return rv
+
+    def unpack_fields(self, data, fkey, prefix=None):
+        unpacked = unpack_data(data, fkey)
+        for k, v in unpacked.items():
+            if prefix:
+                k = "{}-{}".format(prefix, k)
+            self.meta[k] = v

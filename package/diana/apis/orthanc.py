@@ -149,6 +149,45 @@ class Orthanc(Endpoint, Serializable):
 
         raise FileNotFoundError("Item {} does not exist".format(oid))
 
+    def getm(self, item: Union[str, Dixel],
+             level: DicomLevel = DicomLevel.STUDIES,
+             key: str = "meta"):
+
+        logger = logging.getLogger(self.name)
+        logger.debug("Get Meta")
+
+        oid, level = self.id_from_item(item, level)
+
+        try:
+            r = self.gateway.get_metadata(oid, level, key)
+        except GatewayConnectionError as e:
+            # e = "Gateway connection error"
+            logger.warning(e)
+            r = None
+
+        return r
+
+
+    def putm(self, item: Union[str, Dixel],
+             level: DicomLevel = DicomLevel.STUDIES,
+             key: str = "meta",
+             value: str = "",
+             **kwargs):
+
+        logger = logging.getLogger(self.name)
+        logger.debug("Put Meta")
+
+        oid, level = self.id_from_item(item, level)
+
+        try:
+            r = self.gateway.put_metadata(oid, level, key, value)
+        except GatewayConnectionError as e:
+            # e = "Gateway connection error"
+            logger.warning(e)
+            r = None
+
+        return r
+
     def find(self, item: Union[Mapping, Dixel],
              level=DicomLevel.STUDIES, **kwargs) -> list:
         logger = logging.getLogger(self.name)
