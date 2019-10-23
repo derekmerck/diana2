@@ -104,13 +104,6 @@ dispatcher:
   
 """
 
-# Remap channel names to formal site names
-channel_lu={
-    "project": "Project",
-    "site1":   "Site 1",
-    "site2":   "Site 2"
-}
-
 msg_t="""
 Subject: SIREN/{{ Project }} Study Received {{ now() }}
 
@@ -163,9 +156,9 @@ $ docker run -d -p 8042:8042 \
 $ docker run -d \
    -v /data:/data \
    -v `pwd`/services.yaml:/services.yaml:ro \
-   --env-file .env \
+   --env-file siren.env \
    -e DIANA_SERVICES_PATH=/services.yaml \
-   --link splunk --link orthanc \
+   --link admin_splunk --link orthanc \
    --log-driver=splunk \
    --log-opt splunk-token=$SPLUNK_HEC_TOKEN \
    --log-opt splunk-url=http://localhost:8088 \
@@ -173,7 +166,7 @@ $ docker run -d \
    --log-opt splunk-source=orthanc \
    --log-opt tag="{{.Name}}/{{.ID}}" \
    --log-opt splunk-index=logging \
-   --name diana diana2.1 python3 examples/study_submission_rt.py
+   --name diana derekmerck/diana2 python3 examples/study_submission_rt.py
 """
 
 # Parameters
@@ -184,8 +177,21 @@ fernet_key = os.environ.get("PROJECT_FERNET_KEY").encode("utf8")
 # Globals
 tagged_studies = deque(maxlen=50)  # history
 
+siren_project_tags = {
+    "hobit": "HOBIT"
+}
+siren_site_tags = {
+    "mishare-test": "Data Coordination",
+    "duke": "Duke University Hospital",
+    "hennepin": "Hennepin County Hospital",
+    "detroit": "Detroit Receiving Hospital"
+}
 
-def pack_siren_info(d: Dixel) -> str:
+def pack_siren_info(d: Dixel, base_path) -> str:
+
+    fp = Path(d.meta["siren_info"]["FileName"]).relative_to(base_path)
+    project_tag = fp.parts[0]   # e.g., hobit
+    site_tag = fp.parts[1]      # e.g., hennepin
 
     res = {
         "ShamID": d.meta["ShamID"],  # Just for tracking
@@ -195,6 +201,8 @@ def pack_siren_info(d: Dixel) -> str:
         "PatientBirthDate": d.tags.get("PatientBirthDate"),
         "StudyDateTime": d.meta["StudyDateTime"],
         "FileName": d.meta["FileName"],
+        "ProjectTag": project_tag,
+        "SiteTag": site_tag,
         "timestamp": datetime.now()
     }
     clear_text = json.dumps(res, cls=SmartJSONEncoder)
@@ -262,26 +270,20 @@ def handle_study_arrived_at_orthanc(item, source: Orthanc, dest: Dispatcher, spl
     _item.meta["siren_info"] = unpack_siren_info(siren_info_tok)
     logging.debug(pformat(_item.meta["siren_info"]))
 
-    fp = Path(_item.meta["siren_info"]["FileName"]).relative_to(base_path)
-    channels = [
-        fp.parts[0],              # ie, hobit
-        "/".join(fp.parts[0:2])   # ie, hobit/hennepin
-    ]
-    logging.debug(channels)
+    channels = [_item.meta["siren_info"]["project_tag"],
+                "{}/{}".format(_item.meta["siren_info"]["project_tag"],
+                                _item.meta["siren_info"]["site_tag"])
+                ]
 
     original_study_date = DateTimeParser.parse(_item.meta["siren_info"]["StudyDateTime"]).date()
     timestamp = DateTimeParser.parse(_item.meta["siren_info"]["timestamp"])
-    project = fp.parts[0]
-    if channel_lu.get(project):
-        project = channel_lu.get(project, project)
-    site = fp.parts[1]
-    if channel_lu.get(site):
-        site = channel_lu.get(site, site)
+    project_name = siren_project_tags.get(_item.meta["siren_info"]["ProjectTag"], "Unknown Project")
+    site_name = siren_site_tags.get(_item.meta["siren_info"]["SiteTag"], "Unknown Site")
 
     _item.meta.update(
         {"OriginalStudyDate": original_study_date,
-         "Project": project,
-         "Site": site,
+         "Project": project_name,
+         "Site": site_name,
          "SubmissionTimestamp": timestamp}
     )
 
@@ -306,7 +308,9 @@ def test_study_alert(orth: Orthanc, disp: Dispatcher,
                      splunk: Splunk = None,
                      base_path: str = "/data"):
 
-    item = {"oid": "91499a9e-abbc193d-fb780cbb-5fd054d3-46a4e2fe"}
+    # Anonymized f0
+    item = {"oid": "097968b5-d8a998fd-b8ef712a-9ff7cba8-023e0212"}
+    # item = {"oid": "91499a9e-abbc193d-fb780cbb-5fd054d3-46a4e2fe"}
     handle_study_arrived_at_orthanc(item, orth, disp, splunk=splunk, base_path=base_path)
 
 
@@ -346,4 +350,4 @@ if __name__ == "__main__":
     #main(dcmdir, orth, disp, splunk)
 
     # test_upload_zipfile(dcmdir, orth)
-    test_study_alert(orth, disp, splunk=splunk, base_path=dcmdir.path)
+    # test_study_alert(orth, disp, splunk=splunk, base_path=dcmdir.path)

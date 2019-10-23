@@ -1,7 +1,7 @@
 ---
 - channel: project
   subscribers:
-    - name: Central Reader
+    - name:  Central Reader
       email: $TEST_EMAIL_RCV0
 
 - channel: project/site1
