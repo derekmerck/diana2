@@ -1,14 +1,14 @@
 import os
 import click
-from crud.cli.utils import validate_endpoint
+from crud.cli.utils import ClickEndpoint
 from diana.apis import DcmDir
 
 
 @click.command()
-@click.argument("source", callback=validate_endpoint, type=click.STRING)
+@click.argument("source", type=ClickEndpoint(expects=DcmDir))
 @click.option("-b", "--binary", help="Get binary file as well as data", is_flag=True, default=False)
 @click.pass_context
-def cli(ctx, source, binary):
+def dgetall(ctx, source, binary):
     """Get all instances from DcmDir for chaining"""
     click.echo(click.style('Get All Items from DcmDir', underline=True, bold=True))
 

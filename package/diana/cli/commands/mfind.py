@@ -1,7 +1,6 @@
 from datetime import datetime
 import click
-from crud.cli.utils import validate_endpoint, validate_dict, validate_array
-
+from crud.cli.utils import ClickEndpoint, CLICK_ARRAY
 from diana.apis import Montage
 
 """
@@ -14,10 +13,10 @@ $ diana-cli -s @services.yml mfind -A @my_accessions.txt -e lungrads -e radcat m
 """
 
 
-@click.command(short_help="Find item in montage by query for chaining")
-@click.argument('source', callback=validate_endpoint, type=click.STRING)
+@click.command(short_help="Find item in Montage by query for chaining")
+@click.argument('source', type=ClickEndpoint(expects=Montage))
 @click.option('--accession_number', '-a', help="Requires PHI privileges on Montage")
-@click.option('--accessions_list',  '-A', callback=validate_array,
+@click.option('--accessions_list',  '-A', type=CLICK_ARRAY,
               help="List of a/ns in comma or newline separated string or @file.txt format")
 @click.option('--start_date', default="2003-01-01",
               help="Starting date query bound")
@@ -29,16 +28,16 @@ $ diana-cli -s @services.yml mfind -A @my_accessions.txt -e lungrads -e radcat m
               type=click.Choice(['radcat', 'lungrads']),
               help="Perform a data extraction on each report")
 @click.pass_context
-def cli(ctx,
-        source,
-        accession_number,
-        accessions_list,
-        start_date,
-        end_date,
-        today,
-        _query,
-        extraction):
-    """Find item in montage by query for chaining"""
+def mfind(ctx,
+          source,
+          accession_number,
+          accessions_list,
+          start_date,
+          end_date,
+          today,
+          _query,
+          extraction):
+    """Find item in Montage by query for chaining"""
     click.echo(click.style('Montage Find', underline=True, bold=True))
 
     from diana.dixel import RadiologyReport, LungScreeningReport
