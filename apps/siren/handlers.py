@@ -1,3 +1,24 @@
+"""
+SIREN Trial image management handlers
+
+Desired process:
+
+1. As each new PHI, partial-anon, or anon study arrives in the folder
+   "/incoming/proj/site":
+2.   Each instance is uploaded
+3.   Each uploaded instance is anonymized and deleted (instance-by-instance to
+     create serial instance times, if possible)
+4. As each anonymized study becomes stable:
+5.   Meta for each study is pulled, including pre-anon meta + source directory
+6.   Meta is forwarded to indexer for logging
+7.   Meta is forwarded to the dispatcher along with source dir (channel)
+8.   Meta is multiplexed from subscription roster to produce messages
+9.     Each message is submitted to the appropriate transport mechanism
+10.    Each message forwarded to indexer to be logged
+
+"""
+
+
 import os
 from functools import partial
 import logging

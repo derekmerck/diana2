@@ -26,37 +26,37 @@ hobit-detroit:
 # Subscriber Info
 
 - name: Any HOBIT
-  email: derek.merck+hobit@gmail.com
+  email: $TEST_GMAIL_BASE+hobit@gmail.com
   listening: [hobit]
 
 - name: Any Testing
-  email: derek.merck+testing@gmail.com
+  email: $TEST_GMAIL_BASE+testing@gmail.com
   listening: [testing]
 
 - name: Invalid
-  email: derek.merck+invalid@gmail.com
+  email: $TEST_GMAIL_BASE+invalid@gmail.com
   listening: [invalid]
 
 - name: HOBIT Testing
-  email: derek.merck+hobittesting@gmail.com
+  email: $TEST_GMAIL_BASE+hobittesting@gmail.com
   listening: [hobit-testing]
 
 - name: HOBIT at Duke
-  email: derek.merck+hobitduke@gmail.com
+  email: $TEST_GMAIL_BASE+hobitduke@gmail.com
   listening: [hobit-duke]
 
 - name: HOBIT at Hennepin
-  email: derek.merck+hobithennepin@gmail.com
+  email: $TEST_GMAIL_BASE+hobithennepin@gmail.com
   listening: [hobit-hennepin]
 
 - name: HOBIT at Duke and Hennepin
-  email: derek.merck+hobitdukehennepin@gmail.com
+  email: $TEST_GMAIL_BASE+hobitdukehennepin@gmail.com
   listening: [hobit-duke, hobit-hennepin]
 
 - name: HOBIT at Detroit
-  email: derek.merck+hobitdetroit@gmail.com
+  email: $TEST_GMAIL_BASE+hobitdetroit@gmail.com
   listening: [hobit-detroit]
 
 - name: HOBIT at St Francis
-  email: derek.merck+hobitstf@gmail.com
+  email: $TEST_GMAIL_BASE+hobitstf@gmail.com
   listening: [hobit-stfrancis]
