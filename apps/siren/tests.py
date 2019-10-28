@@ -30,7 +30,7 @@ from wuphf.cli.string_descs import *
 from diana.utils import unpack_data
 from crud.utils import deserialize_dict
 
-from handlers import handle_upload_file, handle_upload_dir, handle_upload_zip, handle_notify_study
+from handlers import handle_upload_dir, handle_upload_zip, handle_notify_study, handle_file_arrived
 
 # Retrofit DIANA apis to crud manager
 from crud.abc import Serializable
@@ -38,7 +38,7 @@ Serializable.Factory.registry["ObservableOrthanc"] = ObservableOrthanc
 Serializable.Factory.registry["Dixel"] = Dixel
 
 # CONFIG
-_services          = "@./siren_services.yaml"
+_services          = "@./services.yaml"
 _subscriptions     = "@./subscriptions.yaml"
 
 os.environ["ORTHANC_PASSWORD"] = "passw0rd!"  # Set defaults
@@ -50,11 +50,12 @@ fkey               = b'o-KzB3u1a_Vlb8Ji1CdyfTFpZ2FvdsPK4yQCRzFCcss='
 messenger_name     = "gmail:"   # Use "gmail:" or "local_smtp"
 splunk_index       = "testing"  # Set to "dicom" for production or "testing"
 msg_t              = """to: {{ recipient.email }}\nfrom: {{ from_addr }}\nsubject: Test Message\n\nThis is the message text: "{{ item.msg_text }}"\n"""
-notify_msg_t = "@./siren_notify.txt.j2"
+notify_msg_t = "@./notify.txt.j2"
 
 # TESTING CONfIG
-test_sample_zip    = os.path.abspath("./resources/test.zip")
-test_sample_dir    = os.path.expanduser("~/data/test")
+test_sample_zip    = os.path.abspath("../../tests/resources/dcm_zip/test.zip")
+test_sample_file   = os.path.abspath("../../tests/resources/dcm/IM2263")
+test_sample_dir    = os.path.expanduser("~/data/test")  # Need to dl separately
 test_email_addr1   = os.environ.get("TEST_EMAIL_ADDR1")
 os.environ["TEST_GMAIL_BASE"] = test_email_addr1.split("@")[0]
 
@@ -228,10 +229,28 @@ def test_upload_zip_handler(zip_file, orth: Orthanc):
     return True
 
 
+def test_file_arrived_handler(dcm_file, zip_file, orth: Orthanc):
+    print("Testing can handle file arrived")
 
+    orth.clear()
+    assert (len(orth.studies()) == 0)
 
+    data = {"fn": zip_file}
+    handle_file_arrived(data, DcmDir(), orth, fkey, anon_salt=anon_salt)
+    assert (len(orth.instances()) > 1)
 
+    orth.clear()
+    assert (len(orth.studies()) == 0)
 
+    data = {"fn": dcm_file}
+    handle_file_arrived(data, DcmDir(), orth, fkey, anon_salt=anon_salt)
+    assert (len(orth.instances()) == 1)
+
+    orth.clear()
+    assert (len(orth.studies()) == 0)
+
+    print("Passed!")
+    return True
 
 
 def test_watch_dcmdir(watch_path, test_data):
@@ -321,8 +340,9 @@ if __name__ == "__main__":
     # - notify
 
     # assert( test_upload_dir_handler( dcm_dir, orth) )
-    assert( test_upload_zip_handler( test_sample_zip, orth ))
-    # TODO: assert( test_upload_file( orth, dcm_dir, file, zip_file ))
+    # assert( test_upload_zip_handler( test_sample_zip, orth ))
+    # assert( test_file_arrived_handler( test_sample_file, test_sample_zip, orth ) )
+
     # TODO: assert( test_notify( orth, oid, disp_kwargs, messenger ))
 
     # Verify watcher pipeline
