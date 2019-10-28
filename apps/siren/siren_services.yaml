@@ -15,8 +15,8 @@ splunk:
   password:  $SPLUNK_PASSWORD
   hec_token: $SPLUNK_HEC_TOKEN
 
-smtp_server:
+local_smtp:
   ctype:     SmtpMessenger
-  host:      $SMTP_HOST
+  host:      $LOCAL_SMTP_HOST
   port:      25
 ...

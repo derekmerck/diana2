@@ -1,12 +1,13 @@
 from cryptography.fernet import Fernet
 import json
+import logging
 from typing import Mapping, Union
 
 from . import SmartJSONEncoder
 
 
 def pack_data(data: Mapping, fkey: Union[str, bytes], fields=None):
-    print(fields)
+    logging.debug(f"Packing fields: {fields}")
     if isinstance(fkey, str):
         fkey = fkey.encode("utf8")
     if fields:

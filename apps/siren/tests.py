@@ -2,6 +2,7 @@
 #
 # Requires env vars:
 # - TEST_EMAIL_ADDR1
+# - LOCAL_SMTP_HOST
 # - GMAIL_USER
 # - GMAIL_APP_PASSWORD
 
@@ -52,8 +53,7 @@ msg_t              = """to: {{ recipient.email }}\nfrom: {{ from_addr }}\nsubjec
 notify_msg_t = "@./siren_notify.txt.j2"
 
 # TESTING CONfIG
-test_resources_dir = "./resources"
-test_sample_zip    = "./resources/test.zip"
+test_sample_zip    = os.path.abspath("./resources/test.zip")
 test_sample_dir    = os.path.expanduser("~/data/test")
 test_email_addr1   = os.environ.get("TEST_EMAIL_ADDR1")
 os.environ["TEST_GMAIL_BASE"] = test_email_addr1.split("@")[0]
@@ -196,7 +196,7 @@ def test_distribute( subscriptions, messenger: SmtpMessenger, dryrun=False ):
     return True
 
 
-def test_upload_dir_handler(orth: Orthanc, dcm_dir: DcmDir):
+def test_upload_dir_handler(dcm_dir: DcmDir, orth: Orthanc):
     print("Testing can upload dir w handler")
 
     orth.clear()
@@ -204,6 +204,22 @@ def test_upload_dir_handler(orth: Orthanc, dcm_dir: DcmDir):
 
     handle_upload_dir(dcm_dir, orth, fkey, anon_salt=anon_salt)
     assert (len(orth.instances()) > 20)
+
+    orth.clear()
+    assert (len(orth.studies()) == 0)
+
+    print("Passed!")
+    return True
+
+
+def test_upload_zip_handler(zip_file, orth: Orthanc):
+    print("Testing can upload zip w handler")
+
+    orth.clear()
+    assert (len(orth.studies()) == 0)
+
+    handle_upload_zip(DcmDir(), zip_file, orth, fkey, anon_salt=anon_salt)
+    assert (len(orth.instances()) > 1)
 
     orth.clear()
     assert (len(orth.studies()) == 0)
@@ -304,8 +320,8 @@ if __name__ == "__main__":
     # - file
     # - notify
 
-    # assert( test_upload_dir_handler( orth, dcm_dir) )
-    # TODO: assert( test_upload_zip_handler( orth, dcm_dir, zip_file ))
+    # assert( test_upload_dir_handler( dcm_dir, orth) )
+    assert( test_upload_zip_handler( test_sample_zip, orth ))
     # TODO: assert( test_upload_file( orth, dcm_dir, file, zip_file ))
     # TODO: assert( test_notify( orth, oid, disp_kwargs, messenger ))
 
