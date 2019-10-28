@@ -61,6 +61,10 @@ class Watcher(object):
                 if hasattr(source.proc, "terminate"):
                     source.proc.terminate()
 
+    def __del__(self):
+        print("Destroying watcher")
+        self.stop()
+
     def run(self):
 
         logger = logging.getLogger("Watcher")

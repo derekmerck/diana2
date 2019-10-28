@@ -167,9 +167,6 @@ def handle_file_arrived(item,
     p = Path(fn).relative_to(source.path)
     pp = p.parent
     trial, site = os.path.split(pp)
-    #
-    # _path, _ = os.path.split(fn)
-    # trial, site = os.path.split(_path)
 
     if fn.endswith(".zip"):
         items = source.get_zipped(fn)
@@ -200,7 +197,7 @@ def start_watcher(source: DcmDir,
                   dispatcher: Dispatcher=None,
                   dryrun: bool=False,
                   indexer: Splunk=None,
-                  index_name = "dicom"):
+                  index_name="dicom"):
 
         def add_route(self: Watcher, source: Endpoint, event_type, func, **kwargs):
             func = partial(func, source=source, **kwargs)
