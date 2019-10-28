@@ -6,14 +6,14 @@
 # - GMAIL_USER
 # - GMAIL_APP_PASSWORD
 
-import os
-import yaml
 import time
 import logging
 import shutil
 import io
+import tempfile
+from pathlib import Path
 from pprint import pformat
-from contextlib import redirect_stdout, redirect_stderr
+from contextlib import redirect_stdout
 from multiprocessing import Process
 from datetime import datetime, timedelta
 from interruptingcow import timeout
@@ -22,15 +22,17 @@ from crud.endpoints import Splunk
 from diana.utils.endpoint import Watcher, Trigger
 from wuphf.endpoints import SmtpMessenger
 from wuphf.daemons import Dispatcher
-from wuphf.daemons.dispatcher import Transport
 from diana.apis import Orthanc, ObservableOrthanc, DcmDir, ObservableDcmDir
 from diana.dixel import Dixel, ShamDixel
-from diana.utils.dicom import DicomLevel as DLV, DicomEventType as DEV
+from diana.utils.dicom import DicomLevel as DLv, DicomEventType as DEv
 from wuphf.cli.string_descs import *
 from diana.utils import unpack_data
 from crud.utils import deserialize_dict
+from diana.utils.gateways import suppress_urllib_debug
+from diana.utils.endpoint.watcher import suppress_watcher_debug
 
-from handlers import handle_upload_dir, handle_upload_zip, handle_notify_study, handle_file_arrived
+from handlers import handle_upload_dir, handle_upload_zip, handle_notify_study, \
+    handle_file_arrived, start_watcher, tagged_studies
 
 # Retrofit DIANA apis to crud manager
 from crud.abc import Serializable
@@ -48,7 +50,7 @@ os.environ["SPLUNK_HEC_TOKEN"] = "b45a6398-ec35-4552-8b9b-9492a12e60a4"
 anon_salt          = "Test+Test+Test"
 fkey               = b'o-KzB3u1a_Vlb8Ji1CdyfTFpZ2FvdsPK4yQCRzFCcss='
 messenger_name     = "gmail:"   # Use "gmail:" or "local_smtp"
-splunk_index       = "testing"  # Set to "dicom" for production or "testing"
+SPLUNK_INDEX       = "testing"  # Set to "dicom" for production or "testing"
 msg_t              = """to: {{ recipient.email }}\nfrom: {{ from_addr }}\nsubject: Test Message\n\nThis is the message text: "{{ item.msg_text }}"\n"""
 notify_msg_t = "@./notify.txt.j2"
 
@@ -59,11 +61,10 @@ test_sample_dir    = os.path.expanduser("~/data/test")  # Need to dl separately
 test_email_addr1   = os.environ.get("TEST_EMAIL_ADDR1")
 os.environ["TEST_GMAIL_BASE"] = test_email_addr1.split("@")[0]
 
-CHECK_SPLUNK       = False   # Set False to skip long wait for dixel to index
-EMAIL_DRYRUN       = True    # Set False to send live emails
+CHECK_SPLUNK       = True   # Set False to skip long wait for dixel to index
+EMAIL_DRYRUN       = True   # Set False to send live emails
 
 # TESTS
-
 
 def test_upload_one(orth: Orthanc, dixel: Dixel):
     print("Testing can upload")
@@ -97,8 +98,8 @@ def test_anonymize_one(orth: Orthanc, dixel: Dixel):
 
     orth.put(anon)
 
-    orth.putm(anon.sham_parent_oid(DLV.STUDIES),
-           level=DLV.STUDIES,
+    orth.putm(anon.sham_parent_oid(DLv.STUDIES),
+           level=DLv.STUDIES,
            key="signature",
            value=anon.pack_fields(fkey))
 
@@ -123,10 +124,10 @@ def test_anonymize_one(orth: Orthanc, dixel: Dixel):
     return True
 
 
-def test_index_one( splunk: Splunk, dixel: Dixel, check_exists=True ):
+def test_index_one( splunk: Splunk, dixel: Dixel, check_exists=CHECK_SPLUNK ):
     print("Testing can index")
 
-    splunk.put(dixel, index=splunk_index)
+    splunk.put(dixel, index=SPLUNK_INDEX)
 
     if check_exists:
         print("Waiting for 1 min to index")
@@ -143,7 +144,7 @@ def test_index_one( splunk: Splunk, dixel: Dixel, check_exists=True ):
     return True
 
 
-def test_email_messenger( messenger: SmtpMessenger, dryrun=False ):
+def test_email_messenger( messenger: SmtpMessenger, dryrun=EMAIL_DRYRUN ):
     print("Testing can email from template")
 
     outgoing = "The quick brown fox jumped over the lazy dog"
@@ -162,7 +163,7 @@ def test_email_messenger( messenger: SmtpMessenger, dryrun=False ):
     return True
 
 
-def test_distribute( subscriptions, messenger: SmtpMessenger, dryrun=False ):
+def test_distribute( subscriptions, messenger: SmtpMessenger ):
     print("Testing can dispatch")
 
     ch, subs = deserialize_dict(subscriptions)
@@ -178,8 +179,7 @@ def test_distribute( subscriptions, messenger: SmtpMessenger, dryrun=False ):
     data = {"tags": {"AccessionNumber": "ABC123",
                      "PatientName": "DOE^JOHN^S"},
             "meta": {"signature":
-                         {"StudyDateTime": "Some date/time",
-                          "trial": "SOME TRIAL",
+                         {"trial": "SOME TRIAL",
                           "site":  "Some site"}
                      }
             }
@@ -235,42 +235,151 @@ def test_file_arrived_handler(dcm_file, zip_file, orth: Orthanc):
     orth.clear()
     assert (len(orth.studies()) == 0)
 
-    data = {"fn": zip_file}
-    handle_file_arrived(data, DcmDir(), orth, fkey, anon_salt=anon_salt)
+    watch_path = tempfile.mkdtemp()
+    site_path = os.path.join(watch_path, "my_trial", "my_site")
+    os.makedirs(site_path)
+
+    shutil.copy(zip_file, site_path)
+    data = {"fn": os.path.join( site_path, Path(zip_file).name )}
+    handle_file_arrived(data, DcmDir(path=watch_path), orth, fkey=fkey, anon_salt=anon_salt, signature_meta_key="signature")
     assert (len(orth.instances()) > 1)
 
+    oid = orth.studies()[0]
+    data = orth.getm(oid, key="signature")
+    clear = unpack_data(data, fkey)
+    print(pformat(clear))
+    assert(clear["trial"] == "my_trial")
+
     orth.clear()
     assert (len(orth.studies()) == 0)
 
-    data = {"fn": dcm_file}
-    handle_file_arrived(data, DcmDir(), orth, fkey, anon_salt=anon_salt)
+    tagged_studies.clear()
+
+    shutil.copy(dcm_file, site_path)
+
+    data = {"fn": os.path.join(site_path, Path(dcm_file).name)}
+    handle_file_arrived(data, DcmDir(path=watch_path), orth, fkey=fkey, anon_salt=anon_salt, signature_meta_key="signature")
     assert (len(orth.instances()) == 1)
 
+    time.sleep(1.0)
+    oid = orth.studies()[0]
+    data = orth.getm(oid, key="signature")
+    clear = unpack_data(data, fkey)
+    print(pformat(clear))
+    assert(clear["trial"] == "my_trial")
+
     orth.clear()
     assert (len(orth.studies()) == 0)
+
+    shutil.rmtree(watch_path, ignore_errors=True)
 
     print("Passed!")
     return True
 
 
-def test_watch_dcmdir(watch_path, test_data):
+def test_notify_handler(dixel, orth: Orthanc,
+                        subscriptions, messenger: SmtpMessenger,
+                        indexer: Splunk, dryrun=EMAIL_DRYRUN):
 
-    shutil.rmtree(watch_path, ignore_errors=True)
-    os.mkdir(watch_path)
-    dcmdir = ObservableDcmDir(path=watch_path)
+    orth.clear()
+    assert (len(orth.studies()) == 0)
+
+    orth.put(dixel)
+    dixel.meta["trial"] = "hobit"
+    dixel.meta["site"] = "testing"
+
+    orth.putm(dixel.parent_oid(DLv.STUDIES),
+              level=DLv.STUDIES,
+              key="signature",
+              value=dixel.pack_fields(fkey, fields=["trial", "site"]))
+
+    ch, subs = deserialize_dict(subscriptions)
+    dispatch = Dispatcher(
+        subscribers_desc=subs,
+        channels_desc=ch
+    )
+    messenger.set_msg_t(notify_msg_t)
+    dispatch.add_messenger("email", messenger)
+
+    data = {"oid": dixel.parent_oid(DLv.STUDIES)}
+    handle_notify_study(data, source=orth,
+                        dispatcher=dispatch, dryrun=dryrun,
+                        indexer=indexer, index_name=SPLUNK_INDEX,
+                        fkey=fkey)
+
+    print("Passed!")
+    return True
+
+
+def test_watch_orthanc(test_dixel, orth: ObservableOrthanc):
+
+    orth.clear()
+    assert (len(orth.studies()) == 0)
+
+    watcher = Watcher()
+
+    trigger0 = Trigger(
+        evtype=DEv.INSTANCE_ADDED,
+        source=orth,
+        action=orth.say)
+    watcher.add_trigger(trigger0)
+
+    trigger1 = Trigger(
+        evtype=DEv.STUDY_ADDED,
+        source=orth,
+        action=orth.say)
+    watcher.add_trigger(trigger1)
+
+    def runner():
+        """Pause to start watcher and then copy sample file to incoming"""
+        time.sleep(1.0)
+        orth.put(test_dixel)
+
+    p = Process(target=runner)
+    p.start()
+
+    f = io.StringIO()
+    print("Starting watcher")
+    with redirect_stdout(f):
+
+        print("In capture")
+        try:
+            with timeout(180):  # Give it a little time to say the instance or study oid
+                watcher.run()
+        except RuntimeError:
+            print("Stopping watcher")
+        finally:
+            watcher.stop()
+
+    out = f.getvalue()
+    print("Watcher output:")
+    print(out)
+
+    if dixel.oid() in out and dixel.parent_oid(DLv.STUDIES) in out:
+        print("Passed!")
+        return True
+
+
+def test_watch_dir(test_file):
+
+    watch_path = tempfile.mkdtemp()
+    site_path = os.path.join(watch_path, "my_trial", "my_site")
+    os.makedirs(site_path)
+
+    dcm_dir = ObservableDcmDir(path=watch_path)
 
     watcher = Watcher()
 
     trigger = Trigger(
-        evtype=DEV.FILE_ADDED,
-        source=dcmdir,
-        action=dcmdir.say)
+        evtype=DEv.FILE_ADDED,
+        source=dcm_dir,
+        action=dcm_dir.say)
     watcher.add_trigger(trigger)
 
     def runner():
         """Pause to start watcher and then copy sample file to incoming"""
         time.sleep(1.0)
-        shutil.copy(test_data, watch_path)
+        shutil.copy(test_file, site_path)
 
     p = Process(target=runner)
     p.start()
@@ -285,19 +394,82 @@ def test_watch_dcmdir(watch_path, test_data):
                 watcher.run()
         except RuntimeError:
             print("Stopping watcher")
+        finally:
+            watcher.stop()
 
     out = f.getvalue()
     print("Watcher output:")
     print(out)
 
-    if test_sample_data in out:
+    shutil.rmtree(watch_path, ignore_errors=True)
+
+    from pathlib import Path
+    if Path(test_file).name in out:
         print("Passed!")
         return True
+
+
+def test_siren_receiver(test_file, orth: Orthanc,
+                        subscriptions, messenger: SmtpMessenger,
+                        indexer: Splunk, dryrun=EMAIL_DRYRUN):
+
+    orth.clear()
+    assert (len(orth.studies()) == 0)
+
+    ch, subs = deserialize_dict(subscriptions)
+    dispatch = Dispatcher(
+        subscribers_desc=subs,
+        channels_desc=ch
+    )
+    messenger.set_msg_t(notify_msg_t)
+    dispatch.add_messenger("email", messenger)
+
+    watch_path = tempfile.mkdtemp()
+    site_path = os.path.join(watch_path, "hobit", "testing")
+    os.makedirs(site_path)
+
+    incoming = ObservableDcmDir(path=watch_path)
+
+    def runner():
+        """Pause to start watcher and then copy sample file to incoming/trial/site"""
+        time.sleep(1.0)
+        shutil.copy(test_file, site_path)
+
+    p = Process(target=runner)
+    p.start()
+
+    f = io.StringIO()
+    print("Starting SIREN Receiver")
+    with redirect_stdout(f):
+
+        print("In capture")
+        try:
+            with timeout(180):  # Give it a little time for the study to settle
+                start_watcher(
+                    incoming,
+                    orth,
+                    fkey=fkey,
+                    anon_salt=anon_salt,
+                    dispatcher=dispatch,
+                    dryrun=dryrun,
+                    indexer=indexer,
+                    index_name=SPLUNK_INDEX
+                )
+        except RuntimeError:
+            print("Stopping watcher")
+
+    out = f.getvalue()
+    print("SIREN Reciever output:")
+    print(out)
+
+    shutil.rmtree(watch_path, ignore_errors=True)
 
 
 if __name__ == "__main__":
 
     logging.basicConfig(level=logging.DEBUG)
+    suppress_urllib_debug()
+    suppress_watcher_debug()
 
     # Create service endpoints
     mgr = EndpointManager(serialized_ep_descs=_services)
@@ -310,28 +482,35 @@ if __name__ == "__main__":
     splunk: Splunk = mgr.get("splunk")
     dcm_dir = DcmDir(path=test_sample_dir)
 
-    # Verify that all endpoints are online
-    # assert(orth.check())
-    # assert(messenger.check())
-    # assert(splunk.check())
-
     # Load a dixel
     dixel = dcm_dir.get("IN000001", file=True)
     assert( dixel )
     assert( dixel.file )
 
-    # Verify capabilities:
+    # Verify that all endpoints are online
+    assert(orth.check())
+    assert(messenger.check())
+    assert(splunk.check())
+
+    # Verify basic capabilities:
     # - upload
     # - anonymize
     # - index
     # - message
     # - distribute
 
-    # assert( test_upload_one( orth, dixel ) )
-    # assert( test_anonymize_one( orth, dixel ) )
-    # assert( test_index_one(splunk, dixel, check_exists=CHECK_SPLUNK))
-    # assert( test_email_messenger(messenger, dryrun=EMAIL_DRYRUN) )
-    # assert( test_distribute(_subscriptions, messenger, dryrun=EMAIL_DRYRUN) )
+    assert( test_upload_one(orth, dixel) )
+    assert( test_anonymize_one(orth, dixel) )
+    assert( test_index_one(splunk, dixel) )
+    assert( test_email_messenger(messenger) )
+    assert( test_distribute(_subscriptions, messenger) )
+
+    # Verify observer daemons:
+    # - watch dir
+    # - watch orth
+
+    assert( test_watch_dir(test_sample_file) )
+    assert( test_watch_orthanc(dixel, orth) )
 
     # Verify handlers:
     # - directory
@@ -339,11 +518,12 @@ if __name__ == "__main__":
     # - file
     # - notify
 
-    # assert( test_upload_dir_handler( dcm_dir, orth) )
-    # assert( test_upload_zip_handler( test_sample_zip, orth ))
-    # assert( test_file_arrived_handler( test_sample_file, test_sample_zip, orth ) )
-
-    # TODO: assert( test_notify( orth, oid, disp_kwargs, messenger ))
+    assert( test_upload_dir_handler(dcm_dir, orth) )
+    assert( test_upload_zip_handler(test_sample_zip, orth) )
+    assert( test_file_arrived_handler(test_sample_file, test_sample_zip, orth) )
+    assert( test_notify_handler(dixel, orth, _subscriptions, messenger, splunk) )
 
     # Verify watcher pipeline
-    # TODO: assert( test_watcher( dcm_dir, orth, disp_kwargs, messenger)
+    # - run watcher
+
+    assert( test_siren_receiver(test_sample_file, orth, _subscriptions, messenger, splunk) )

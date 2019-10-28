@@ -22,6 +22,7 @@ Desired process:
 import os
 from functools import partial
 import logging
+from pathlib import Path
 from collections import deque
 from crud.abc import Endpoint, Watcher, Trigger
 from crud.endpoints import Splunk
@@ -39,8 +40,8 @@ SIGNATURE_ELEMENTS = ["AccessionNumber", "PatientName", "AccessionNumber",
 tagged_studies = deque(maxlen=20)  # Remember last 20 studies
 
 
-def handle_notify_study(source: Orthanc,
-                        oid,
+def handle_notify_study(item,
+                        source: Orthanc=None,
                         dispatcher: Dispatcher=None,
                         dryrun: bool=False,
                         indexer: Splunk=None,
@@ -48,10 +49,13 @@ def handle_notify_study(source: Orthanc,
                         fkey=None,
                         signature_meta_key="signature"):
 
+    logger = logging.getLogger("SirenNotify")
+
+    oid = item.get("oid")
     try:
         item = source.get(oid, level=DLv.STUDIES)
-    except:
-        logging.error(f"Received bad study oid for upload: {oid}")
+    except GatewayConnectionError:
+        logger.error(f"Unable to collect study: {oid}@{source}")
         return
 
     if fkey and signature_meta_key:
@@ -61,7 +65,7 @@ def handle_notify_study(source: Orthanc,
             item.meta[signature_meta_key] = metadata
         except GatewayConnectionError:
             # This is not an anonymized study
-            logging.warning(f"Found non-anonymized study: {oid}")
+            logger.warning(f"Found non-anonymized study: {oid}")
             return
 
     if dispatcher:
@@ -89,6 +93,9 @@ def handle_upload_file(item: Dixel,
     anon.file = f
     dest.put(anon)
 
+    logging.debug(f"Packing data w fkey: {fkey}")
+    logging.debug(f"Packing data to sig meta: {signature_meta_key}")
+
     if fkey and signature_meta_key:
         anon_study_oid = anon.sham_parent_oid(DLv.STUDIES)
         if anon_study_oid not in tagged_studies:
@@ -96,6 +103,8 @@ def handle_upload_file(item: Dixel,
             dest.putm(anon.sham_parent_oid(DLv.STUDIES),
                       level=DLv.STUDIES, key=signature_meta_key, value=sig_value)
             tagged_studies.appendleft(anon_study_oid)
+        # else:
+        #     logging.debug("Already tagged study")
 
 
 def handle_upload_zip(source: DcmDir,
@@ -144,17 +153,24 @@ def handle_upload_dir(source: DcmDir,
                         anon_salt=anon_salt)
 
 
-def handle_file_arrived(item, source: DcmDir,
-                        dest: Orthanc,
+def handle_file_arrived(item,
+                        source: DcmDir=None,
+                        dest: Orthanc=None,
                         fkey=None,
                         signature_meta_key="signature",
                         anon_salt=None):
 
-    # Assume input DcmDir basepath is incoming/trial/site
-    _path, site = os.path.split(source.path)
-    _, trial = os.path.split(_path)
-
     fn = item.get("fn")
+
+    # Assume input DcmDir basepath is /incoming and fn is trial/site/fn
+
+    p = Path(fn).relative_to(source.path)
+    pp = p.parent
+    trial, site = os.path.split(pp)
+    #
+    # _path, _ = os.path.split(fn)
+    # trial, site = os.path.split(_path)
+
     if fn.endswith(".zip"):
         items = source.get_zipped(fn)
         for _item in items:
@@ -197,11 +213,19 @@ def start_watcher(source: DcmDir,
         w = Watcher()
 
         w.add_route(source, DEvT.FILE_ADDED, handle_file_arrived,
-                    dest=dest, salt=anon_salt,
+                    dest=dest, anon_salt=anon_salt,
                     fkey=fkey, signature_meta_key=signature_meta_key)
+
+        def say(item, source):
+            """Testing callback"""
+            logging.debug(f"Received item: {item}@{source})")
+            print(f"{item}@{source}")
+
+        w.add_route(dest, DEvT.INSTANCE_ADDED, say)
+
         w.add_route(dest, DEvT.STUDY_ADDED, handle_notify_study,
                     dispatcher=dispatcher, dryrun=dryrun,
-                    index=indexer, index_name=index_name,
+                    indexer=indexer, index_name=index_name,
                     fkey=fkey, signature_meta_key=signature_meta_key)
 
         w.run()

@@ -1,5 +1,10 @@
 # DIANA SIREN Receiver
 
+Derek Merck  
+<derek.merck@ufl.edu>  
+University of Florida and Shands Hospital  
+Gainesville, FL  
+
 [SIREN][] is an NIH-funded multi-center clinical trial network for neuroemergency and resuscitation trials.  As patients are enrolled at participating sites, imaging studies must be submitted for central review, archival, and secondary analysis.
 
 
@@ -14,15 +19,15 @@
 
 ## Setup
 
-Create a source an `config.env` file with some required secrets:
+Create and source an `config.env` file with some required secrets:
   
-    - `ORTHANC_PASSWORD` - Admin password for Orthanc
-    - `SPLUNK_PASSWORD`  - Admin password for Splunk
-    - `SPLUNK_HEC_TOKEN` - A Splunk token (or create one later)
-    - `DIANA_FKEY` - A Fernet key for encoding a study signature
-    - `SMTP_HOST` - For local email server, if applicable
-    - `GMAIL_USER` - For using gmail as an email server, if applicable
-    - `GMAIL_APP_PASSWORD` - Requires creating a special "app password" in the gmail user security panel
+  - `ORTHANC_PASSWORD` - Admin password for Orthanc
+  - `SPLUNK_PASSWORD`  - Admin password for Splunk
+  - `SPLUNK_HEC_TOKEN` - A Splunk token (or create one later)
+  - `DIANA_FKEY` - A Fernet key for encoding a study signature 
+  - `SMTP_HOST` - For local email server, if applicable
+  - `GMAIL_USER` - For using gmail as an email server, if applicable
+  - `GMAIL_APP_PASSWORD` - Requires creating a special "app password" in the gmail user security panel
 
 Use Docker to setup administrative services such as [Traefik][] and [Splunk][].  Setting up the baseline administration network and services is documented in `diana.platform.docker-stacks`.  A one-off Splunk container can be created with a command like this:
 
@@ -64,12 +69,12 @@ $ docker run -it \
         -v services.yaml:/services.yaml \
         -v subscriptions.yaml:/subscriptions.yaml \
         -v notify.txt.j2:/notify.txt.j2 \
-        -e DIANA_SERVICES=@/services \
+        -e DIANA_SERVICES=@/services.yaml \
         -env-file config.env \
         derekmerck/diana2
 ```
 
-Finally, interact with the `diana-siren` script from the command-line directly, or by installing it as a short-cut.
+Finally, interact with the `diana-siren` cli script from the command-line directly, or by installing it as a short-cut.
 
 ```bash
 /opt/diana$ python3 apps/siren/cli.py --version
@@ -106,7 +111,14 @@ Upload a study in zip format to the appropriate archive, anonymize, and tag with
 $ diana-siren upload_zip path:/incoming/hobit/site_xxx mystudy.zip orthanc:
 ```
 
-Get study with meta tags from orthanc and send to dispatcher and splunk:
+Get study with meta tags from orthanc, dispatch to trial-site channels and send meta to indexer:
+
+```bash
+$ diana-siren notify_study orthanc: xano-nxst-udyx-oid \
+              -S @/subscriptions -E gmail: -T @/receipt.txt.j2 -I splunk:
+```
+
+And similar functionalty using `diana-cli`:
 
 ```bash
 $ diana-cli oget -m signature -f $DIANA_FKEY orthanc: xano-nxst-udyx-oidx \
@@ -114,12 +126,12 @@ $ diana-cli oget -m signature -f $DIANA_FKEY orthanc: xano-nxst-udyx-oidx \
                      --email-messenger gmail: \
                      --msg_t @/receipt.txt.tmpl \
                      --channel_tmpl='$trial-$site' \
-            put splunk
+            put splunk:
 ```
 
-### The Watcher
+### Start The Watcher
 
-Start an automated watcher service.
+Start the automated watcher service.
 
 ```bash
 $ diana-siren start-watcher \
@@ -131,8 +143,7 @@ $ diana-siren start-watcher \
               -I splunk:
 ```
 
-[SIREN]: http://xxx
-[Traefik]: http://xxx
-[Splunk]:  http://xxx
-[Orthanc]: http://xxx
-
+[SIREN]: https://siren.network
+[Traefik]: https://traefik.io
+[Splunk]:  https://www.splunk.com
+[Orthanc]: https://www.orthanc-server.com

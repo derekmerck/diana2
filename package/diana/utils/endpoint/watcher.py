@@ -58,7 +58,8 @@ class Watcher(object):
     def stop(self):
         if self.sources:
             for source in self.sources.values():
-                source.proc.terminate()
+                if hasattr(source.proc, "terminate"):
+                    source.proc.terminate()
 
     def run(self):
 

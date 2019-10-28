@@ -104,7 +104,7 @@ def notify_study(ctx, source: Orthanc, item,
     """Dispatch study notification and send meta to indexer
 
     \b
-    $ diana-siren notify-study \\
+    $ diana-siren notify-study orthanc: xxsa-mple-oidx-xxx \\
                   -S ./subscriptions.yaml \\
                   -E gmail: \\
                   -T ./notify.txt.j2 \\
@@ -122,7 +122,7 @@ def notify_study(ctx, source: Orthanc, item,
             email_messenger.msg_t = email_template
             dispatcher.add_messenger("email", email_messenger)
 
-    handle_notify_study(source, item, dispatcher=dispatcher,
+    handle_notify_study(item, source=source, dispatcher=dispatcher,
                         dryrun=dryrun, indexer=indexer, fkey=fkey)
 
 
