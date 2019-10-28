@@ -36,5 +36,10 @@ setuptools.setup(
     install_requires=reqs,
     extras_require={
         'plus': plus_reqs
-    }
+    },
+
+    entry_points='''
+        [console_scripts]
+        diana-cli=diana.cli.cli:main
+    '''
 )

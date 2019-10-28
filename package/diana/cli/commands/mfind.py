@@ -1,49 +1,46 @@
 from datetime import datetime
 import click
-from crud.cli.utils import ClickEndpoint, CLICK_ARRAY
+from crud.cli.utils import ClickEndpoint, CLICK_ARRAY, CLICK_MAPPING
 from diana.apis import Montage
-
-"""
-$ diana-cli -s @services.yml mfind -a 520xxxxx montage print
-
-$ diana-cli -s @services.yml mfind -A @my_accessions.txt -e lungrads -e radcat montage print json > output.json
-
-{ ... lungrads='2', current_smoker=False, pack_years=15, radcat=(3,true) ... }
-
-"""
+from diana.dixel import RadiologyReport, LungScreeningReport
 
 
-@click.command(short_help="Find item in Montage by query for chaining")
+@click.command(short_help="Find items in Montage by query for chaining")
 @click.argument('source', type=ClickEndpoint(expects=Montage))
-@click.option('--accession_number', '-a', help="Requires PHI privileges on Montage")
-@click.option('--accessions_list',  '-A', type=CLICK_ARRAY,
-              help="List of a/ns in comma or newline separated string or @file.txt format")
-@click.option('--start_date', default="2003-01-01",
+@click.option('--accession_number', '-a', type=CLICK_ARRAY,
+              help="Requires PHI privileges on Montage")
+@click.option('--start_date', type=click.DateTime(),
+              default="2003-01-01",
               help="Starting date query bound")
-@click.option('--end_date', default=datetime.today().strftime("%Y-%m-%d"),
+@click.option('--end_date', type=click.DateTime(),
+              default=datetime.today().strftime("%Y-%m-%d"),
               help="Ending date query bound")
 @click.option('--today', is_flag=True, default=False)
-@click.option('--query', '-q', "_query", help="Query string")
+@click.option('--query', '-q', "_query", type=CLICK_MAPPING,
+              help="Query string")
 @click.option('--extraction', '-e', multiple=True,
               type=click.Choice(['radcat', 'lungrads']),
               help="Perform a data extraction on each report")
 @click.pass_context
 def mfind(ctx,
           source,
-          accession_number,
-          accessions_list,
+          accession_numbers,
           start_date,
           end_date,
           today,
           _query,
           extraction):
-    """Find item in Montage by query for chaining"""
+    """Find items in Montage by query for chaining.
+
+    \b
+    $ diana-cli mfind -a 520xxxxx montage print
+
+    $ diana-cli mfind -a @my_accessions.txt -e lungrads -e radcat montage print json > output.json
+    $ cat output.json
+    { ... lungrads='2', current_smoker=False, pack_years=15, radcat=(3,true) ... }
+    """
+
     click.echo(click.style('Montage Find', underline=True, bold=True))
-
-    from diana.dixel import RadiologyReport, LungScreeningReport
-
-    if not isinstance(source, Montage):
-        raise click.UsageError("Wrong endpoint type")
 
     def do_query(q):
 
@@ -70,14 +67,10 @@ def mfind(ctx,
         query["end_date"] = end_date
         result = do_query(query)
 
-    elif accession_number:
-        query["q"] = accession_number
-        result = do_query(query)
-
-    elif accessions_list:
+    elif accession_numbers:
         result = []
-        for accession_num in accessions_list:
-            query["q"] = accession_num
+        for accession_number in accession_numbers:
+            query["q"] = accession_number
             result.extend( do_query(query) )
 
     elif today:

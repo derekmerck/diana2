@@ -1,0 +1,62 @@
+---
+# Channel Info
+
+hobit-testing:
+  incoming: hobit/testing
+  project: HOBIT
+  site: HOBIT Testing
+
+hobit-duke:
+  incoming: hobit/duke
+  project: HOBIT
+  site: Duke University Hospital
+
+hobit-hennepin:
+  incoming: hobit/hennepin
+  project: HOBIT
+  site: Hennepin Co Medical Center
+
+hobit-detroit:
+  incoming: hobit/detroit
+  project: HOBIT
+  site: Detroit Receiving Hospital
+
+
+---
+# Subscriber Info
+
+- name: Any HOBIT
+  email: derek.merck+hobit@gmail.com
+  listening: [hobit]
+
+- name: Any Testing
+  email: derek.merck+testing@gmail.com
+  listening: [testing]
+
+- name: Invalid
+  email: derek.merck+invalid@gmail.com
+  listening: [invalid]
+
+- name: HOBIT Testing
+  email: derek.merck+hobittesting@gmail.com
+  listening: [hobit-testing]
+
+- name: HOBIT at Duke
+  email: derek.merck+hobitduke@gmail.com
+  listening: [hobit-duke]
+
+- name: HOBIT at Hennepin
+  email: derek.merck+hobithennepin@gmail.com
+  listening: [hobit-hennepin]
+
+- name: HOBIT at Duke and Hennepin
+  email: derek.merck+hobitdukehennepin@gmail.com
+  listening: [hobit-duke, hobit-hennepin]
+
+- name: HOBIT at Detroit
+  email: derek.merck+hobitdetroit@gmail.com
+  listening: [hobit-detroit]
+
+- name: HOBIT at St Francis
+  email: derek.merck+hobitstf@gmail.com
+  listening: [hobit-stfrancis]

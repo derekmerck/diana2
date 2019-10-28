@@ -1,0 +1,22 @@
+---
+orthanc_hobit:
+  ctype:     ObservableOrthanc
+  host:      localhost
+#  host:      orthanc-hobit
+  user:      orthanc
+  password:  $ORTHANC_PASSWORD
+
+splunk:
+  ctype:     Splunk
+  host:      localhost
+#  host:      splunk
+  user:      admin
+  index:     dicom
+  password:  $SPLUNK_PASSWORD
+  hec_token: $SPLUNK_HEC_TOKEN
+
+smtp_server:
+  ctype:     SmtpMessenger
+  host:      $SMTP_HOST
+  port:      25
+...
