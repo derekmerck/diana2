@@ -24,7 +24,7 @@ Create and source an `config.env` file with some required secrets:
   - `ORTHANC_PASSWORD` - Admin password for Orthanc
   - `SPLUNK_PASSWORD`  - Admin password for Splunk
   - `SPLUNK_HEC_TOKEN` - A Splunk token (or create one later)
-  - `DIANA_FKEY` - A Fernet key for encoding a study signature 
+  - `DIANA_FKEY` - Fernet key for encoding a study signature 
   - `SMTP_HOST` - For local email server, if applicable
   - `GMAIL_USER` - For using gmail as an email server, if applicable
   - `GMAIL_APP_PASSWORD` - Requires creating a special "app password" in the gmail user security panel
@@ -74,15 +74,10 @@ $ docker run -it \
         derekmerck/diana2
 ```
 
-Finally, interact with the `diana-siren` cli script from the command-line directly, or by installing it as a short-cut.
+Finally, interact with the `siren.py` script from the command-line.
 
 ```bash
 /opt/diana$ python3 apps/siren/cli.py --version
-diana-siren, version 2.1.x
-
-/opt/diana$ pip3 install apps/siren
-  ...
-/opt/diana$ diana-siren --version
 diana-siren, version 2.1.x
 ```
 
@@ -91,7 +86,7 @@ diana-siren, version 2.1.x
 Upload a study from the incoming directory to the appropriate archive, anonymize and tag with meta:
 
 ```bash
-$ diana-siren upload_dir path:/incoming/hobit/site_xxx mystudy.zip orthanc:
+$ python3 siren.py upload_dir path:/incoming/hobit/site_xxx mystudy.zip orthanc:
 ```
 
 Similar functionality using `diana-cli`:
@@ -108,14 +103,14 @@ $ diana-cli dgetall -b path:/incoming/hobit/site_xxx \
 Upload a study in zip format to the appropriate archive, anonymize, and tag with meta:
 
 ```bash
-$ diana-siren upload_zip path:/incoming/hobit/site_xxx mystudy.zip orthanc:
+$ python3 siren.py upload_zip path:/incoming/hobit/site_xxx mystudy.zip orthanc:
 ```
 
 Get study with meta tags from orthanc, dispatch to trial-site channels and send meta to indexer:
 
 ```bash
-$ diana-siren notify_study orthanc: xano-nxst-udyx-oid \
-              -S @/subscriptions -E gmail: -T @/receipt.txt.j2 -I splunk:
+$ python3 siren.py notify_study orthanc: xano-nxst-udyx-oid \
+                   -S @/subscriptions -E gmail: -T @/receipt.txt.j2 -I splunk:
 ```
 
 And similar functionalty using `diana-cli`:
@@ -134,16 +129,23 @@ $ diana-cli oget -m signature -f $DIANA_FKEY orthanc: xano-nxst-udyx-oidx \
 Start the automated watcher service.
 
 ```bash
-$ diana-siren start-watcher \
-              path:/data/incoming \
-              orthanc: \
-              -S ./subscriptions.yaml \
-              -E gmail: \
-              -T ./notify.txt.j2 \
-              -I splunk:
+$ python3 siren.py start-watcher \
+                   path:/data/incoming \
+                   orthanc: \
+                   -S ./subscriptions.yaml \
+                   -E gmail: \
+                   -T ./notify.txt.j2 \
+                   -I splunk:
 ```
+
+This can also be passed directly to the DIANA service container as the command (call `apps/siren/siren.py`, or set the working directory with the additional argument `-w /opt/diana/apps/siren`).
 
 [SIREN]: https://siren.network
 [Traefik]: https://traefik.io
 [Splunk]:  https://www.splunk.com
 [Orthanc]: https://www.orthanc-server.com
+
+License
+-------------
+
+MIT

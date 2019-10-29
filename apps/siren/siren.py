@@ -57,7 +57,7 @@ def upload_dir(ctx, source: DcmDir, dest: Orthanc, fkey, salt):
     """Upload directory to dicom archive and anonymize
 
     \b
-    $ diana-siren upload-dir path:/incoming/hobit/site_xxx orthanc:
+    $ python3 siren.py upload-dir path:/incoming/hobit/site_xxx orthanc:
     """
     handle_upload_dir(source, dest, fkey=fkey, anon_salt=salt)
 
@@ -76,7 +76,7 @@ def upload_zip(ctx, source: DcmDir, fn, dest: Orthanc, fkey, salt):
     """Upload zip file to dicom archive and anonymize
 
     \b
-    $ diana-siren upload_dir path:/incoming/hobit/site_xxx mystudy.zip orthanc:
+    $ python3 siren upload_dir path:/incoming/hobit/site_xxx mystudy.zip orthanc:
     """
     handle_upload_zip(source, fn, dest, fkey=fkey, anon_salt=salt)
 
@@ -104,11 +104,11 @@ def notify_study(ctx, source: Orthanc, item,
     """Dispatch study notification and send meta to indexer
 
     \b
-    $ diana-siren notify-study orthanc: xxsa-mple-oidx-xxx \\
-                  -S ./subscriptions.yaml \\
-                  -E gmail: \\
-                  -T ./notify.txt.j2 \\
-                  -I splunk:
+    $ python3 siren notify-study orthanc: xxsa-mple-oidx-xxx \\
+                    -S ./subscriptions.yaml \\
+                    -E gmail: \\
+                    -T ./notify.txt.j2 \\
+                    -I splunk:
     """
 
     dispatcher = None
@@ -155,13 +155,13 @@ def start_watcher(ctx, incoming: DcmDir,
     email notifications and send meta to indexer
 
     \b
-    $ diana-siren start-watcher \\
-                  path:/data/incoming \\
-                  orthanc: \\
-                  -S ./subscriptions.yaml \\
-                  -E gmail: \\
-                  -T ./notify.txt.j2 \\
-                  -I splunk:
+    $ python3-siren start-watcher \\
+                    path:/data/incoming \\
+                    orthanc: \\
+                    -S ./subscriptions.yaml \\
+                    -E gmail: \\
+                    -T ./notify.txt.j2 \\
+                    -I splunk:
     """
 
     dispatcher = None
