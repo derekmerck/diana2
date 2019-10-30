@@ -1,10 +1,11 @@
 ---
-orthanc_hobit:
+hobit:
   ctype:     ObservableOrthanc
   host:      localhost
 #  host:      orthanc-hobit
   user:      orthanc
   password:  $ORTHANC_PASSWORD
+  polling_interval: 10
 
 splunk:
   ctype:     Splunk
@@ -15,8 +16,9 @@ splunk:
   password:  $SPLUNK_PASSWORD
   hec_token: $SPLUNK_HEC_TOKEN
 
-local_smtp:
+smtp_server:
   ctype:     SmtpMessenger
-  host:      $LOCAL_SMTP_HOST
+  host:      $SMTP_HOST
   port:      25
+  msg_t:     "@/notify.txt.j2"
 ...

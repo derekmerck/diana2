@@ -21,10 +21,12 @@ Gainesville, FL
 
 Create and source an `config.env` file with some required secrets:
   
+  - `DATA_DIR` - Base data path on host
   - `ORTHANC_PASSWORD` - Admin password for Orthanc
   - `SPLUNK_PASSWORD`  - Admin password for Splunk
   - `SPLUNK_HEC_TOKEN` - A Splunk token (or create one later)
   - `DIANA_FKEY` - Fernet key for encoding a study signature 
+  - `DIANA_ANON_SALT` - Anonymization "salt" to create a unique sham namespace
   - `SMTP_HOST` - For local email server, if applicable
   - `GMAIL_USER` - For using gmail as an email server, if applicable
   - `GMAIL_APP_PASSWORD` - Requires creating a special "app password" in the gmail user security panel
@@ -65,13 +67,13 @@ Create a DIANA Docker container with appropriate config file and variable mappin
 
 ```bash
 $ docker run -it \
-        -v /incoming:/incoming \
-        -v services.yaml:/services.yaml \
-        -v subscriptions.yaml:/subscriptions.yaml \
-        -v notify.txt.j2:/notify.txt.j2 \
+        -v $DATA_DIR/incoming:/incoming \
+        -v $PWD/services.yaml:/services.yaml \
+        -v $PWD/subscriptions.yaml:/subscriptions.yaml \
+        -v $PWD/notify.txt.j2:/notify.txt.j2 \
         -e DIANA_SERVICES=@/services.yaml \
-        -env-file config.env \
-        derekmerck/diana2
+        --env-file $PWD/config.env \
+        derekmerck/diana2 /bin/bash
 ```
 
 Finally, interact with the `siren.py` script from the command-line.
@@ -117,9 +119,9 @@ And similar functionalty using `diana-cli`:
 
 ```bash
 $ diana-cli oget -m signature -f $DIANA_FKEY orthanc: xano-nxst-udyx-oidx \
-            dispatch --users @/subscriptions.yaml \
+            dispatch --subsciptions @/subscriptions.yaml \
                      --email-messenger gmail: \
-                     --msg_t @/receipt.txt.tmpl \
+                     --msg_t @/notify.txt.tmpl \
                      --channel_tmpl='$trial-$site' \
             put splunk:
 ```
@@ -130,11 +132,11 @@ Start the automated watcher service.
 
 ```bash
 $ python3 siren.py start-watcher \
-                   path:/data/incoming \
+                   path:/incoming \
                    orthanc: \
-                   -S ./subscriptions.yaml \
+                   -S @/subscriptions.yaml \
                    -E gmail: \
-                   -T ./notify.txt.j2 \
+                   -T @/notify.txt.j2 \
                    -I splunk:
 ```
 

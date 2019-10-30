@@ -2,23 +2,19 @@
 # Channel Info
 
 hobit-testing:
-  incoming: hobit/testing
-  project: HOBIT
+  trial: HOBIT
   site: HOBIT Testing
 
 hobit-duke:
-  incoming: hobit/duke
-  project: HOBIT
+  trial: HOBIT
   site: Duke University Hospital
 
 hobit-hennepin:
-  incoming: hobit/hennepin
-  project: HOBIT
+  trial: HOBIT
   site: Hennepin Co Medical Center
 
 hobit-detroit:
-  incoming: hobit/detroit
-  project: HOBIT
+  trial: HOBIT
   site: Detroit Receiving Hospital
 
 

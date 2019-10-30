@@ -6,7 +6,13 @@
 # ## Note -- $SPLUNK_HOST must be the swarm IP addr, not localhost
 # $ docker stack deploy -c backend/postgres-service.yaml backend
 # $ ln -s ~/siren.env siren.env
+# $ ln -s ~/dev/diana2/apps/siren/notify.txt.j2 notify.txt.j2
+# $ ln -s ~/siren_subs subscriptions.yaml
 # $ docker stack deploy -c submission-service.yaml siren
+
+# Note:
+# Soft link subscriptions, notify, and env file into this directory for config
+
 ---
 version: '3.3'
 
@@ -26,8 +32,8 @@ networks:
     attachable: true
 
 configs:
-  notify_default:
-    file: ./notify_default.txt.j2
+  notify_tmpl:
+    file: ./notify.txt.j2
   services:
     file: ./services.yaml
   subscriptions:
@@ -37,16 +43,19 @@ services:
 
   diana-transport:
 
-#    image: derekmerck/diana2
-    image: diana2:v21
-#    command: python3 examples/study_submission_rt.py
+    image: derekmerck/diana2
+#    command: >
+#      python3 apps/siren/siren.cli start-watcher
+#                          path:/incoming hobit
+#                          -S @/subscriptions.yaml -E local_smtp -T @/notify.txt.j2
+#                          -I splunk
     networks:
       - admin_logging_network
       - service_network
     volumes:
       - type:   bind
         source: $DATA_DIR/incoming
-        target: /data
+        target: /incoming
     environment:
       PYTHONUNBUFFERED: "true"
       TZ:               "America/New_York"
@@ -55,8 +64,8 @@ services:
       - ./siren.env
 
     configs:
-      - source: notify_default
-        target: /notify_default.txt.j2
+      - source: notify_tmpl
+        target: /notify.txt.j2
       - source: services
         target: /services.yaml
       - source: subscriptions

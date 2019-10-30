@@ -1,8 +1,4 @@
 ---
-dcm_incoming:
-  ctype:  DicomDir
-  path:   /data
-
 hobit:
   ctype:  ObservableOrthanc
   host:   orthanc-hobit
@@ -18,16 +14,12 @@ splunk:
   password:  ${SPLUNK_PASSWORD}
   hec_token: ${SPLUNK_HEC_TOKEN}
 
-smtp_server: &SMTP_SERVER
+smtp_server:
   ctype:  SmtpMessenger
   host:   ${SMTP_HOST}
   user:   ${SMTP_USER}
   password: ${SMTP_PASSWORD}
   tls:    ${SMTP_USE_TLS}
   port:   ${SMTP_PORT}
-  msg_t:  "@/notify_default.txt.j2"
-
-dispatcher:
-  ctype:  Dispatcher
-  smtp_messenger_desc: *SMTP_SERVER
-  subscriptions_desc:  "@/subscriptions.yaml"
+  msg_t:  "@/notify.txt.j2"
+...

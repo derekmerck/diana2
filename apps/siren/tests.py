@@ -1,10 +1,34 @@
-# SIREN/DIANA basic functionality testing framework
-#
-# Requires env vars:
-# - TEST_EMAIL_ADDR1
-# - LOCAL_SMTP_HOST
-# - GMAIL_USER
-# - GMAIL_APP_PASSWORD
+"""
+SIREN/DIANA basic functionality testing framework
+
+Requires env vars:
+- TEST_EMAIL_ADDR1
+- LOCAL_SMTP_HOST
+- GMAIL_USER
+- GMAIL_APP_PASSWORD
+- GMAIL_BASE_NAME  -- ie, abc -> abc+hobitduke@gmail.com
+
+
+TODO: The email notification template needs to distingush between the receiver's affiliation and the submitters affiliation
+
+submitter.trial
+submitter.institution
+
+(subscriber)
+receiver.name
+receiver.institution
+receiver.role
+
+channel [hobit]
+
+figure out submitter by looking at fp vs. incomimg (find incoming in path+ffp)
+
+
+TODO: Move stuff to archive after collected
+TODO: Write data into daily folder or something form mi-share
+
+
+"""
 
 import time
 import logging
@@ -178,17 +202,21 @@ def test_distribute( subscriptions, messenger: SmtpMessenger ):
     data = {"tags": {"AccessionNumber": "ABC123",
                      "PatientName": "DOE^JOHN^S"},
             "meta": {"signature":
-                         {"trial": "SOME TRIAL",
-                          "site":  "Some site"}
+                         {"trial": "hobit",
+                          "site":  "duke"}
                      }
             }
 
     dispatch.put(data, channels=["hobit-duke"])
+
+    data["meta"]["signature"]["site"] = "detroit"
     dispatch.put(data, channels=["hobit-detroit"])
 
     msgs = dispatch.peek_queue()
 
-    assert( "SIREN/SOME TRIAL" in "".join(msgs) )
+    # logging.debug(pformat(msgs))
+
+    assert( "SIREN/HOBIT" in "".join(msgs) )
     assert( "+testing+hobit@gmail.com" in "".join(msgs))
     assert( 'subject jacket for "DOE^JOHN^S"' in "".join(msgs))
 
@@ -479,7 +507,7 @@ if __name__ == "__main__":
 
     print(pformat(mgr.ep_descs))
 
-    orth: ObservableOrthanc = mgr.get("orthanc_hobit")
+    orth: ObservableOrthanc = mgr.get("hobit")
     orth.polling_interval = 5.0
     messenger: SmtpMessenger = mgr.get(messenger_name)
     messenger.msg_t = msg_t
@@ -503,32 +531,32 @@ if __name__ == "__main__":
     # - message
     # - distribute
 
-    assert( test_upload_one(orth, dixel) )
-    assert( test_anonymize_one(orth, dixel) )
-    assert( test_index_one(splunk, dixel) )
-    assert( test_email_messenger(messenger) )
+    # assert( test_upload_one(orth, dixel) )
+    # assert( test_anonymize_one(orth, dixel) )
+    # assert( test_index_one(splunk, dixel) )
+    # assert( test_email_messenger(messenger) )
     assert( test_distribute(_subscriptions, messenger) )
 
     # Verify observer daemons:
     # - watch dir
     # - watch orth
-
-    assert( test_watch_dir(test_sample_file) )
-    assert( test_watch_orthanc(dixel, orth) )
-
-    # Verify handlers:
-    # - directory
-    # - zip
-    # - file
-    # - notify
-
-    if DO_DIR_UPLOAD:
-        assert( test_upload_dir_handler(dcm_dir, orth) )
-    assert( test_upload_zip_handler(test_sample_zip, orth) )
-    assert( test_file_arrived_handler(test_sample_file, test_sample_zip, orth) )
-    assert( test_notify_handler(dixel, orth, _subscriptions, messenger, splunk) )
-
-    # Verify watcher pipeline
-    # - run watcher
-
-    assert( test_siren_receiver(test_sample_file, orth, _subscriptions, messenger, splunk) )
+    #
+    # assert( test_watch_dir(test_sample_file) )
+    # assert( test_watch_orthanc(dixel, orth) )
+    #
+    # # Verify handlers:
+    # # - directory
+    # # - zip
+    # # - file
+    # # - notify
+    #
+    # if DO_DIR_UPLOAD:
+    #     assert( test_upload_dir_handler(dcm_dir, orth) )
+    # assert( test_upload_zip_handler(test_sample_zip, orth) )
+    # assert( test_file_arrived_handler(test_sample_file, test_sample_zip, orth) )
+    # assert( test_notify_handler(dixel, orth, _subscriptions, messenger, splunk) )
+    #
+    # # Verify watcher pipeline
+    # # - run watcher
+    #
+    # assert( test_siren_receiver(test_sample_file, orth, _subscriptions, messenger, splunk) )
