@@ -6,7 +6,7 @@ from crud.endpoints import Splunk
 from crud.cli.utils import CLICK_MAPPING, ClickEndpoint
 from crud.cli.commands import check, ls
 from diana import __version__
-from diana.apis import DcmDir, Orthanc
+from diana.apis import DcmDir, Orthanc, ObservableOrthanc
 from wuphf.daemons import Dispatcher
 from wuphf.endpoints import SmtpMessenger
 from handlers import handle_upload_zip, handle_upload_dir, handle_notify_study, start_watcher
@@ -148,7 +148,7 @@ def notify_study(ctx, source: Orthanc, item,
               help="Indexing service bucket (defaults to 'dicom'")
 @click.pass_context
 def start_watcher(ctx, incoming: DcmDir,
-                  orthanc: Orthanc, salt, fkey,
+                  orthanc: ObservableOrthanc, salt, fkey,
                   subscriptions, email_messenger: SmtpMessenger, email_template, dryrun,
                   indexer: Splunk, index_name):
     """Run watcher to monitor incoming directory path, anonymize and upload studies,
