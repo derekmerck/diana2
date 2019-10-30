@@ -36,7 +36,7 @@ def cli(ctx, verbose, services):
     if not ctx.obj:
         ctx.obj = {}
 
-    service_mgr = EndpointManager(services)
+    service_mgr = EndpointManager(ep_descs=services)
 
     ctx.obj['services'] = service_mgr
 
