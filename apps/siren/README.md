@@ -56,12 +56,12 @@ $ docker run -d --rm \
            derekmerck/orthanc-wbv:latest-amd64
 ```
 
-Setup an incoming data directory `/incoming/hobit/site_xxx` for each submitting site.  Data from each enrolling site should be uploaded to a unique directory for processing.  The directory structure `/incoming/{trial}/{site}` is used to infer the notification channel `#{trial}-{site}` for each incoming study.
+Setup an incoming data directory `/incoming/hobit/site_xxx` for each submitting site.  Data from each enrolling site should be uploaded to a unique directory for processing.  The directory structure `/incoming/{trial}/{site}` is used to infer the notification channel `f"{trial}-{site}"` for each incoming study.
 
 Create configuration files:
   - `services.yaml` with DIANA service descriptions for orthanc, splunk, local_smtp
   - `subscriptions.yaml` with two documents: one with channel tag to name mappings (i.e., `site_xxx: My Site Hospital`) and one with subscribers, including affiliation (see [subscriptions](subscriptions.yaml) for an example)
-  - `notify.txt.j2` with text for receipt message and `jinja2` template markup
+  - `notify.txt.j2` with text for receipt message and `jinja2` template markup.  I soft-link this from the diana/apps/siren directory.
 
 Create a DIANA Docker container with appropriate config file and variable mappings.
 
@@ -79,7 +79,7 @@ $ docker run -it \
 Finally, interact with the `siren.py` script from the command-line.
 
 ```bash
-/opt/diana$ python3 apps/siren/cli.py --version
+/opt/diana$ python3 apps/siren/siren.py --version
 diana-siren, version 2.1.x
 ```
 

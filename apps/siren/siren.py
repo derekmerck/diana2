@@ -6,13 +6,18 @@ from crud.endpoints import Splunk
 from crud.cli.utils import CLICK_MAPPING, ClickEndpoint
 from crud.cli.commands import check, ls
 from diana import __version__
-from diana.apis import DcmDir, Orthanc, ObservableOrthanc
-# from wuphf.daemons import Dispatcher
+from diana.apis import DcmDir, Orthanc, ObservableOrthanc, ObservableDcmDir
 from wuphf.endpoints import SmtpMessenger
 from trial_dispatcher import TrialDispatcher as Dispatcher
 from handlers import handle_upload_zip, handle_upload_dir, handle_notify_study, start_watcher
 import wuphf.cli.string_descs
 import diana.cli.string_descs
+
+from crud.abc import Serializable
+Serializable.Factory.registry["ObservableOrthanc"] = ObservableOrthanc
+Serializable.Factory.registry["ObservableDcmDir"] = ObservableDcmDir
+Serializable.Factory.registry["Orthanc"] = Orthanc
+Serializable.Factory.registry["DcmDir"] = DcmDir
 
 
 @click.group(name="diana-siren")  # Non-chaining commands

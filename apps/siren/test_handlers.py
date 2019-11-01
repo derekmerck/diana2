@@ -12,8 +12,8 @@ TODO: Move stuff to archive after collected
 TODO: Write data into daily folder or something form mi-share
 
 $ git -C /opt/python-wuphf pull \
-  git -C /opt/pycrud pull \
-  git -C /opt/diana pull
+  && git -C /opt/pycrud pull \
+  && git -C /opt/diana pull
 
 
 """
