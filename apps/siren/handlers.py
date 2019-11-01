@@ -69,13 +69,8 @@ def handle_notify_study(item,
             return
 
     if dispatcher:
-        trial = item.meta.get(signature_meta_key).get("trial")
-        site = item.meta.get(signature_meta_key).get("site")
-        if not trial or not site:
-            raise ValueError("Missing info to set study distribution channel")
-        channel = "{}-{}".format(trial,site)
-        dispatcher.put(item, channels=[channel])
-        dispatcher.handle_queue(dryrun=dryrun)
+        # Trial Dispatcher type can infer the channels from the item signature
+        dispatcher.put(item, dryrun=dryrun)
 
     if indexer:
         indexer.put(item, index=index_name)

@@ -1,58 +1,63 @@
 ---
-# Channel Info
+# CHANNEL TAG INFO
 
-hobit-testing:
-  trial: HOBIT
-  site: HOBIT Testing
+hobit: HOBIT
 
-hobit-duke:
-  trial: HOBIT
-  site: Duke University Hospital
+testing: Systems Testing
 
-hobit-hennepin:
-  trial: HOBIT
-  site: Hennepin Co Medical Center
+coordination: Trial Coordination Center
 
-hobit-detroit:
-  trial: HOBIT
-  site: Detroit Receiving Hospital
+duke: Duke University Hospital
+
+hennepin: Hennepin Co Medical Center
+
+detroit: Detroit Receiving Hospital
 
 
 ---
-# Subscriber Info
+# SUBSCRIBER INFO
 
 - name: Any HOBIT
   email: $TEST_GMAIL_BASE+hobit@gmail.com
-  listening: [hobit]
+  affiliation: coordination
+  channels: [hobit]
 
 - name: Any Testing
   email: $TEST_GMAIL_BASE+testing@gmail.com
-  listening: [testing]
+  affiliation: testing
+  channels: [testing]
 
 - name: Invalid
   email: $TEST_GMAIL_BASE+invalid@gmail.com
-  listening: [invalid]
+  affiliation: invalid
+  channels: [invalid]
 
 - name: HOBIT Testing
   email: $TEST_GMAIL_BASE+hobittesting@gmail.com
-  listening: [hobit-testing]
+  affiliation: testing
+  channels: [hobit-testing]
 
 - name: HOBIT at Duke
   email: $TEST_GMAIL_BASE+hobitduke@gmail.com
-  listening: [hobit-duke]
+  affiliation: duke
+  channels: [hobit-duke]
 
 - name: HOBIT at Hennepin
   email: $TEST_GMAIL_BASE+hobithennepin@gmail.com
-  listening: [hobit-hennepin]
+  affiliation: hennepin
+  channels: [hobit-hennepin]
 
 - name: HOBIT at Duke and Hennepin
   email: $TEST_GMAIL_BASE+hobitdukehennepin@gmail.com
-  listening: [hobit-duke, hobit-hennepin]
+  affiliation: duke
+  channels: [hobit-duke, hobit-hennepin]
 
 - name: HOBIT at Detroit
   email: $TEST_GMAIL_BASE+hobitdetroit@gmail.com
-  listening: [hobit-detroit]
+  affiliation: detroit
+  channels: [hobit-detroit]
 
 - name: HOBIT at St Francis
   email: $TEST_GMAIL_BASE+hobitstf@gmail.com
-  listening: [hobit-stfrancis]
+  affiliation: st_francis
+  channels: [hobit-st_francis]

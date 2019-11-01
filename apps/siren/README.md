@@ -60,7 +60,7 @@ Setup an incoming data directory `/incoming/hobit/site_xxx` for each submitting 
 
 Create configuration files:
   - `services.yaml` with DIANA service descriptions for orthanc, splunk, local_smtp
-  - `notifications.yaml` with channels (i.e., `#hobit-site_xxx`) and subscribers
+  - `subscriptions.yaml` with two documents: one with channel tag to name mappings (i.e., `site_xxx: My Site Hospital`) and one with subscribers, including affiliation (see [subscriptions](subscriptions.yaml) for an example)
   - `notify.txt.j2` with text for receipt message and `jinja2` template markup
 
 Create a DIANA Docker container with appropriate config file and variable mappings.

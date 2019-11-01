@@ -7,8 +7,9 @@ from crud.cli.utils import CLICK_MAPPING, ClickEndpoint
 from crud.cli.commands import check, ls
 from diana import __version__
 from diana.apis import DcmDir, Orthanc, ObservableOrthanc
-from wuphf.daemons import Dispatcher
+# from wuphf.daemons import Dispatcher
 from wuphf.endpoints import SmtpMessenger
+from trial_dispatcher import TrialDispatcher as Dispatcher
 from handlers import handle_upload_zip, handle_upload_dir, handle_notify_study, start_watcher
 import wuphf.cli.string_descs
 import diana.cli.string_descs
@@ -167,13 +168,11 @@ def start_watcher(ctx, incoming: DcmDir,
     dispatcher = None
     if subscriptions:
         ch, subs = yaml.safe_load_all(subscriptions)
-        dispatcher = Dispatcher(
-            subscribers_desc=subs,
-            channels_desc=ch
-        )
+        dispatcher = Dispatcher(channel_tags=ch)
+        dispatcher.add_subscribers(subs)
         if email_messenger:
             email_messenger.msg_t = email_template
-            dispatcher.add_messenger("email", email_messenger)
+            dispatcher.email_messenger = email_messenger
 
     start_watcher(
         incoming,

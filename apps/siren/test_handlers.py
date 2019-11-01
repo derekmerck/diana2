@@ -8,24 +8,12 @@ Requires env vars:
 - GMAIL_APP_PASSWORD
 - GMAIL_BASE_NAME  -- ie, abc -> abc+hobitduke@gmail.com
 
-
-TODO: The email notification template needs to distingush between the receiver's affiliation and the submitters affiliation
-
-submitter.trial
-submitter.institution
-
-(subscriber)
-receiver.name
-receiver.institution
-receiver.role
-
-channel [hobit]
-
-figure out submitter by looking at fp vs. incomimg (find incoming in path+ffp)
-
-
 TODO: Move stuff to archive after collected
 TODO: Write data into daily folder or something form mi-share
+
+$ git -C /opt/python-wuphf pull \
+  git -C /opt/pycrud pull \
+  git -C /opt/diana pull
 
 
 """
@@ -46,7 +34,6 @@ from crud.abc import Watcher, Trigger
 from crud.endpoints import Splunk
 # from diana.utils.endpoint import Watcher, Trigger
 from wuphf.endpoints import SmtpMessenger
-from wuphf.daemons import Dispatcher
 from diana.apis import Orthanc, ObservableOrthanc, DcmDir, ObservableDcmDir
 from diana.dixel import Dixel, ShamDixel
 from diana.utils.dicom import DicomLevel as DLv, DicomEventType as DEv
@@ -58,6 +45,7 @@ from diana.utils.endpoint.watcher import suppress_watcher_debug
 
 from handlers import handle_upload_dir, handle_upload_zip, handle_notify_study, \
     handle_file_arrived, start_watcher, tagged_studies
+from trial_dispatcher import TrialDispatcher as Dispatcher
 
 # Retrofit DIANA apis to crud manager
 from crud.abc import Serializable
@@ -190,12 +178,11 @@ def test_distribute( subscriptions, messenger: SmtpMessenger ):
     print("Testing can dispatch")
 
     ch, subs = deserialize_dict(subscriptions)
-    dispatch = Dispatcher(
-        subscribers_desc=subs,
-        channels_desc=ch
-    )
+    dispatch = Dispatcher(channel_tags=ch)
+    dispatch.add_subscribers(subs)
+
     messenger.set_msg_t(notify_msg_t)
-    dispatch.add_messenger("email", messenger)
+    dispatch.email_messenger = messenger
 
     logging.debug(pformat(dispatch.subscribers))
 
@@ -207,18 +194,21 @@ def test_distribute( subscriptions, messenger: SmtpMessenger ):
                      }
             }
 
-    dispatch.put(data, channels=["hobit-duke"])
+    sent = dispatch.put(data, dryrun=EMAIL_DRYRUN)
 
     data["meta"]["signature"]["site"] = "detroit"
-    dispatch.put(data, channels=["hobit-detroit"])
+    sent += dispatch.put(data, dryrun=EMAIL_DRYRUN)
 
-    msgs = dispatch.peek_queue()
+    print(sent)
+
+    msgs = [x['msg'] for x in sent]
+    msgs = "\n".join(msgs)
 
     # logging.debug(pformat(msgs))
 
-    assert( "SIREN/HOBIT" in "".join(msgs) )
-    assert( "+testing+hobit@gmail.com" in "".join(msgs))
-    assert( 'subject jacket for "DOE^JOHN^S"' in "".join(msgs))
+    assert( "SIREN/HOBIT" in msgs )
+    assert( "+testing+hobit@gmail.com" in msgs )
+    assert( 'subject jacket for "DOE^JOHN^S"' in msgs )
 
     print("Passed!")
     return True
@@ -319,11 +309,11 @@ def test_notify_handler(dixel, orth: Orthanc,
 
     ch, subs = deserialize_dict(subscriptions)
     dispatch = Dispatcher(
-        subscribers_desc=subs,
-        channels_desc=ch
+        channel_tags=ch
     )
+    dispatch.add_subscribers(subs)
     messenger.set_msg_t(notify_msg_t)
-    dispatch.add_messenger("email", messenger)
+    dispatch.email_messenger = messenger
 
     data = {"oid": dixel.parent_oid(DLv.STUDIES)}
     handle_notify_study(data, source=orth,
@@ -369,7 +359,7 @@ def test_watch_orthanc(test_dixel, orth: ObservableOrthanc):
 
         print("In capture")
         try:
-            with timeout(90 and CHECK_WATCH_STUDIES or 5):  # Give it a little time to say the instance or study oid
+            with timeout(5):  # Give it a little time to say the instance
                 watcher.run()
         except RuntimeError:
             print("Stopping watcher")
@@ -379,9 +369,6 @@ def test_watch_orthanc(test_dixel, orth: ObservableOrthanc):
     out = f.getvalue()
     print("Watcher output:")
     print(out)
-
-    if CHECK_WATCH_STUDIES and dixel.parent_oid(DLv.STUDIES) not in out:
-        return False
 
     if dixel.oid() in out:
         print("Passed!")
@@ -447,11 +434,11 @@ def test_siren_receiver(test_file, orth: Orthanc,
 
     ch, subs = deserialize_dict(subscriptions)
     dispatch = Dispatcher(
-        subscribers_desc=subs,
-        channels_desc=ch
+        channel_tags=ch
     )
+    dispatch.add_subscribers(subs)
     messenger.set_msg_t(notify_msg_t)
-    dispatch.add_messenger("email", messenger)
+    dispatch.email_messenger = messenger
 
     watch_path = tempfile.mkdtemp()
     site_path = os.path.join(watch_path, "hobit", "testing")
@@ -508,7 +495,7 @@ if __name__ == "__main__":
     print(pformat(mgr.ep_descs))
 
     orth: ObservableOrthanc = mgr.get("hobit")
-    orth.polling_interval = 5.0
+    orth.polling_interval = 2.0
     messenger: SmtpMessenger = mgr.get(messenger_name)
     messenger.msg_t = msg_t
     splunk: Splunk = mgr.get("splunk")
@@ -531,32 +518,32 @@ if __name__ == "__main__":
     # - message
     # - distribute
 
-    # assert( test_upload_one(orth, dixel) )
-    # assert( test_anonymize_one(orth, dixel) )
-    # assert( test_index_one(splunk, dixel) )
-    # assert( test_email_messenger(messenger) )
+    assert( test_upload_one(orth, dixel) )
+    assert( test_anonymize_one(orth, dixel) )
+    assert( test_index_one(splunk, dixel) )
+    assert( test_email_messenger(messenger) )
     assert( test_distribute(_subscriptions, messenger) )
 
     # Verify observer daemons:
     # - watch dir
     # - watch orth
-    #
-    # assert( test_watch_dir(test_sample_file) )
-    # assert( test_watch_orthanc(dixel, orth) )
-    #
-    # # Verify handlers:
-    # # - directory
-    # # - zip
-    # # - file
-    # # - notify
-    #
-    # if DO_DIR_UPLOAD:
-    #     assert( test_upload_dir_handler(dcm_dir, orth) )
-    # assert( test_upload_zip_handler(test_sample_zip, orth) )
-    # assert( test_file_arrived_handler(test_sample_file, test_sample_zip, orth) )
-    # assert( test_notify_handler(dixel, orth, _subscriptions, messenger, splunk) )
-    #
-    # # Verify watcher pipeline
-    # # - run watcher
-    #
-    # assert( test_siren_receiver(test_sample_file, orth, _subscriptions, messenger, splunk) )
+
+    assert( test_watch_dir(test_sample_file) )
+    assert( test_watch_orthanc(dixel, orth) )
+
+    # Verify handlers:
+    # - directory
+    # - zip
+    # - file
+    # - notify
+
+    if DO_DIR_UPLOAD:
+        assert( test_upload_dir_handler(dcm_dir, orth) )
+    assert( test_upload_zip_handler(test_sample_zip, orth) )
+    assert( test_file_arrived_handler(test_sample_file, test_sample_zip, orth) )
+    assert( test_notify_handler(dixel, orth, _subscriptions, messenger, splunk) )
+
+    # Verify watcher pipeline
+    # - run watcher
+
+    assert( test_siren_receiver(test_sample_file, orth, _subscriptions, messenger, splunk) )
