@@ -12,12 +12,6 @@ from trial_dispatcher import TrialDispatcher as Dispatcher
 from handlers import handle_upload_zip, handle_upload_dir, handle_notify_study, start_watcher
 import wuphf.cli.string_descs
 import diana.cli.string_descs
-#
-# from crud.abc import Serializable
-# Serializable.Factory.registry["ObservableOrthanc"] = ObservableOrthanc
-# Serializable.Factory.registry["ObservableDcmDir"] = ObservableDcmDir
-# Serializable.Factory.registry["Orthanc"] = Orthanc
-# Serializable.Factory.registry["DcmDir"] = DcmDir
 
 
 @click.group(name="diana-siren")  # Non-chaining commands
@@ -121,12 +115,12 @@ def notify_study(ctx, source: Orthanc, item,
     if subscriptions:
         ch, subs = yaml.safe_load_all(subscriptions)
         dispatcher = Dispatcher(
-            subscribers_desc=subs,
-            channels_desc=ch
+            channel_tags=ch
         )
+        dispatcher.add_subscribers(subs)
         if email_messenger:
             email_messenger.msg_t = email_template
-            dispatcher.add_messenger("email", email_messenger)
+            dispatcher.email_messenger = email_messenger
 
     handle_notify_study(item, source=source, dispatcher=dispatcher,
                         dryrun=dryrun, indexer=indexer, fkey=fkey)
