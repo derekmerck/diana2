@@ -28,7 +28,9 @@ Hospital picture archive and communications systems (PACS) are not well suited f
 Python-Diana
 ----------------
 
-The Python-Diana package for Python >= 3.6 provides an api for a network of DICOM-file related services including PACS query, local archive, anonymization, file access, and study indexing.
+The Python-Diana package for Python >= 3.6 provides an api for a network of DICOM-file related services including PACS query, local archive, anonymization, file access, and study indexing.  As of DIANA 2.1, the endpoint API abstraction has been refactored to a separate package, [python-crud][].
+
+[python-crud]: https://github.com/derekmerck/pycrud
 
 It comes in two flavors: vanilla and "plus," which includes dependencies on scientific and machine learning packages.
 
@@ -79,7 +81,7 @@ The docker-image directory includes details on building diana2 and diana2-plus d
 
 ```bash
 $ docker run -it derekmerck/diana2 /bin/bash diana-cli --version
-('diana-cli.py', 'python-diana'), version ('2.x.x', '2.x.x')
+2.x.x
 ```
 
 
