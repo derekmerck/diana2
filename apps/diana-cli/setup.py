@@ -22,21 +22,21 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
-    classifiers=(
+    classifiers=[
         'Development Status :: 3 - Alpha',
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
-    ),
+    ],
     license='MIT',
     install_requires=reqs,
     extras_require={
         'plus': 'python-diana[plus]'
     },
 
-entry_points='''
+    entry_points='''
         [console_scripts]
-        diana-cli=diana_cli.cli:main
-        diana-plus=diana_plus.cli:main [plus]
+        diana-cli.legacy=diana_cli.cli:main
+        diana-plus.legacy=diana_plus.cli:main [plus]
     ''',
 )
