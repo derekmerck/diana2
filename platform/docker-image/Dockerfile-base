@@ -12,9 +12,9 @@ ARG DOCKER_ARCH="amd64"
 # ARG DOCKER_ARCH="arm64v8"
 
 LABEL maintainer="Derek Merck"
-LABEL email="derek_merck@brown.edu"
+LABEL email="derek.merck@ufl.edu"
 LABEL description="X-Arch Diana Base"
-LABEL vendor="Rhode Island Hospital"
+LABEL vendor="University of Floridal"
 LABEL architecture="$DOCKER_ARCH"
 LABEL os="linux"
 
@@ -61,5 +61,3 @@ ENV INITSYSTEM off
 
 # In case TINI is not PID 1
 ENV TINI_SUBREAPER
-
-
