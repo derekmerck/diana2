@@ -4,7 +4,7 @@ import logging
 from pathlib import Path
 import attr
 from .. import Orthanc
-from ...utils.endpoint import Event, ObservableMixin
+from crud.abc import Serializable, Event, ObservableMixin
 from ...utils.dicom import DicomEventType
 
 
@@ -105,3 +105,4 @@ class ObservableOrthanc(Orthanc, ObservableMixin):
             # self.logger.debug("Found {} Orthanc changes for {}".format(len(event_queue), self.location))
             return event_queue
 
+ObservableOrthanc.register()

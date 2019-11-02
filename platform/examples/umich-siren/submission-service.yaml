@@ -55,13 +55,13 @@ services:
     volumes:
       - type:   bind
         source: $DATA_DIR/incoming
-        target: /incoming
+        target: /incoming/hobit
     environment:
       PYTHONUNBUFFERED: "true"
       TZ:               "America/New_York"
-      DIANA_SERVICES_PATH: /services.yaml
+      DIANA_SERVICES:   "@/services.yaml"
     env_file:
-      - ./siren.env
+      - $PWD/config.env
 
     configs:
       - source: notify_tmpl
@@ -98,7 +98,7 @@ services:
       ORTHANC_NAME:             HOBIT Image Registry
       ORTHANC_AET:              HOBIT
       ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
-      ORTHANC_METADATA_0:       siren_info,9875
+      ORTHANC_METADATA_0:       signature,9875
       ORTHANC_STORE_COMPRESSED: "true"
       ORTHANC_PG_ENABLED:       "true"
       ORTHANC_PG_STORE_DICOM:   "true"

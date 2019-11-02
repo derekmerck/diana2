@@ -1,8 +1,8 @@
 import csv, logging
 import attr
-from ..dixel import Dixel
-from ..utils import Endpoint, Serializable
-from ..utils.dicom import DicomLevel
+from crud.abc import Endpoint, Serializable
+from diana.dixel import Dixel
+from diana.utils.dicom import DicomLevel
 
 
 @attr.s
@@ -69,3 +69,6 @@ class CsvFile(Endpoint, Serializable):
                 data = {("_"+k):v for (k,v) in item.meta.items()}
                 data.update(item.tags)
                 writer.writerow(data)
+
+
+CsvFile.register()

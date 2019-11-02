@@ -2,7 +2,7 @@ import os, logging
 
 from diana.dixel import DixelView
 from diana.apis import DcmDir
-from diana.plus.halibut import get_mobilenet
+# from diana.plus.halibut import get_mobilenet
 
 from test_utils import find_resource
 

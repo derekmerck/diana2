@@ -13,13 +13,13 @@ from pathlib import Path
 from multiprocessing import Pool
 import attr
 
-from diana.apis import Orthanc, CsvFile, DcmDir
+from diana.apis import Orthanc, DcmDir, CsvFile
 from diana.dixel import Dixel, ShamDixel, DixelView
 # from diana.utils.endpoint import Endpoint
 from diana.utils.dicom import DicomLevel
 
 from requests.exceptions import HTTPError
-from diana.utils.gateways.exceptions import GatewayConnectionError
+from crud.exceptions import GatewayConnectionError
 
 
 @attr.s

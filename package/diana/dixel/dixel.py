@@ -7,11 +7,10 @@ from dateutil import parser as DatetimeParser
 import attr
 import pydicom
 import numpy as np
-import json
-from cryptography.fernet import Fernet
+from crud.abc import Serializable
 from .report import RadiologyReport
 from ..utils.dicom import DicomLevel, DicomFormatError
-from ..utils import Serializable, dicom_simplify, SmartJSONEncoder, pack_data, unpack_data
+from ..utils import dicom_simplify, pack_data, unpack_data
 from ..utils.gateways import orthanc_id, Montage
 
 
@@ -385,3 +384,6 @@ class Dixel(Serializable):
             if prefix:
                 k = "{}-{}".format(prefix, k)
             self.meta[k] = v
+
+
+Dixel.register()

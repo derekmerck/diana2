@@ -1,4 +1,5 @@
 import logging
+from pprint import pformat
 import click
 from crud.manager import EndpointManager
 from crud.cli.utils import CLICK_MAPPING, import_cmds
@@ -36,13 +37,14 @@ def cli(ctx, verbose, services):
     if verbose:
         logging.basicConfig(level=logging.DEBUG)
         click.echo('Verbose mode is ON')
-        suppress_watcher_debug()
     else:
         logging.basicConfig(level=logging.WARNING)
         suppress_urllib_debug()
+    suppress_watcher_debug()
 
     if verbose:
-        click.echo("Using services: {}".format(services))
+        click.echo("Using services:")
+        click.echo(pformat(services))
 
     # Runner does not instantiate ctx properly
     if not ctx.obj:
@@ -64,6 +66,7 @@ try:
     import_cmds(cli, wuphf_cmds)
     import wuphf.cli.string_descs
 except ImportError:
+    click.echo("wuphf messenger crud lib unavailable")
     pass
 
 

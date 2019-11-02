@@ -5,9 +5,10 @@ from pprint import pformat
 import time
 import logging
 import attr
-from ..utils.gateways import GatewayConnectionError
+from crud.abc import Endpoint, Serializable
+from crud.exceptions import GatewayConnectionError
 from ..utils.dicom import DicomLevel, dicom_date, dicom_time
-from ..utils import Endpoint, Serializable, FuncByDates
+from ..utils import FuncByDates
 from . import Orthanc
 from ..dixel import Dixel, DixelView
 
@@ -91,4 +92,4 @@ class ProxiedDicom(Endpoint, Serializable):
             for item in cache:
                 yield item
 
-
+ProxiedDicom.register()

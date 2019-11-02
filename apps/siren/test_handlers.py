@@ -2,19 +2,18 @@
 SIREN/DIANA basic functionality testing framework
 
 Requires env vars:
-- TEST_EMAIL_ADDR1
-- LOCAL_SMTP_HOST
 - GMAIL_USER
 - GMAIL_APP_PASSWORD
 - GMAIL_BASE_NAME  -- ie, abc -> abc+hobitduke@gmail.com
 
+These env vars are set to default:
+- ORTHANC_PASSWORD
+- SPLUNK_PASSWORD
+- SPLUNK_HEC_TOKEN
+
 TODO: Move stuff to archive after collected
-TODO: Write data into daily folder or something form mi-share
-
-$ git -C /opt/python-wuphf pull \
-  && git -C /opt/pycrud pull \
-  && git -C /opt/diana pull
-
+TODO: Write data into daily folder or something from mi-share ingress
+TODO: Suppress dicom-simplify missing (series) creation time
 
 """
 
@@ -32,7 +31,6 @@ from interruptingcow import timeout
 from crud.manager import EndpointManager
 from crud.abc import Watcher, Trigger
 from crud.endpoints import Splunk
-# from diana.utils.endpoint import Watcher, Trigger
 from wuphf.endpoints import SmtpMessenger
 from diana.apis import Orthanc, ObservableOrthanc, DcmDir, ObservableDcmDir
 from diana.dixel import Dixel, ShamDixel
@@ -49,7 +47,10 @@ from trial_dispatcher import TrialDispatcher as Dispatcher
 
 # Retrofit DIANA apis to crud manager
 from crud.abc import Serializable
+Serializable.Factory.registry["Orthanc"] = Orthanc
 Serializable.Factory.registry["ObservableOrthanc"] = ObservableOrthanc
+Serializable.Factory.registry["DcmDir"] = DcmDir
+Serializable.Factory.registry["ObservableDcmDir"] = ObservableDcmDir
 Serializable.Factory.registry["Dixel"] = Dixel
 
 # CONFIG

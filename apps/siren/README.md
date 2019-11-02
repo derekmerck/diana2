@@ -35,6 +35,7 @@ Use Docker to setup administrative services such as [Traefik][] and [Splunk][]. 
 
 ```bash
 $ docker run -d --rm \
+           --name splunk \
            -e SPLUNK_START_ARGS="--accept-license" \
            -e SPLUNK_PASSWORD=$SPLUNK_PASSWORD \
            -e SPLUNK_HEC_TOKEN=$SPLUNK_HEC_TOKEN \
@@ -49,6 +50,7 @@ Setup an [Orthanc][] instance for each trial.  Configure it to create the metada
 
 ```bash
 $ docker run -d --rm \
+           --name orthanc \
            -e ORTHANC_METADATA_0="signature,1025" \
            -e ORTHANC_PASSWORD=$ORTHANC_PASSWORD \
            -e TZ="America/New_York" \
@@ -63,18 +65,29 @@ Create configuration files:
   - `subscriptions.yaml` with two documents: one with channel tag to name mappings (i.e., `site_xxx: My Site Hospital`) and one with subscribers, including affiliation (see [subscriptions](subscriptions.yaml) for an example)
   - `notify.txt.j2` with text for receipt message and `jinja2` template markup.  I soft-link this from the diana/apps/siren directory.
 
-Create a DIANA Docker container with appropriate config file and variable mappings.
+Create a DIANA Docker container with appropriate config file and variable mappings.  (And in this case, I added the SIREN platform service and logging networks to resolve the hobit and splunk container names).
 
 ```bash
-$ docker run -it \
-        -v $DATA_DIR/incoming:/incoming \
+$ docker run -it --rm \
+        -v $DATA_DIR/incoming:/incoming/hobit \
         -v $PWD/services.yaml:/services.yaml \
         -v $PWD/subscriptions.yaml:/subscriptions.yaml \
         -v $PWD/notify.txt.j2:/notify.txt.j2 \
         -e DIANA_SERVICES=@/services.yaml \
         --env-file $PWD/config.env \
+        --network siren_service_network \
+        --network admin_logging_network \
         derekmerck/diana2 /bin/bash
 ```
+
+Typically the first thing you need to do with a fresh container is to update any scripts that haven't been pushed to the docker image already:
+
+```bash
+/opt/diana$ git -C /opt/python-wuphf pull \
+  && git -C /opt/pycrud pull \
+  && git -C /opt/diana pull
+```
+
 
 Finally, interact with the `siren.py` script from the command-line.
 
@@ -88,7 +101,7 @@ diana-siren, version 2.1.x
 Upload a study from the incoming directory to the appropriate archive, anonymize and tag with meta:
 
 ```bash
-$ python3 siren.py upload_dir path:/incoming/hobit/site_xxx mystudy.zip orthanc:
+$ python3 siren.py upload-dir path:/incoming/hobit/site_xxx orthanc:
 ```
 
 Similar functionality using `diana-cli`:
@@ -105,13 +118,13 @@ $ diana-cli dgetall -b path:/incoming/hobit/site_xxx \
 Upload a study in zip format to the appropriate archive, anonymize, and tag with meta:
 
 ```bash
-$ python3 siren.py upload_zip path:/incoming/hobit/site_xxx mystudy.zip orthanc:
+$ python3 siren.py upload-zip path:/incoming/hobit/site_xxx mystudy.zip orthanc:
 ```
 
 Get study with meta tags from orthanc, dispatch to trial-site channels and send meta to indexer:
 
 ```bash
-$ python3 siren.py notify_study orthanc: xano-nxst-udyx-oid \
+$ python3 siren.py notify-study orthanc: xano-nxst-udyx-oid \
                    -S @/subscriptions -E gmail: -T @/receipt.txt.j2 -I splunk:
 ```
 
@@ -140,7 +153,7 @@ $ python3 siren.py start-watcher \
                    -I splunk:
 ```
 
-This can also be passed directly to the DIANA service container as the command (call `apps/siren/siren.py`, or set the working directory with the additional argument `-w /opt/diana/apps/siren`).
+This can also be passed directly to an (up-to-date) DIANA service container as the command (call `apps/siren/siren.py`, or set the working directory with the additional argument `-w /opt/diana/apps/siren`).
 
 [SIREN]: https://siren.network
 [Traefik]: https://traefik.io

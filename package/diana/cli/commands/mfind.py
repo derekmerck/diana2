@@ -34,9 +34,10 @@ def mfind(ctx,
 
     \b
     $ diana-cli mfind -a 520xxxxx montage print
+    { "AccesssionNumber": 520xxxxx, "PatientID": abcdef, ... }
 
-    $ diana-cli mfind -a @my_accessions.txt -e lungrads -e radcat montage print json > output.json
-    $ cat output.json
+    $ diana-cli mfind -a @my_accessions.txt -e lungrads -e radcat montage print jsonl > output.jsonl
+    $ cat output.jsonl
     { ... lungrads='2', current_smoker=False, pack_years=15, radcat=(3,true) ... }
     """
 

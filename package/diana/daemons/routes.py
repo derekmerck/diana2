@@ -2,10 +2,11 @@ import os, logging
 from pprint import pprint
 from typing import Union, Mapping
 from functools import partial
+from crud.abc import Endpoint, Serializable, Trigger
+from crud.endpoints import Splunk
 from ..dixel import Dixel, DixelView, ShamDixel
 from ..apis import *
 from ..utils import DicomLevel, DicomEventType
-from ..utils.endpoint import Endpoint, Serializable, Trigger
 
 
 def put_item(item: str, source: Endpoint, dest: Endpoint, **kwargs):

@@ -1,5 +1,5 @@
 __name__ = "python-diana"
-__version__ = "2.1.0"
+__version__ = "2.1.1"
 __author__ = "Derek Merck"
-__author_email__ = "derek_merck@brown.edu"
+__author_email__ = "derek.merck@ufl.edu"
 __gistsig__ = "4b0bfbca0a415655d97f36489629e1cc"

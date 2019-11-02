@@ -2,10 +2,10 @@ import logging, hashlib, json, os
 from typing import Any, Union, Mapping
 from redis import Redis as RedisGateway, exceptions as RedisExceptions
 import attr
-from ..dixel import Dixel
-from ..utils.dicom import DicomFormatError
-from ..utils.endpoint import Endpoint, Serializable
-from ..utils import SmartJSONEncoder
+from diana.dixel import Dixel
+from diana.utils.dicom import DicomFormatError
+from diana.utils.endpoint import Endpoint, Serializable
+from diana.utils import SmartJSONEncoder
 
 @attr.s
 class Redis(Endpoint, Serializable):

@@ -1,11 +1,11 @@
 import logging
-from typing import Union
+from typing import Union, Mapping
 from . import Orthanc
 from ..dixel import Dixel
 from ..utils.dicom import DicomLevel
 
 
-def get_annotation(source: Orthanc, study: Dixel) -> Union[dict, None]:
+def get_annotation(source: Orthanc, item: Dixel) -> Union[Mapping, None]:
     """
     Method to summarize collections of Osimis-style ROI metadata and
     monkey-patch for diana.apis.Orthanc
@@ -20,18 +20,21 @@ def get_annotation(source: Orthanc, study: Dixel) -> Union[dict, None]:
 
     """
 
+    attachment_id = 9999   # Per Osimis specification
     try:
-        resource = "studies/{}/attachments/9999/data".format(study.oid())
+        oid = item.oid()
+        resource = f"studies/{oid}/attachments/{attachment_id}/data"
         ret = source.gateway._get(resource)
 
     except:
+        oid = item.oid()
         logger = logging.getLogger("Osimis")
-        logger.warning("No annotations to retrieve")
+        logger.warning(f"No annotations to retrieve for {oid}")
         return
 
     study_annotations = {
-        'AccessionNumber': study.meta["AccessionNumber"],
-        'StudyInstanceUID': study.meta["StudyInstanceUID"],
+        'AccessionNumber': item.tags["AccessionNumber"],
+        'StudyInstanceUID': item.tags["StudyInstanceUID"],
         'Annotations': []
     }
 
@@ -76,4 +79,3 @@ def get_annotation(source: Orthanc, study: Dixel) -> Union[dict, None]:
 
 # Monkey-patch
 Orthanc.get_annotation = get_annotation
-

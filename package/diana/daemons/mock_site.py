@@ -2,8 +2,8 @@ import random, logging, time
 from pprint import pprint
 from datetime import datetime, timedelta
 import attr
-from diana.dixel import MockStudy
-from diana.apis import Orthanc
+from ..dixel import MockStudy
+from ..apis import Orthanc
 
 sample_site_desc = """
 ---

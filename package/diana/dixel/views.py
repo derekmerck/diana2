@@ -8,8 +8,8 @@ class DixelView(Flag):
 
     Use `DixelView.TAGS in view` to test for different flags.
     """
-    META = auto()   #: In Orthanc this is the data from  /<level>/<oid>
-    METAKV = auto() #: In Orthanc this is the data from /<level>/<oid>/metadata/*
+    META = auto()   #: In Orthanc, this is the data from /<level>/<oid>
+    METAKV = auto() #: In Orthanc, this is the data from /<level>/<oid>/metadata/*
     TAGS = auto()   #: In Orthanc, this is the data from /<level>/<oid>/tags
     FILE = auto()   #: In Orthanc, this is the data from /<level>/<oid>/file
     PIXELS = auto() #: Optional for pydicom readers

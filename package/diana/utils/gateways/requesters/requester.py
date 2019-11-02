@@ -1,14 +1,14 @@
 import os, logging, json as _json
 import requests
 import attr
-from ..exceptions import GatewayConnectionError
-from ...smart_json import SmartJSONEncoder
+from crud.exceptions import GatewayConnectionError
+from crud.utils import SmartJSONEncoder
 
 # Enabled sessions to handle cookies from Docker swarm for sticky connections
 USE_SESSIONS = True
 
-NORMAL_TIMEOUT = (3.1, 12.1)  # (connect to, read to)
-LARGE_TIMEOUT  = (6.1, 360.1) # Use large timeout on <1Gb connections
+NORMAL_TIMEOUT = (3.1, 12.1)   # (connect to, read to)
+LARGE_TIMEOUT  = (6.1, 360.1)  # Use large timeout on <1Gb connections
 
 # On a raspberry pi with a 400Mb connection:
 #   - ~5 mins to pull a 1500 image study

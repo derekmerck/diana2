@@ -315,3 +315,6 @@ class MockStudy(Dixel):
                                 n_instances=n_instances)
                 self.children.append( S )
 
+MockInstance.register()
+MockSeries.register()
+MockStudy.register()

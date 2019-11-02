@@ -2,7 +2,7 @@ import logging
 from datetime import datetime, timedelta
 from enum import Enum
 import attr
-from diana.utils.endpoint import Serializable, ObservableMixin, Event
+from crud.abc import Serializable, ObservableMixin, Event
 
 class MockEventType(Enum):
     THIS = "this"
@@ -46,8 +46,8 @@ class MockObservable(Serializable, ObservableMixin):
         else:
             logging.debug("No changes")
 
-
     def say(self, data):
         print(data)
 
-Serializable.Factory.registry["MockObservable"] = MockObservable
+
+MockObservable.register()

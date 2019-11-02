@@ -4,8 +4,8 @@ from pathlib import Path
 from typing import Union, Collection
 import attr
 import pydicom
+from crud.abc import Endpoint, Serializable
 from ..dixel import Dixel, DixelView, ShamDixel
-from ..utils import Endpoint, Serializable
 from ..utils.dicom import DicomLevel, DicomFormatError
 from ..utils.gateways import DcmFileHandler, ZipFileHandler, ImageFileHandler, ImageFileFormat, TextFileHandler
 
@@ -57,7 +57,7 @@ class DcmDir(Endpoint, Serializable):
         if not self.gateway.exists(fn):
             raise FileNotFoundError(fn)
 
-        get_pixels = DixelView.PIXELS in view
+        get_pixels = DixelView.PIXELS in view or kwargs.get("pixels")
         # logger.debug("Pixels: {}".format(get_pixels))
 
         if DixelView.TAGS in view or DixelView.PIXELS in view:
@@ -264,3 +264,6 @@ class ImageDir(DcmDir):
 
         fn = "{}.{}".format(item.image_base_fn, self.format.value)
         self.gateway.put(fn, item.get_pixels())
+
+
+DcmDir.register()

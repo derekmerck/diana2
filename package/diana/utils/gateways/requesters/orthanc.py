@@ -3,7 +3,7 @@ from pprint import pformat
 from hashlib import sha1
 import attr
 from .requester import Requester
-from ..exceptions import GatewayConnectionError
+from crud.exceptions import GatewayConnectionError
 from ...dicom import DicomLevel
 
 orthanc_metadata_keys = [

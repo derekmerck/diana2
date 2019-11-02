@@ -1,2 +1,0 @@
-class GatewayConnectionError(Exception):
-    pass

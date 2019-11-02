@@ -5,8 +5,10 @@ from typing import Mapping
 from pprint import pformat
 import attr
 
-from ..utils import Endpoint, Serializable, FuncByDates
-from ..utils.gateways import Montage as MontageGateway, GatewayConnectionError
+from crud.abc import Endpoint, Serializable
+from crud.exceptions import GatewayConnectionError
+from ..utils import FuncByDates
+from ..utils.gateways import Montage as MontageGateway
 from ..dixel import Dixel
 
 
@@ -100,4 +102,4 @@ class Montage(Endpoint, Serializable):
                 yield item
 
 
-
+Montage.register()

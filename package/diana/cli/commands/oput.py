@@ -5,7 +5,7 @@ from typing import Mapping
 from crud.cli.utils import CLICK_MAPPING, ClickEndpoint
 from diana.apis import Orthanc
 from diana.dixel import ShamDixel
-from diana.utils.dicom import DicomLevel as DLV
+from diana.utils.dicom import DicomLevel as DLv
 
 
 @click.command()
@@ -31,7 +31,7 @@ def oput(ctx, dest: Orthanc, anonymize: bool, anon_salt, sign: Mapping, fkey):
 
         if anonymize:
             anon = ShamDixel.from_dixel(item, salt=anon_salt)
-            f = dest.anonymize(item, replacement_map=anon.orthanc_sham_map())
+            f = dest.anonymize(item)
             anon.file = f
             dest.put(anon)
             dest.delete(item)
@@ -39,5 +39,5 @@ def oput(ctx, dest: Orthanc, anonymize: bool, anon_salt, sign: Mapping, fkey):
             if sign:
                 for sig_key, sig_elements in sign.items():
                     sig_value = item.pack_fields(fkey, sig_elements)
-                    dest.putm(anon.sham_parent_oid(DLV.STUDIES),
-                              level=DLV.STUDIES, key=sig_key, value=sig_value)
+                    dest.putm(anon.sham_parent_oid(DLv.STUDIES),
+                              level=DLv.STUDIES, key=sig_key, value=sig_value)

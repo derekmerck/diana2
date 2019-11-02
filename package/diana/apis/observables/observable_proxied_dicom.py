@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from collections import deque
 import attr
 from .. import ProxiedDicom
-from ...utils.endpoint import Event, ObservableMixin
+from crud.abc import Event, ObservableMixin
 from ...utils.dicom import DicomEventType, DicomLevel, dicom_date, dicom_time
 
 @attr.s
@@ -95,5 +95,5 @@ class ObservableProxiedDicom(ProxiedDicom, ObservableMixin):
             return event_queue
 
 
-
+ObservableProxiedDicom.register()
 

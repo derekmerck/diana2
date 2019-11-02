@@ -4,7 +4,7 @@ import click
 from diana.utils.gateways import ImageFileHandler
 
 @click.command()
-@click.argument('format', type=click.Choice(["png"]), default="png")
+@click.argument("_format", type=click.Choice(["png"]), default="png")
 @click.argument('outpath', default=".", type=click.Path())
 @click.pass_context
 def fdump(ctx, _format, outpath):
@@ -24,4 +24,5 @@ def fdump(ctx, _format, outpath):
     for item in ctx.obj.get("items"):
         stem = Path(item.meta["FileName"]).stem
         outfile = os.path.join(outpath, f"{stem}.png")
-        ImageFileHandler().put(item.get_pixels(), outfile)
+        click.echo(f"Saving {outfile}")
+        ImageFileHandler().put(outfile, item.get_pixels())

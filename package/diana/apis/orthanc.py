@@ -1,40 +1,41 @@
 import logging
 from typing import Mapping, Union
-from pprint import pformat
+# from pprint import pformat
 import attr
 from ..dixel import Dixel, ShamDixel, DixelView
-from ..utils import Endpoint, Serializable
+from crud.abc import Endpoint, Serializable
+# from ..utils import Endpoint, Serializable
 from ..utils.gateways import Orthanc as OrthancGateway, GatewayConnectionError
-from ..utils.dicom import DicomLevel, dicom_simplify
+from ..utils.dicom import DicomLevel
 
 # Special metadata:
 # $ export ORTHANC_METADATA_0=Source,9876
 
-
-def sham_map(d: ShamDixel):
-
-    if d.level > DicomLevel.STUDIES:
-        raise NotImplementedError("Can only create default sham maps for STUDIES")
-
-    logging.debug(d)
-
-    m = {
-        "Replace": {
-            "PatientName": d.meta["ShamName"],
-            "PatientID": d.meta["ShamID"],
-            "PatientBirthDate": d.meta["ShamBirthDate"],
-            "AccessionNumber": d.meta["ShamAccessionNumber"],
-            "StudyDate": d.ShamStudyDate(),
-            "StudyTime": d.ShamStudyTime(),
-            },
-        "Keep": [
-            "PatientSex",
-            'StudyDescription',
-            'SeriesDescription',
-            ],
-        "Force": True
-    }
-    return m
+#
+# def sham_map(d: ShamDixel):
+#
+#     if d.level > DicomLevel.STUDIES:
+#         raise NotImplementedError("Can only create default sham maps for STUDIES")
+#
+#     logging.debug(d)
+#
+#     m = {
+#         "Replace": {
+#             "PatientName": d.meta["ShamName"],
+#             "PatientID": d.meta["ShamID"],
+#             "PatientBirthDate": d.meta["ShamBirthDate"],
+#             "AccessionNumber": d.meta["ShamAccessionNumber"],
+#             "StudyDate": d.ShamStudyDate(),
+#             "StudyTime": d.ShamStudyTime(),
+#             },
+#         "Keep": [
+#             "PatientSex",
+#             'StudyDescription',
+#             'SeriesDescription',
+#             ],
+#         "Force": True
+#     }
+#     return m
 
 
 @attr.s
@@ -167,7 +168,6 @@ class Orthanc(Endpoint, Serializable):
 
         return r
 
-
     def putm(self, item: Union[str, Dixel],
              level: DicomLevel = DicomLevel.STUDIES,
              key: str = "meta",
@@ -253,15 +253,17 @@ class Orthanc(Endpoint, Serializable):
     def anonymize(self, item: Union[str, Dixel],
                   level=DicomLevel.STUDIES,
                   replacement_map: Mapping = None,
+                  use_default_map: bool = False,
                   **kwargs):
 
         oid, level = self.id_from_item(item, level)
         if not replacement_map:
-            if isinstance(item, Dixel):
-                # Must have pre-assigned sham values
-                replacement_map = sham_map(item)
+            if use_default_map:
+                sham_dixel = ShamDixel.from_dixel(item)
+                replacement_map = sham_dixel.orthanc_sham_map()
             else:
-                raise ValueError("Anonymization requires a replacement map or dixel shams")
+                raise ValueError("Anonymization requires a replacement map or "
+                                 "explicit \"use_default_map\" flag")
 
         return self.gateway.anonymize(oid, level, replacement_map)
 
@@ -300,3 +302,6 @@ class Orthanc(Endpoint, Serializable):
 
     def instances(self):
         return self.gateway.inventory(level=DicomLevel.INSTANCES)
+
+
+Orthanc.register()

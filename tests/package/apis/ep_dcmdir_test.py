@@ -1,8 +1,8 @@
 import logging, json
 from pprint import pformat
+from crud.abc import Serializable
 from diana.apis import DcmDir
 from diana.dixel import DixelView
-from diana.utils import Serializable
 
 from test_utils import find_resource
 

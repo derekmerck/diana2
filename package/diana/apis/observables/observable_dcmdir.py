@@ -3,9 +3,10 @@ import time
 import attr
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler, FileSystemEvent
+from crud.abc import Event, ObservableMixin
 from .. import DcmDir
 from ...utils.dicom import DicomEventType
-from ...utils.endpoint import Event, ObservableMixin
+
 
 @attr.s
 class ObservableDcmDir(DcmDir, ObservableMixin):
@@ -69,7 +70,6 @@ class ObservableDcmDir(DcmDir, ObservableMixin):
             else:
                 logger.debug('Rejecting non-creation event {}'.format(wd_event))
 
-
     def poll_events(self):
 
         observer = Observer()
@@ -79,3 +79,6 @@ class ObservableDcmDir(DcmDir, ObservableMixin):
         observer.start()
 
         self.proc = observer  # For kill on __del__
+
+
+ObservableDcmDir.register()

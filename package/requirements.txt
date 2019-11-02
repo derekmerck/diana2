@@ -11,3 +11,6 @@ python-dateutil
 redis
 requests
 watchdog
+click
+pyyaml
+python-crud @ git+https://github.com/derekmerck/pycrud.git#subdirectory=package
