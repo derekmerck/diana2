@@ -1,6 +1,8 @@
 from click.testing import CliRunner
 import click
 
+from importlib import import_module
+
 
 def run_cli_help(app, cmd=None):
     runner = CliRunner()
@@ -15,7 +17,9 @@ def get_app_info(app):
 
     header = app.__dict__.get("__readme_header__", "")
     footer = app.__dict__.get("__readme_footer__", "")
-    cmds = [cmd.name for cmd in app.cli.cmds]
+
+    cmds = list(app.cli.commands.keys())
+    cmds.sort()
 
     return header, footer, cmds
 
@@ -27,16 +31,22 @@ def cli(apps, outfile):
 
     text = ""
     for app in apps:
-        _app = __import__(app)
+
+        app = "diana.cli.cli"
+        # should be something like diana.cli (the file)
+        _app: click.Group = import_module(app)
+
+        # print(dir(_app))
+        # print(_app.cli.commands.keys())
 
         header, footer, cmds = get_app_info(_app)
 
         text += header
-        text += "```\n" + run_cli_help(_app.cli) + "```\n"
+        text += "```\n" + run_cli_help(_app) + "```\n"
 
         for cmd in cmds:
             text += "## {}\n\n".format(cmd)
-            text += "```\n" + run_cli_help(_app.cli, cmd) + "```\n"
+            text += "```\n" + run_cli_help(_app, cmd) + "```\n"
 
         text += footer
 

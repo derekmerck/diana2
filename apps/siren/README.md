@@ -2,7 +2,7 @@
 
 Derek Merck  
 <derek.merck@ufl.edu>  
-University of Florida and Shands Hospital  
+University of Florida and Shands Hospital
 Gainesville, FL  
 
 [SIREN][] is an NIH-funded multi-center clinical trial network for neuroemergency and resuscitation trials.  As patients are enrolled at participating sites, imaging studies must be submitted for central review, archival, and secondary analysis.

@@ -4,7 +4,7 @@ diana-cli
 Derek Merck  
 <derek.merck@ufl.edu>  
 University of Florida and Shands Hospital  
-Gainesville, FL  
+Gainesville, FL 
 
 [![Build Status](https://travis-ci.org/derekmerck/diana2.svg?branch=master)](https://travis-ci.org/derekmerck/diana2)
 [![Coverage Status](https://codecov.io/gh/derekmerck/diana2/branch/master/graph/badge.svg)](https://codecov.io/gh/derekmerck/diana2)
@@ -16,36 +16,58 @@ Image:  <https://cloud.docker.com/repository/docker/derekmerck/diana2>
 
 `diana-cli` provides a command-line interface to DIANA endpoints.
 
-```
-Usage: diana-cli [OPTIONS] COMMAND [ARGS]...
+## Parameter Types
 
-  Run diana packages using a command-line interface.
+- MAPPING or DICT parameters may be json or yaml format strings, or an `@/file.yaml` path to a json or yaml formatted file.
+- ARRAY parameters such as ITEMS may be json or yaml format strings, or an `@/file.txt` path to a newline separated list of items.
+- ENDPOINT parameters, including SOURCE and DEST, must either reference a named service from the services description, or be a prefixed shortcut such as `path:/data/my_dir`, for example, which would create a DcmDir with `basepath=/data/my_dir`.
+
+## Usage
+
+```
+Usage: diana-cli [OPTIONS] COMMAND1 [ARGS]... [COMMAND2 [ARGS]...]...
+
+  Run DIANA packages using a command-line interface.
+
+  $ python3 -m diana.cli.cli --version
+  diana-cli, version 2.1.x
+
+  $ pip3 install python-diana
+  $ diana-cli --version
+  diana-cli, version 2.1.x
+
+  Also supports chained operations on dixels.  For example, to read a
+  directory and put all instances in a local orthanc:
+
+  $ diana-cli dgetall path:/data/dcm oput orthanc:
 
 Options:
-  --verbose / --no-verbose
-  --version                 Show the version and exit.
-  -s, --services TEXT       Diana service desc as yaml format string
-  -S, --services_path PATH  Diana service desc as a yaml format file or
-                            directory of files
-  --help                    Show this message and exit.
+  --version               Show the version and exit.
+  -v, --verbose
+  -s, --services MAPPING  Services dict as yaml/json format string or @file.yaml
+  --help                  Show this message and exit.
 
 Commands:
-  check     Check endpoint status
-  collect   Collect and handle studies
-  collect2  Collect and handle studies v2
-  dcm2im    Convert DICOM to image
-  dcm2json  Convert DICOM header to json
-  epdo      Call endpoint method
-  findex    Create a persistent DICOM file index
-  fiup      Upload indexed DICOM files
-  guid      Generate a GUID
-  mfind     Find item in Montage by query
-  mock      Generate mock DICOM traffic
-  ofind     Find item in Orthanc by query
-  verify    Verify DIANA source code against public gist signature
-  watch     Watch sources and route events
+  check    Check endpoint status
+  dgetall  Get all instances from DcmDir for chaining
+  do       Call endpoint method
+  fdump    Convert and save chained DICOM image data in png format.
+  get      Get items from endpoint for chaining
+  guid     Generate a GUID
+  ls       List all services and health
+  mfind    Find items in Montage by query for chaining
+  mock     Generate mock DICOM traffic
+  oget     Get studies from orthanc for chaining
+  ogetm    Get study-level item metadata from orthanc
+  oput     Put chained instances in orthanc
+  oputm    Set study-level item metadata in orthanc
+  print    Print chained items to stdout
+  put      Put chained items in endpoint
+  setmeta  Set metadata kvs for chained items
+  verify   Verify DIANA source code against public gist signature
+  wsend    Send items via Messenger endpoint
 
-  SERVICES is a required platform endpoint description in yaml format.
+  SERVICES is a required platform endpoint description in json/yaml format.
 
   ---
   orthanc:
@@ -59,126 +81,69 @@ Commands:
 ## check
 
 ```
-Usage: diana-cli check [OPTIONS] [ENDPOINTS]...
+Usage: diana-cli check [OPTIONS] ENDPOINT
 
-  Survey status of service ENDPOINTS
+  Check endpoint status
 
-Options:
-  --help  Show this message and exit.
-```
-## collect
-
-```
-Usage: diana-cli collect [OPTIONS] PROJECT DATA_PATH SOURCE DOMAIN [DEST]
-
-  Create a PROJECT key at DATA_PATH, then pull data from SOURCE and send to
-  DEST.
-
-Options:
-  -a, --anonymize
-  -b, --subpath_depth INTEGER  Number of sub-directories to use  (if dest is
-                               directory)
-  --help                       Show this message and exit.
-```
-## collect2
-
-```
-Usage: diana-cli collect2 [OPTIONS] SOURCE DEST [WORKLIST]...
-
-  Pull data from SOURCE and save/send to DEST.  If source is a service, a
-  QUERY must be provided, and a time range can be optionally provided for
-  retrospective data collection (otherwise defaulting to real-time
-  monitoring).
-
-Options:
-  -W, --worklist_source TEXT      file or service
-  -q, --query TEXT                worklist query (json)
-  -Q, --query_source TEXT         json file with worklist query
-  -t, --time_range TEXT           run query over time range
-  -a, --anonymize
-  -i, --image_dest TEXT           Specify image dest
-  -m, --meta_dest TEXT            Specify meta dest
-  -r, --report_dest TEXT          Specify report dest
-  -I, --image_format [d|i|c|o|m]  Convert images to format
-  -M, --meta_format [c|s|v]
-  -R, --report_format [i|n|l|i|n|e]
-  -b, --subfolders <INTEGER INTEGER>...
-  -B, --split_meta INTEGER
-  -p, --pool INTEGER              Pool size for multi-threading
-  -P, --pause FLOAT               Pause between threads
-  -d, --dryrun                    Process worklist and create keys without PACS
-                                  pulls
-  --help                          Show this message and exit.
-
-  $ diana-cli -S /services.yml collect pacs path:/data 9999999 ...
-```
-## dcm2im
-
-```
-Usage: diana-cli dcm2im [OPTIONS] INPATH [OUTPATH]
-
-  Convert a DICOM file or directory of files at INPATH into pixels and save
-  result in a standard image format (png, jpg) at OUTPATH.
+  $ crud-cli check redis
 
 Options:
   --help  Show this message and exit.
 ```
-## dcm2json
+## dgetall
 
 ```
-Usage: diana-cli dcm2json [OPTIONS] INPATH [OUTPATH]
+Usage: diana-cli dgetall [OPTIONS] SOURCE
 
-  Convert a DICOM file or directory of files at INPATH into dictionaries and
-  save result in json format at OUTPATH.
+  Get all instances from DcmDir for chaining
+
+Options:
+  -b, --binary  Get binary file as well as data
+  --help        Show this message and exit.
+```
+## do
+
+```
+Usage: diana-cli do [OPTIONS] ENDPOINT METHOD
+
+  Call an arbitrary endpoint method with *args, *mapargs, and **kwargs
+
+  $ crud-cli do redis check
+  $ crud-cli do redis find -m '{"data":"test"}'
+  $ crud-cli do redis get -g my_key print
+  $ crud-cli do orthanc get xxxx-xxxx... -k '{"level":"series"}'
+
+Options:
+  -g, --args ARRAY       Arguments as comma or newline separated or @file.txt
+                         format
+  -m, --mapargs MAPPING  Mapping-type arguments as json or @file.yaml format
+  -k, --kwargs MAPPING   Keyword arguments as json or @file.yaml format
+  --help                 Show this message and exit.
+```
+## fdump
+
+```
+Usage: diana-cli fdump [OPTIONS] [[png]] [OUTPATH]
+
+  Convert and save chained DICOM image data in png format.
+
+  /b $ diana-cli get path:/data/dcm IM0001.dcm fdump $ ls IM0001.png
 
 Options:
   --help  Show this message and exit.
 ```
-## epdo
+## get
 
 ```
-Usage: diana-cli epdo [OPTIONS] ENDPOINT METHOD
+Usage: diana-cli get [OPTIONS] SOURCE ITEMS
 
-  Call ENDPOINT METHOD with *args and **kwargs. Use "path:" for a DcmDir ep
-  and "ipath:" for an ImageDir epp.
-
-    $ diana-cli epdo orthanc info
-    $ diana-cli epdo ipath:/data/images exists my_file_name
-    $ diana-cli epdo montage find --map_arg '{"q": "<accession_number>"}'
+  Get items from endpoint for chaining
 
 Options:
-  -g, --args TEXT
-  -m, --map_arg TEXT
-  -k, --kwargs TEXT
-  -a, --anonymize              (ImageDir only)
-  -b, --subpath_depth INTEGER  Number of sub-directories to use (*Dir Only)
-  --help                       Show this message and exit.
-```
-## findex
-
-```
-Usage: diana-cli findex [OPTIONS] PATH REGISTRY
-
-  Inventory collections of files by accession number with a PATH REGISTRY for
-  retrieval
-
-Options:
-  -o, --orthanc_db         Use subpath width/depth=2
-  -r, --regex TEXT         Glob regular expression
-  -p, --pool_size INTEGER  Worker threads
-  --help                   Show this message and exit.
-```
-## fiup
-
-```
-Usage: diana-cli fiup [OPTIONS] COLLECTION PATH REGISTRY DEST
-
-  Collect files in a study by COLLECTION (accession number or "ALL") using a
-  PATH REGISTRY, and send to DEST.
-
-Options:
-  -p, --pool_size INTEGER  Worker threads
-  --help                   Show this message and exit.
+  -k, --kwargs MAPPING  kwargs dict as yaml/json format string or @file.yaml,
+                        i.e., '{"level": "series"}'
+  -b, --binary          Get binary file as well as data
+  --help                Show this message and exit.
 ```
 ## guid
 
@@ -192,16 +157,57 @@ Options:
   --age INTEGER                   Substitute age and ref date for DOB
   --reference_date [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
                                   Reference date for AGE
+  --salt TEXT                     Anonymization salt
   --help                          Show this message and exit.
 
-  $ python3 diana-cli.py guid "MERCK^DEREK^L" --age 30
+  $ python3 diana-cli.py guid --age 40 "MERCK^DEREK^L"
   Generating GUID
   ------------------------
   WARNING:GUIDMint:Creating non-reproducible GUID using current date
-  {'BirthDate': datetime.date(1988, 11, 20),
-   'ID': 'VXNQHHN523ZQNJFIY3TXJM4YXABTL6SL',
-   'Name': ['VANWASSENHOVE', 'XAVIER', 'N'],
-   'TimeOffset': datetime.timedelta(-47, 82822)}
+  {'birth_date': '19891023',
+   'id': 'TJEIRJJ2MK5HBVHLQCB5YDPXMU64LDPM',
+   'name': 'THURMER^JONAS^E',
+   'time_offset': '-3 days, 0:22:08'}
+```
+## ls
+
+```
+Usage: diana-cli ls [OPTIONS]
+
+  List all services and health
+
+  $ crud-cli ls
+
+Options:
+  -h, --health-check / -k, --skip-health-check
+                                  Skip health
+  --help                          Show this message and exit.
+```
+## mfind
+
+```
+Usage: diana-cli mfind [OPTIONS] SOURCE
+
+  Find items in Montage by query for chaining.
+
+  $ diana-cli mfind -a 520xxxxx montage print
+  { "AccesssionNumber": 520xxxxx, "PatientID": abcdef, ... }
+
+  $ diana-cli mfind -a @my_accessions.txt -e lungrads -e radcat montage print
+  jsonl > output.jsonl $ cat output.jsonl { ... lungrads='2',
+  current_smoker=False, pack_years=15, radcat=(3,true) ... }
+
+Options:
+  -a, --accession_number ARRAY    Requires PHI privileges on Montage
+  --start_date [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
+                                  Starting date query bound
+  --end_date [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
+                                  Ending date query bound
+  --today
+  -q, --query MAPPING             Query string
+  -e, --extraction [radcat|lungrads]
+                                  Perform a data extraction on each report
+  --help                          Show this message and exit.
 ```
 ## mock
 
@@ -212,8 +218,8 @@ Usage: diana-cli mock [OPTIONS] [DESC]
   DESC.  Studies are optionally forwarded to an endpoint DEST.
 
 Options:
-  --dest TEXT  Destination DICOM service
-  --help       Show this message and exit.
+  --dest ENDPOINT  Destination DICOM service
+  --help           Show this message and exit.
 
   DESC must be a mock-site description in yaml format.
 
@@ -230,44 +236,87 @@ Options:
       studies_per_hour: 4
   ...
 ```
-## mfind
+## oget
 
 ```
-Usage: diana-cli mfind [OPTIONS] SOURCE
+Usage: diana-cli oget [OPTIONS] SOURCE ITEMS
 
-  Find studies matching QUERY string in SOURCE Montage service.
+  Get study from orthanc
 
 Options:
-  -a, --accession_number TEXT     Link multiple a/ns with ' | ', requires PHI
-                                  privileges on Montage
-  -A, --accessions_path TEXT      Path to text file with study ids
-  --start_date TEXT               Starting date query bound
-  --end_date TEXT                 Ending date query bound
-  --today
-  -q, --query TEXT                Query string
-  -e, --extraction [radcat|lungrads]
-                                  Perform a data extraction on each report
-  -j, --json                      Output as json
-  --help                          Show this message and exit.
+  -m, --metakeys ARRAY  Meta key(s) to retrieve
+  --fkey TEXT           Fernet key for encrypting metadata
+  -k, --kwargs MAPPING  kwargs dict as yaml/json format string or @file.yaml,
+                        i.e., '{"level": "series"}'
+  -b, --binary          Get binary file as well as data
+  --help                Show this message and exit.
 ```
-## ofind
+## ogetm
 
 ```
-Usage: diana-cli ofind [OPTIONS] SOURCE
+Usage: diana-cli ogetm [OPTIONS] SOURCE ITEM KEY
 
-  Find studies matching yaml/json QUERY in SOURCE Orthanc or ProxiedDicom
-  service. The optional proxy DOMAIN issues a remote-find to a manually
-  proxied DICOM endpoint.
+  Get study-level item metadata from orthanc
 
 Options:
-  -a, --accession_number TEXT
-  --today
-  -q, --query TEXT             Query in json format
-  -l, --level TEXT
-  -d, --domain TEXT            Domain for proxied query when using Orthanc
-                               source
-  -r, --retrieve
-  --help                       Show this message and exit.
+  --fkey TEXT  Fernet key for decrypting metadata
+  --help       Show this message and exit.
+```
+## oput
+
+```
+Usage: diana-cli oput [OPTIONS] DEST
+
+  Put chained instances in orthanc
+
+Options:
+  -a, --anonymize   Anonymize instances as they are uploaded
+  --anon-salt TEXT  Anonymization salt
+  --sign MAPPING    Signature key(s) and elements
+  --fkey TEXT       Fernet key for encrypting metadata
+  --help            Show this message and exit.
+```
+## oputm
+
+```
+Usage: diana-cli oputm [OPTIONS] SOURCE ITEM UPDATES
+
+  Set study-level item metadata in orthanc
+
+Options:
+  --help  Show this message and exit.
+```
+## print
+
+```
+Usage: diana-cli print [OPTIONS] [[plain|jsonl|csv]]
+
+  Print chained items to stdout
+
+Options:
+  --help  Show this message and exit.
+```
+## put
+
+```
+Usage: diana-cli put [OPTIONS] DEST
+
+  Put chained items in endpoint
+
+Options:
+  -k, --kwargs MAPPING  kwargs dict as yaml/json format string or @file.yaml,
+                        i.e., '{"level": "series"}'
+  --help                Show this message and exit.
+```
+## setmeta
+
+```
+Usage: diana-cli setmeta [OPTIONS] UPDATE_DICT
+
+  Set metadata kvs for chained items
+
+Options:
+  --help  Show this message and exit.
 ```
 ## verify
 
@@ -284,91 +333,18 @@ Usage: diana-cli verify [OPTIONS]
 Options:
   --help  Show this message and exit.
 ```
-## watch
+## wsend
 
 ```
-Usage: diana-cli watch [OPTIONS]
+Usage: diana-cli wsend [OPTIONS] MESSENGER
 
-  Watch sources for events to handle based on ROUTES
+  Send data or chained items via Messenger endpoint
+
+  $ wuphf-cli send -t test@example.com gmail:user:pword "msg_text: Hello 123"
 
 Options:
-  -r, --route TEXT...
-  -R, --routes_path PATH
-  --help                  Show this message and exit.
-
-  Examples:
-
-  $ diana-cli watch -r upload_files path:/incoming queue
-  $ diana-cli watch -r anon_and_send_instances queue archive
-  $ diana-cli watch -r index_studies pacs splunk
-  $ diana-cli watch -r classify_ba archive splunk
-  $ diana-cli watch -R routes.yml
-
-  Multiple ROUTES file format:
-
-  ---
-  - handler: upload_files
-    source: "path:/incoming"
-    dest: queue
-  - handler: anon_and_send_instances
-    source: queue
-    dest: archive
-  - handler: index_studies
-    source: pacs
-    dest: splunk
-  ...
-
-  Provided route handlers:
-
-  - say_dlvl
-  - send_dlvl or anon_and_send_dlvl
-  - upload_files
-  - index_dlvl
+  --data MAPPING
+  -t, --target TEXT  Optional target, if not using a dedicated messenger
+  -m, --msg_t TEXT   Optional message template
+  --help             Show this message and exit.
 ```
-
-diana-plus
-=================
-
-`diana-plus` provides additional commands for pixel-processing.
-
-```
-Usage: diana-plus [OPTIONS] COMMAND [ARGS]...
-
-  Run diana and diana-plus packages using a command-line interface.
-
-Options:
-  --verbose / --no-verbose
-  --version                 Show the version and exit.
-  --help                    Show this message and exit.
-
-Commands:
-  check     Check endpoint status
-  classify  Classify DICOM files
-  collect   Collect and handle studies
-  collect2  Collect and handle studies v2
-  dcm2im    Convert DICOM to image
-  dcm2json  Convert DICOM header to json
-  epdo      Call endpoint method
-  findex    Create a persistent DICOM file index
-  fiup      Upload indexed DICOM files
-  guid      Generate a GUID
-  mfind     Find item in Montage by query
-  mock      Generate mock DICOM traffic
-  ofind     Find item in Orthanc by query
-  ssde      Estimate patient size from localizer
-  verify    Verify DIANA source code against public gist signature
-  watch     Watch sources and route events
-```
-## ssde
-
-```
-```
-## classify
-
-```
-```
-
-License
--------------
-
-MIT
