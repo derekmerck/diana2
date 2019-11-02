@@ -1,3 +1,2 @@
 click
 pyyaml
-#python-diana

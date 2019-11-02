@@ -14,6 +14,6 @@ cryptography
 watchdog
 click
 pyyaml
-python-crud
+
 # This seems to cause an error when checking as a requirement (from diana-cli)
-# @git+https://github.com/derekmerck/pycrud.git#subdirectory=package
+# python-crud@git+https://github.com/derekmerck/pycrud.git#subdirectory=package

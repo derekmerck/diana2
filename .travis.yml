@@ -84,6 +84,6 @@ after_success:
   # Retag image ${DIANA_VERSION} and push
   - docker-manifest ${DOCKER_USERNAME} -t ${DIANA_VERSION} -s diana2
 
-  - docker-compose build diana2-plus-amd64 diana2-plus-arm32v7
-  - docker-manifest ${DOCKER_USERNAME} -s diana2-plus
-  - docker-manifest ${DOCKER_USERNAME} -t ${DIANA_VERSION} -s diana2-plus
+#  - docker-compose build diana2-plus-amd64 diana2-plus-arm32v7
+#  - docker-manifest ${DOCKER_USERNAME} -s diana2-plus
+#  - docker-manifest ${DOCKER_USERNAME} -t ${DIANA_VERSION} -s diana2-plus
