@@ -23,7 +23,6 @@ addons:
       - python3-numpy
       - python-sklearn
       - python3-scipy
-      - python3-cryptography
 
 before_install:
   - pip3 install --upgrade pip
