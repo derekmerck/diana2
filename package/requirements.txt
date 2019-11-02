@@ -10,6 +10,7 @@ pillow
 python-dateutil
 redis
 requests
+cryptography
 watchdog
 click
 pyyaml
