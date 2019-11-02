@@ -12,7 +12,9 @@ requests
 watchdog
 lxml
 jinja2
-python-crud@git+https://github.com/derekmerck/pycrud.git#subdirectory=package
+python-crud
+# Causes some errors in pip with diana-cli app
+#@git+https://github.com/derekmerck/pycrud.git#subdirectory=package
 
 # APP REQS
 # -----------------
