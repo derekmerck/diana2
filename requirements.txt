@@ -12,7 +12,7 @@ requests
 watchdog
 lxml
 jinja2
-python-crud @ git+https://github.com/derekmerck/pycrud.git#subdirectory=package
+python-crud@git+https://github.com/derekmerck/pycrud.git#subdirectory=package
 
 # APP REQS
 # -----------------
