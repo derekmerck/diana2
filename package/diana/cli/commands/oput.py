@@ -20,7 +20,7 @@ from diana.utils.dicom import DicomLevel as DLv
               help="Fernet key for encrypting metadata")
 @click.pass_context
 def oput(ctx, dest: Orthanc, anonymize: bool, anon_salt, sign: Mapping, fkey):
-    """Put chained instances in orthanc"""
+    """Put chained instances in Orthanc"""
     click.echo(click.style('Putting Instances in Orthanc', underline=True, bold=True))
 
     if sign and not fkey:

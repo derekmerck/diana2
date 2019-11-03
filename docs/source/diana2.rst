@@ -2,9 +2,8 @@
 =======================================
 
 | Derek Merck
-| derek_merck@brown.edu
-| Rhode Island Hospital and Brown University
-| Providence, RI
+| derek.merck@ufl.edu
+| University of Florida and Shands Hospital Gainesville, FL
 
 |Build Status| |Coverage Status| |Doc Status|
 
@@ -33,7 +32,9 @@ Python-Diana
 
 The Python-Diana package for Python >= 3.6 provides an api for a network
 of DICOM-file related services including PACS query, local archive,
-anonymization, file access, and study indexing.
+anonymization, file access, and study indexing. As of DIANA 2.1, the
+endpoint API abstraction has been refactored to a separate package,
+`python-crud <https://github.com/derekmerck/pycrud>`__.
 
 It comes in two flavors: vanilla and “plus,” which includes dependencies
 on scientific and machine learning packages.
@@ -95,7 +96,7 @@ images from ci are available on docker hub.
 .. code:: bash
 
    $ docker run -it derekmerck/diana2 /bin/bash diana-cli --version
-   ('diana-cli.py', 'python-diana'), version ('2.x.x', '2.x.x')
+   2.x.x
 
 License
 -------

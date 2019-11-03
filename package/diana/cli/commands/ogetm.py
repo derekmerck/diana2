@@ -12,7 +12,7 @@ from diana.apis import Orthanc
 
 @click.pass_context
 def ogetm(ctx, source: Orthanc, item, key, fkey):
-    """Get study-level item metadata from orthanc"""
+    """Get study-level item metadata from Orthanc"""
     click.echo(click.style('Orthanc Get Meta', underline=True, bold=True))
     if not isinstance(source, Orthanc):
         raise click.UsageError("Wrong endpoint type")

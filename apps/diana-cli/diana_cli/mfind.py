@@ -2,8 +2,8 @@ from datetime import datetime
 from pprint import pformat
 import json
 import click
-from diana.utils.endpoint import Serializable
-from diana.utils import SmartJSONEncoder
+from crud.abc import Serializable
+from crud.utils import SmartJSONEncoder
 from diana.dixel import RadiologyReport, LungScreeningReport
 # Importing all apis allows them to be immediately deserialized
 from diana.apis import *

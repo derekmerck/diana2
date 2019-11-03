@@ -2,9 +2,9 @@ Diana-REST
 ==========
 
 | Derek Merck
-| derek_merck@brown.edu
-| Rhode Island Hospital and Brown University
-| Providence, RI
+| derek.merck@ufl.edu
+| University of Florida and Shands Hospital
+| Gainesville, FL
 
 |Build Status| |Coverage Status| |Doc Status|
 

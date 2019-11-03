@@ -1,18 +1,23 @@
 import logging
 from datetime import datetime
 import attr
+
+# TODO: No collections or key by a/n yet
+# from crud.endpoints import Redis
+
 from diana.apis import Redis
+from crud.abc import Serializable
 from diana.dixel import Dixel
-from diana.utils import Serializable
 
 
-@attr.s
+@attr.s(cmp=False)
 class Test(Serializable):
     data = attr.ib(default=None)
-    #
-    # def __cmp__(self, other):
-    #     return self.sid() == other.sid() and \
-    #            self.data == other.data
+
+    # Force epid to update for comparison
+    def __cmp__(self, other):
+        return self.epid == other.epid and \
+               self.data == other.data
 
 Redis.test = Test
 
@@ -29,8 +34,8 @@ def test_redis_ep(setup_redis):
     id = R.put(t)
     s = R.get(id)
 
-    logging.debug(t)
-    logging.debug(s)
+    logging.debug(f"t={t}")
+    logging.debug(f"s={s}")
     assert( t == s )
 
     u = Test(data=42)
@@ -40,12 +45,6 @@ def test_redis_ep(setup_redis):
     logging.debug(u)
     logging.debug(v)
     assert( u == v )
-
-    R.update(id, u)
-    w = R.get(id)
-
-    assert( w == v )
-    assert( w != s )
 
     assert( R.exists(id) )
     R.delete(id)
@@ -75,7 +74,9 @@ def test_redis_index(setup_redis):
 if __name__=="__main__":
 
     logging.basicConfig(level=logging.DEBUG)
-    from conftest import setup_redis
-    for i in setup_redis():
-        test_redis_ep(None)
-        test_redis_index(None)
+
+    from conftest import mk_redis
+    S0 = mk_redis()
+
+    test_redis_ep(None)
+    test_redis_index(None)

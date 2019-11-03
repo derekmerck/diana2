@@ -1,12 +1,12 @@
 import os
 import connexion
 import yaml
+from crud.abc import Serializable
+from crud.utils import SmartJSONEncoder
 from diana.apis import *
 from diana.daemons import FileIndexer, Collector
-from diana.utils.endpoint import Serializable
 from diana.utils.guid import GUIDMint
 from diana.utils.dicom import dicom_name, dicom_date
-from diana.utils import SmartJSONEncoder
 
 services = {}
 

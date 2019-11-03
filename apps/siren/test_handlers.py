@@ -45,13 +45,6 @@ from handlers import handle_upload_dir, handle_upload_zip, handle_notify_study, 
     handle_file_arrived, start_watcher, tagged_studies
 from trial_dispatcher import TrialDispatcher as Dispatcher
 
-# Retrofit DIANA apis to crud manager
-from crud.abc import Serializable
-Serializable.Factory.registry["Orthanc"] = Orthanc
-Serializable.Factory.registry["ObservableOrthanc"] = ObservableOrthanc
-Serializable.Factory.registry["DcmDir"] = DcmDir
-Serializable.Factory.registry["ObservableDcmDir"] = ObservableDcmDir
-Serializable.Factory.registry["Dixel"] = Dixel
 
 # CONFIG
 _services          = "@./services.yaml"

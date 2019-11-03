@@ -4,7 +4,7 @@ import click
 from crud.cli.utils import ClickEndpoint, CLICK_ARRAY, CLICK_MAPPING
 from diana.apis import Orthanc
 
-@click.command(short_help="Get studies from orthanc for chaining")
+@click.command()
 @click.argument("source", type=ClickEndpoint(expects=Orthanc))
 @click.argument("items", type=CLICK_ARRAY)
 @click.option("-m", "--metakeys", type=CLICK_ARRAY, default=None,
@@ -16,7 +16,7 @@ from diana.apis import Orthanc
 @click.option("-b", "--binary", help="Get binary file as well as data", is_flag=True, default=False)
 @click.pass_context
 def oget(ctx, source: Orthanc, items, metakeys, fkey, kwargs, binary):
-    """Get study from orthanc"""
+    """Get studies from Orthanc"""
     click.echo(click.style('Get Studies from Orthanc', underline=True, bold=True))
 
     if not isinstance(source, Orthanc):

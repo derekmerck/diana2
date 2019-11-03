@@ -3,7 +3,7 @@ import json
 import logging
 from typing import Mapping, Union
 
-from . import SmartJSONEncoder
+from crud.utils import SmartJSONEncoder
 
 
 def pack_data(data: Mapping, fkey: Union[str, bytes], fields=None):

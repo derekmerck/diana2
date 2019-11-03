@@ -1,7 +1,7 @@
 import logging
 from typing import Mapping
 import attr
-from diana.utils import Endpoint, Serializable
+from crud.abc import Endpoint, Serializable
 
 import pytest
 

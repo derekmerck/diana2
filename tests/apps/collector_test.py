@@ -2,7 +2,7 @@ import logging
 import os
 import tempfile
 import shutil
-from diana.utils.endpoint import Serializable
+from crud.abc import Serializable
 from diana.apis import *
 from diana_cli import app
 from diana_cli.collect2 import Collector2

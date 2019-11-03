@@ -2,7 +2,7 @@ import logging, json
 from hashlib import md5
 from datetime import datetime
 from diana.utils.dicom import DicomLevel
-from diana.utils import SmartJSONEncoder
+from crud.utils import SmartJSONEncoder
 
 
 def test_encoder():

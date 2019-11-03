@@ -1,7 +1,7 @@
 import yaml
 import click
 from pprint import pformat
-from diana.utils.endpoint import Serializable
+from crud.abc import Serializable
 from diana.apis import *
 
 

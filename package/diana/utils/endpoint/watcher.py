@@ -4,7 +4,7 @@ from enum import Enum
 from datetime import datetime, timedelta
 from typing import Callable
 import attr
-from . import ObservableMixin, Event
+from crud.abc import ObservableMixin, Event
 
 @attr.s
 class Trigger(object):

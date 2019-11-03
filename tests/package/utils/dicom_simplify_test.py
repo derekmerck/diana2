@@ -1,7 +1,7 @@
 import os, json, logging
 from pprint import pformat
 from test_utils import find_resource
-from diana.utils import SmartJSONEncoder
+from crud.utils import SmartJSONEncoder
 from diana.utils.dicom import dicom_simplify
 
 import difflib

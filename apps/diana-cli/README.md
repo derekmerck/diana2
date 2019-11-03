@@ -4,7 +4,7 @@ diana-cli
 Derek Merck  
 <derek.merck@ufl.edu>  
 University of Florida and Shands Hospital  
-Gainesville, FL 
+Gainesville, FL  
 
 [![Build Status](https://travis-ci.org/derekmerck/diana2.svg?branch=master)](https://travis-ci.org/derekmerck/diana2)
 [![Coverage Status](https://codecov.io/gh/derekmerck/diana2/branch/master/graph/badge.svg)](https://codecov.io/gh/derekmerck/diana2)
@@ -18,9 +18,9 @@ Image:  <https://cloud.docker.com/repository/docker/derekmerck/diana2>
 
 ## Parameter Types
 
-- MAPPING or DICT parameters may be json or yaml format strings, or an `@/file.yaml` path to a json or yaml formatted file.
-- ARRAY parameters such as ITEMS may be json or yaml format strings, or an `@/file.txt` path to a newline separated list of items.
-- ENDPOINT parameters, including SOURCE and DEST, must either reference a named service from the services description, or be a prefixed shortcut such as `path:/data/my_dir`, for example, which would create a DcmDir with `basepath=/data/my_dir`.
+- MAPPING parameters may be json or yaml format strings, or an `@/file.yaml` path to a json or yaml formatted file.
+- ARRAY parameters may be json or yaml format strings, or an `@/file.txt` path to a newline separated list of items.
+- ENDPOINT parameters must either exist in the services description, or be a prefixed shortcut such as `path:/data/my_dir`, which would create a DcmDir with `basepath=/data/my_dir`.
 
 ## Usage
 
@@ -49,6 +49,7 @@ Options:
 
 Commands:
   check    Check endpoint status
+  delete   Delete items in endpoint
   dgetall  Get all instances from DcmDir for chaining
   do       Call endpoint method
   fdump    Convert and save chained DICOM image data in png format.
@@ -86,6 +87,16 @@ Usage: diana-cli check [OPTIONS] ENDPOINT
   Check endpoint status
 
   $ crud-cli check redis
+
+Options:
+  --help  Show this message and exit.
+```
+## delete
+
+```
+Usage: diana-cli delete [OPTIONS] SOURCE [ITEMS]
+
+  Remove items from endpoint
 
 Options:
   --help  Show this message and exit.

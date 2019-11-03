@@ -3,7 +3,7 @@ import logging
 import click
 from enum import Enum
 from typing import Tuple
-from diana.utils.endpoint import Serializable
+from crud.abc import Serializable, Endpoint
 from diana.apis import *
 from diana.dixel import Dixel, ShamDixel
 
@@ -14,7 +14,6 @@ $ diana-cli -S /services.yml collect pacs path:/data 9999999 ...
 """
 
 import attr
-from diana.utils import Endpoint
 from diana.dixel import DixelView
 
 

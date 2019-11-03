@@ -2,7 +2,7 @@ import yaml
 from datetime import datetime
 from pprint import pformat
 import click
-from diana.utils.endpoint import Serializable
+from crud.abc import Serializable
 from diana.utils.dicom import DicomLevel, dicom_date
 # importing all apis allows them to be immediately deserialized
 from diana.apis import *

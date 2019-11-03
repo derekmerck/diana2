@@ -2,7 +2,7 @@ import logging
 from pprint import pformat
 from collections import Mapping
 import click
-from diana.utils import Serializable
+from crud.abc import Serializable
 from pprint import pformat
 # importing all apis allows them to be immediately deserialized
 from diana.apis import *

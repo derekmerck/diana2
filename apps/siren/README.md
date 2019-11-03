@@ -2,7 +2,7 @@
 
 Derek Merck  
 <derek.merck@ufl.edu>  
-University of Florida and Shands Hospital
+University of Florida and Shands Hospital  
 Gainesville, FL  
 
 [SIREN][] is an NIH-funded multi-center clinical trial network for neuroemergency and resuscitation trials.  As patients are enrolled at participating sites, imaging studies must be submitted for central review, archival, and secondary analysis.
@@ -31,7 +31,7 @@ Create and source an `config.env` file with some required secrets:
   - `GMAIL_USER` - For using gmail as an email server, if applicable
   - `GMAIL_APP_PASSWORD` - Requires creating a special "app password" in the gmail user security panel
 
-Use Docker to setup administrative services such as [Traefik][] and [Splunk][].  Setting up the baseline administration network and services is documented in `diana.platform.docker-stacks`.  A one-off Splunk container can be created with a command like this:
+Use Docker to setup administrative services such as [Traefik][] and [Splunk][].  Setting up the baseline administration network and services is documented in `diana.platform.docker-stacks`.  A one-off Splunk container for testing can be created with a command like this:
 
 ```bash
 $ docker run -d --rm \
@@ -46,7 +46,7 @@ $ docker run -d --rm \
            splunk/splunk
 ```
 
-Setup an [Orthanc][] instance for each trial.  Configure it to create the metadata field `signature`, usually by passing an env variables like `ORTHANC_META_0=signature,1025` to the `derekmerck/orthanc-wbv` container image.  The `docker-compose.yaml` for the University of Michigan SIREN Receiver can be found in `diana.platform.examples.umich-siren`.  A one-off Orthanc container can be created with a command like this:
+Setup an [Orthanc][] instance for each trial.  Configure it to create the metadata field `signature`, usually by passing an env variables like `ORTHANC_META_0=signature,1025` to the `derekmerck/orthanc-wbv` container image.  The `docker-compose.yaml` for the University of Michigan SIREN Receiver can be found in `diana.platform.examples.umich-siren`.  A one-off Orthanc container for testing can be created with a command like this:
 
 ```bash
 $ docker run -d --rm \
@@ -65,7 +65,7 @@ Create configuration files:
   - `subscriptions.yaml` with two documents: one with channel tag to name mappings (i.e., `site_xxx: My Site Hospital`) and one with subscribers, including affiliation (see [subscriptions](subscriptions.yaml) for an example)
   - `notify.txt.j2` with text for receipt message and `jinja2` template markup.  I soft-link this from the diana/apps/siren directory.
 
-Create a DIANA Docker container with appropriate config file and variable mappings.  (And in this case, I added the SIREN platform service and logging networks to resolve the hobit and splunk container names).
+Create a DIANA Docker container with appropriate config file and variable mappings.  (In this case, I added the SIREN platform service and logging networks to resolve the hobit and splunk container names).
 
 ```bash
 $ docker run -it --rm \
@@ -80,7 +80,7 @@ $ docker run -it --rm \
         derekmerck/diana2 /bin/bash
 ```
 
-Typically the first thing you need to do with a fresh container is to update any scripts that haven't been pushed to the docker image already:
+Often, the first thing you need to do with a fresh DIANA container is update any scripts that haven't been pushed to the docker image already:
 
 ```bash
 /opt/diana$ git -C /opt/python-wuphf pull \
@@ -89,7 +89,7 @@ Typically the first thing you need to do with a fresh container is to update any
 ```
 
 
-Finally, interact with the `siren.py` script from the command-line.
+Finally, interact with the `siren.py` script from the container command-line.
 
 ```bash
 /opt/diana$ python3 apps/siren/siren.py --version
@@ -104,7 +104,7 @@ Upload a study from the incoming directory to the appropriate archive, anonymize
 $ python3 siren.py upload-dir path:/incoming/hobit/site_xxx orthanc:
 ```
 
-Similar functionality using `diana-cli`:
+Similar functionality using `diana-cli` explicitly:
 
 ```bash
 $ diana-cli dgetall -b path:/incoming/hobit/site_xxx \
@@ -125,10 +125,10 @@ Get study with meta tags from orthanc, dispatch to trial-site channels and send 
 
 ```bash
 $ python3 siren.py notify-study orthanc: xano-nxst-udyx-oid \
-                   -S @/subscriptions -E gmail: -T @/receipt.txt.j2 -I splunk:
+                   -S @/subscriptions.yaml -E gmail: -T @/receipt.txt.j2 -I splunk:
 ```
 
-And similar functionalty using `diana-cli`:
+And similar functionalty using `diana-cli` explicitly:
 
 ```bash
 $ diana-cli oget -m signature -f $DIANA_FKEY orthanc: xano-nxst-udyx-oidx \
@@ -141,7 +141,7 @@ $ diana-cli oget -m signature -f $DIANA_FKEY orthanc: xano-nxst-udyx-oidx \
 
 ### Start The Watcher
 
-Start the automated watcher service.
+Start the automated watcher service:
 
 ```bash
 $ python3 siren.py start-watcher \
@@ -153,7 +153,7 @@ $ python3 siren.py start-watcher \
                    -I splunk:
 ```
 
-This can also be passed directly to an (up-to-date) DIANA service container as the command (call `apps/siren/siren.py`, or set the working directory with the additional argument `-w /opt/diana/apps/siren`).
+This can also be passed directly to a DIANA service container as the command (use the full path to the script `/opt/diana/apps/siren/siren.py`, or set the working directory with the additional argument `-w /opt/diana/apps/siren`).
 
 [SIREN]: https://siren.network
 [Traefik]: https://traefik.io

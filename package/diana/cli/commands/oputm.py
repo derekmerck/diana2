@@ -8,6 +8,6 @@ from diana.apis import Orthanc
 @click.argument("updates", type=CLICK_MAPPING)
 @click.pass_context
 def oputm(ctx, source: Orthanc, item, key, value):
-    """Set study-level item metadata in orthanc"""
+    """Set study-level item metadata in Orthanc"""
     click.echo(click.style('Orthanc Put Meta', underline=True, bold=True))
     source.putm(item, key=key, value=value)

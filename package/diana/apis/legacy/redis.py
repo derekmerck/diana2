@@ -4,8 +4,8 @@ from redis import Redis as RedisGateway, exceptions as RedisExceptions
 import attr
 from diana.dixel import Dixel
 from diana.utils.dicom import DicomFormatError
-from diana.utils.endpoint import Endpoint, Serializable
-from diana.utils import SmartJSONEncoder
+from crud.abc import Endpoint, Serializable
+from crud.utils import SmartJSONEncoder
 
 @attr.s
 class Redis(Endpoint, Serializable):
@@ -181,3 +181,6 @@ class Redis(Endpoint, Serializable):
         for d in data:
             result.append(d.decode("UTF-8"))
         return result
+
+
+Redis.register()

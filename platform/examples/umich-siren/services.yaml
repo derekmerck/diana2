@@ -4,7 +4,7 @@ hobit:
   host:   orthanc-hobit
   user:   orthanc
   password: ${ORTHANC_PASSWORD}
-  polling_interval: 10
+  polling_interval: 5
 
 splunk:
   ctype:  Splunk
