@@ -18,7 +18,7 @@ def ogetm(ctx, source: Orthanc, item, key, fkey):
         raise click.UsageError("Wrong endpoint type")
     meta = source.getm(item, key=key)
 
-    if fkey:
+    if meta and fkey:
         from diana.utils import unpack_data
         meta = unpack_data(meta, fkey)
 
