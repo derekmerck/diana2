@@ -28,7 +28,7 @@ def parse_timestamps(tags, ignore_errors):
     if not tags.get("SeriesDateTime"):
         tags["SeriesDateTime"] = tags.get("StudyDateTime")
 
-    if not tags.get("InstanceCreationDateTime"):
+    if not tags.get("SeriesDateTime"):
         err = "No series creation time identified"
         handle_errors(err, ignore_errors)
 
