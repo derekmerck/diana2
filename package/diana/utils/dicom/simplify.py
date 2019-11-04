@@ -220,6 +220,8 @@ def dicom_simplify(tags, ignore_errors=True):
       - Add sensible defaults for exposure data in dose reports
     """
 
+    # TODO: Identify and flatten multiple ContentSequence tags
+
     # Convert timestamps to python datetimes
     tags = parse_timestamps(tags, ignore_errors)
 
