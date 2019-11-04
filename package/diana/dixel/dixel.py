@@ -1,11 +1,13 @@
 import csv
 import logging
 import os
+from tempfile import NamedTemporaryFile
 from pprint import pformat
 from typing import Mapping
 from dateutil import parser as DatetimeParser
 import attr
 import pydicom
+from hashlib import md5
 import numpy as np
 from crud.abc import Serializable
 from .report import RadiologyReport
@@ -97,16 +99,25 @@ class Dixel(Serializable):
                 if elem.keyword == "PixelData":
                     continue
                     # Deal with that separately
-                if not elem.value:
+                elif not elem.value or not elem.keyword:
                     continue
-                if elem.VR == "PN":
+                elif elem.VR == "PN":
                     output[elem.keyword] = str(elem.value)
+                    # print(elem.value)
+                elif elem.VM != 1 and elem.VR == 'SQ':
+                # elif elem.keyword == "AdmittingDiagnosesCodeSequence":
+                #     print(f"Diagnosis Code: VM {elem.VM} VR {elem.VR}")
+                    output[elem.keyword] = [dictify_ds(item) for item in elem]
                 elif elem.VM != 1:
+                    # print(f"VM ne 1: VM {elem.VM} VR {elem.VR}")
                     output[elem.keyword] = [item for item in elem]
                 elif elem.VR != 'SQ':
                     output[elem.keyword] = elem.value
                 else:
                     output[elem.keyword] = [dictify_ds(item) for item in elem]
+
+            # print(output)
+
             return output
 
         tags = dictify_ds(ds)
@@ -120,6 +131,19 @@ class Dixel(Serializable):
                   tags=tags,
                   level=DicomLevel.INSTANCES)
         d.simplify_tags()
+
+        if not d.tags.get("PatientID") and d.tags.get("PatientName"):
+            logging.warning("Imputing missing PatientID from PatientName")
+            new_id = md5(d.tags.get("PatientName").encode('utf8')).hexdigest()
+            d.tags["PatientID"] = new_id
+            if file:
+                logging.warning("Editing file copy with new PatientID tag, OID will be valid")
+                ds.PatientID = new_id
+                with NamedTemporaryFile() as f:
+                    ds.save_as(filename=f.name, write_like_original=True)
+                    file = f.read()
+            else:
+                logging.warning("No file to update, OID will be invalid")
 
         if not d.tags.get('PatientID') or \
            not d.tags.get('StudyInstanceUID') or \

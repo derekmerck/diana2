@@ -35,7 +35,7 @@ class DcmFileHandler(FileHandler):
             logger.debug("Checking data is dicom")
             return check(item)
 
-    def get(self, fn: str, get_pixels=False) -> pydicom.Dataset:
+    def get(self, fn: str, get_pixels=False, force=False) -> pydicom.Dataset:
         fp = self.get_path(fn)
         logger = logging.getLogger(self.name)
 
@@ -43,7 +43,7 @@ class DcmFileHandler(FileHandler):
             raise DicomFormatError("Not a DCM file: {}".format(fp))
 
         logger.debug("Reading {}".format(fp))
-        ds = pydicom.dcmread(fp, stop_before_pixels=not get_pixels)
+        ds = pydicom.dcmread(fp, stop_before_pixels=not get_pixels, force=force)
         return ds
 
     def put(self, fn: str, data):

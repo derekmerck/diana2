@@ -1,7 +1,7 @@
 ---
 hobit:
   ctype:     ObservableOrthanc
-  host:      localhost
+  host:      $UMICH_HOST
 #  host:      orthanc-hobit
   user:      orthanc
   password:  $ORTHANC_PASSWORD
