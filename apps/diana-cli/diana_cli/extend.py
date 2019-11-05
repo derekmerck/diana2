@@ -102,6 +102,15 @@ def extend(ctx,
                             dcmdir_name = os.path.dirname(f)
                             break
 
+                    # Filter out non-ER cases by StationName
+                    s = pydicom.dcmread(dcmdir_name)
+                    try:
+                        assert(s.StationName.lower() == "cter" or s.StationName.upper() == "CTAWP66457")
+                    except (AttributeError, AssertionError):
+                        print("No station name or not ER scanner")
+                        shutil.rmtree("/diana_direct/{}/data/{}_process".format(ml, an))
+                        continue
+
                     p_predict = subprocess.Popen("python3 run.py '{}'".format(dcmdir_name), shell=True, cwd="/diana_direct/{}/halibut-dm/".format(ml))
                     p_predict.wait()
 
