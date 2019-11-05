@@ -15,6 +15,8 @@ from ..utils.dicom import DicomLevel, DicomFormatError
 from ..utils import dicom_simplify, pack_data, unpack_data
 from ..utils.gateways import orthanc_id, Montage
 
+from io import BytesIO
+
 
 @attr.s(cmp=False, hash=False)
 class Dixel(Serializable):
@@ -136,11 +138,24 @@ class Dixel(Serializable):
             logging.warning("Imputing missing PatientID from PatientName")
             new_id = md5(d.tags.get("PatientName").encode('utf8')).hexdigest()
             d.tags["PatientID"] = new_id
-            if file:
-                logging.warning("Editing file copy with new PatientID tag, OID will be valid")
-                ds.PatientID = new_id
+
+            if hasattr(ds, "PixelData"):
+                logging.warning("Creating file with new PatientID tag, OID will be valid")
+                ds_edit = ds
+                ds_edit.PatientID = new_id
+
                 with NamedTemporaryFile() as f:
-                    ds.save_as(filename=f.name, write_like_original=True)
+                    ds_edit.save_as(filename=f.name, write_like_original=True)
+                    file = f.read()
+
+            elif not hasattr(ds, "PixelData") and file:
+                logging.warning("Loading pixels and creating file with new PatientID tag, OID will be valid")
+
+                ds_edit = pydicom.read_file(BytesIO(file), stop_before_pixels=False)
+                ds_edit.PatientID = new_id
+
+                with NamedTemporaryFile() as f:
+                    ds_edit.save_as(filename=f.name, write_like_original=True)
                     file = f.read()
             else:
                 logging.warning("No file to update, OID will be invalid")
