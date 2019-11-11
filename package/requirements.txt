@@ -1,19 +1,23 @@
+# CRUD reqs
 attrs >= 18.1.0
+docker
+python-dateutil
+redis
+pyyaml
+jinja2
 bs4
 lxml
-jinja2
-docker
+requests
+click
+
+# Possible error
+# gistsig@git+https://github.com/derekmerck/gistsig
+
+# DIANA reqs
 numpy
 pydicom
 pyyaml
 pillow
 python-dateutil
-redis
-requests
 cryptography
 watchdog
-click
-pyyaml
-
-# This seems to cause an error when checking as a requirement (from diana-cli)
-# python-crud@git+https://github.com/derekmerck/pycrud.git#subdirectory=package

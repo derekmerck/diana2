@@ -6,8 +6,11 @@ with open("README.md") as f:
 with open("requirements.txt") as f:
     reqs = f.read().splitlines()
 
-with open("plus_requirements.txt") as f:
+with open("requirements-plus.txt") as f:
     plus_reqs = f.read().splitlines()
+
+with open("requirements-wuphf.txt") as f:
+    wuphf_reqs = f.read().splitlines()
 
 with open("diana/__init__.py") as f:
     content = f.read()
@@ -20,10 +23,10 @@ setuptools.setup(
     version=metadata.get("version"),
     author=metadata.get("author"),
     author_email=metadata.get("author_email"),
-    description="DICOM analysis and archive (DIANA)",
+    description=metadata.get("desc"),
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/derekmerck/diana2",
+    url=metadata.get("url"),
     packages=setuptools.find_packages(),
     package_data={'python-diana': ['utils/guid/us_census/*.txt']},
     classifiers=(
@@ -35,7 +38,8 @@ setuptools.setup(
     license='MIT',
     install_requires=reqs,
     extras_require={
-        'plus': plus_reqs
+        'plus': plus_reqs,
+        'wuphf': wuphf_reqs
     },
 
     entry_points='''

@@ -3,7 +3,7 @@ import pytest
 import docker
 from diana.utils.endpoint import Containerized
 
-sys.path.append('test_utils')
+sys.path.append('utils')
 
 
 @pytest.fixture(scope="session")

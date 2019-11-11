@@ -92,4 +92,5 @@ class ProxiedDicom(Endpoint, Serializable):
             for item in cache:
                 yield item
 
+
 ProxiedDicom.register()

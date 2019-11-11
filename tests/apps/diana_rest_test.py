@@ -2,7 +2,7 @@ import json
 import logging
 
 import pytest
-from test_utils import find_resource
+from utils import find_resource
 
 app = __import__('diana-rest').app
 

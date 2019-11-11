@@ -1,6 +1,7 @@
 import os
 from crud.manager import EndpointManager
-from diana.apis import Orthanc, DcmDir
+from diana.apis import Orthanc, DcmDir, Redis
+
 
 def make_orthanc(s):  # orthanc:user,password,host,port
     s = s[8:]
@@ -25,6 +26,7 @@ def make_orthanc(s):  # orthanc:user,password,host,port
         port=port
     )
 
+
 EndpointManager.add_prefix("orthanc:", make_orthanc)
 
 
@@ -32,4 +34,12 @@ def make_dcmdir(s):  # path:/data/this/that
     path = s[5:]     # remove "path:" prefix
     return DcmDir(path=path)
 
+
 EndpointManager.add_prefix("path:", make_dcmdir)
+
+
+def make_redis(s):
+    return Redis()
+
+
+EndpointManager.add_prefix("redis:", make_redis)

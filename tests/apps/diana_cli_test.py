@@ -1,6 +1,6 @@
 import logging
 from conftest import *
-from test_utils import find_resource
+from utils import find_resource
 from click.testing import CliRunner
 from diana.cli.cli import cli as app
 

@@ -134,12 +134,15 @@ class Dixel(Serializable):
                   level=DicomLevel.INSTANCES)
         d.simplify_tags()
 
+        # TODO: If the creation times are going to be "now", use the file creation time instead?
+
         if not d.tags.get("PatientID") and d.tags.get("PatientName"):
             logging.warning("Imputing missing PatientID from PatientName")
             new_id = md5(d.tags.get("PatientName").encode('utf8')).hexdigest()
             d.tags["PatientID"] = new_id
 
             if hasattr(ds, "PixelData"):
+                # Don't need file, can recreate it
                 logging.warning("Creating file with new PatientID tag, OID will be valid")
                 ds_edit = ds
                 ds_edit.PatientID = new_id
@@ -149,6 +152,7 @@ class Dixel(Serializable):
                     file = f.read()
 
             elif not hasattr(ds, "PixelData") and file:
+                # Read pixels out of file and _then_ recreate it
                 logging.warning("Loading pixels and creating file with new PatientID tag, OID will be valid")
 
                 ds_edit = pydicom.read_file(BytesIO(file), stop_before_pixels=False)

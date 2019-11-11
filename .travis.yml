@@ -50,10 +50,9 @@ install:
   - pip3 install codecov
   # These don't install politely as dependencies
   - pip3 install git+https://github.com/derekmerck/gistsig
-  - pip3 install git+https://github.com/derekmerck/pycrud.git#subdirectory=package
   - pip3 install -r requirements.txt
   - pip3 install -e package
-  -
+
 #  - pip3 install -e package[plus]
 #  - pip3 install -e apps/diana-cli[plus]
 #  - pip3 install tensorflow  # No longer directly in requirements

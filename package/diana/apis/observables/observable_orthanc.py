@@ -105,4 +105,5 @@ class ObservableOrthanc(Orthanc, ObservableMixin):
             # self.logger.debug("Found {} Orthanc changes for {}".format(len(event_queue), self.location))
             return event_queue
 
+
 ObservableOrthanc.register()

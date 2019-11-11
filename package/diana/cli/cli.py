@@ -82,6 +82,9 @@ def cli(ctx, verbose, services):
     service_mgr = EndpointManager(ep_descs=services)
 
     ctx.obj['services'] = service_mgr
+    ctx.obj['items'] = []
+
+
 
 from crud.cli import commands as crud_cmds
 import_cmds(cli, crud_cmds)
@@ -90,13 +93,9 @@ from diana.cli import commands as diana_cmds
 import_cmds(cli, diana_cmds)
 import diana.cli.string_descs
 
-try:
-    from wuphf.cli import commands as wuphf_cmds
-    import_cmds(cli, wuphf_cmds)
-    import wuphf.cli.string_descs
-except ImportError:
-    click.echo("wuphf messenger crud lib unavailable")
-    pass
+from wuphf.cli import commands as wuphf_cmds
+import_cmds(cli, wuphf_cmds)
+import wuphf.cli.string_descs
 
 
 # Indirection to set envar prefix from setuptools entry pt

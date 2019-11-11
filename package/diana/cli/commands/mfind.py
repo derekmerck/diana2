@@ -23,7 +23,7 @@ from diana.dixel import RadiologyReport, LungScreeningReport
               help="Perform a data extraction on each report")
 @click.pass_context
 def mfind(ctx,
-          source,
+          source: Montage,
           accession_numbers,
           start_date,
           end_date,

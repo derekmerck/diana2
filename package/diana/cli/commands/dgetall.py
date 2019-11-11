@@ -8,15 +8,9 @@ from diana.apis import DcmDir
 @click.argument("source", type=ClickEndpoint(expects=DcmDir))
 @click.option("-b", "--binary", help="Get binary file as well as data", is_flag=True, default=False)
 @click.pass_context
-def dgetall(ctx, source, binary):
+def dgetall(ctx, source: DcmDir, binary):
     """Get all instances from DcmDir for chaining"""
     click.echo(click.style('Get All Items from DcmDir', underline=True, bold=True))
-
-    if not ctx.obj.get("items"):
-        ctx.obj["items"] = []
-
-    if not isinstance(source, DcmDir):
-        click.echo("Wrong endpoint type")
 
     items = []
     for root, dirs, files in os.walk(source.path):
