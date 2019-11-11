@@ -14,8 +14,12 @@ def dgetall(ctx, source: DcmDir, binary):
 
     items = []
     for root, dirs, files in os.walk(source.path):
-        items.append(os.path.join(root, files))
+        for file in files:
+            items.append(os.path.join(root, file))
 
     for item in items:
         _item = source.get(item, file=binary)
-        ctx.obj["items"].append(_item)
+        if _item:
+            ctx.obj["items"].append(_item)
+
+    ctx.obj["source"] = source

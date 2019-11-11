@@ -72,7 +72,7 @@ after_success:
   - codecov
 
   # Save the new version hashes
-  - gistsig -g 4b0bfbca0a415655d97f36489629e1cc push diana diana_cli
+  - gistsig -g 4b0bfbca0a415655d97f36489629e1cc push diana crud wuphf
 
   - DIANA_VERSION=$(python3 -c "import diana; print(diana.__version__)")
 

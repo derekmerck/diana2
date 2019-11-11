@@ -1,6 +1,7 @@
 import os
 from crud.manager import EndpointManager
-from diana.apis import Orthanc, DcmDir, Redis
+from crud.endpoints import Redis
+from diana.apis import Orthanc, DcmDir
 
 
 def make_orthanc(s):  # orthanc:user,password,host,port

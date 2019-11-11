@@ -45,21 +45,18 @@ $ pip3 install -e diana2/package[plus]
 Diana-CLI
 -----------------
 
-Diana-CLI provides a command-line interface to invoke several common pipelines.  It requires a service definition yaml file as input.
-
-### Installation
+Diana-CLI provides command-line bindings for "service-level" tasks.  Specifically, given a service description file (endpoint kwargs as yaml), an endpoint can be created and methods (get, put, etc) called on it via command-line. 
 
 ```bash
-$ pip3 install diana2/apps/diana-cli
 $ diana-cli --version
 2.x.x
 ```
 
 Diana-Plus functions are available as well.
 ```bash
-$ pip3 install diana2/apps/diana-cli[plus]
-$ diana-plus --version
-2.x.x
+$ pip3 install diana2/package[plus]
+$ diana-cli --version
+2.x.x++
 ```
 
 DIANA package hashes by version number are publicly posted at <https://gist.github.com/derekmerck/4b0bfbca0a415655d97f36489629e1cc> and can be easily validated through `diana-cli`.
@@ -67,12 +64,15 @@ DIANA package hashes by version number are publicly posted at <https://gist.gith
 ```bash
 $ diana-cli verify
 Package signature python-diana:2.x.x:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx is valid.
+Package signature python-crud:1.x.x:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx is valid.
+Package signature python-wuphf:1.x.x:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx is valid.
 ```
 
 Of course, users should never trust a package to validate itself, so see [gistsig][] for details on the algorithm and how to perform a simple external audit.
 
 [gistsig]: https://github.com/derekmerck/gistsig
 
+Refer to the docs or `diana-cli --help` for more documentation.
 
 Docker-Image
 ----------------
@@ -84,40 +84,19 @@ $ docker run -it derekmerck/diana2 /bin/bash diana-cli --version
 2.x.x
 ```
 
+Python-CRUD
+---------------
 
-# Python-CRUD
-
-Derek Merck  
-<derek.merck@ufl.edu>  
-University of Florida and Shands Hospital  
-Gainesville, FL  
-
-Python framework for implementing CRUD (create, retrieve, update, delete) service endpoints and management daemons.  Supports distributed task management with [celery[].
+DIANA provides a python framework for implementing CRUD (create, retrieve, update, delete) service endpoints and management daemons.  Python-CRUD also supports distributed task management with [celery[].
 
 [celery]: http://www.celeryproject.org
 
-The [Python-DIANA][] library extends Python-CRUD with DICOM-relevant items, endpoints, tasks, and daemons.
-
-[python-diana]: http://github.com/derekmerck/diana2
-
-The [Python-WUPHF][] library extends Python-CRUD with SMTP and SMS messenger endpoints and a dispatcher daemon.
-
-[python-wuphf]: http://github.com/derekmerck/wuphf
 
 ## Usage
 
 Endpoints provide an abstraction layer between application specific logic and technical implementations of specific services such a file directories or servers (generically called Gateways here).  Method syntax generally follows standard KV nomenclature (get, put, find, etc.)
 
 Endpoints handle Items, which may include metadata, data, and other attributes.  Items may be referenced by an ItemID for Get or Delete requests.  Put requests require an Item type argument.  And Find requests describe Items by a mapping Query.
-
-### Command-line Interface
-
-Command-line bindings for "service-level" tasks are also provided in `crud-cli`.  Specifically, given a service description file (endpoint kwargs as yaml), an endpoint can be created and methods (get, put, etc) called on it via command-line.
-
-## License
-
-MIT
-
 
 
 License

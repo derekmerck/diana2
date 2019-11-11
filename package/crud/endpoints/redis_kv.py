@@ -44,10 +44,11 @@ class RedisKV(Endpoint, Serializable):
             item_id = item.epid
             key = "{}{}".format(self.prefix, item_id).encode("utf-8")
         else:
-            key = item
+            key = "{}{}".format(self.prefix, item).encode("utf-8")
 
         logging.debug(f"getting key={key}")
         item_flat = self.gateway.get(key)
+        logging.debug(item_flat)
         if item_flat:
             item_dict = json.loads(item_flat)
             if isinstance(item_dict, dict):
@@ -66,6 +67,8 @@ class RedisKV(Endpoint, Serializable):
             item_id = hash(item)
             item_flat = f"\"{item}\""  # Minimal json wrapper
 
+        logging.debug(item_flat)
+
         key = "{}{}".format(self.prefix, item_id).encode("utf-8")
         self.gateway.set(key, item_flat)
         return key
@@ -81,11 +84,24 @@ class RedisKV(Endpoint, Serializable):
 
         self.gateway.delete(key)
 
+    def skeys(self):
+
+        keys = self.gateway.keys("SET{}*".format(self.prefix))
+        _keys = []
+        for key in keys:
+            key = key.decode("utf-8")
+            _keys.append(key[3+len(self.prefix):])
+        return _keys
+
     def sget(self, skey: str):
 
-        item_ids = self.gateway.smembers(skey.encode("utf-8"))
+        skey = "SET{}{}".format(self.prefix, skey).encode("utf-8")
+        item_ids = self.gateway.smembers(skey)
+        logging.debug(f"Looking up members of {skey}")
+        logging.debug(item_ids)
         result = []
         for item_id in item_ids:
+            item_id = item_id.decode("utf8")
             result.append(self.get(item_id))
         return result
 
@@ -96,7 +112,10 @@ class RedisKV(Endpoint, Serializable):
             item_id = item.epid
         else:
             item_id = item
-        self.gateway.sadd(skey.encode("utf-8"), item_id)
+        skey = "SET{}{}".format(self.prefix, skey).encode("utf-8")
+        logging.debug(f"Adding {item_id} to {skey}")
+        rv = self.gateway.sadd(skey, item_id)
+
 
     def check(self):
         logger = logging.getLogger(self.name)
