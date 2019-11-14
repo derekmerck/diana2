@@ -12,6 +12,7 @@ requests
 watchdog
 lxml
 jinja2
+pyxnat
 xmltodict
 
 # Causes some errors in pip with diana-cli app
