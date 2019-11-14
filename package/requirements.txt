@@ -21,3 +21,4 @@ pillow
 python-dateutil
 cryptography
 watchdog
+xmltodict
