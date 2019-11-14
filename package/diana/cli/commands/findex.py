@@ -1,3 +1,40 @@
+"""
+
+Simplest
+------------
+
+`$ diana-cli dgetall -b path:/ericsfiles oput -a ericsorthanc`
+
+`dgetall` reads all DICOM files on a path, the `-b` flag tells it to also read the binary file.
+
+`oput` sends any previously found DICOM items to an Orthanc instance, the `-a` flag tells it to anonymize them on receipt.
+
+Advanced
+------------
+
+`$ diana-cli dgetall path:/ericsfiles findex my_redis`
+
+In this case, the items loaded by `dgetall` do not include the binary.
+
+`findex` uses a Redis instance to organize collections of loose files into studies by accession number, so that you can upload them or otherwise manipulate them one-by-one or repeatedly without rereading the entire folder.
+
+Once the index is created, you can upload the files by a/n (or "all")
+
+```
+$ diana-cli findex-get path:/ericsfiles my_redis my_accession_num print
+... prints tags in each file ...
+```
+
+`$ diana-cli findex-get -b path:/ericsfiles my_redis all oput -a ericsorthanc`
+
+Note in this case, the file for each item has to be loaded by findex-get, b/c Redis doesn't store any binary info and Orthanc ingests files.
+
+This is a super useful feature for pulling data from the massive archive of loose files on the old CIRR, where just reading the all the files to figure out what is actually in there takes about a week, but then sending items one-by-one to Orthanc for Scott can be very useful.  But I still need to implement a couple more features to really work well for that.
+
+
+"""
+
+
 from hashlib import sha1
 from pprint import pformat
 import click
@@ -53,5 +90,7 @@ def findex_get(ctx, source: DcmDir, index: Redis, collection_ids, binary):
         click.echo(items)
 
         for item in items:
-            d = source.get(item, file=binary)
-            ctx.obj["items"].append(d)
+            if binary:
+                # Refresh entire object
+                item = source.get(item, file=True)
+            ctx.obj["items"].append(item)

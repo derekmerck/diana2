@@ -1,4 +1,6 @@
 from datetime import datetime
+import logging
+from pprint import pformat
 import click
 from crud.cli.utils import ClickEndpoint, CLICK_ARRAY, CLICK_MAPPING
 from diana.apis import Montage
@@ -7,7 +9,7 @@ from diana.dixel import RadiologyReport, LungScreeningReport
 
 @click.command(short_help="Find items in Montage by query for chaining")
 @click.argument('source', type=ClickEndpoint(expects=Montage))
-@click.option('--accession_number', '-a', type=CLICK_ARRAY,
+@click.option('--accession_numbers', '-a', type=CLICK_ARRAY,
               help="Requires PHI privileges on Montage")
 @click.option('--start_date', type=click.DateTime(),
               default="2003-01-01",
@@ -46,7 +48,6 @@ def mfind(ctx,
     def do_query(q):
 
         result = source.find(q)
-
         for r in result:
             if "lungrads" in extraction:
                 r.meta["lungrads"] = LungScreeningReport.lungrads(r.report)
@@ -71,6 +72,7 @@ def mfind(ctx,
     elif accession_numbers:
         result = []
         for accession_number in accession_numbers:
+            click.echo(f"Looking up accession number: {accession_number}")
             query["q"] = accession_number
             result.extend( do_query(query) )
 
@@ -78,9 +80,16 @@ def mfind(ctx,
         dt = datetime.today()
         query["start_date"] = dt.strftime("%Y-%m-%d")
         query["end_date"] = dt.strftime("%Y-%m-%d")
+
+        logging.debug(pformat(query))
         result = do_query(query)
 
     else:
         result = []
 
     ctx.obj["items"] = result
+
+    click.echo("Found {} result{}".format(
+        len(result),
+        "" if len(result) == 1 else "s"
+    ))
