@@ -16,6 +16,8 @@ Gainesville, FL
 4. Send receipt for submission to enrolling site and notify coordinators
 5. Index imaging data for dashboards
 
+![SIREN image review schema](siren_im_review.png)
+
 
 ## Setup
 
@@ -83,9 +85,7 @@ $ docker run -it --rm \
 Often, the first thing you need to do with a fresh DIANA container is update any scripts that haven't been pushed to the docker image already:
 
 ```bash
-/opt/diana$ git -C /opt/python-wuphf pull \
-  && git -C /opt/pycrud pull \
-  && git -C /opt/diana pull
+/opt/diana$ git -C /opt/diana pull
 ```
 
 
