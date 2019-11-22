@@ -64,8 +64,8 @@ Setup an incoming data directory `/incoming/hobit/site_xxx` for each submitting 
 
 Create configuration files:
   - [`services.yaml`](services.yaml) with DIANA service descriptions for orthanc, splunk, local_smtp
-  - `subscriptions.yaml` with two documents: one with channel tag to name mappings (i.e., `site_xxx: My Site Hospital`) and one with subscribers, including affiliation (see [subscriptions](subscriptions.yaml) for an example)
-  - `notify.txt.j2` with text for receipt message and `jinja2` template markup.  I soft-link this from the diana/apps/siren directory.
+  - [`subscriptions.yaml`](subscriptions.yaml) with two documents: one with channel tag to name mappings (i.e., `site_xxx: My Site Hospital`) and one with subscribers, including affiliation
+  - [`notify.txt.j2`](notify.txt.j2) with text for receipt message and `jinja2` template markup.  I soft-link this from the diana/apps/siren directory.
 
 Create a DIANA Docker container with appropriate config file and variable mappings.  (In this case, I added the SIREN platform service and logging networks to resolve the hobit and splunk container names).
 
@@ -82,14 +82,7 @@ $ docker run -it --rm \
         derekmerck/diana2 /bin/bash
 ```
 
-Often, the first thing you need to do with a fresh DIANA container is update any scripts that haven't been pushed to the docker image already:
-
-```bash
-/opt/diana$ git -C /opt/diana pull
-```
-
-
-Finally, interact with the `siren.py` script from the container command-line.
+Then interact with the [`siren.py`](siren.py) script from the container command-line.
 
 ```bash
 /opt/diana$ python3 apps/siren/siren.py --version
