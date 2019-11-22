@@ -102,7 +102,7 @@ def init_app():
             _services = yaml.load(f)
         services.update(_services)
 
-    services_path = os.environ.get("DIANA_SERVICES_PATH")
+    services_path = os.environ.get("DIANA_SERVICES")
     if services_path:
         load_services(services_path)
     app = connexion.App(__name__, specification_dir='.')

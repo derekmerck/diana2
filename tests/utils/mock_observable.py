@@ -18,7 +18,8 @@ sample_observations = [
     (3, MockEventType.THAT, "sixth event (THAT)"),
 ]
 
-@attr.s(cmp=False, hash=None)
+# @attr.s(cmp=False, hash=None)
+@attr.s(order=False, hash=None)
 class MockObservable(Serializable, ObservableMixin):
     """A minimal implementation of the Observable Mixin that can be scripted for testing."""
 

@@ -20,6 +20,7 @@ site_desc = """
     studies_per_hour: 1
 """
 
+
 def mock_runner():
     """Generates a single CR study and sends to the mock pacs"""
 

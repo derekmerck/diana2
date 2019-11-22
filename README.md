@@ -71,6 +71,8 @@ DIANA package hashes by version number are publicly posted at <https://gist.gith
 ```bash
 $ diana-cli verify
 Package signature python-diana:2.1.x:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx is valid.
+Package signature python-crud:1.0.x:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx is valid.
+Package signature python-wuphf:1.0.x:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx is valid.
 ```
 
 Of course, users should never trust a package to validate itself, so see [gistsig][] for details on the algorithm and how to perform a simple external audit.

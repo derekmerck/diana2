@@ -10,7 +10,7 @@ from crud.endpoints import Pickle, Redis, Csv
 
 import pytest
 
-@pytest.mark.skip(reason="No celery testing")
+
 def check_for_endpoint(ep):
     """
     Generate a few items, stash them, and make sure they are
@@ -37,10 +37,8 @@ def check_for_endpoint(ep):
         item = ep.get(key)
         assert( item.epid in expected )
 
-@pytest.mark.skip(reason="No celery testing")
-def test_persistence():
 
-    logging.basicConfig(level=logging.DEBUG)
+def test_persistence(setup_redis):
 
     endpoints = [Pickle(),
                  Redis(clear=True, db=1),
@@ -49,6 +47,10 @@ def test_persistence():
         check_for_endpoint(ep)
 
     Redis(clear=True, db=1)
+
+
+@pytest.mark.skip(reason="No celery testing")
+def test_dist_persistence():
 
     endpoints = [DistPickle(),
                  DistRedis(db=1),

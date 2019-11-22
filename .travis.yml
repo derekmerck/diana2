@@ -3,7 +3,7 @@ language: python
 group: edge
 
 python:
-  - "3.6"
+  - "3.8"
 services:
   - docker
 
@@ -48,8 +48,8 @@ install:
 
   # All pip dependencies
   - pip3 install codecov
-  # These don't install politely as dependencies
-  - pip3 install git+https://github.com/derekmerck/gistsig
+  # May not install politely as dependencies
+  # - pip3 install git+https://github.com/derekmerck/gistsig
   - pip3 install -r requirements.txt
   - pip3 install -e package
 

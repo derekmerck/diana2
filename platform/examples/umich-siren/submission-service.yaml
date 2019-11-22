@@ -5,13 +5,11 @@
 # $ docker stack deploy -c admin/splunk-service.yaml admin
 # ## Note -- $SPLUNK_HOST must be the swarm IP addr, not localhost
 # $ docker stack deploy -c backend/postgres-service.yaml backend
+# ## Note: Soft link subscriptions, notify, and env file into this directory for config
 # $ ln -s ~/siren.env siren.env
 # $ ln -s ~/dev/diana2/apps/siren/notify.txt.j2 notify.txt.j2
 # $ ln -s ~/siren_subs subscriptions.yaml
 # $ docker stack deploy -c submission-service.yaml siren
-
-# Note:
-# Soft link subscriptions, notify, and env file into this directory for config
 
 ---
 version: '3.3'

@@ -7,21 +7,20 @@ import os, logging, csv, argparse
 from tkinter import *
 import tkinter.ttk as ttk
 
-# In case running from /examples folder in git
-sys.path.insert(0, os.path.abspath('../DixelKit'))
 from diana.dixel import RadiologyReport
 
-__desc__ = """
+__desc__ = """\
 Open a CSV dump from Montage and audit entries with a Tkinter GUI.
 Results are saved as they are generated as `source+audit.csv`.
 """
-__version__ = "0.1.3"
+__version__ = "0.1.4"
 __prog__ = "RADCATr"
 
 root = Tk()
 current = 0
 items = []
 fieldnames = []
+
 
 def load_data():
     global items, fieldnames

@@ -42,11 +42,11 @@ class RedisKV(Endpoint, Serializable):
 
         if hasattr(item, "epid"):
             item_id = item.epid
-            key = "{}{}".format(self.prefix, item_id).encode("utf-8")
         else:
-            key = "{}{}".format(self.prefix, item).encode("utf-8")
+            item_id = item
+        key = "{}{}".format(self.prefix, item_id).encode("utf-8")
+        logging.debug(f"get key={key}")
 
-        logging.debug(f"getting key={key}")
         item_flat = self.gateway.get(key)
         logging.debug(item_flat)
         if item_flat:
@@ -61,27 +61,27 @@ class RedisKV(Endpoint, Serializable):
     def put(self, item: Item, *args, **kwargs):
 
         if hasattr(item, "epid"):
+            logging.debug("Using json")
             item_id = item.epid
             item_flat = item.json()
         else:
+            logging.debug("Using string")
             item_id = hash(item)
             item_flat = f"\"{item}\""  # Minimal json wrapper
 
-        logging.debug(item_flat)
-
         key = "{}{}".format(self.prefix, item_id).encode("utf-8")
+        logging.debug(f"put key={key}")
+        logging.debug(f"put item={item_flat}")
         self.gateway.set(key, item_flat)
-        return key
+        return item_id
 
     def delete(self, item: Union[Item, ItemID], **kwargs):
         if hasattr(item, "epid"):
             item_id = item.epid
-            key = "{}{}".format(self.prefix, item_id).encode("utf-8")
         else:
-            key = item
-
-        print(key)
-
+            item_id = item
+        key = "{}{}".format(self.prefix, item_id).encode("utf-8")
+        logging.debug(f"del key={key}")
         self.gateway.delete(key)
 
     def skeys(self):

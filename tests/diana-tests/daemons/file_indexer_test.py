@@ -34,6 +34,7 @@ def test_index(setup_redis):
     240 fps checking over 24k | 120 fps registration over 12k (Christianson)
     """
 
+
 @pytest.mark.skip(reason="Needs large dataset for uploading")
 def test_upload(setup_redis, setup_orthanc0):
 

@@ -5,8 +5,9 @@ import attr
 # TODO: No collections or key by a/n yet
 # from crud.endpoints import Redis
 
-from diana.apis import Redis
+# from diana.apis import Redis
 from crud.abc import Serializable
+from crud.endpoints import Redis
 from diana.dixel import Dixel
 
 
@@ -31,8 +32,10 @@ def test_redis_ep(setup_redis):
     R.check()
 
     t = Test(data={"myDateTime": datetime.now(), "foo": {'bar': 3}})
-    id = R.put(t)
-    s = R.get(id)
+    key = R.put(t)
+    s = R.get(key)
+
+    logging.debug(f"key={key}")
 
     logging.debug(f"t={t}")
     logging.debug(f"s={s}")
@@ -42,13 +45,13 @@ def test_redis_ep(setup_redis):
     id2 = R.put(u)
     v = R.get(id2)
 
-    logging.debug(u)
-    logging.debug(v)
+    logging.debug(f"u={u}")
+    logging.debug(f"v={v}")
     assert( u == v )
 
-    assert( R.exists(id) )
-    R.delete(id)
-    assert( not R.exists(id) )
+    assert( R.exists(key) )
+    R.delete(key)
+    assert( not R.exists(key) )
 
     a = "one two three"
     id2 = R.put(a)
@@ -79,4 +82,4 @@ if __name__=="__main__":
     S0 = mk_redis()
 
     test_redis_ep(None)
-    test_redis_index(None)
+    # test_redis_index(None)
