@@ -1,6 +1,6 @@
 # PKG REQS
 # -----------------
-attrs >= 18.1.0
+attrs >= 19.3.0
 bs4
 docker
 pydicom

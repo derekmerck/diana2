@@ -107,14 +107,15 @@ class RedisKV(Endpoint, Serializable):
 
     def sput(self, item: Union[Item, ItemID], skey: str):
 
-        self.put(item)
-        if hasattr(item, "epid"):
-            item_id = item.epid
-        else:
-            item_id = item
+        item_id = self.put(item)
+        # if hasattr(item, "epid"):
+        #     item_id = item.epid
+        # else:
+        #     item_id = item
         skey = "SET{}{}".format(self.prefix, skey).encode("utf-8")
         logging.debug(f"Adding {item_id} to {skey}")
         rv = self.gateway.sadd(skey, item_id)
+        return item_id
 
 
     def check(self):

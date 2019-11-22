@@ -60,4 +60,7 @@ def test_dist_persistence():
 
 
 if __name__ == "__main__":
+
+    from conftest import mk_redis
+    mk_redis()
     test_persistence()

@@ -2,7 +2,8 @@ import attr
 from datetime import datetime
 from crud.abc import Serializable
 
-@attr.s
+
+@attr.s(eq=False)
 class SimpleItem(Serializable):
 
     data = attr.ib(default=None)
@@ -14,6 +15,11 @@ class SimpleItem(Serializable):
             self.epid = self.meta['epid']
         else:
             self.meta['epid'] = self.epid
+
+    # Force epid to update for comparison
+    def __eq__(self, other: "SimpleItem"):
+        return self.epid == other.epid and \
+               self.data == other.data
 
 
 # Have to register anything that will be flattened
