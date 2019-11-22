@@ -1,9 +1,10 @@
-|logo| DICOM Image Analysis and Archive
-=======================================
+|logo|\ DICOM Image Analysis and Archive
+========================================
 
 | Derek Merck
 | derek.merck@ufl.edu
-| University of Florida and Shands Hospital Gainesville, FL
+| University of Florida and Shands Hospital
+| Gainesville, FL
 
 |Build Status| |Coverage Status| |Doc Status|
 
@@ -32,9 +33,7 @@ Python-Diana
 
 The Python-Diana package for Python >= 3.6 provides an api for a network
 of DICOM-file related services including PACS query, local archive,
-anonymization, file access, and study indexing. As of DIANA 2.1, the
-endpoint API abstraction has been refactored to a separate package,
-`python-crud <https://github.com/derekmerck/pycrud>`__.
+anonymization, file access, and study indexing.
 
 It comes in two flavors: vanilla and “plus,” which includes dependencies
 on scientific and machine learning packages.
@@ -44,34 +43,39 @@ Installation
 
 .. code:: bash
 
+   $ pip3 install git+https://github.com/derekmerck/diana2#subdirectory=package
+
+Or install as locally editable:
+
+.. code:: bash
+
    $ git clone git+https://github.com/derekmerck/diana2
    $ pip3 install -e diana2/package
    $ pip3 install -e diana2/package[plus]
 
-Diana-CLI
----------
+Refer to the `package docs <package/README.md>`__ for details about
+dependencies.
 
-Diana-CLI provides a command-line interface to invoke several common
-pipelines. It requires a service definition yaml file as input.
+``diana-cli``
+-------------
 
-.. _installation-1:
-
-Installation
-~~~~~~~~~~~~
+``diana-cli`` provides command-line bindings for “service-level” tasks.
+Specifically, given a service description file (endpoint kwargs as
+yaml), an endpoint can be created and methods (get, put, etc) called on
+it via command-line.
 
 .. code:: bash
 
-   $ pip3 install diana2/apps/diana-cli
    $ diana-cli --version
-   2.x.x
+   2.1.x
 
 Diana-Plus functions are available as well.
 
 .. code:: bash
 
-   $ pip3 install diana2/apps/diana-cli[plus]
-   $ diana-plus --version
-   2.x.x
+   $ pip3 install diana2/package[plus]
+   $ diana-cli --version
+   2.1.x++
 
 DIANA package hashes by version number are publicly posted at
 https://gist.github.com/derekmerck/4b0bfbca0a415655d97f36489629e1cc and
@@ -80,11 +84,16 @@ can be easily validated through ``diana-cli``.
 .. code:: bash
 
    $ diana-cli verify
-   Package signature python-diana:2.x.x:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx is valid.
+   Package signature python-diana:2.1.x:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx is valid.
+   Package signature python-crud:1.0.x:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx is valid.
+   Package signature python-wuphf:1.0.x:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx is valid.
 
 Of course, users should never trust a package to validate itself, so see
 `gistsig <https://github.com/derekmerck/gistsig>`__ for details on the
 algorithm and how to perform a simple external audit.
+
+Refer to the `diana-cli docs <diana-cli.md>`__ or ``diana-cli --help``
+for more documentation.
 
 Docker-Image
 ------------
@@ -96,7 +105,53 @@ images from ci are available on docker hub.
 .. code:: bash
 
    $ docker run -it derekmerck/diana2 /bin/bash diana-cli --version
-   2.x.x
+   2.1.x
+
+Refer to the `container docs <platform/docker-image/README.md>`__ for
+build resources and the `stack
+docs <platform/docker-stacks/README.md>`__ for service stacks.
+
+GUID Mint
+---------
+
+Refer to the `guid docs <guid.md>`__ for details of the GUID and
+pseudo-id generation algorithm.
+
+Python-CRUD and Python-WUPHF
+----------------------------
+
+DIANA provides a generic python framework for implementing CRUD (create,
+retrieve, update, delete) service endpoints and management daemons.
+Python-CRUD also supports distributed task management with
+`celery <http://www.celeryproject.org>`__.
+
+Endpoints provide an abstraction layer between application specific
+logic and technical implementations of specific services such a file
+directories or servers (generically called Gateways here). Method syntax
+generally follows standard KV nomenclature (get, put, find, etc.)
+
+Endpoints handle Items, which may include metadata, data, and other
+attributes. Items may be referenced by an ItemID for Get or Delete
+requests. Put requests require an Item type argument. And Find requests
+describe Items by a mapping Query.
+
+Python-Diana provides DICOM item type and endpoints,
+Python-\ `WUPHF <https://en.wikipedia.org/wiki/WUPHF.com>`__ provides
+interoperable messenging items and endpoints (email, sms, twillo).
+
+Testing
+-------
+
+Usage
+-----
+
+Manually run pytest with coverage and upload to codecov:
+
+.. code:: bash
+
+   $ pip install pytest interruptingcow codecov pytest-cov
+   $ pytest --cov
+   $ codecov --token=$CODCOV_TOK
 
 License
 -------

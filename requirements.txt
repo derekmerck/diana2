@@ -19,7 +19,6 @@ xmltodict
 # -----------------
 click
 connexion[swagger-ui]
-pyyaml
 
 # PIXEL-HANDLING REQS
 # -----------------

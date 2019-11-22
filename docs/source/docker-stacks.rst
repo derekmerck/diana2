@@ -61,9 +61,9 @@ Setup
 
    $ source sample.env
    $ docker-stack -f admin/admin-stack.yml
-   $ docker-stack -f bacekend-data/postgres-service.yml data
-   $ docker-stack -f bacekend-data/redis-service.yml data
-   $ docker-stack -f bacekend-data/splunk-service.yml data
+   $ docker-stack -f backend-data/postgres-service.yml data
+   $ docker-stack -f backend-data/redis-service.yml data
+   $ docker-stack -f backend-data/splunk-service.yml data
 
 .. _exposes-1:
 

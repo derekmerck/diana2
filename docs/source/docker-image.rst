@@ -87,8 +87,8 @@ for git-push-triggered image creation only automates only steps 7 and 8.
 
 .. code:: bash
 
-   $ docker run derekmerck/diana2:2.x.x python3 -c "import diana; print(diana.__version__)"
-   2.x.x
+   $ docker run derekmerck/diana2:2.1.x python3 -c "import diana; print(diana.__version__)"
+   2.1.x
 
 Build a DIANA-Plus Docker Image
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

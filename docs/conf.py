@@ -21,13 +21,15 @@ sys.path.insert(0, os.path.abspath('../tests'))
 # -- Project information -----------------------------------------------------
 
 project = 'DIANA'
-copyright = '2018, Derek Merck'
+copyright = '2019, Derek Merck'
 author = 'Derek Merck'
 
+from diana import __version__ as vers
+
 # The short X.Y version
-version = '2.0.9'
+version = vers
 # The full version, including alpha/beta/rc tags
-release = '2.0.9'
+release = vers
 
 
 # -- General configuration ---------------------------------------------------

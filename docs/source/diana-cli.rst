@@ -6,12 +6,6 @@ diana-cli
 | University of Florida and Shands Hospital
 | Gainesville, FL
 
-|Build Status| |Coverage Status| |Doc Status|
-
-| Source: https://www.github.com/derekmerck/diana2
-| Documentation: https://diana.readthedocs.io
-| Image: https://cloud.docker.com/repository/docker/derekmerck/diana2
-
 ``diana-cli`` provides a command-line interface to DIANA endpoints.
 
 Parameter Types
@@ -53,25 +47,28 @@ Usage
      --help                  Show this message and exit.
 
    Commands:
-     check    Check endpoint status
-     delete   Delete items in endpoint
-     dgetall  Get all instances from DcmDir for chaining
-     do       Call endpoint method
-     fdump    Convert and save chained DICOM image data in png format.
-     get      Get items from endpoint for chaining
-     guid     Generate a GUID
-     ls       List all services and health
-     mfind    Find items in Montage by query for chaining
-     mock     Generate mock DICOM traffic
-     oget     Get studies from orthanc for chaining
-     ogetm    Get study-level item metadata from orthanc
-     oput     Put chained instances in orthanc
-     oputm    Set study-level item metadata in orthanc
-     print    Print chained items to stdout
-     put      Put chained items in endpoint
-     setmeta  Set metadata kvs for chained items
-     verify   Verify DIANA source code against public gist signature
-     wsend    Send items via Messenger endpoint
+     check       Check endpoint status
+     delete      Delete items in endpoint
+     dgetall     Get all instances from DcmDir for chaining
+     do          Call endpoint method
+     fdump       Convert and save chained DICOM image data in png format
+     findex      Index items by accession number
+     findex-get  Put indexed files in a destination node by accession number  $...
+     get         Get items from endpoint for chaining
+     guid        Generate a GUID
+     ls          List all services and health
+     mfind       Find items in Montage by query for chaining
+     mock        Generate mock DICOM traffic
+     ofind       Find item in Orthanc by query for chaining
+     oget        Get studies from Orthanc
+     ogetm       Get study-level item metadata from Orthanc
+     oput        Put chained instances in Orthanc
+     oputm       Set study-level item metadata in Orthanc
+     print       Print chained items to stdout
+     put         Put chained items in endpoint
+     setmeta     Set metadata kvs for chained items
+     verify      Verify DIANA source code against public gist signature
+     wsend       Send items via Messenger endpoint
 
      SERVICES is a required platform endpoint description in json/yaml format.
 
@@ -151,12 +148,42 @@ fdump
 
    Usage: diana-cli fdump [OPTIONS] [[png]] [OUTPATH]
 
-     Convert and save chained DICOM image data in png format.
+     Convert and save chained DICOM image data in png format
 
      /b $ diana-cli get path:/data/dcm IM0001.dcm fdump $ ls IM0001.png
 
    Options:
      --help  Show this message and exit.
+
+findex
+------
+
+::
+
+   Usage: diana-cli findex [OPTIONS] INDEX
+
+     Index files by accession number
+
+     $ diana-cli findex path:/data redis:
+
+   Options:
+     --help  Show this message and exit.
+
+findex-get
+----------
+
+::
+
+   Usage: diana-cli findex-get [OPTIONS] SOURCE INDEX COLLECTION_IDS
+
+     Put indexed files in a destination node by accession number
+
+     $ diana-cli findex-get path:/data redis: all print
+     $ diana-cli findex-get -b path:/data redis: CT3456789 oput orthanc:
+
+   Options:
+     -b, --binary  Get binary file as well as data
+     --help        Show this message and exit.
 
 get
 ---
@@ -232,7 +259,7 @@ mfind
      current_smoker=False, pack_years=15, radcat=(3,true) ... }
 
    Options:
-     -a, --accession_number ARRAY    Requires PHI privileges on Montage
+     -a, --accession_numbers ARRAY   Requires PHI privileges on Montage
      --start_date [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
                                      Starting date query bound
      --end_date [%Y-%m-%d|%Y-%m-%dT%H:%M:%S|%Y-%m-%d %H:%M:%S]
@@ -272,6 +299,26 @@ mock
          studies_per_hour: 4
      ...
 
+ofind
+-----
+
+::
+
+   Usage: diana-cli ofind [OPTIONS] SOURCE
+
+     Find studies matching yaml/json QUERY in SOURCE Orthanc or ProxiedDicom
+     service. The optional proxy DOMAIN issues a remote-find to a manually
+     proxied DICOM endpoint.
+
+   Options:
+     -a, --accession_numbers ARRAY   Requires PHI privileges on Montage
+     --today
+     -q, --query MAPPING             Query string
+     -l, --level [studies|series|instances]
+     -d, --domain TEXT               Remote domain for proxied query
+     -r, --retrieve                  Retrieve from remote for proxied query
+     --help                          Show this message and exit.
+
 oget
 ----
 
@@ -279,7 +326,7 @@ oget
 
    Usage: diana-cli oget [OPTIONS] SOURCE ITEMS
 
-     Get study from orthanc
+     Get studies from Orthanc
 
    Options:
      -m, --metakeys ARRAY  Meta key(s) to retrieve
@@ -296,7 +343,7 @@ ogetm
 
    Usage: diana-cli ogetm [OPTIONS] SOURCE ITEM KEY
 
-     Get study-level item metadata from orthanc
+     Get study-level item metadata from Orthanc
 
    Options:
      --fkey TEXT  Fernet key for decrypting metadata
@@ -309,7 +356,7 @@ oput
 
    Usage: diana-cli oput [OPTIONS] DEST
 
-     Put chained instances in orthanc
+     Put chained instances in Orthanc
 
    Options:
      -a, --anonymize   Anonymize instances as they are uploaded
@@ -325,7 +372,7 @@ oputm
 
    Usage: diana-cli oputm [OPTIONS] SOURCE ITEM UPDATES
 
-     Set study-level item metadata in orthanc
+     Set study-level item metadata in Orthanc
 
    Options:
      --help  Show this message and exit.
@@ -401,10 +448,3 @@ wsend
      -t, --target TEXT  Optional target, if not using a dedicated messenger
      -m, --msg_t TEXT   Optional message template
      --help             Show this message and exit.
-
-.. |Build Status| image:: https://travis-ci.org/derekmerck/diana2.svg?branch=master
-   :target: https://travis-ci.org/derekmerck/diana2
-.. |Coverage Status| image:: https://codecov.io/gh/derekmerck/diana2/branch/master/graph/badge.svg
-   :target: https://codecov.io/gh/derekmerck/diana2
-.. |Doc Status| image:: https://readthedocs.org/projects/diana/badge/?version=master
-   :target: https://diana.readthedocs.io/en/master/?badge=master

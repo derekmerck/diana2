@@ -52,12 +52,6 @@ Plus
 -  `scipy <https://www.scipy.org>`__
 -  `tensorflow <https://www.tensorflow.org>`__
 
-Notes
------
-
-See `guid <./guid.md>`__ for documentation of the GUID and pseudo-id
-generation algorithm.
-
 License
 -------
 

@@ -116,6 +116,21 @@ Python-Diana provides DICOM item type and endpoints, Python-[WUPHF][] provides i
 [WUPHF]: https://en.wikipedia.org/wiki/WUPHF.com
 
 
+Testing
+-------
+
+Usage
+------------------
+
+Manually run pytest with coverage and upload to codecov:
+
+```bash
+$ pip install pytest interruptingcow codecov pytest-cov
+$ pytest --cov
+$ codecov --token=$CODCOV_TOK
+```
+
+
 License
 -------
 

@@ -9,8 +9,6 @@ bs4
 lxml
 requests
 click
-
-# Possible error
 gistsig@git+https://github.com/derekmerck/gistsig
 
 # DIANA reqs

@@ -20,6 +20,11 @@ Purposes
 4. Send receipt for submission to enrolling site and notify coordinators
 5. Index imaging data for dashboards
 
+.. figure:: siren_im_review.png
+   :alt: SIREN image review schema
+
+   SIREN image review schema
+
 Setup
 -----
 
@@ -81,13 +86,14 @@ unique directory for processing. The directory structure
 ``/incoming/{trial}/{site}`` is used to infer the notification channel
 ``f"{trial}-{site}"`` for each incoming study.
 
-Create configuration files: - ``services.yaml`` with DIANA service
-descriptions for orthanc, splunk, local_smtp - ``subscriptions.yaml``
-with two documents: one with channel tag to name mappings (i.e.,
-``site_xxx: My Site Hospital``) and one with subscribers, including
-affiliation (see `subscriptions <subscriptions.yaml>`__ for an example)
-- ``notify.txt.j2`` with text for receipt message and ``jinja2``
-template markup. I soft-link this from the diana/apps/siren directory.
+Create configuration files: - ```services.yaml`` <services.yaml>`__ with
+DIANA service descriptions for orthanc, splunk, local_smtp -
+```subscriptions.yaml`` <subscriptions.yaml>`__ with two documents: one
+with channel tag to name mappings (i.e., ``site_xxx: My Site Hospital``)
+and one with subscribers, including affiliation -
+```notify.txt.j2`` <notify.txt.j2>`__ with text for receipt message and
+``jinja2`` template markup. I soft-link this from the diana/apps/siren
+directory.
 
 Create a DIANA Docker container with appropriate config file and
 variable mappings. (In this case, I added the SIREN platform service and
@@ -106,17 +112,8 @@ logging networks to resolve the hobit and splunk container names).
            --network admin_logging_network \
            derekmerck/diana2 /bin/bash
 
-Often, the first thing you need to do with a fresh DIANA container is
-update any scripts that haven’t been pushed to the docker image already:
-
-.. code:: bash
-
-   /opt/diana$ git -C /opt/python-wuphf pull \
-     && git -C /opt/pycrud pull \
-     && git -C /opt/diana pull
-
-Finally, interact with the ``siren.py`` script from the container
-command-line.
+Then interact with the ```siren.py`` <siren.py>`__ script from the
+container command-line.
 
 .. code:: bash
 
