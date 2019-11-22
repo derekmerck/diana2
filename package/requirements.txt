@@ -11,7 +11,7 @@ requests
 click
 
 # Possible error
-# gistsig@git+https://github.com/derekmerck/gistsig
+gistsig@git+https://github.com/derekmerck/gistsig
 
 # DIANA reqs
 numpy

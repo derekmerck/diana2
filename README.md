@@ -1,5 +1,4 @@
-![logo](resources/images/diana_logo_sm.png)\
-DICOM Image Analysis and Archive
+![logo](resources/images/diana_logo_sm.png)DICOM Image Analysis and Archive
 ==================
 
 Derek Merck  
@@ -34,6 +33,12 @@ The Python-Diana package for Python >= 3.6 provides an api for a network of DICO
 It comes in two flavors: vanilla and "plus," which includes dependencies on scientific and machine learning packages.
 
 ### Installation
+
+```bash
+$ pip3 install git+https://github.com/derekmerck/diana2#subdirectory=package
+```
+
+Or install as locally editable:
 
 ```bash
 $ git clone git+https://github.com/derekmerck/diana2
