@@ -28,7 +28,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url=metadata.get("url"),
     packages=setuptools.find_packages(),
-    package_data={'python-diana': ['utils/guid/us_census/*.txt']},
+    include_package_data=True,
     classifiers=(
         'Development Status :: 3 - Alpha',
         "Programming Language :: Python :: 3",

@@ -1,5 +1,5 @@
 # CRUD reqs
-attrs >= 18.1.0
+attrs >= 19.3.0
 docker
 python-dateutil
 redis

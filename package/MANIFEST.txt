@@ -1,1 +1,0 @@
-diana/utils/guid/us_census/*.txt
