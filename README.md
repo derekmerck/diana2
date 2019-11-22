@@ -64,15 +64,13 @@ DIANA package hashes by version number are publicly posted at <https://gist.gith
 ```bash
 $ diana-cli verify
 Package signature python-diana:2.x.x:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx is valid.
-Package signature python-crud:1.x.x:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx is valid.
-Package signature python-wuphf:1.x.x:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx is valid.
 ```
 
 Of course, users should never trust a package to validate itself, so see [gistsig][] for details on the algorithm and how to perform a simple external audit.
 
 [gistsig]: https://github.com/derekmerck/gistsig
 
-Refer to the docs or `diana-cli --help` for more documentation.
+Refer to the [docs](diana-cli.md) or `diana-cli --help` for more documentation.
 
 Docker-Image
 ----------------

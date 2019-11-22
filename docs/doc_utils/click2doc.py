@@ -25,30 +25,27 @@ def get_app_info(app):
 
 
 @click.command()
-@click.argument("apps", nargs=-1)
+@click.argument("app", default="diana.cli.cli")
 @click.option("--outfile", "-o", type=click.Path())
-def cli(apps, outfile):
+def cli(app, outfile):
 
     text = ""
-    for app in apps:
 
-        app = "diana.cli.cli"
-        # should be something like diana.cli (the file)
-        _app: click.Group = import_module(app)
+    _app: click.Group = import_module(app)
 
-        # print(dir(_app))
-        # print(_app.cli.commands.keys())
+    # print(dir(_app))
+    # print(_app.cli.commands.keys())
 
-        header, footer, cmds = get_app_info(_app)
+    header, footer, cmds = get_app_info(_app)
 
-        text += header
-        text += "```\n" + run_cli_help(_app) + "```\n"
+    text += header
+    text += "```\n" + run_cli_help(_app) + "```\n"
 
-        for cmd in cmds:
-            text += "## {}\n\n".format(cmd)
-            text += "```\n" + run_cli_help(_app, cmd) + "```\n"
+    for cmd in cmds:
+        text += "## {}\n\n".format(cmd)
+        text += "```\n" + run_cli_help(_app, cmd) + "```\n"
 
-        text += footer
+    text += footer
 
     if outfile:
         with open(outfile, "w") as f:
