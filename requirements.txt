@@ -15,9 +15,6 @@ jinja2
 pyxnat
 xmltodict
 
-# Causes some errors in pip with diana-cli app
-#python-crud@git+https://github.com/derekmerck/pycrud.git#subdirectory=package
-
 # APP REQS
 # -----------------
 click

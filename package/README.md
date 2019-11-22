@@ -55,12 +55,6 @@ Dependencies
 - [tensorflow](https://www.tensorflow.org)
 
 
-Notes
----------------
-
-See [guid](./guid.md) for documentation of the GUID and pseudo-id generation algorithm.
-
-
 License
 ---------------
 

@@ -17,14 +17,6 @@ Derek Merck
 University of Florida and Shands Hospital  
 Gainesville, FL  
 
-[![Build Status](https://travis-ci.org/derekmerck/diana2.svg?branch=master)](https://travis-ci.org/derekmerck/diana2)
-[![Coverage Status](https://codecov.io/gh/derekmerck/diana2/branch/master/graph/badge.svg)](https://codecov.io/gh/derekmerck/diana2)
-[![Doc Status](https://readthedocs.org/projects/diana/badge/?version=master)](https://diana.readthedocs.io/en/master/?badge=master)
-
-Source: <https://www.github.com/derekmerck/diana2>  
-Documentation: <https://diana.readthedocs.io>  
-Image:  <https://cloud.docker.com/repository/docker/derekmerck/diana2>
-
 `diana-cli` provides a command-line interface to DIANA endpoints.
 
 ## Parameter Types
