@@ -50,9 +50,9 @@ install:
   # All pip dependencies
   - pip3 install codecov
   - pip3 install -r requirements.txt
-  - pip3 install package
+  - pip3 install ./package
 
-#  - pip3 install -e package[plus]
+#  - pip3 install ./package[plus]
 #  - pip3 install tensorflow  # No longer directly in requirements
 
   # Required docker images for test fixtures
