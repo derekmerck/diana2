@@ -1,5 +1,5 @@
 __name__ = "python-diana"
-__version__ = "2.1.2"
+__version__ = "2.1.3"
 __author__ = "Derek Merck"
 __author_email__ = "derek.merck@ufl.edu"
 __desc__ = "CRUD endpoint APIs for DICOM with Python"
