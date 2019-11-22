@@ -23,6 +23,7 @@ addons:
       - python3-numpy
       - python-sklearn
       - python3-scipy
+      - python3-h5py
 
 before_install:
   - pip3 install --upgrade pip
@@ -48,16 +49,13 @@ install:
 
   # All pip dependencies
   - pip3 install codecov
-  # May not install politely as dependencies
-  # - pip3 install git+https://github.com/derekmerck/gistsig
   - pip3 install -r requirements.txt
-  - pip3 install -e package
+  - pip3 install package
 
 #  - pip3 install -e package[plus]
-#  - pip3 install -e apps/diana-cli[plus]
 #  - pip3 install tensorflow  # No longer directly in requirements
 
-  # Required docker images for fixtures
+  # Required docker images for test fixtures
   - docker pull alpine
   - docker pull redis
   - docker pull derekmerck/orthanc-confd
