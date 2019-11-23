@@ -1,26 +1,30 @@
-# PKG REQS
-# -----------------
+# CRUD reqs
+# ---------------
 attrs >= 19.3.0
-bs4
 docker
+python-dateutil
+redis
+pyyaml
+jinja2
+bs4
+lxml
+requests
+click
+gistsig@git+https://github.com/derekmerck/gistsig
+
+# DIANA reqs
+# ---------------
+numpy
 pydicom
 pyyaml
 pillow
 python-dateutil
-redis
-requests
+cryptography
 watchdog
-lxml
-jinja2
-pyxnat
 xmltodict
+pyxnat
 
-# APP REQS
-# -----------------
-click
-connexion[swagger-ui]
-
-# PIXEL-HANDLING REQS
+# Plus reqs
 # -----------------
 cython
 numpy
@@ -36,13 +40,21 @@ scikit-learn
 # tf-nightly
 # tf-nightly-gpu
 
-# TESTING REQS
+# WUPHF reqs
+# ---------------
+twilio
+
+# REST server reqs
+# ---------------
+connexion[swagger-ui]
+
+# Testing reqs
 # -----------------
 pytest >= 4.0
 pytest-cov
 interruptingcow
 
-# SPHINX REQS
+# Sphinx reqs
 # -----------------
 recommonmark
 pypandoc
