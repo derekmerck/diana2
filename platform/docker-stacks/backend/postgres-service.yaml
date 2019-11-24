@@ -38,3 +38,5 @@ services:
         splunk-format:  json
         splunk-index:   logging
         tag:            "{{.Name}}/{{.ID}}"
+
+...

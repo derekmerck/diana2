@@ -249,7 +249,8 @@ def test_file_arrived_handler(dcm_file, zip_file, orth: Orthanc):
 
     shutil.copy(zip_file, site_path)
     data = {"fn": os.path.join( site_path, Path(zip_file).name )}
-    handle_file_arrived(data, DcmDir(path=watch_path), orth, fkey=fkey, anon_salt=anon_salt, signature_meta_key="signature")
+    handle_file_arrived(data, DcmDir(path=watch_path), orth,
+                        fkey=fkey, anon_salt=anon_salt, signature_meta_key="signature")
     assert (len(orth.instances()) > 1)
 
     oid = orth.studies()[0]
@@ -265,7 +266,8 @@ def test_file_arrived_handler(dcm_file, zip_file, orth: Orthanc):
     shutil.copy(dcm_file, site_path)
 
     data = {"fn": os.path.join(site_path, Path(dcm_file).name)}
-    handle_file_arrived(data, DcmDir(path=watch_path), orth, fkey=fkey, anon_salt=anon_salt, signature_meta_key="signature")
+    handle_file_arrived(data, DcmDir(path=watch_path), orth,
+                        fkey=fkey, anon_salt=anon_salt, signature_meta_key="signature")
     assert (len(orth.instances()) == 1)
 
     time.sleep(1.0)

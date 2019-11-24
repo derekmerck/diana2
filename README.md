@@ -119,9 +119,6 @@ Python-Diana provides DICOM item type and endpoints, Python-[WUPHF][] provides i
 Testing
 -------
 
-Usage
-------------------
-
 Manually run pytest with coverage and upload to codecov:
 
 ```bash

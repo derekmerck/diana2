@@ -1,6 +1,6 @@
 # Provides a mock PACS service available as DICOM node: "MOCKPACS@orthanc-mock:4242"
 # This is essentially similar to a Balena embedded watcher build
-
+---
 version: '3.0'
 
 
@@ -54,3 +54,5 @@ services:
       DIANA_WATCH_ROUTE: >
         say_studies Remote -
       TZ:                   "America/New_York"
+
+...

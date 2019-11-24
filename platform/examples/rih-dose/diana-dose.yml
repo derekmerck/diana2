@@ -1,3 +1,4 @@
+---
 version: '3.2'
 
 
@@ -90,3 +91,5 @@ services:
       ORTHANC_PASSWORD:     ${ORTHANC_PASSWORD}
       SPLUNK_HEC_TOKEN:     ${SPLUNK_HEC_TOKEN}
       TZ:                   "America/New_York"
+
+...

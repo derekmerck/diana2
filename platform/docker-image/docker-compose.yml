@@ -1,3 +1,4 @@
+---
 version: '3'
 
 services:
@@ -113,3 +114,5 @@ services:
 #      args:
 #        DOCKER_ARCH:  arm64v8
 #    image: diana2-plus-arm64v8
+
+...

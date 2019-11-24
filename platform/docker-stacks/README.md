@@ -117,6 +117,7 @@ $ docker-stack deploy -c diana-workers/mock-stack.yml mock
 
 Additionally, see [Remote Embedded Diana Watcher](https://github.com/derekmerck/red-dcm-watcher) for Raspberry Pi and Balena.
 
+
 Provisioning
 -------------------
 
@@ -149,13 +150,12 @@ $ docker node update --label-add bridge=true host2    # registered IP address fo
 
 If the firewall stops workers from joining see <https://www.digitalocean.com/community/tutorials/how-to-configure-the-linux-firewall-for-docker-swarm-on-centos-7>
 
-
 ### TODO
 
 Grant orthanc user superuser privileges so it can create trigrams
+
 
 License
 -------------
 
 MIT
-

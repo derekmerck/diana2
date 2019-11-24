@@ -51,6 +51,3 @@ def cli(path, outdir, recurse):
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     cli()
-
-
-

@@ -16,7 +16,7 @@ def setup_orthanc0():
 
 @pytest.fixture(scope="session")
 def setup_orthanc1():
-    S = mk_orthanc(8043,4243,8042,4242)
+    S = mk_orthanc(8043, 4243, 8042, 4242)
     yield S
     print("Tearing down orthanc fixture")
     S.stop_container()
@@ -35,8 +35,10 @@ def mk_orthanc(http_port=8042, dcm_port=4242, remote_peer=8043, remote_mod=4243)
             dkr_name  = dkr_name,
             dkr_image = "derekmerck/orthanc-confd",
             dkr_ports = {"8042/tcp": http_port, "4242/tcp": dcm_port},
-            dkr_env = {"ORTHANC_MOD_0": "mod0,ORTHANC{},{},{}".format(remote_mod, host_ip, remote_mod),
-                       "ORTHANC_PEER_0": "peer0,http://{}:{},orthanc,passw0rd!".format(host_ip, remote_peer),
+            dkr_env = {"ORTHANC_MOD_0": "mod0,ORTHANC{},{},{}".format(
+                remote_mod, host_ip, remote_mod),
+                       "ORTHANC_PEER_0": "peer0,http://{}:{},orthanc,passw0rd!".format(
+                           host_ip, remote_peer),
                        "ORTHANC_AET": "ORTHANC{}".format(dcm_port),
                        "ORTHANC_VERBOSE": "true"}
     )

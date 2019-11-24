@@ -71,3 +71,4 @@ services:
         constraints:
           - node.role==manager
 
+...

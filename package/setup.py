@@ -41,7 +41,6 @@ setuptools.setup(
         'plus': plus_reqs,
         'wuphf': wuphf_reqs
     },
-
     entry_points='''
         [console_scripts]
         diana-cli=diana.cli.cli:main

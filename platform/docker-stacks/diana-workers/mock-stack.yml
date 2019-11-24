@@ -2,6 +2,7 @@
 #   - Swarm addr:    MOCK@orthanc-mock:4242
 #   - External addr: MOCK@host:2424
 
+---
 version: '3.0'
 
 
@@ -45,3 +46,5 @@ services:
             "password": "${ORTHANC_PASSWORD}"
         }}
       TZ:                   "America/New_York"
+
+...

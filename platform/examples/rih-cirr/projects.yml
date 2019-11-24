@@ -1,3 +1,4 @@
+---
 version: '3.2'
 
 
@@ -95,3 +96,5 @@ services:
         - "traefik.docker.network=admin_proxy_network"
         - "traefik.port=8042"
         - "traefik.frontend.rule=PathPrefixStrip:/dualenergy/"
+
+...
