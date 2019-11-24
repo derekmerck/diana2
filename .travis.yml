@@ -8,8 +8,8 @@ services:
   - docker
 
 env:
-  # Enable app import from diana-cli/diana-plus
-  PYTHONPATH="$TRAVIS_BUILD_DIR/apps/diana-cli:$TRAVIS_BUILD_DIR/apps/diana-rest:"
+  # Enable app import from diana-plus
+  PYTHONPATH="$TRAVIS_BUILD_DIR/apps/diana-rest"
 
 addons:
   apt:
@@ -50,7 +50,7 @@ install:
   # All pip dependencies
   - pip3 install codecov
   - pip3 install -r requirements.txt
-  - pip3 install ./package
+  - pip3 install -e ./package
 
 #  - pip3 install ./package[plus]
 #  - pip3 install tensorflow  # No longer directly in requirements

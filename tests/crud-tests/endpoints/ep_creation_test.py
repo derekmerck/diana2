@@ -7,7 +7,7 @@ import pytest
 
 
 @attr.s
-class TestEP(Endpoint, Serializable):
+class SimpleEP(Endpoint, Serializable):
 
     cache = attr.ib(factory=dict, init=False)
     dummy1 = attr.ib(default=42)
@@ -43,7 +43,7 @@ def test_ep(item1, item2):
 
     logging.debug("Testing ep accessors")
 
-    ep = TestEP()
+    ep = SimpleEP()
     assert(ep.check())
 
     id = ep.put(item1)
@@ -65,7 +65,7 @@ def test_ep_factory():
 
     logging.debug("Testing ep factory")
 
-    ep = TestEP(name="test", dummy1=10)
+    ep = SimpleEP(name="test", dummy1=10)
     kwargs = ep.asdict()
     logging.debug(kwargs)
 
