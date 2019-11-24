@@ -4,8 +4,8 @@ import tempfile
 import shutil
 from crud.abc import Serializable
 from diana.apis import *
-from diana_cli import app
-from diana_cli.collect2 import Collector2
+from diana.cli import cli as app
+# from diana_cli.collect2 import Collector2
 
 from click.testing import CliRunner
 import json
@@ -74,7 +74,7 @@ def test_collector(setup_orthanc0, setup_orthanc1, anonymize):
     print("Handled: {}".format(h))
     print("Skipped: {}".format(s))
 
-    assert((h,s,f) == (1,0,1))
+    assert((h, s, f) == (1, 0, 1))
 
     c.reset()
     h, s, f = c.run(["52682350", "99920000"], anonymize=anonymize)
