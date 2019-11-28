@@ -48,7 +48,7 @@ from crud.cli.utils import ClickEndpoint, CLICK_ARRAY
 @click.argument("index", type=ClickEndpoint(expects=Redis))
 @click.pass_context
 def findex(ctx, index: Redis):
-    """Index files by accession number
+    """Index chained files by accession number
 
     \b
     $ diana-cli findex path:/data redis:

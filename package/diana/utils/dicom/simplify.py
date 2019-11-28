@@ -140,40 +140,47 @@ def flatten_content_sequence(tags):
             logger.debug('No key or no type, returning')
             return
 
-        if type_ == "TEXT":
-            value = item['TextValue']
-            # logger.debug('Found text value')
+        try:
 
-        elif type_ == "IMAGE":
-            # "IMAGE" sometimes encodes a text UUID, sometimes a refsop
-            try:
+            if type_ == "TEXT":
                 value = item['TextValue']
-            except KeyError:
-                logger = logging.getLogger("DcmSimplify")
-                logger.debug('No text value for "IMAGE", returning')
-                return
+                # logger.debug('Found text value')
 
-        elif type_ == "NUM":
-            value = float(item['MeasuredValueSequence'][0]['NumericValue'])
-            # logger.debug('Found numeric value')
-        elif type_ == 'UIDREF':
-            value = item['UID']
-            # logger.debug('Found uid value')
-        elif type_ == 'DATETIME':
-            value = mk_time(item['DateTime'])
-            # logger.debug('Found date/time value')
-        elif type_ == 'CODE':
-            try:
-                value = item['ConceptCodeSequence'][0]['CodeMeaning']
-            except:
-                value = "UNKNOWN"
-            # logger.debug('Found coded value')
-        elif type_ == "CONTAINER":
-            value = flatten_content_sequence(item)
-            # logger.debug('Found container - recursing')
-        else:
+            elif type_ == "IMAGE":
+                # "IMAGE" sometimes encodes a text UUID, sometimes a refsop
+                try:
+                    value = item['TextValue']
+                except KeyError:
+                    logger = logging.getLogger("DcmSimplify")
+                    logger.debug('No text value for "IMAGE", returning')
+                    return
+
+            elif type_ == "NUM":
+                value = float(item['MeasuredValueSequence'][0]['NumericValue'])
+                # logger.debug('Found numeric value')
+            elif type_ == 'UIDREF':
+                value = item['UID']
+                # logger.debug('Found uid value')
+            elif type_ == 'DATETIME':
+                value = mk_time(item['DateTime'])
+                # logger.debug('Found date/time value')
+            elif type_ == 'CODE':
+                try:
+                    value = item['ConceptCodeSequence'][0]['CodeMeaning']
+                except:
+                    value = "UNKNOWN"
+                # logger.debug('Found coded value')
+            elif type_ == "CONTAINER":
+                value = flatten_content_sequence(item)
+                # logger.debug('Found container - recursing')
+            else:
+                logger = logging.getLogger("DcmSimplify")
+                logger.debug("Unknown ValueType (" + item['ValueType'] + ")")
+
+        except KeyError as e:
             logger = logging.getLogger("DcmSimplify")
-            logger.debug("Unknown ValueType (" + item['ValueType'] + ")")
+            logger.warning(e)
+            logger.warning(item)
 
         if data.get(key):
             # logger.debug('Key already exists (' + key + ')')

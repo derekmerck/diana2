@@ -119,8 +119,6 @@ class MockSite(object):
                 device.poll(dest=pacs)
                 time.sleep(1)
 
-
-
     class Factory(object):
 
         @classmethod
