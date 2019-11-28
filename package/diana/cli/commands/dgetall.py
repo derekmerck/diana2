@@ -17,9 +17,16 @@ def dgetall(ctx, source: DcmDir, binary):
         for file in files:
             items.append(os.path.join(root, file))
 
+    nitems = 0
     for item in items:
         _item = source.get(item, file=binary)
         if _item:
             ctx.obj["items"].append(_item)
+            nitems+=1
 
     ctx.obj["source"] = source
+
+    click.echo("Found {} item{}".format(
+        nitems,
+        "" if nitems == 1 else "s"
+    ))

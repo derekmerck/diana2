@@ -68,7 +68,7 @@ def ofind(ctx,
 
     ctx.obj["items"] = result
 
-    click.echo("Found {} result{}".format(
+    click.echo("Found {} results{}".format(
         len(result),
         "" if len(result) == 1 else "s"
     ))
