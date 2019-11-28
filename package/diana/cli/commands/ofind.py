@@ -60,13 +60,13 @@ def ofind(ctx,
             query["StudyTime"] = ""
 
     if domain and hasattr(source, "rfind"):
-        result = source.rfind(query, domain, level, retrieve=retrieve)
+        results = source.rfind(query, domain, level, retrieve=retrieve)
     else:
-        result = source.find(query, level, retrieve=retrieve)
+        results = source.find(query, level, retrieve=retrieve)
 
-    ctx.obj["items"] = result
+    ctx.obj["items"] = results
 
     click.echo("Found {} results{}".format(
-        len(result),
-        "" if len(result) == 1 else "s"
+        len(results),
+        "" if len(results) == 1 else "s"
     ))

@@ -204,10 +204,16 @@ class Orthanc(Endpoint, Serializable):
 
         # logger.debug(pformat(q))
 
-        r = self.gateway.find(q)
+        results = self.gateway.find(q)
 
-        # Returns a list of OIDs
-        return r
+        # Returns a list of OIDs that must be converted to dixels
+
+        if results:
+            rv = []
+            for oid in results:
+                item = Dixel(meta={"ID": oid}, level=level)
+                rv.append(item)
+            return rv
 
     def rfind(self,
               item: Union[Mapping, Dixel],
