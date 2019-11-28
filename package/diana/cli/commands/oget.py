@@ -22,10 +22,15 @@ def oget(ctx, source: Orthanc, items, metakeys, fkey, kwargs, binary):
     if not isinstance(source, Orthanc):
         raise click.UsageError("Wrong endpoint type")
 
-    if not ctx.obj.get("items"):
-        ctx.obj["items"] = []
+    # Compile the input items list
+    _items = ctx.obj["items"]
+    if ctx.obj.get("items"):
+        _items.extend(ctx.obj["items"])
 
-    for item in items:
+    # Reset the output items
+    ctx.obj["items"] = []
+
+    for item in _items:
         _item = source.get(item, file=binary, **kwargs)
 
         if metakeys:
