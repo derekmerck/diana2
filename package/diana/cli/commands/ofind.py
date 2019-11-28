@@ -37,7 +37,8 @@ def ofind(ctx,
 
     click.echo(click.style('Orthanc Find', underline=True, bold=True))
 
-    # source.find(query)
+    if not query:
+        query = {}
 
     if accession_number:
         query["AccessionNumber"] = accession_number
