@@ -6,7 +6,7 @@ from crud.cli.utils import CLICK_MAPPING, import_cmds
 from crud.cli.cli import epilog
 from diana import __version__
 from diana.utils.endpoint.watcher import suppress_watcher_debug
-from diana.utils.gateways.requesters import suppress_urllib_debug
+from diana.utils.gateways.requesters import suppress_urllib_debug, USE_SESSIONS
 
 __readme_header__ = """\
 diana-cli
@@ -35,8 +35,9 @@ Gainesville, FL
 @click.option('-v', '--verbose', is_flag=True, default=False)
 @click.option('-s', '--services', type=CLICK_MAPPING, default={},
               help="Services dict as yaml/json format string or @file.yaml")
+@click.option('--sessions/--no-sessions', default=True)
 @click.pass_context
-def cli(ctx, verbose, services):
+def cli(ctx, verbose, services, sessions):
     """Run DIANA packages using a command-line interface.
 
     \b
@@ -66,6 +67,11 @@ def cli(ctx, verbose, services):
     if verbose:
         click.echo("Using services:")
         click.echo(pformat(services))
+
+    if not sessions:
+        click.echo("Disabling requests sessions")
+        global USE_SESSIONS
+        USE_SESSIONS = False
 
     # Runner does not instantiate ctx properly
     if not ctx.obj:
