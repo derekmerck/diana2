@@ -6,7 +6,7 @@ from diana.apis import Orthanc
 
 @click.command()
 @click.argument("source", type=ClickEndpoint(expects=Orthanc))
-@click.argument("items", type=CLICK_ARRAY, optional=True)
+@click.argument("items", type=CLICK_ARRAY, required=False)
 @click.option("-m", "--metakeys", type=CLICK_ARRAY, default=None,
               help="Meta key(s) to retrieve")
 @click.option("--fkey", type=click.STRING, envvar="DIANA_FKEY",
