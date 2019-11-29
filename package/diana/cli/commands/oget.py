@@ -1,5 +1,6 @@
 # Specialized orthanc put with anonymize and tag
 
+import logging
 import click
 from crud.cli.utils import ClickEndpoint, CLICK_ARRAY, CLICK_MAPPING
 from diana.apis import Orthanc
@@ -25,12 +26,16 @@ def oget(ctx, source: Orthanc, items, metakeys, fkey, kwargs, binary):
     """
     click.echo(click.style('Get Studies from Orthanc', underline=True, bold=True))
 
-    if not isinstance(source, Orthanc):
-        raise click.UsageError("Wrong endpoint type")
+    if not kwargs:
+        kwargs = {}
 
     # Compile the input items list
+    if not items:
+        items = []
     if ctx.obj.get("items"):
         items.extend(ctx.obj["items"])
+
+    logging.debug(f"Items: {items}")
 
     # Reset the output items
     ctx.obj["items"] = []

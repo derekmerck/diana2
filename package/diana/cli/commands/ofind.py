@@ -64,9 +64,12 @@ def ofind(ctx,
     else:
         results = source.find(query, level, retrieve=retrieve)
 
+    if not results:
+        results = []
+
     ctx.obj["items"] = results
 
-    click.echo("Found {} results{}".format(
+    click.echo("Found {} result{}".format(
         len(results),
         "" if len(results) == 1 else "s"
     ))
