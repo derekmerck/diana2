@@ -68,6 +68,13 @@ class Endpoint(ABC):
         """Remove an item from the crud"""
         raise NotImplementedError
 
+    @property
+    def logger(self):
+        return logging.getLogger(self.name)
+
+    def suppress_debug_logging(self):
+        self.logger.setLevel(logging.WARNING)
+
 
 @attr.s
 class MultiEndpoint(Endpoint):

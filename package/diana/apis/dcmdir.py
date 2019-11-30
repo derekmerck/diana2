@@ -30,23 +30,19 @@ class DcmDir(Endpoint, Serializable):
     _gen = attr.ib(init=False, repr=False, default=None)
 
     def put(self, item: Dixel, **kwargs):
-        logger = logging.getLogger(self.name)
-        logger.debug("EP PUT")
+        self.logger.debug("EP PUT")
         if not item.file:
             raise ValueError("Dixel has no file attribute, can only save file data")
         self.gateway.write_file(item.fn, item.file)
 
     def update(self, fn: str, item: Dixel, **kwargs):
-        logger = logging.getLogger(self.name)
-        logger.debug("EP UPDATE")
+        self.logger.debug("EP UPDATE")
         if not item.file:
             raise ValueError("Dixel has no file attribute, can only save file data")
         self.gateway.write_file(fn, Dixel.file)
 
     def get(self, item: Union[str, Dixel], view=DixelView.TAGS, **kwargs):
-
-        logger = logging.getLogger(self.name)
-        logger.debug("EP GET")
+        self.logger.debug("EP GET")
         if isinstance(item, str) or isinstance(item, Path):
             fn = item
         elif isinstance(item, Dixel) or hasattr(item, 'fn'):
@@ -72,7 +68,7 @@ class DcmDir(Endpoint, Serializable):
                 # logging.debug(ds)
                 result = Dixel.from_pydicom(ds, fn, file=file)
             except (pydicom.errors.InvalidDicomError, DicomFormatError) as e:
-                logging.warning(f"Failed to parse with {e}")
+                self.logger.warning(f"Failed to parse with {e}")
                 return
         else:
             result = Dixel(level=DicomLevel.INSTANCES, meta={"FileName": fn})
@@ -83,8 +79,7 @@ class DcmDir(Endpoint, Serializable):
         return result
 
     def delete(self, item: Union[str, Dixel], **kwargs):
-        logger = logging.getLogger(self.name)
-        logger.debug("EP DELETE")
+        self.logger.debug("EP DELETE")
         if isinstance(item, str):
             fn = item
         elif isinstance(item, Dixel) or hasattr(item, 'fn'):
@@ -94,8 +89,7 @@ class DcmDir(Endpoint, Serializable):
         return self.gateway.delete(fn)
 
     def exists(self, item: Union[str, Dixel]):
-        logger = logging.getLogger(self.name)
-        logger.debug("EP EXISTS")
+        self.logger.debug("EP EXISTS")
 
         if isinstance(item, Dixel):
             fn = item.fn
@@ -109,13 +103,11 @@ class DcmDir(Endpoint, Serializable):
         return self.gateway.exists(fn)
 
     def check(self):
-        logger = logging.getLogger(self.name)
-        logger.debug("EP CHECK")
+        self.logger.debug("EP CHECK")
         return os.path.exists(self.path)
 
     def get_zipped(self, item: Union[Path, str]):
-        logger = logging.getLogger(self.name)
-        logger.debug("EP GET ZIPPED")
+        self.logger.debug("EP GET ZIPPED")
         gateway = ZipFileHandler(path=self.path)
         files = gateway.unzip(item)
         _fp = gateway.get_path(item)
@@ -131,8 +123,7 @@ class DcmDir(Endpoint, Serializable):
         return result
 
     def put_zipped(self, item: Union[Path, str], items: Collection):
-        logger = logging.getLogger(self.name)
-        logger.debug("EP PUT ZIPPED")
+        self.logger.debug("EP PUT ZIPPED")
         gateway = ZipFileHandler(path=self.path)
         gateway.zip(item, items)
 
@@ -186,6 +177,11 @@ class DcmDir(Endpoint, Serializable):
 
     def files(self, rex="*.dcm"):
         return self.gateway.get_files(rex=rex)
+
+    @property
+    def logger(self):
+        return logging.getLogger(self.name)
+
 
 
 @attr.s
