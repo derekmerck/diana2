@@ -132,6 +132,15 @@ class Orthanc(Requester):
             # Returns entire file as bytes
             return response
 
+    def modify(self, oid, level, replacement_map):
+        resource = "{!s}/{}/modify".format(level, oid)
+        response = self._post(resource, json=replacement_map)
+        if level <= DicomLevel.SERIES:
+            return response.get("ID")
+        else:
+            # Returns entire file as bytes
+            return response
+
     def get_metadata(self, oid: str, level: DicomLevel, key: str ):
         resource = "{!s}/{}/metadata/{}".format(level, oid, key)
         return self._get(resource)

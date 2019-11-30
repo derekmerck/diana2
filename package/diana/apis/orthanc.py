@@ -256,6 +256,17 @@ class Orthanc(Endpoint, Serializable):
         for item in self.patients():
             self.gateway.delete(item, DicomLevel.PATIENTS)
 
+    def modify(self, item: Union[str, Dixel],
+                  level=DicomLevel.STUDIES,
+                  replacement_map: Mapping = None,
+                  **kwargs):
+
+        oid, level = self.id_from_item(item, level)
+        if not replacement_map:
+            raise ValueError("Modification requires explicit replacement map")
+
+        return self.gateway.modify(oid, level, replacement_map)
+
     def anonymize(self, item: Union[str, Dixel],
                   level=DicomLevel.STUDIES,
                   replacement_map: Mapping = None,

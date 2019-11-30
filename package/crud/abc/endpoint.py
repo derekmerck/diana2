@@ -72,8 +72,10 @@ class Endpoint(ABC):
     def logger(self):
         return logging.getLogger(self.name)
 
-    def suppress_debug_logging(self):
-        self.logger.setLevel(logging.WARNING)
+    @classmethod
+    def suppress_debug_logging(cls):
+        logger = logging.getLogger( cls.__name__ )
+        logger.setLevel(logging.WARNING)
 
 
 @attr.s
