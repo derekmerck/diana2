@@ -1,8 +1,11 @@
 """
 Merck, Fall 2019
 
-Sort single-foldered studies into patient/date/series folders
-and filter by desired series description
+Given single-foldered studies
+- Filter non-primary-head series
+- Filter any series with contrast
+- Delete RequestingPhysician tag
+- Save remaining series (nc primary head) as patient/date/series_desc.zip
 
 dcm.uid.1
 - ct.uid.11
@@ -15,35 +18,26 @@ to
 
 patient_name
 - study1-date
-  - series1_protocol_name.zip
-  - series2_protocol_name.zip
+  - series1_desc.zip
+  - series2_desc.zip
 - study1-date
-  - series1_protocol_name.zip
+  - series1_desc.zip
 
 Requires an orthanc helper, used for only a single study at a time
-
-Rough diana-cli equivalent for a single study:
-
-$ diana-cli dgetall -b path:/input_dir/study \
-            oput orthanc: \
-            ofind -q "SeriesDescription: *W/O*" --level=series orthanc: \
-            oget -b orthanc "" \
-            put path:/output_dir
 """
 
 import os
 import logging
-from pprint import pformat
-from functools import partial
 from pathlib import Path
 from diana.apis import DcmDir, Orthanc
 from diana.dixel import DixelView as DVw
 from diana.utils.dicom import DicomLevel as DLv
-from diana.utils.gateways.requesters import suppress_urllib_debug, USE_SESSIONS
+from diana.utils.gateways.requesters import suppress_urllib_debug
+from diana.utils.gateways.requesters import requester
 from crud.utils import path_safe
 
 # Script vars
-# ----------------
+# --------------------------------
 
 # output filepath
 fpo = "/tmp"
@@ -54,36 +48,16 @@ src_dir = "/Users/derek/Dropbox (UFL)/UFH ICH Heads"
 handled_file = "handled.txt"
 errors_file  = "errors.txt"
 
-# queries =[ {"SeriesDescription": "*W/O*",
-#             "BodyPartExamined": "Head"},
-#            {"SeriesDescription": "*NON?CON*",
-#             "BodyPartExamined": "Head"},
-#            {"SeriesDescription": "*BRAIN*STEALTH*",
-#             "BodyPartExamined": "Head"}
-#          ]
+replacement_map = {"Remove": ["RequestingPhysician"]}
 
-# Include any heads, throw out any heads with contrast
-includes = [{"BodyPartExamined": "Head",
-             "ImageType": "ORIGINAL?PRIMARY?AXIAL"}]
+# Windows does not like request session objects
+requester.USE_SESSIONS = False
+
+clear = True
+pull = True
 
 
-def str_lt(b: int, s: str):
-    def get_int(s: str):
-        digits = filter(str.isdigit, s)
-        as_str = ''.join(digits)
-        num = int(as_str)
-        return num
-    rv = get_int(s) < b
-    logging.debug(f"Testing lt: {s} < {b} = {rv}")
-    return rv
-
-
-filters = [{"ContrastBolusAgent": "CE",
-            "ConvolutionKernel": partial(str_lt, 50)} ]
-
-# replacement_map = {"Remove": ["RequestingPhysician"]}
-replacement_map = None
-
+# --------------------------------
 
 def ul_study(source: DcmDir, dest: Orthanc):
     """Grab a single study and upload it"""
@@ -104,55 +78,60 @@ def ul_study(source: DcmDir, dest: Orthanc):
             dest.put(_item)
 
 
+def get_int(s: str):
+    digits = filter(str.isdigit, s)
+    as_str = ''.join(digits)
+    num = int(as_str)
+    return num
+
+
 def dl_series(source: Orthanc, pull=True):
 
-    qitems = []
+    query = {"BodyPartExamined": "Head",
+            "ImageType": "ORIGINAL?PRIMARY?AXIAL"}
 
-    for query in includes:
-        _qitems = source.find(query, level=DLv.SERIES)
+    qitems = source.find(query, level=DLv.SERIES)
 
-        if _qitems:
-            qitems.extend( _qitems )
+    if not qitems:
+        logging.warning("No candidate series available")
+        return
 
-    logging.info(f"Found candidate series: {pformat(qitems)}")
+    logging.debug(f"Found {len(qitems)} candidate series")
 
-    tagged_items = []
+    items = []
     for qitem in qitems:
         item = source.get(qitem, view=DVw.TAGS)
 
         logging.debug(f"Testing: {item.tags.get('SeriesDescription')}")
 
-        include = True
-        for filt in filters:
-            for k, v in filt.items():
-                if (callable(v) and v(item.tags.get(k))) or \
-                     item.tags.get(k) == v:
-                    include = False
-
-        if include:
-            tagged_items.append(item)
-            logging.debug(f"Including {item.tags['SeriesDescription']}")
-        else:
+        if item.tags.get("ContrastBolusAgent"):
             logging.debug(f"Discarding {item.tags['SeriesDescription']}")
+            continue
 
-    if not tagged_items:
+        logging.debug(f"Including {item.tags['SeriesDescription']}")
+        items.append(item)
+
+    if not items:
         logging.warning("No valid series identified")
 
-    logging.info(f"Found valid series: {pformat(tagged_items)}")
+    logging.info(f"Found {len(items)} valid series:")
+    for item in items:
+        logging.info(f"  {item.tags['SeriesDescription']} w kernel: {item.tags['ConvolutionKernel']}")
 
     if pull:
         rv = []
-        for item in tagged_items:
+        for item in items:
             if replacement_map:
                 logging.info("Running replacement map")
-                item = source.modify(item, replacement_map=replacement_map)
+                item_id = source.modify(item, replacement_map=replacement_map)
+                item = source.get(item_id, view=DVw.TAGS)
             item = source.get(item, view=DVw.FILE)
             rv.append(item)
 
         return rv
 
     else:
-        return tagged_items
+        return items
 
 
 def write_item(item, fpo):
@@ -197,10 +176,8 @@ def handle_study(fpi, fpo, clear=True, pull=True):
 
 if __name__ == "__main__":
 
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
 
-    # Windows does not like request session objects
-    USE_SESSIONS = False
     suppress_urllib_debug()
     DcmDir.suppress_debug_logging()
 
@@ -212,12 +189,9 @@ if __name__ == "__main__":
 
     study_dirs = os.listdir(src_dir)
 
-    # study_dirs = ["1.3.6.1.4.1.29565.1.4.67799414.108615.1538292283.543265"]
-    # study_dirs = ["1.3.6.1.4.1.29565.1.4.67799414.2635.1530202664.221926"]
-    study_dirs = ["1.3.6.1.4.1.29565.1.4.67799414.14323.1561904796.589380"]
-
-    clear = True
-    pull = False
+    # # study_dirs = ["1.3.6.1.4.1.29565.1.4.67799414.108615.1538292283.543265",
+    #              # "1.3.6.1.4.1.29565.1.4.67799414.2635.1530202664.221926",
+    # study_dirs = ["1.3.6.1.4.1.29565.1.4.67799414.14323.1561904796.589380"]
 
     for study_dir in study_dirs:
         if study_dir in sorted_studies:
