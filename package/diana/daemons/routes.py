@@ -160,7 +160,7 @@ def say(item: str, suffix: str=None):
 
 
 def write_ai(item: str, proj_path: str = None):
-    with open("{}/q_results.json".format(proj_path), 'a+') as data_file:
+    with open("{}/q_results.json".format(proj_path), 'w+') as data_file:
         data_file.write(str(item) + "\n")
 
 
