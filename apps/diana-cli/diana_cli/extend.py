@@ -107,6 +107,8 @@ def extend(ctx,
                     except (AttributeError, AssertionError):
                         print("No station name or not ER scanner")
                         shutil.rmtree("{}/data/{}_process".format(proj_path, an))
+                        with open("{}/{}_scores.txt".format(proj_path, ml), "a+") as f:
+                            f.write("{}, -, -, NOT_ER_SCANNER\n".format(an))
                         continue
 
                     p_predict = subprocess.Popen("python3 run.py '{}'".format(dcmdir_name), shell=True, cwd="{}/halibut-dm/".format(proj_path))
@@ -119,6 +121,9 @@ def extend(ctx,
                     pred_brain_bleed = [_.strip() for _ in pred_brain_bleed]
                     with open("{}/{}_scores.txt".format(proj_path, ml), "a+") as f:
                         f.write("{}, {}, {}, {}\n".format(an, pred_brain_bleed[0], pred_brain_bleed[1], pred_brain_bleed[2]))
+                    if float(pred_brain_bleed[0]) < 70:
+                        print("ICH below 70% threshold")
+                        continue
                 else:
                     raise NotImplementedError
 
@@ -134,9 +139,6 @@ def extend(ctx,
                         )
                         assert(sl_fiup_response["ok"])
                 elif ml == "brain_bleed":
-                    if float(pred_brain_bleed[0]) < 70:
-                        print("ICH below 70% threshold")
-                        continue
                     for channel in bb_channels:
                         sl_fiup_response = sl_bot_client.files_upload(
                             channels=channel,  # WARNING: check param spelling in updates
