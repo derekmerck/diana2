@@ -48,9 +48,9 @@ def extend(ctx,
                 with open("{}/{}_slack_an.txt".format(proj_path, ml)) as f:
                     accession_nums = [f.read().strip()]
                 os.remove("{}/{}_slack_an.txt".format(proj_path, ml))
-                with open("{}/{}.studies.txt".format(proj_path, ml), 'a+') as f:
-                    for an in accession_nums:
-                        f.write(an)
+            with open("{}/{}.studies.txt".format(proj_path, ml), 'a+') as f:
+                for an in accession_nums:
+                    f.write(an)
 
             # Validating second half of pipeline
             # accession_nums = [53144722]
@@ -59,8 +59,6 @@ def extend(ctx,
                 continue
             os.remove("{}/q_results.json".format(proj_path))
 
-            if os.path.isfile("{}/{}.studies.txt".format(proj_path, ml)):
-                os.remove("{}/{}.studies.txt".format(proj_path, ml))
             if os.path.isfile("{}/{}.key.csv".format(proj_path, ml)):
                 os.remove("{}/{}.key.csv".format(proj_path, ml))
             p_collect = subprocess.Popen("diana-cli collect {} {} sticky_bridge radarch".format(ml, proj_path), shell=True)
@@ -68,6 +66,9 @@ def extend(ctx,
             time.sleep(10)
             p_collect = subprocess.Popen("diana-cli collect {} {} sticky_bridge radarch".format(ml, proj_path), shell=True)
             p_collect.wait()
+
+            if os.path.isfile("{}/{}.studies.txt".format(proj_path, ml)):
+                os.remove("{}/{}.studies.txt".format(proj_path, ml))
 
             for i, an in enumerate(accession_nums):
                 print("Processing unique a/n: {}".format(an))
