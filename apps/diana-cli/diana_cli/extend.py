@@ -48,6 +48,9 @@ def extend(ctx,
                 with open("{}/{}_slack_an.txt".format(proj_path, ml)) as f:
                     accession_nums = [f.read().strip()]
                 os.remove("{}/{}_slack_an.txt".format(proj_path, ml))
+
+            if os.path.isfile("{}/{}.studies.txt".format(proj_path, ml)):
+                os.remove("{}/{}.studies.txt".format(proj_path, ml))
             with open("{}/{}.studies.txt".format(proj_path, ml), 'a+') as f:
                 for an in accession_nums:
                     f.write(an)
@@ -67,8 +70,6 @@ def extend(ctx,
             p_collect = subprocess.Popen("diana-cli collect {} {} sticky_bridge radarch".format(ml, proj_path), shell=True)
             p_collect.wait()
 
-            if os.path.isfile("{}/{}.studies.txt".format(proj_path, ml)):
-                os.remove("{}/{}.studies.txt".format(proj_path, ml))
 
             for i, an in enumerate(accession_nums):
                 print("Processing unique a/n: {}".format(an))
@@ -144,7 +145,6 @@ def extend(ctx,
                         assert(sl_fiup_response["ok"])
                 shutil.rmtree("{}/data/{}_process".format(proj_path, an))
 
-            os.remove("{}/{}.studies.txt".format(proj_path, ml))
             time.sleep(2)  # slightly wait for ObservableProxiedDicom polling_interval
     except (KeyboardInterrupt, FileNotFoundError, KeyError, AssertionError) as e:
         try:
