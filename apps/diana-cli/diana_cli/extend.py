@@ -28,7 +28,7 @@ def extend(ctx,
     try:
         sl_bot_client = slack.WebClient(token=os.environ['SLACK_BOT_TOKEN'])
         ba_channels = ["CM2BV81DX", "CLHKN3W3V"]
-        bb_channels = ["GP57V327Q"]
+        bb_channels = ["GP57V327Q", "GPJ16UN07"]
         p_slack_rtm = subprocess.Popen("python /opt/diana/package/diana/daemons/slack_rtm.py {} {}".format(proj_path, ml), shell=True, stdout=subprocess.PIPE)
 
         rt = "write_series_AI"
