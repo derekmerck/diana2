@@ -36,10 +36,11 @@ def extend(ctx,
         if not os.path.isfile("{}/{}_scores.txt".format(proj_path, ml)):
             open("{}/{}_scores.txt".format(proj_path, ml), 'a').close()
 
+        clear_counter = 0
         while True:
             time.sleep(3)  # give json time to finish writing
             while not os.path.isfile("{}/q_results.json".format(proj_path)):
-                time.sleep(2)
+                time.sleep(3)
             print("Query {}".format(datetime.now()))
             with open("{}/q_results.json".format(proj_path), 'r') as data_file:
                 accession_nums = parse_results(data_file, proj_path, ml)
@@ -59,8 +60,10 @@ def extend(ctx,
             # accession_nums = [53144722]
 
             if len(accession_nums) == 0:
-                open("{}/q_results.json".format(proj_path), 'w').close()
-                time.sleep(2)
+                clear_counter += 1
+                if clear_counter > 1200:
+                    open("{}/q_results.json".format(proj_path), 'w').close()
+                    clear_counter = 0
                 continue
             os.remove("{}/q_results.json".format(proj_path))
 
