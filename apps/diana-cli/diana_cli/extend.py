@@ -101,7 +101,7 @@ def extend(ctx,
                             break
 
                     # Filter out non-ER cases by StationName
-                    s = pydicom.dcmread(dcmdir_name)
+                    s = pydicom.dcmread(f)
                     try:
                         assert(s.StationName.lower() == "cter" or s.StationName.upper() == "CTAWP66457")
                     except (AttributeError, AssertionError):
