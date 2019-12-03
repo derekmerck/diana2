@@ -53,7 +53,7 @@ def extend(ctx,
                 os.remove("{}/{}.studies.txt".format(proj_path, ml))
             with open("{}/{}.studies.txt".format(proj_path, ml), 'a+') as f:
                 for an in accession_nums:
-                    f.write(an)
+                    f.write(an + "\n")
 
             # Validating second half of pipeline
             # accession_nums = [53144722]
@@ -69,7 +69,6 @@ def extend(ctx,
             time.sleep(10)
             p_collect = subprocess.Popen("diana-cli collect {} {} sticky_bridge radarch".format(ml, proj_path), shell=True)
             p_collect.wait()
-
 
             for i, an in enumerate(accession_nums):
                 print("Processing unique a/n: {}".format(an))
@@ -136,6 +135,7 @@ def extend(ctx,
                         assert(sl_fiup_response["ok"])
                 elif ml == "brain_bleed":
                     if float(pred_brain_bleed[0]) < 70:
+                        print("ICH below 70% threshold")
                         continue
                     for channel in bb_channels:
                         sl_fiup_response = sl_bot_client.files_upload(
