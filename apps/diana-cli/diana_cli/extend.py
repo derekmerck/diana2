@@ -135,6 +135,8 @@ def extend(ctx,
                         )
                         assert(sl_fiup_response["ok"])
                 elif ml == "brain_bleed":
+                    if float(pred_brain_bleed[0]) < 70:
+                        continue
                     for channel in bb_channels:
                         sl_fiup_response = sl_bot_client.files_upload(
                             channels=channel,  # WARNING: check param spelling in updates
