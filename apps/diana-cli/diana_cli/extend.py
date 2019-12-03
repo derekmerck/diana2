@@ -39,7 +39,7 @@ def extend(ctx,
         while True:
             time.sleep(3)  # give json time to finish writing
             while not os.path.isfile("{}/q_results.json".format(proj_path)):
-                time.sleep(5)
+                time.sleep(2)
             print("Query {}".format(datetime.now()))
             with open("{}/q_results.json".format(proj_path), 'r') as data_file:
                 accession_nums = parse_results(data_file, proj_path, ml)
@@ -59,6 +59,8 @@ def extend(ctx,
             # accession_nums = [53144722]
 
             if len(accession_nums) == 0:
+                open("{}/q_results.json".format(proj_path), 'w').close()
+                time.sleep(2)
                 continue
             os.remove("{}/q_results.json".format(proj_path))
 
