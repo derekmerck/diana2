@@ -96,7 +96,7 @@ def extend(ctx,
                     with open("/opt/diana/{}_temp_predict".format(ml)) as f:
                         pred_bone_age = f.read()
                     with open("{}/{}_scores.txt".format(proj_path, ml), "a+") as f:
-                        f.write("{}, {}\n".format(an, pred_bone_age))
+                        f.write("{}, {}, {}\n".format(an, str(datetime.now()), pred_bone_age))
                 elif ml == "brain_bleed":
                     files = [f for f in glob.glob("{}/data/{}_process/".format(proj_path, an) + "**/*.dcm", recursive=True)]
                     for f in files:
@@ -113,7 +113,7 @@ def extend(ctx,
                         print("No station name or not ER scanner")
                         shutil.rmtree("{}/data/{}_process".format(proj_path, an))
                         with open("{}/{}_scores.txt".format(proj_path, ml), "a+") as f:
-                            f.write("{}, -, -, NOT_ER_SCANNER\n".format(an))
+                            f.write("{}, {}, -, -, NOT_ER_SCANNER\n".format(an, str(datetime.now())))
                         continue
 
                     p_predict = subprocess.Popen("python3 run.py '{}'".format(dcmdir_name), shell=True, cwd="{}/halibut-dm/".format(proj_path))
@@ -125,7 +125,7 @@ def extend(ctx,
                         pred_brain_bleed = f.readlines()
                     pred_brain_bleed = [_.strip() for _ in pred_brain_bleed]
                     with open("{}/{}_scores.txt".format(proj_path, ml), "a+") as f:
-                        f.write("{}, {}, {}, {}\n".format(an, pred_brain_bleed[0], pred_brain_bleed[1], pred_brain_bleed[2]))
+                        f.write("{}, {}, {}, {}, {}\n".format(an, str(datetime.now()), pred_brain_bleed[0], pred_brain_bleed[1], pred_brain_bleed[2]))
                     if float(pred_brain_bleed[0]) < 70:
                         print("ICH below 70% threshold")
                         continue
