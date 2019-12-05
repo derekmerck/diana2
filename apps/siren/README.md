@@ -159,6 +159,8 @@ Submitting multiple studies (or indeed multiple series within a study) with sequ
 
 A given accession number (or DICOM UID, if accession number is missing) will be hashed reproducibly to a unique new sham accession number.  However, if an input accession number is an obviously non-unique string, like "study 1", all other studies using that non-unique string will be assigned to the same sham accession number.  In this case, it is important to add the images to unique sham subject id rather than to the default subject.
 
+The default shamming and anonymization schema can be modified to meet specific needs by providing a different replacement map in [`handlers.py`](handlers.py).
+
 
 ## License
 
