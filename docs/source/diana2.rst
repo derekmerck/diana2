@@ -130,10 +130,10 @@ logic and technical implementations of specific services such a file
 directories or servers (generically called Gateways here). Method syntax
 generally follows standard KV nomenclature (get, put, find, etc.)
 
-Endpoints handle Items, which may include metadata, data, and other
-attributes. Items may be referenced by an ItemID for Get or Delete
-requests. Put requests require an Item type argument. And Find requests
-describe Items by a mapping Query.
+*Endpoints* handle *Items*, which may include metadata, data, and other
+attributes. *Items* may be referenced by an *ItemID* for *Get* or
+*Delete* requests. *Put* requests require an *Item* type argument.
+*Find* requests describe *Items* with a mapping *Query*.
 
 Python-Diana provides DICOM item type and endpoints,
 Python-\ `WUPHF <https://en.wikipedia.org/wiki/WUPHF.com>`__ provides
@@ -141,9 +141,6 @@ interoperable messenging items and endpoints (email, sms, twillo).
 
 Testing
 -------
-
-Usage
------
 
 Manually run pytest with coverage and upload to codecov:
 

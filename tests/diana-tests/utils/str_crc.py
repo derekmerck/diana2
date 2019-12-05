@@ -1,5 +1,5 @@
-
 from diana.utils import str_crc, mk_crc, chk_crc, b32char
+
 
 def test_str_crc():
 

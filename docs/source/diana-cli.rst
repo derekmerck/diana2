@@ -41,10 +41,12 @@ Usage
      $ diana-cli dgetall path:/data/dcm oput orthanc:
 
    Options:
-     --version               Show the version and exit.
+     --version                   Show the version and exit.
      -v, --verbose
-     -s, --services MAPPING  Services dict as yaml/json format string or @file.yaml
-     --help                  Show this message and exit.
+     -s, --services MAPPING      Services dict as yaml/json format string or
+                                 @file.yaml
+     --sessions / --no-sessions
+     --help                      Show this message and exit.
 
    Commands:
      check       Check endpoint status
@@ -60,7 +62,7 @@ Usage
      mfind       Find items in Montage by query for chaining
      mock        Generate mock DICOM traffic
      ofind       Find item in Orthanc by query for chaining
-     oget        Get studies from Orthanc
+     oget        Get studies from Orthanc.
      ogetm       Get study-level item metadata from Orthanc
      oput        Put chained instances in Orthanc
      oputm       Set study-level item metadata in Orthanc
@@ -162,7 +164,7 @@ findex
 
    Usage: diana-cli findex [OPTIONS] INDEX
 
-     Index files by accession number
+     Index chained files by accession number
 
      $ diana-cli findex path:/data redis:
 
@@ -311,7 +313,7 @@ ofind
      proxied DICOM endpoint.
 
    Options:
-     -a, --accession_numbers ARRAY   Requires PHI privileges on Montage
+     -a, --accession_number TEXT     Requires PHI privileges on Montage
      --today
      -q, --query MAPPING             Query string
      -l, --level [studies|series|instances]
@@ -324,9 +326,12 @@ oget
 
 ::
 
-   Usage: diana-cli oget [OPTIONS] SOURCE ITEMS
+   Usage: diana-cli oget [OPTIONS] SOURCE [ITEMS]
 
-     Get studies from Orthanc
+     Get studies from Orthanc.
+
+     $ diana-cli oget oidx-xxxx... print
+     $ diana-cii ofind -a 123xxx orthanc: oget orthanc: print
 
    Options:
      -m, --metakeys ARRAY  Meta key(s) to retrieve
