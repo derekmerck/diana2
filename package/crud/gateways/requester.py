@@ -4,8 +4,14 @@ import attr
 from ..exceptions import GatewayConnectionError
 from ..utils.smart_json import SmartJSONEncoder
 
+"""
+print out RequestException respnose and header info:
+  pprint(e.response)
+  pprint(e.request.headers)
+"""
+
 # Enabled sessions to handle cookies from Docker swarm for sticky connections
-USE_SESSIONS = True
+USE_SESSIONS = False
 
 NORMAL_TIMEOUT = (3.1, 12.1)  # (connect to, read to)
 LARGE_TIMEOUT  = (6.1, 360.1) # Use large timeout on <1Gb connections
@@ -32,13 +38,14 @@ class Requester(object):
     port = attr.ib(default=80)
     path = attr.ib(default=None)
 
-    user = attr.ib(default="diana")
-    password = attr.ib(default="passw0rd!")
+    user = attr.ib(default=None)
+    password = attr.ib(default=None)
+    auth_tok = attr.ib(default=None)
 
-    base_url = attr.ib(init=False, repr=False)
+    base_url = attr.ib(init=False, default=None)
+    auth_header = attr.ib(init=False, default=None)
     auth = attr.ib(init=False, default=None)
-
-    session = attr.ib(init=False, factory=requests.Session)
+    session = attr.ib(init=False, default=None)
 
     # Can't use attr.s defaults here b/c the derived classes don't see the vars yet
     def __attrs_post_init__(self):
@@ -49,11 +56,20 @@ class Requester(object):
         if self.path:
             base_url = os.path.join( base_url, self.path )
         self.base_url = base_url
-        if self.user:
+
+        # If auth is assigned, it cannot be overwritten with a header
+        if self.user and self.password:
             self.auth = (self.user, self.password)
 
+        if self.auth_tok and hasattr(self, "setup_auth_header"):
+            self.auth_header = self.setup_auth_header()
+
         if USE_SESSIONS:
-            self.session.auth = self.auth
+            self.session = requests.Session()
+            if self.auth:
+                self.session.auth = self.auth
+            if self.auth_header:
+                self.session.headers = self.auth_header
             self.session.verify = False
 
     def make_url(self, resource):
@@ -78,10 +94,16 @@ class Requester(object):
         logger = logging.getLogger(self.name)
         logger.debug("Calling get")
         url = self.make_url(resource)
+        # logger.debug(url)
+
         try:
             if USE_SESSIONS:
                 result = self.session.get(url, params=params, headers=headers, timeout=TIMEOUTS)
             else:
+                if self.auth_header and headers:
+                    headers.update(self.auth_header)
+                else:
+                    headers = self.auth_header
                 result = requests.get(url, params=params, headers=headers, auth=self.auth, timeout=TIMEOUTS)
 
         except (requests.exceptions.ConnectionError,
@@ -101,6 +123,10 @@ class Requester(object):
             if USE_SESSIONS:
                 result = self.session.put(url, data=data, headers=headers,timeout=TIMEOUTS)
             else:
+                if self.auth_header and headers:
+                    headers.update(self.auth_header)
+                else:
+                    headers = self.auth_header
                 result = requests.put(url, data=data, headers=headers, auth=self.auth, timeout=TIMEOUTS)
         except requests.exceptions.Timeout as e:
             raise GatewayConnectionError("Response timed out")
@@ -119,6 +145,10 @@ class Requester(object):
             if USE_SESSIONS:
                 result = self.session.post(url, data=data, headers=headers,timeout=TIMEOUTS)
             else:
+                if self.auth_header and headers:
+                    headers.update(self.auth_header)
+                else:
+                    headers = self.auth_header
                 result = requests.post(url, data=data, headers=headers, auth=self.auth, timeout=TIMEOUTS)
         except requests.exceptions.Timeout as e:
             raise GatewayConnectionError("Response timed out")
@@ -135,6 +165,10 @@ class Requester(object):
             if USE_SESSIONS:
                 result = self.session.delete(url, headers=headers)
             else:
+                if self.auth_header and headers:
+                    headers.update(self.auth_header)
+                else:
+                    headers = self.auth_header
                 result = requests.delete(url, headers=headers, auth=self.auth)
         except requests.exceptions.Timeout as e:
             raise GatewayConnectionError("Response timed out")
