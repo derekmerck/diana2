@@ -11,7 +11,7 @@ print out RequestException respnose and header info:
 """
 
 # Enabled sessions to handle cookies from Docker swarm for sticky connections
-USE_SESSIONS = False
+USE_SESSIONS = True
 
 NORMAL_TIMEOUT = (3.1, 12.1)  # (connect to, read to)
 LARGE_TIMEOUT  = (6.1, 360.1) # Use large timeout on <1Gb connections
