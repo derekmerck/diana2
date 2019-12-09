@@ -154,7 +154,7 @@ def extend(ctx,
                         assert(sl_fiup_response["ok"])
                 shutil.rmtree("{}/data/{}_process".format(proj_path, an))
 
-            p_watch.send_signal(signal.SIGTERM)
+            os.killpg(os.getpgid(p_watch.pid), signal.SIGTERM)
             p_watch = subprocess.Popen("diana-cli watch -r {} radarch None {}".format(rt, proj_path), shell=True, stdout=subprocess.PIPE)
     except (KeyboardInterrupt, FileNotFoundError, KeyError, AssertionError) as e:
         if type(e) is FileNotFoundError:
