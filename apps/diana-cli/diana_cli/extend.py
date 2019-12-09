@@ -187,7 +187,8 @@ def parse_results(json_lines, proj_path, ml):
 
         if ml == "brain_bleed" and (study_desc not in ["ct brain wo iv contrast", "ct brain c-spine wo iv contrast", "ct brain face wo iv contrast",
                                                        "ct brain face c-spine wo iv contrast", "ct brain acute stroke", "ct panscan w iv contrast",
-                                                       "ct panscan with cta neck w iv contrast", "ct panscan face and cta neck w iv contrast", "cta elvo head and neck"]):
+                                                       "ct panscan with cta neck w iv contrast", "ct panscan face and cta neck w iv contrast", "cta elvo head and neck",
+                                                       "cta brain and neck w wo iv contrast", "cta brain w wo iv contrast"]):
             continue
         elif ml == "brain_bleed" and (series_desc in ["axial brain reformat", "axial nc brain reformat", "nc axial brain reformat", "thick nc brain volume"]):
             print("Found head CT...")
