@@ -154,21 +154,24 @@ def extend(ctx,
                         assert(sl_fiup_response["ok"])
                 shutil.rmtree("{}/data/{}_process".format(proj_path, an))
 
-            time.sleep(2)  # slightly wait for ObservableProxiedDicom polling_interval
+            p_watch.send_signal(signal.SIGTERM)
+            p_watch = subprocess.Popen("diana-cli watch -r {} radarch None {}".format(rt, proj_path), shell=True, stdout=subprocess.PIPE)
     except (KeyboardInterrupt, FileNotFoundError, KeyError, AssertionError) as e:
-        try:
-            p_slack_rtm.send_signal(signal.SIGINT)
-            p_watch.send_signal(signal.SIGINT)
-            p_collect.send_signal(signal.SIGINT)
-            p_predict.send_signal(signal.SIGINT)
-        except UnboundLocalError:
-            pass
         if type(e) is FileNotFoundError:
             print("Excepted error: {}".format(e))
-        if type(e) is KeyError:
+        elif type(e) is KeyError:
             print("Key Error: {}".format(e))
-        if type(e) is AssertionError:
+        elif type(e) is AssertionError:
             print("Slack Error: {}".format(e))
+        else:
+            print("Some error: {}".format(e))
+        try:
+            p_slack_rtm.send_signal(signal.SIGTERM)
+            p_watch.send_signal(signal.SIGTERM)
+            p_collect.send_signal(signal.SIGTERM)
+            p_predict.send_signal(signal.SIGTERM)
+        except UnboundLocalError:
+            pass
 
 
 def parse_results(json_lines, proj_path, ml):
@@ -184,7 +187,7 @@ def parse_results(json_lines, proj_path, ml):
 
         if ml == "brain_bleed" and (study_desc not in ["ct brain wo iv contrast", "ct brain c-spine wo iv contrast", "ct brain face wo iv contrast",
                                                        "ct brain face c-spine wo iv contrast", "ct brain acute stroke", "ct panscan w iv contrast",
-                                                       "ct panscan with cta neck w iv contrast", "ct panscan face and cta neck w iv contrast"]):
+                                                       "ct panscan with cta neck w iv contrast", "ct panscan face and cta neck w iv contrast", "cta elvo head and neck"]):
             continue
         elif ml == "brain_bleed" and (series_desc in ["axial brain reformat", "axial nc brain reformat", "nc axial brain reformat", "thick nc brain volume"]):
             print("Found head CT...")
@@ -198,7 +201,7 @@ def parse_results(json_lines, proj_path, ml):
 
             with open("{}/{}_scores.txt".format(proj_path, ml)) as score_file:
                 if str(entry['AccessionNumber']) in score_file.read():
-                    print("...duplicate a/n.")
+                    print("...duplicate a/n")
                     continue
             f.write(entry['AccessionNumber'] + "\n")
             accession_nums.append(entry['AccessionNumber'])
