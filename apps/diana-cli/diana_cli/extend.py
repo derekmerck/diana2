@@ -84,12 +84,15 @@ def extend(ctx,
                         zip_ref.extractall("{}/data/{}_process".format(proj_path, an))
                     os.remove("{}/data/{}.zip".format(proj_path, an))
 
+                dcmdir_name = None
                 if ml == "bone_age":
                     subdirs = get_subdirectories("{}/data/{}_process".format(proj_path, an))
                     for fn in subdirs:
                         if "{}".format(an) in fn:
                             dcmdir_name = fn
                             break
+                    if dcmdir_name is None:
+                        continue
                     p_predict = subprocess.Popen("python3 predict.py '{}'".format(dcmdir_name), shell=True, cwd="{}/package/src/".format(proj_path))
                     p_predict.wait()
 
@@ -104,6 +107,8 @@ def extend(ctx,
                         if temp_dcm.SeriesDescription.lower() in ["axial brain reformat", "axial nc brain reformat", "nc axial brain reformat", "thick nc brain volume"]:
                             dcmdir_name = os.path.dirname(f)
                             break
+                    if dcmdir_name is None:
+                        continue
 
                     # Filter out non-ER cases by StationName
                     s = pydicom.dcmread(f)
