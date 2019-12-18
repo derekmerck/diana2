@@ -220,7 +220,7 @@ if __name__ == "__main__":
     if os.path.isfile(handled_file):
         with open(handled_file) as f:
             sorted_studies = f.read()
-            sorted_studies = sorted_studies.split("/n")
+            sorted_studies = sorted_studies.split("\n")
             logging.info("Found already handled studies:")
             logging.info(sorted_studies)
     else:
