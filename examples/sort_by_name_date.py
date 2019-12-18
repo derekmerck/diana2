@@ -95,7 +95,7 @@ def ul_study(source: DcmDir, dest: Orthanc):
             fn = os.path.join(root, file)
             files.append(fn)
 
-    logging.info(f"Found {len(files)} files in {DcmDir.path}")
+    logging.info(f"Found {len(files)} files in {source.path}")
 
     for f in files:
         _item = source.get(f, file=True)
