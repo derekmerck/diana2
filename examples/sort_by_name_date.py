@@ -3,9 +3,9 @@ Merck, Fall 2019
 
 Given single-foldered studies
 - Filter non-primary-head series
-- Filter any series with contrast
+- Optionally filter any series with or with-out contrast
 - Delete RequestingPhysician tag
-- Save remaining series (nc primary head) as patient/date/series_desc.zip
+- Save remaining series as patient/date/series_desc.zip
 
 dcm.uid.1
 - ct.uid.11
@@ -40,13 +40,11 @@ from crud.utils import path_safe
 # Filters
 # --------------------------------
 
-
 def contrasted(item):
     logging.debug("Checking for contrast")
     if item.tags.get("ContrastBolusAgent"):
         return True
     return False
-
 
 def not_contrasted(item):
     return not contrasted(item)
@@ -55,9 +53,8 @@ def not_contrasted(item):
 # Script vars
 # --------------------------------
 
+UPDATE_ID = True
 id_prefix = "IRB201800011"
-name_suffix = None
-UPDATE_NAME = True
 
 # unsorted source data
 source_dir = "/mnt/imrsch/Exams_Sorted"
@@ -75,6 +72,7 @@ series_query = {"BodyPartExamined": "Head",
 # filters = [not_contrasted]
 filters = []
 
+# Requesting physician was overlooked in initial anonymization
 replacement_map = {"Remove": ["RequestingPhysician"],
                    "Replace": {} }
 
@@ -115,6 +113,22 @@ def ul_study(source: DcmDir, dest: Orthanc):
 
 def dl_series(source: Orthanc, pull=True):
 
+    # Have to create new pt before collecting series or the oid will change
+    if UPDATE_ID and id_prefix:
+        patient_id = source.patients()[0]
+        patient = source.get(patient_id, level=DLv.PATIENTS, view=DVw.TAGS)
+
+        id_suffix = patient.tags["PatientID"].split("-")[1]
+        new_id = f"{id_prefix}-{id_suffix}"
+        logging.info(f"Replacing name and id: {new_id}")
+        _replacement_map = {
+            "Replace": {"PatientName": new_id,
+                        "PatientID":   new_id},
+            "Force": True
+        }
+        source.modify(patient, replacement_map=_replacement_map)
+        source.delete(patient)
+
     qitems = source.find(series_query, level=DLv.SERIES)
 
     if not qitems:
@@ -152,15 +166,6 @@ def dl_series(source: Orthanc, pull=True):
         for item in items:
             if replacement_map:
                 logging.info("Running replacement map")
-                if UPDATE_NAME and id_prefix:
-                    id_suffix = item.tags["PatientID"].split("-")[1]
-                    new_id = f"{id_prefix}-{name_suffix}"
-                    logging.info(f"Replacing name and id: {new_id}")
-                    replacement_map["Replace"].update(
-                        {"PatientName": new_id,
-                         "PatientID": new_id }
-                    )
-                    replacement_map["Force"] = True
                 item_id = source.modify(item, replacement_map=replacement_map)
                 item = source.get(item_id, view=DVw.TAGS)
             item = source.get(item, view=DVw.FILE)
