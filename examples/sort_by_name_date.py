@@ -63,7 +63,7 @@ source_dir = "/mnt/imrsch/Exams_Sorted"
 
 # sorted and filtered data
 # target_dir = "/Users/derek/Dropbox (UFL)/UFH ICH Heads"
-target_dir = "/Users/derek/Dropbox (UFL)/UFH Perfusion Heads"
+target_dir = "/home/derek/Dropbox/UFH Perfusion Heads"
 
 handled_file = "handled.txt"
 errors_file  = "errors.txt"
@@ -130,10 +130,9 @@ def dl_series(source: Orthanc, pull=True):
         for filt in filters:
             if not filt(item):
                 logging.debug(f"Discarding {item.tags['SeriesDescription']}")
-                continue
-
-        logging.debug(f"Including {item.tags['SeriesDescription']}")
-        items.append(item)
+            else:
+                logging.debug(f"Including {item.tags['SeriesDescription']}")
+                items.append(item)
 
     if not items:
         logging.warning("No valid series identified")
