@@ -28,6 +28,7 @@ Requires an orthanc helper, used for only a single study at a time
 
 import os
 import logging
+from pprint import pformat
 from pathlib import Path
 from diana.apis import DcmDir, Orthanc
 from diana.dixel import DixelView as DVw
@@ -159,6 +160,7 @@ def dl_series(source: Orthanc, pull=True):
                         {"PatientName": new_id,
                          "PatientID": new_id }
                     )
+                    replacement_map["Force"] = True
                 item_id = source.modify(item, replacement_map=replacement_map)
                 item = source.get(item_id, view=DVw.TAGS)
             item = source.get(item, view=DVw.FILE)
@@ -222,7 +224,7 @@ if __name__ == "__main__":
             sorted_studies = f.read()
             sorted_studies = sorted_studies.split("\n")
             logging.info("Found already handled studies:")
-            logging.info(sorted_studies)
+            logging.info(pformat(sorted_studies))
     else:
         sorted_studies = []
 
@@ -230,7 +232,7 @@ if __name__ == "__main__":
     # study_dirs = os.listdir(source_dir)
 
     study_dirs = [
-        "IRB201901039-120",
+        # "IRB201901039-120",
         "IRB201901039-121",
     ]
 
