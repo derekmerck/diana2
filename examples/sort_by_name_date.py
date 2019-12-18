@@ -127,10 +127,14 @@ def dl_series(source: Orthanc, pull=True):
 
         logging.debug(f"Testing: {item.tags.get('SeriesDescription')}")
 
+        include_item = True
         for filt in filters:
             if not filt(item):
                 logging.debug(f"Discarding {item.tags['SeriesDescription']}")
-            else:
+                include_item = False
+                break
+
+        if include_item:
                 logging.debug(f"Including {item.tags['SeriesDescription']}")
                 items.append(item)
 
@@ -148,7 +152,9 @@ def dl_series(source: Orthanc, pull=True):
                 logging.info("Running replacement map")
                 if UPDATE_NAME and id_prefix:
                     name_suffix = item.tags["PatientName"].split("-")[1]
-                    replacement_map["Replace"].update( {"PatientName": f"{id_prefix}-{name_suffix}"} )
+                    new_name = f"{id_prefix}-{name_suffix}"
+                    logging.debug(f"Replacing name: {new_name}")
+                    replacement_map["Replace"].update( {"PatientName": new_name} )
                 item_id = source.modify(item, replacement_map=replacement_map)
                 item = source.get(item_id, view=DVw.TAGS)
             item = source.get(item, view=DVw.FILE)
