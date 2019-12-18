@@ -71,7 +71,8 @@ errors_file  = "errors.txt"
 series_query = {"BodyPartExamined": "Head",
                 "ImageType": "ORIGINAL?PRIMARY?AXIAL"}
 
-filters = [not_contrasted]
+# filters = [not_contrasted]
+filters = []
 
 replacement_map = {"Remove": ["RequestingPhysician"],
                    "Replace": {} }
@@ -151,10 +152,13 @@ def dl_series(source: Orthanc, pull=True):
             if replacement_map:
                 logging.info("Running replacement map")
                 if UPDATE_NAME and id_prefix:
-                    name_suffix = item.tags["PatientName"].split("-")[1]
-                    new_name = f"{id_prefix}-{name_suffix}"
-                    logging.debug(f"Replacing name: {new_name}")
-                    replacement_map["Replace"].update( {"PatientName": new_name} )
+                    id_suffix = item.tags["PatientID"].split("-")[1]
+                    new_id = f"{id_prefix}-{name_suffix}"
+                    logging.info(f"Replacing name and id: {new_id}")
+                    replacement_map["Replace"].update(
+                        {"PatientName": new_id,
+                         "PatientID": new_id }
+                    )
                 item_id = source.modify(item, replacement_map=replacement_map)
                 item = source.get(item_id, view=DVw.TAGS)
             item = source.get(item, view=DVw.FILE)
@@ -216,6 +220,8 @@ if __name__ == "__main__":
     if os.path.isfile(handled_file):
         with open(handled_file) as f:
             sorted_studies = f.readlines()
+            logging.info("Found already handled studies:")
+            logging.info(sorted_studies)
     else:
         sorted_studies = []
 
@@ -223,7 +229,7 @@ if __name__ == "__main__":
     # study_dirs = os.listdir(source_dir)
 
     study_dirs = [
-        # "IRB201901039-120",
+        "IRB201901039-120",
         "IRB201901039-121",
     ]
 
