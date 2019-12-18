@@ -17,11 +17,11 @@ dcm.uid.2
 to
 
 patient_name
-- study1-date
-  - series1_desc.zip
-  - series2_desc.zip
-- study1-date
-  - series1_desc.zip
+- study1_date-study1_desc
+  - 1-series1_desc.zip
+  - 2-series2_desc.zip
+- study1_date-study1_desc
+  - 1-series1_desc.zip
 
 Requires an orthanc helper, used for only a single study at a time
 """
@@ -183,14 +183,17 @@ def write_item(item, fpo):
         raise ValueError("No file to write")
 
     pn = path_safe( item.tags["PatientName"] )
-    dt = path_safe( item.tags["StudyDate"] )
-    fp = os.path.join(fpo, pn, dt)
+    study_dt = path_safe( item.tags["StudyDate"] )
+    study_desc = path_safe( item.tags["StudyDescription"])
+    study_dir_o = f"{study_dt}-{study_desc}"
+    fp = os.path.join(fpo, pn, study_dir_o)
 
     Path(fp).mkdir(parents=True, exist_ok=True)
 
-    sn = item.tags["SeriesNumber"]
-    sd = path_safe( item.tags["SeriesDescription"] )
-    fp = os.path.join(fpo, pn, dt, f"{sn}-{sd}.zip")
+    ser_num = item.tags["SeriesNumber"]
+    ser_desc = path_safe( item.tags["SeriesDescription"] )
+    ser_file = f"{ser_num}-{ser_desc}.zip"
+    fp = os.path.join(fpo, pn, study_dir_o, ser_file)
 
     with open(fp, "wb") as f:
         f.write(item.file)
