@@ -13,6 +13,10 @@ class FigshareGateway(Requester):
     def setup_auth_header(self):
         return {'Authorization': f'token {self.auth_tok}'}
 
+    def account_info(self):
+        resource = "account"
+        return self._get(resource)
+
     # Article object API
     # ---------------------
 

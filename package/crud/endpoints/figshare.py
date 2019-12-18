@@ -41,8 +41,11 @@ class Figshare(Endpoint, Serializable):
     def setup_gateway(self):
         return FigshareGateway(auth_tok=self.auth_tok)
 
-    def check(self):
-        return self.inventory() is not None
+    def check(self, private=True):
+        if private:
+            return self.gateway.account_info() is not None
+        else:
+            return self.gateway.articles() is not None
 
     def inventory(self, level=Flv.ITEM, private=True):
         if level == Flv.ITEM:

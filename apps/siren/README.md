@@ -118,8 +118,13 @@ $ python3 siren.py upload-zip path:/incoming/hobit/site_xxx mystudy.zip orthanc:
 Get study with meta tags from orthanc, dispatch to trial-site channels and send meta to indexer:
 
 ```bash
-$ python3 siren.py notify-study orthanc: xano-nxst-udyx-oid \
-                   -S @/subscriptions.yaml -E gmail: -T @/receipt.txt.j2 -I splunk:
+$ python3 siren.py notify-study \
+                   orthanc: \
+                   xano-nxst-udyx-oid \
+                   -S @/subscriptions.yaml \
+                   -E gmail: \
+                   -T @/receipt.txt.j2 \
+                   -I splunk:
 ```
 
 And similar functionalty using `diana-cli` explicitly:
@@ -166,7 +171,7 @@ The default shamming and anonymization schema can be modified to meet specific n
 
 MIT
 
-[SIREN]: https://siren.network
+[SIREN]:   https://siren.network
 [Traefik]: https://traefik.io
 [Splunk]:  https://www.splunk.com
 [Orthanc]: https://www.orthanc-server.com

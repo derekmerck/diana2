@@ -36,17 +36,38 @@ from diana.utils.gateways.requesters import suppress_urllib_debug
 from diana.utils.gateways.requesters import requester
 from crud.utils import path_safe
 
+# Filters
+# --------------------------------
+
+
+def contrasted(item):
+    logging.debug("Checking for contrast")
+    if item.tags.get("ContrastBolusAgent"):
+        return True
+    return False
+
+
+def not_contrasted(item):
+    return not contrasted(item)
+
+
 # Script vars
 # --------------------------------
 
-# output filepath
-fpo = "/tmp"
-
 # unsorted source data
-src_dir = "/Users/derek/Dropbox (UFL)/UFH ICH Heads"
+source_dir = "/mnt/imrsch/Exams_Sorted"
+
+# sorted and filtered data
+# target_dir = "/Users/derek/Dropbox (UFL)/UFH ICH Heads"
+target_dir = "/Users/derek/Dropbox (UFL)/UFH Perfusion Heads"
 
 handled_file = "handled.txt"
 errors_file  = "errors.txt"
+
+series_query = {"BodyPartExamined": "Head",
+                "ImageType": "ORIGINAL?PRIMARY?AXIAL"}
+
+filters = [contrasted]
 
 replacement_map = {"Remove": ["RequestingPhysician"]}
 
@@ -54,7 +75,7 @@ replacement_map = {"Remove": ["RequestingPhysician"]}
 requester.USE_SESSIONS = False
 
 clear = True
-pull = True
+pull = False
 
 
 # --------------------------------
@@ -87,10 +108,7 @@ def get_int(s: str):
 
 def dl_series(source: Orthanc, pull=True):
 
-    query = {"BodyPartExamined": "Head",
-            "ImageType": "ORIGINAL?PRIMARY?AXIAL"}
-
-    qitems = source.find(query, level=DLv.SERIES)
+    qitems = source.find(series_query, level=DLv.SERIES)
 
     if not qitems:
         logging.warning("No candidate series available")
@@ -104,9 +122,10 @@ def dl_series(source: Orthanc, pull=True):
 
         logging.debug(f"Testing: {item.tags.get('SeriesDescription')}")
 
-        if item.tags.get("ContrastBolusAgent"):
-            logging.debug(f"Discarding {item.tags['SeriesDescription']}")
-            continue
+        for filt in filters:
+            if not filt(item):
+                logging.debug(f"Discarding {item.tags['SeriesDescription']}")
+                continue
 
         logging.debug(f"Including {item.tags['SeriesDescription']}")
         items.append(item)
@@ -187,18 +206,20 @@ if __name__ == "__main__":
     else:
         sorted_studies = []
 
-    study_dirs = os.listdir(src_dir)
+    # Should use a glob here
+    # study_dirs = os.listdir(source_dir)
 
-    # # study_dirs = ["1.3.6.1.4.1.29565.1.4.67799414.108615.1538292283.543265",
-    #              # "1.3.6.1.4.1.29565.1.4.67799414.2635.1530202664.221926",
-    # study_dirs = ["1.3.6.1.4.1.29565.1.4.67799414.14323.1561904796.589380"]
+    study_dirs = [
+        "IRB201901039-120",
+        "IRB201901039-121",
+    ]
 
     for study_dir in study_dirs:
         if study_dir in sorted_studies:
             # Already handled this one
             continue
-        fpi = os.path.join(src_dir, study_dir)
-        handle_study(fpi, fpo, clear=clear, pull=pull)
+        fpi = os.path.join(source_dir, study_dir)
+        handle_study(fpi, target_dir, clear=clear, pull=pull)
 
         with open(handled_file, "a") as f:
             f.write(f"{study_dir}\n")
