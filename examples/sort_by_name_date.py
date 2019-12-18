@@ -73,8 +73,7 @@ series_query = {"BodyPartExamined": "Head",
 filters = []
 
 # Requesting physician was overlooked in initial anonymization
-replacement_map = {"Remove": ["RequestingPhysician"],
-                   "Replace": {} }
+replacement_map = { "Remove": ["RequestingPhysician"] }
 
 # Windows does not like request session objects
 requester.USE_SESSIONS = False
@@ -238,12 +237,12 @@ if __name__ == "__main__":
         sorted_studies = []
 
     # Should use a glob here
-    # study_dirs = os.listdir(source_dir)
+    study_dirs = os.listdir(source_dir)
 
-    study_dirs = [
-        # "IRB201901039-120",
-        "IRB201901039-121",
-    ]
+    # study_dirs = [
+    #     # "IRB201901039-120",
+    #     "IRB201901039-121",
+    # ]
 
     for study_dir in study_dirs:
         if study_dir in sorted_studies:
