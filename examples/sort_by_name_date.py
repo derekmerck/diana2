@@ -188,8 +188,9 @@ def write_item(item, fpo):
 
     Path(fp).mkdir(parents=True, exist_ok=True)
 
-    sn = path_safe( item.tags["SeriesDescription"] )
-    fp = os.path.join(fpo, pn, dt, f"{sn}.zip")
+    sn = item.tags["SeriesNumber"]
+    sd = path_safe( item.tags["SeriesDescription"] )
+    fp = os.path.join(fpo, pn, dt, f"{sn}-{sd}.zip")
 
     with open(fp, "wb") as f:
         f.write(item.file)
