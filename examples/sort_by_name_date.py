@@ -54,6 +54,10 @@ def not_contrasted(item):
 # Script vars
 # --------------------------------
 
+id_prefix = "IRB201800011"
+name_suffix = None
+UPDATE_NAME = True
+
 # unsorted source data
 source_dir = "/mnt/imrsch/Exams_Sorted"
 
@@ -67,15 +71,16 @@ errors_file  = "errors.txt"
 series_query = {"BodyPartExamined": "Head",
                 "ImageType": "ORIGINAL?PRIMARY?AXIAL"}
 
-filters = [contrasted]
+filters = [not_contrasted]
 
-replacement_map = {"Remove": ["RequestingPhysician"]}
+replacement_map = {"Remove": ["RequestingPhysician"],
+                   "Replace": {} }
 
 # Windows does not like request session objects
 requester.USE_SESSIONS = False
 
 clear = True
-pull = False
+pull = True
 
 
 # --------------------------------
@@ -88,10 +93,9 @@ def ul_study(source: DcmDir, dest: Orthanc):
 
         for file in _files:
             fn = os.path.join(root, file)
-            # logging.debug(f"Found {fn}")
             files.append(fn)
 
-    logging.info(f"Found {len(files)} files")
+    logging.info(f"Found {len(files)} files in {DcmDir.path}")
 
     for f in files:
         _item = source.get(f, file=True)
@@ -99,12 +103,13 @@ def ul_study(source: DcmDir, dest: Orthanc):
             dest.put(_item)
 
 
-def get_int(s: str):
-    digits = filter(str.isdigit, s)
-    as_str = ''.join(digits)
-    num = int(as_str)
-    return num
-
+# For comparing convolution kernel sizes
+# def get_int(s: str):
+#     digits = filter(str.isdigit, s)
+#     as_str = ''.join(digits)
+#     num = int(as_str)
+#     return num
+#
 
 def dl_series(source: Orthanc, pull=True):
 
@@ -142,6 +147,9 @@ def dl_series(source: Orthanc, pull=True):
         for item in items:
             if replacement_map:
                 logging.info("Running replacement map")
+                if UPDATE_NAME and id_prefix:
+                    name_suffix = item.tags["PatientName"].split("-")[1]
+                    replacement_map["Replace"].update( {"PatientName": f"{id_prefix}-{name_suffix}"} )
                 item_id = source.modify(item, replacement_map=replacement_map)
                 item = source.get(item_id, view=DVw.TAGS)
             item = source.get(item, view=DVw.FILE)
@@ -195,7 +203,7 @@ def handle_study(fpi, fpo, clear=True, pull=True):
 
 if __name__ == "__main__":
 
-    logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG)
 
     suppress_urllib_debug()
     DcmDir.suppress_debug_logging()
@@ -210,7 +218,7 @@ if __name__ == "__main__":
     # study_dirs = os.listdir(source_dir)
 
     study_dirs = [
-        "IRB201901039-120",
+        # "IRB201901039-120",
         "IRB201901039-121",
     ]
 
