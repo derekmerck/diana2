@@ -92,6 +92,7 @@ def extend(ctx,
                             dcmdir_name = fn
                             break
                     if dcmdir_name is None:
+                        print("dcmdir_name is None")
                         continue
                     p_predict = subprocess.Popen("python3 predict.py '{}'".format(dcmdir_name), shell=True, cwd="{}/package/src/".format(proj_path))
                     p_predict.wait()
@@ -108,6 +109,7 @@ def extend(ctx,
                             dcmdir_name = os.path.dirname(f)
                             break
                     if dcmdir_name is None:
+                        print("dcmdir_name is None")
                         continue
 
                     # Filter out non-ER cases by StationName
@@ -194,7 +196,8 @@ def parse_results(json_lines, proj_path, ml):
         if ml == "brain_bleed" and (study_desc not in ["ct brain wo iv contrast", "ct brain c-spine wo iv contrast", "ct brain face wo iv contrast",
                                                        "ct brain face c-spine wo iv contrast", "ct brain acute stroke", "ct panscan w iv contrast",
                                                        "ct panscan with cta neck w iv contrast", "ct panscan face and cta neck w iv contrast", "cta elvo head and neck",
-                                                       "cta brain and neck w wo iv contrast", "cta brain w wo iv contrast"]):
+                                                       "cta brain and neck w wo iv contrast", "cta brain w wo iv contrast", "ct elvo w panscan",
+                                                       "ct elvo w dissection", "ct elvo w panscan and cta aorta bilat runoff", "ct elvo w c spine"]):
             continue
         elif ml == "brain_bleed" and (series_desc in ["axial brain reformat", "axial nc brain reformat", "nc axial brain reformat", "thick nc brain volume"]):
             print("Found head CT...")
