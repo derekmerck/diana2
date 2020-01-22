@@ -6,6 +6,10 @@ networks:
     driver: overlay
     attachable: true
 
+  data_network:
+    driver: overlay
+    attachable: true
+
   agent_network:
     driver: overlay
 

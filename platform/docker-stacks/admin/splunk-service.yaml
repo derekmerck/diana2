@@ -5,9 +5,12 @@ networks:
   admin_proxy_network:
     external: true   # Created by admin-stack
 
-  logging_network:
-    driver: overlay
-    attachable: true
+  admin_data_network:
+    external: true   # Created by admin-stack
+
+#  logging_network:
+#    driver: overlay
+#    attachable: true
 
 
 services:
@@ -19,7 +22,7 @@ services:
       - "8089:8089"
     networks:
       - admin_proxy_network
-      - logging_network
+      - admin_data_network
     volumes:
       - type: bind
         source: ${DATA_DIR}/splunk/etc

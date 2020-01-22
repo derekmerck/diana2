@@ -1,15 +1,15 @@
 # $ docker swarm init --advertise-addr=x.x.x.x --data-path-addr=y.y.y.y
 # ## Note -- data-path-addr should be an Internet connected interface
 # $ mkdir -p /data/{splunk,postgres,incoming}
+# $ source ~/siren.env
 # $ docker stack deploy -c admin/admin-stack.yaml admin
 # $ docker stack deploy -c admin/splunk-service.yaml admin
 # ## Note -- $SPLUNK_HOST must be the swarm IP addr, not localhost
 # $ docker stack deploy -c backend/postgres-service.yaml backend
-# ## Note: Soft link subscriptions, notify, and env file into this directory for config
+# ## Note: Soft link subscriptions and env file into this directory for diana-transport
 # $ ln -s ~/siren.env siren.env
-# $ ln -s ~/dev/diana2/apps/siren/notify.txt.j2 notify.txt.j2
-# $ ln -s ~/siren_subs subscriptions.yaml
-# $ docker stack deploy -c submission-service.yaml siren
+# $ ln -s ~/subscriptions.yaml subscriptions.yaml
+# $ docker stack deploy -c submission-stack.yaml siren
 
 ---
 version: '3.3'
@@ -19,15 +19,8 @@ networks:
   admin_proxy_network:
     external: true   # Created by admin-stack
 
-  admin_logging_network:
+  admin_data_network:
     external: true   # Created by admin-stack
-
-  backend_data_network:
-    external: true   # Created by backend-stack
-
-  service_network:
-    driver: overlay
-    attachable: true
 
 configs:
   notify_tmpl:
@@ -42,14 +35,16 @@ services:
   diana-transport:
 
     image: derekmerck/diana2
+
+# Best to start by hand, using `screen` or similar
 #    command: >
 #      python3 apps/siren/siren.cli start-watcher
 #                          path:/incoming hobit
 #                          -S @/subscriptions.yaml -E local_smtp -T @/notify.txt.j2
 #                          -I splunk
+
     networks:
-      - admin_logging_network
-      - service_network
+      - admin_data_network
     volumes:
       - type:   bind
         source: $DATA_DIR/incoming
@@ -59,7 +54,7 @@ services:
       TZ:               "America/New_York"
       DIANA_SERVICES:   "@/services.yaml"
     env_file:
-      - $PWD/config.env
+      - $PWD/diana.env
 
     configs:
       - source: notify_tmpl
@@ -69,14 +64,14 @@ services:
       - source: subscriptions
         target: /subscriptions.yaml
 
-    logging:
-      driver: splunk
-      options:
-        splunk-url:     "http://${SPLUNK_HOST}:8088"
-        splunk-token:   ${SPLUNK_HEC_TOKEN}
-        splunk-format:  json
-        splunk-index:   logging
-        tag:            "{{.Name}}/{{.ID}}"
+#    logging:
+#      driver: splunk
+#      options:
+#        splunk-url:     "http://${SPLUNK_HOST}:8088"
+#        splunk-token:   ${SPLUNK_HEC_TOKEN}
+#        splunk-format:  json
+#        splunk-index:   logging
+#        tag:            "{{.Name}}/{{.ID}}"
 
 
   orthanc-hobit:
@@ -86,16 +81,16 @@ services:
       - 4242:4242
     networks:
       - admin_proxy_network
-      - admin_logging_network
-      - backend_data_network
-      - service_network
+      - admin_data_network
     volumes:
       - type: tmpfs
         target: /etc/orthanc
     environment:
       ORTHANC_NAME:             HOBIT Image Registry
       ORTHANC_AET:              HOBIT
-      ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}
+      ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}  # Admin credentials
+      ORTHANC_USER_0:           ${ORTHANC_HOBIT_USER_0}    # Reviewer credential
+      ORTHANC_USER_1:           ${ORTHANC_HOBIT_USER_1}    # Coordination credential
       ORTHANC_METADATA_0:       signature,9875
       ORTHANC_STORE_COMPRESSED: "true"
       ORTHANC_PG_ENABLED:       "true"
@@ -119,13 +114,53 @@ services:
         - traefik.http.services.hobit-service.loadbalancer.server.port=8042
         - traefik.http.services.hobit-service.loadbalancer.sticky=true
 
-    logging:
-      driver: splunk
-      options:
-        splunk-url:     "http://${SPLUNK_HOST}:8088"
-        splunk-token:   ${SPLUNK_HEC_TOKEN}
-        splunk-format:  json
-        splunk-index:   logging
-        tag:            "{{.Name}}/{{.ID}}"
+#    logging:
+#      driver: splunk
+#      options:
+#        splunk-url:     "http://${SPLUNK_HOST}:8088"
+#        splunk-token:   ${SPLUNK_HEC_TOKEN}
+#        splunk-format:  json
+#        splunk-index:   logging
+#        tag:            "{{.Name}}/{{.ID}}"
+
+  orthanc-boost:
+    image: derekmerck/orthanc-wbv:latest-amd64
+    ports:
+      - 8042:8042
+      - 4242:4242
+    networks:
+      - admin_proxy_network
+      - admin_data_network
+    volumes:
+      - type: tmpfs
+        target: /etc/orthanc
+    environment:
+      ORTHANC_NAME:             BOOST Image Registry
+      ORTHANC_AET:              BOOST
+      ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}  # Admin credentials
+      ORTHANC_USER_0:           ${ORTHANC_BOOST_USER_0}    # Reviewer credential
+      ORTHANC_USER_1:           ${ORTHANC_BOOST_USER_1}    # Coordination credential
+      ORTHANC_METADATA_0:       signature,9875
+      ORTHANC_STORE_COMPRESSED: "true"
+      ORTHANC_PG_ENABLED:       "true"
+      ORTHANC_PG_STORE_DICOM:   "true"
+      ORTHANC_PG_DATABASE:      orthanc_boost
+      ORTHANC_PG_HOST:          postgres
+      ORTHANC_PG_USER:          postgres
+      ORTHANC_PG_PASSWORD:      ${POSTGRES_PASSWORD}
+      ORTHANC_VERBOSE:          "true"
+      ORTHANC_WBV_ENABLED:      "true"
+      TZ:                       "America/New_York"
+
+    deploy:
+      replicas: 2  # Multiple nodes, PG provides data persistence
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=admin_proxy_network
+        - traefik.http.routers.boost.rule=PathPrefix("/boost")
+        - traefik.http.middlewares.boost-stripprefix.stripprefix.prefixes=/boost
+        - traefik.http.routers.boost.middlewares=boost-stripprefix@docker
+        - traefik.http.services.boost-service.loadbalancer.server.port=8042
+        - traefik.http.services.boost-service.loadbalancer.sticky=true
 
 ...

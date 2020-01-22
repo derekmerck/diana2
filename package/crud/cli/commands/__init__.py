@@ -1,6 +1,6 @@
 from .delete import delete
 from .do import do
-from .check import check
+from .check import check, check_all
 from .get import get
 from .ls import ls
 from .print import _print as print
