@@ -17,6 +17,7 @@ from diana.utils.endpoint import Serializable
 from diana.utils.dicom import DicomLevel
 from diana.dixel import DixelView
 from diana.utils.gateways.exceptions import GatewayConnectionError
+from diana.apis import DcmDim, Orthanc
 logging.basicConfig(filename='/opt/diana/debug.log', level=logging.DEBUG)
 
 
@@ -34,6 +35,10 @@ def extend(ctx,
     """
     click.echo(click.style('Beginning AI analytics extension', underline=True, bold=True))
     try:
+        SERIES_DESCRIPTIONS = ["axial brain reformat", "axial nc brain reformat", "nc axial brain reformat", "thick nc brain volume"]
+        if not os.path.isdir(proj_path + "/data"):
+            os.mkdir(proj_path + "/data")
+        data_dir = DcmDir(proj_path + "/data")
         services = ctx.obj.get('services')
         PACS_Orthanc = Serializable.Factory.create(**services.get("sticky_bridge"))
 
@@ -104,24 +109,25 @@ def extend(ctx,
                              # "BodyPartExamined": "Head",
                              # "ImageType": "ORIGINAL?PRIMARY?AXIAL"}
                     if hasattr(PACS_Orthanc, "rfind"):
-                        print("rfind activated")
+                        logging.debug("rfind activated")
                         result = PACS_Orthanc.rfind(query, "radarch", level, retrieve=retrieve)
                     else:
-                        print("regular find")
+                        logging.debug("regular find")
                         result = PACS_Orthanc.find(query, level, retrieve=retrieve)
-                    print("Begin Result:")
                     print(result)
-                    print(":End result")
-                    exit()
-                    # for d in result:
-                    #     d = PACS_Orthanc.get(d, level=level, view=DixelView.FILE)
-                    #     some_DcmDir.put(d)
-                    #
-                    #     try:
-                    #         PACS_Orthanc.delete(d)
-                    #     except GatewayConnectionError as e:
-                    #         logging.error("Failed to delete dixel")
-                    #         logging.error(e)
+                    for d in result:
+                        print(d)
+                        if d['SeriesDescription'] not in SERIES_DESCRIPTIONS:
+                            continue
+                        d = PACS_Orthanc.get(d, level=level, view=DixelView.FILE)
+                        data_dir.put(d)
+                        print("Put in directory...?")
+                        try:
+                            PACS_Orthanc.delete(d)
+                        except GatewayConnectionError as e:
+                            logging.error("Failed to delete dixel")
+                            logging.error(e)
+                assert(1 == 2)  # temp graceful exit
 
                 if not os.path.isdir("{}/data/{}_process".format(proj_path, an)):
                     os.rename("{}/data/{}".format(proj_path, an), "{}/data/{}.zip".format(proj_path, an))
@@ -150,7 +156,7 @@ def extend(ctx,
                     files = [f for f in glob.glob("{}/data/{}_process/".format(proj_path, an) + "**/*.dcm", recursive=True)]
                     for f in files:
                         temp_dcm = pydicom.dcmread(f)
-                        if temp_dcm.SeriesDescription.lower() in ["axial brain reformat", "axial nc brain reformat", "nc axial brain reformat", "thick nc brain volume"]:
+                        if temp_dcm.SeriesDescription.lower() in SERIES_DESCRIPTIONS:
                             dcmdir_name = os.path.dirname(f)
                             break
                     if dcmdir_name is None:
@@ -245,7 +251,7 @@ def parse_results(json_lines, proj_path, ml):
                                                        "cta brain and neck w wo iv contrast", "cta brain w wo iv contrast", "ct elvo w panscan",
                                                        "ct elvo w dissection", "ct elvo w panscan and cta aorta bilat runoff", "ct elvo w c spine"]):
             continue
-        elif ml == "brain_bleed" and (series_desc in ["axial brain reformat", "axial nc brain reformat", "nc axial brain reformat", "thick nc brain volume"]):
+        elif ml == "brain_bleed" and (series_desc in SERIES_DESCRIPTIONS):
             print("Found head CT...")
         elif ml == "brain_bleed":
             continue
