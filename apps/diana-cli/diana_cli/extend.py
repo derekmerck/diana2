@@ -11,6 +11,14 @@ import subprocess
 import time
 import zipfile
 
+# Testing selective querying
+import logging
+from diana.utils.endpoint import Serializable
+from diana.utils.dicom import DicomLevel
+from diana.dixel import DixelView
+from diana.utils.gateways.exceptions import GatewayConnectionError
+logging.basicConfig(filename='/opt/diana/debug.log', level=logging.DEBUG)
+
 
 @click.command(short_help="Extend images to an AI analytics package")
 @click.argument('proj_path', type=click.STRING)
@@ -26,6 +34,9 @@ def extend(ctx,
     """
     click.echo(click.style('Beginning AI analytics extension', underline=True, bold=True))
     try:
+        services = ctx.obj.get('services')
+        PACS_Orthanc = Serializable.Factory.create(**services.get("sticky_bridge"))
+
         sl_bot_client = slack.WebClient(token=os.environ['SLACK_BOT_TOKEN'])
         ba_channels = ["CM2BV81DX", "CLHKN3W3V"]
         bb_channels = ["GP57V327Q", "GPJ16UN07"]
@@ -41,6 +52,7 @@ def extend(ctx,
             time.sleep(3)  # give json time to finish writing
             while not os.path.isfile("{}/q_results.json".format(proj_path)):
                 time.sleep(3)
+                logging.debug("Slept while waiting for json to finish writing")
             print("Query {}".format(datetime.now()))
             with open("{}/q_results.json".format(proj_path), 'r') as data_file:
                 accession_nums = parse_results(data_file, proj_path, ml)
@@ -69,14 +81,47 @@ def extend(ctx,
 
             if os.path.isfile("{}/{}.key.csv".format(proj_path, ml)):
                 os.remove("{}/{}.key.csv".format(proj_path, ml))
-            p_collect = subprocess.Popen("diana-cli collect {} {} sticky_bridge radarch".format(ml, proj_path), shell=True)
-            p_collect.wait()
-            time.sleep(10)
-            p_collect = subprocess.Popen("diana-cli collect {} {} sticky_bridge radarch".format(ml, proj_path), shell=True)
-            p_collect.wait()
+
+            if ml == "bone_age":
+                p_collect = subprocess.Popen("diana-cli collect {} {} sticky_bridge radarch".format(ml, proj_path), shell=True)
+                p_collect.wait()
+                time.sleep(10)
+                p_collect = subprocess.Popen("diana-cli collect {} {} sticky_bridge radarch".format(ml, proj_path), shell=True)
+                p_collect.wait()
+            elif ml == "brain_bleed":
+                pass
+            else:
+                raise NotImplementedError
 
             for i, an in enumerate(accession_nums):
                 print("Processing unique a/n: {}".format(an))
+                logging.debug("Processing unique a/n: {}".format(an))
+                if ml == "brain_bleed":
+                    retrieve = False
+                    level = DicomLevel.from_label("series")
+                    query = {"AccessionNumber": f"{an}",
+                             "SeriesDescription": ""}
+                             # "BodyPartExamined": "Head",
+                             # "ImageType": "ORIGINAL?PRIMARY?AXIAL"}
+                    if hasattr(PACS_Orthanc, "rfind"):
+                        print("rfind activated")
+                        result = PACS_Orthanc.rfind(query, "radarch", level, retrieve=retrieve)
+                    else:
+                        print("regular find")
+                        result = PACS_Orthanc.find(query, level, retrieve=retrieve)
+                    print("Begin Result:")
+                    print(result)
+                    print(":End result")
+                    exit()
+                    # for d in result:
+                    #     d = PACS_Orthanc.get(d, level=level, view=DixelView.FILE)
+                    #     some_DcmDir.put(d)
+                    #
+                    #     try:
+                    #         PACS_Orthanc.delete(d)
+                    #     except GatewayConnectionError as e:
+                    #         logging.error("Failed to delete dixel")
+                    #         logging.error(e)
 
                 if not os.path.isdir("{}/data/{}_process".format(proj_path, an)):
                     os.rename("{}/data/{}".format(proj_path, an), "{}/data/{}.zip".format(proj_path, an))
@@ -134,7 +179,7 @@ def extend(ctx,
                     with open("{}/{}_scores.txt".format(proj_path, ml), "a+") as f:
                         f.write("{}, {}, {}, {}, {}\n".format(an, str(datetime.now()), pred_brain_bleed[0], pred_brain_bleed[1], pred_brain_bleed[2]))
                     if float(pred_brain_bleed[0]) < 70:
-                        print("ICH below 70% threshold")
+                        print("ICH below threshold")
                         continue
                 else:
                     raise NotImplementedError
@@ -161,9 +206,9 @@ def extend(ctx,
                         assert(sl_fiup_response["ok"])
                 shutil.rmtree("{}/data/{}_process".format(proj_path, an))
 
-            p_watch.terminate()
+            # p_watch.terminate() # WARNING: this may create many many Docker container archives along w/ subsequent re-Popen...
             time.sleep(1)
-            p_watch = subprocess.Popen("diana-cli watch -r {} radarch None {}".format(rt, proj_path), shell=True, stdout=subprocess.PIPE)
+            # p_watch = subprocess.Popen("diana-cli watch -r {} radarch None {}".format(rt, proj_path), shell=True, stdout=subprocess.PIPE)
     except (KeyboardInterrupt, FileNotFoundError, KeyError, AssertionError) as e:
         if type(e) is FileNotFoundError:
             print("Excepted error: {}".format(e))
@@ -179,6 +224,7 @@ def extend(ctx,
             p_collect.send_signal(signal.SIGTERM)
             p_predict.send_signal(signal.SIGTERM)
         except UnboundLocalError:
+            print("UnboundLocalError on sending SIGTERM signals")
             pass
 
 
