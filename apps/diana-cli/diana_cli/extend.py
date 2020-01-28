@@ -41,7 +41,7 @@ def extend(ctx,
         sub_processes = []
         if not os.path.isdir(proj_path + "/data"):
             os.mkdir(proj_path + "/data")
-        data_dir = DcmDir(path=proj_path + "/data")
+        data_dir = DcmDir(path=proj_path + "/data", subpath_width=2)
         services = ctx.obj.get('services')
         PACS_Orthanc = Serializable.Factory.create(**services.get("sticky_bridge"))
 
@@ -129,7 +129,7 @@ def extend(ctx,
                         data_dir.put(dcm_image)
                         print("Put in directory...?")
                         try:
-                            PACS_Orthanc.delete(d)
+                            PACS_Orthanc.delete(dixel)
                         except GatewayConnectionError as e:
                             logging.error("Failed to delete dixel")
                             logging.error(e)
@@ -231,6 +231,7 @@ def extend(ctx,
             print("Slack Error: {}".format(e))
         else:
             print("Some error: {}".format(e))
+
         try:
             for _ in sub_processes:
                 _.send_signal(signal.SIGTERM)
