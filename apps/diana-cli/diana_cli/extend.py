@@ -38,9 +38,10 @@ def extend(ctx,
     """
     click.echo(click.style('Beginning AI analytics extension', underline=True, bold=True))
     try:
+        sub_processes = []
         if not os.path.isdir(proj_path + "/data"):
             os.mkdir(proj_path + "/data")
-        data_dir = DcmDir(proj_path + "/data")
+        data_dir = DcmDir(path=proj_path + "/data")
         services = ctx.obj.get('services')
         PACS_Orthanc = Serializable.Factory.create(**services.get("sticky_bridge"))
 
@@ -48,9 +49,11 @@ def extend(ctx,
         ba_channels = ["CM2BV81DX", "CLHKN3W3V"]
         bb_channels = ["GP57V327Q", "GPJ16UN07"]
         p_slack_rtm = subprocess.Popen("python /opt/diana/package/diana/daemons/slack_rtm.py {} {}".format(proj_path, ml), shell=True, stdout=subprocess.PIPE)
+        sub_processes.append(p_slack_rtm)
 
         rt = "write_series_AI"
         p_watch = subprocess.Popen("diana-cli watch -r {} radarch None {}".format(rt, proj_path), shell=True, stdout=subprocess.PIPE)
+        sub_processes.append(p_watch)
         if not os.path.isfile("{}/{}_scores.txt".format(proj_path, ml)):
             open("{}/{}_scores.txt".format(proj_path, ml), 'a').close()
 
@@ -118,7 +121,7 @@ def extend(ctx,
                     print(result)
                     for d in result:
                         print(d)
-                        if d['SeriesDescription'] not in SERIES_DESCRIPTIONS:
+                        if "SeriesDescription" not in d or d['SeriesDescription'] not in SERIES_DESCRIPTIONS:
                             continue
                         # really just need oid, but oid automatically put together in Dixel class
                         dixel = Dixel.from_orthanc(meta={}, tags=d, level=level)
@@ -149,6 +152,7 @@ def extend(ctx,
                         print("dcmdir_name is None")
                         continue
                     p_predict = subprocess.Popen("python3 predict.py '{}'".format(dcmdir_name), shell=True, cwd="{}/package/src/".format(proj_path))
+                    sub_processes.append(p_predict)
                     p_predict.wait()
 
                     with open("/opt/diana/{}_temp_predict".format(ml)) as f:
@@ -228,11 +232,12 @@ def extend(ctx,
         else:
             print("Some error: {}".format(e))
         try:
-            p_slack_rtm.send_signal(signal.SIGTERM)
-            p_watch.send_signal(signal.SIGTERM)
-            time.sleep(1)
-            p_collect.send_signal(signal.SIGTERM)
-            p_predict.send_signal(signal.SIGTERM)
+            for _ in sub_processes:
+                _.send_signal(signal.SIGTERM)
+            # p_slack_rtm.send_signal(signal.SIGTERM)
+            # p_watch.send_signal(signal.SIGTERM)
+            # p_collect.send_signal(signal.SIGTERM)
+            # p_predict.send_signal(signal.SIGTERM)
         except UnboundLocalError:
             print("UnboundLocalError on sending SIGTERM signals")
             pass
