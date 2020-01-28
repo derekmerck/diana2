@@ -22,6 +22,7 @@ logging.basicConfig(filename='/opt/diana/debug.log', level=logging.DEBUG)
 
 # Globals
 SERIES_DESCRIPTIONS = ["axial brain reformat", "axial nc brain reformat", "nc axial brain reformat", "thick nc brain volume"]
+ICH_THRESHOLD = 57.6
 
 
 @click.command(short_help="Extend images to an AI analytics package")
@@ -187,7 +188,7 @@ def extend(ctx,
                     pred_brain_bleed = [_.strip() for _ in pred_brain_bleed]
                     with open("{}/{}_scores.txt".format(proj_path, ml), "a+") as f:
                         f.write("{}, {}, {}, {}, {}\n".format(an, str(datetime.now()), pred_brain_bleed[0], pred_brain_bleed[1], pred_brain_bleed[2]))
-                    if float(pred_brain_bleed[0]) < 70:
+                    if float(pred_brain_bleed[0]) < ICH_THRESHOLD:
                         print("ICH below threshold")
                         continue
                 else:
