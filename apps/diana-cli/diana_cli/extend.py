@@ -15,7 +15,7 @@ import zipfile
 import logging
 from diana.utils.endpoint import Serializable
 from diana.utils.dicom import DicomLevel
-from diana.dixel import DixelView
+from diana.dixel import Dixel, DixelView
 from diana.utils.gateways.exceptions import GatewayConnectionError
 from diana.apis import DcmDir, Orthanc
 logging.basicConfig(filename='/opt/diana/debug.log', level=logging.DEBUG)
@@ -121,8 +121,10 @@ def extend(ctx,
                         print(d)
                         if d['SeriesDescription'] not in SERIES_DESCRIPTIONS:
                             continue
-                        d = PACS_Orthanc.get(d, level=level, view=DixelView.FILE)
-                        data_dir.put(d)
+                        # really just need oid, but oid automatically put together in Dixel class
+                        dixel = Dixel.from_orthanc(tags=d, level=level)
+                        dcm_image = PACS_Orthanc.get(dixel, level=level, view=DixelView.FILE)
+                        data_dir.put(dcm_image)
                         print("Put in directory...?")
                         try:
                             PACS_Orthanc.delete(d)
