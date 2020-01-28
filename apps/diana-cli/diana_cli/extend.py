@@ -38,6 +38,8 @@ def extend(ctx,
     """
     click.echo(click.style('Beginning AI analytics extension', underline=True, bold=True))
     try:
+        with open('/opt/diana/debug.log', 'w'):
+            pass
         sub_processes = []
         if not os.path.isdir(proj_path + "/data"):
             os.mkdir(proj_path + "/data")
@@ -110,30 +112,24 @@ def extend(ctx,
                     level = DicomLevel.from_label("series")
                     query = {"AccessionNumber": f"{an}",
                              "SeriesDescription": ""}
-                             # "BodyPartExamined": "Head",
-                             # "ImageType": "ORIGINAL?PRIMARY?AXIAL"}
                     if hasattr(PACS_Orthanc, "rfind"):
                         logging.debug("rfind activated")
                         result = PACS_Orthanc.rfind(query, "radarch", level, retrieve=True)
                     else:
                         logging.debug("regular find")
                         result = PACS_Orthanc.find(query, level, retrieve=True)  # should this be True?
-                    print(result)
                     for d in result:
-                        print(d)
                         if "SeriesDescription" not in d or d['SeriesDescription'] not in SERIES_DESCRIPTIONS:
                             continue
                         # really just need oid, but oid automatically put together in Dixel class
                         dixel = Dixel.from_orthanc(meta={}, tags=d, level=level)
                         dcm_image = PACS_Orthanc.get(dixel, level=level, view=DixelView.FILE)
                         data_dir.put(dcm_image)
-                        print("Put in directory...?")
                         try:
                             PACS_Orthanc.delete(dixel)
                         except GatewayConnectionError as e:
                             logging.error("Failed to delete dixel")
                             logging.error(e)
-                assert(1 == 2)  # temp graceful exit
 
                 if not os.path.isdir("{}/data/{}_process".format(proj_path, an)):
                     os.rename("{}/data/{}".format(proj_path, an), "{}/data/{}.zip".format(proj_path, an))
@@ -234,7 +230,7 @@ def extend(ctx,
 
         try:
             for _ in sub_processes:
-                _.send_signal(signal.SIGTERM)
+                os.killpg(os.getpgid(_.pid), signal.SIGTERM)
             # p_slack_rtm.send_signal(signal.SIGTERM)
             # p_watch.send_signal(signal.SIGTERM)
             # p_collect.send_signal(signal.SIGTERM)
