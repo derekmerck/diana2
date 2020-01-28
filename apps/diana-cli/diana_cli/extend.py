@@ -104,7 +104,6 @@ def extend(ctx,
                 print("Processing unique a/n: {}".format(an))
                 logging.debug("Processing unique a/n: {}".format(an))
                 if ml == "brain_bleed":
-                    retrieve = False
                     level = DicomLevel.from_label("series")
                     query = {"AccessionNumber": f"{an}",
                              "SeriesDescription": ""}
@@ -112,10 +111,10 @@ def extend(ctx,
                              # "ImageType": "ORIGINAL?PRIMARY?AXIAL"}
                     if hasattr(PACS_Orthanc, "rfind"):
                         logging.debug("rfind activated")
-                        result = PACS_Orthanc.rfind(query, "radarch", level, retrieve=retrieve)
+                        result = PACS_Orthanc.rfind(query, "radarch", level, retrieve=True)
                     else:
                         logging.debug("regular find")
-                        result = PACS_Orthanc.find(query, level, retrieve=retrieve)
+                        result = PACS_Orthanc.find(query, level, retrieve=True)  # should this be True?
                     print(result)
                     for d in result:
                         print(d)
@@ -231,6 +230,7 @@ def extend(ctx,
         try:
             p_slack_rtm.send_signal(signal.SIGTERM)
             p_watch.send_signal(signal.SIGTERM)
+            time.sleep(1)
             p_collect.send_signal(signal.SIGTERM)
             p_predict.send_signal(signal.SIGTERM)
         except UnboundLocalError:
