@@ -122,7 +122,7 @@ def extend(ctx,
                         if d['SeriesDescription'] not in SERIES_DESCRIPTIONS:
                             continue
                         # really just need oid, but oid automatically put together in Dixel class
-                        dixel = Dixel.from_orthanc(tags=d, level=level)
+                        dixel = Dixel.from_orthanc(meta={}, tags=d, level=level)
                         dcm_image = PACS_Orthanc.get(dixel, level=level, view=DixelView.FILE)
                         data_dir.put(dcm_image)
                         print("Put in directory...?")
