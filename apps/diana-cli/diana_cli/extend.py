@@ -17,8 +17,11 @@ from diana.utils.endpoint import Serializable
 from diana.utils.dicom import DicomLevel
 from diana.dixel import DixelView
 from diana.utils.gateways.exceptions import GatewayConnectionError
-from diana.apis import DcmDim, Orthanc
+from diana.apis import DcmDir, Orthanc
 logging.basicConfig(filename='/opt/diana/debug.log', level=logging.DEBUG)
+
+# Globals
+SERIES_DESCRIPTIONS = ["axial brain reformat", "axial nc brain reformat", "nc axial brain reformat", "thick nc brain volume"]
 
 
 @click.command(short_help="Extend images to an AI analytics package")
@@ -35,7 +38,6 @@ def extend(ctx,
     """
     click.echo(click.style('Beginning AI analytics extension', underline=True, bold=True))
     try:
-        SERIES_DESCRIPTIONS = ["axial brain reformat", "axial nc brain reformat", "nc axial brain reformat", "thick nc brain volume"]
         if not os.path.isdir(proj_path + "/data"):
             os.mkdir(proj_path + "/data")
         data_dir = DcmDir(proj_path + "/data")
