@@ -25,6 +25,13 @@ def wsend(ctx, messenger, data, target, msg_t):
     click.echo(pformat(data))
     click.echo(target)
 
+    if msg_t:
+        click.echo(msg_t)
+        if msg_t.find("\\n"):
+            click.echo("Expanding newlines")
+            msg_t = msg_t.replace("\\n", "\n")
+            click.echo(msg_t)
+
     if data:
         out = messenger.send(data, target=target, msg_t=msg_t)
 
