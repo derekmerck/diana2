@@ -16,20 +16,24 @@ def wsend(ctx, messenger, data, target, msg_t):
     """Send data or chained items via Messenger endpoint
 
     \b
-    $ diana-cli wsend -t derek.merck@gmail.com --data "msg_text: Hello 123" \
-      --msg_t \
-'To: {{ target }}
-From: {{ from_addr }}
-Subject: Test Message
-Content-Type: text/plain
+    $ diana-cli wsend -t derek.merck@gmail.com --data "msg_text: Hello 123" --msg_t \
+"To: {{ target }}
+From: test-no-reply@example.com
+Subject: Test Message\r
 
-The message is "{{msg_text}}"' \
+This is a test message.
+
+The message is "{{msg_text}}\r"
+" \
       smtp_server
     """
     click.echo(click.style('Send Data to Target via Messenger', underline=True, bold=True))
 
     click.echo(pformat(data))
     click.echo(target)
+
+    if msg_t:
+        msg_t = msg_t.replace("//r", "/r")
 
     if data:
         out = messenger.send(data, target=target, msg_t=msg_t)
