@@ -17,7 +17,7 @@ def wsend(ctx, messenger, data, target, msg_t):
 
     \b
     $ diana-cli wsend -t derek.merck@gmail.com --data "msg_text: Hello 123" --msg_t \
-        "To: {{ target }}\n\rFrom: test-no-reply@example.com\n\rSubject: Test Message\n\r\n\rThe message is "{{msg_text}}"\n\r\n\r" \
+        'To: {{ target }}\nFrom: no-reply@example.com\nSubject: Test Message\n\nThe message is "{{msg_text}}"\n\n' \
         smtp:
     """
     click.echo(click.style('Send Data to Target via Messenger', underline=True, bold=True))
@@ -27,10 +27,9 @@ def wsend(ctx, messenger, data, target, msg_t):
 
     if msg_t:
         click.echo(msg_t)
-        if msg_t.find("\\r") or msg_t.find("\\n"):
-            click.echo("Expanding carriage returns and newlines")
-            msg_t = msg_t.replace("\\r", "\r")
-            msg_t = msg_t.replace("\\n", "\n")
+        if msg_t.find("\\n"):
+            click.echo("Expanding newlines as NL+CR")
+            msg_t = msg_t.replace("\\n", "\r\n")
             click.echo(msg_t)
 
     if data:
