@@ -16,7 +16,15 @@ def wsend(ctx, messenger, data, target, msg_t):
     """Send data or chained items via Messenger endpoint
 
     \b
-    $ wuphf-cli send -t test@example.com gmail:user:pword "msg_text: Hello 123"
+    $ diana-cli wsend -t derek.merck@gmail.com --data "msg_text: Hello 123" \
+      --msg_t \
+'To: {{ target }}
+From: {{ from_addr }}
+Subject: Test Message
+Content-Type: text/plain
+
+The message is "{{msg_text}}"' \
+      smtp_server
     """
     click.echo(click.style('Send Data to Target via Messenger', underline=True, bold=True))
 

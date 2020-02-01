@@ -18,7 +18,7 @@ $ mkdir -p ${DATA_DIR}/postgres
 $ docker stack deploy -c backend/postgres-service.yaml backend
 
 ## Note: Soft link subscriptions and env file into this directory for diana-transport
-$ mkdir -p ${DATA_DIR}/postgres
+$ mkdir -p ${DATA_DIR}/incoming
 $ cd ../examples/umich-siren
 $ ln -s ~/.secrets/siren.env siren.env
 $ ln -s ${DIANA_DIR}/apps/siren/notify.txt.j2 notify.txt.j2

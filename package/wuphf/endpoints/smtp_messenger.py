@@ -4,9 +4,9 @@ import attr
 from ..abc import Messenger
 
 sample_msg = """
-To: {{ target }}
-From: {{ from_addr }}
-Subject: Sample WUPHF generated at {{ now() }}.
+to: {{ target }}
+from: {{ from_addr }}
+subject: Sample WUPHF generated at {{ now() }}.
 
 The WUPHF message is: "{{ msg_text }}"
 """
