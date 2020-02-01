@@ -17,15 +17,8 @@ def wsend(ctx, messenger, data, target, msg_t):
 
     \b
     $ diana-cli wsend -t derek.merck@gmail.com --data "msg_text: Hello 123" --msg_t \
-"To: {{ target }}
-From: test-no-reply@example.com
-Subject: Test Message\r
-
-This is a test message.
-
-The message is "{{msg_text}}\r"
-" \
-      smtp_server
+        "To: {{ target }}\n\rFrom: test-no-reply@example.com\n\rSubject: Test Message\n\r\n\rThe message is "{{msg_text}}"\n\r\n\r" \
+        smtp:
     """
     click.echo(click.style('Send Data to Target via Messenger', underline=True, bold=True))
 
@@ -33,8 +26,12 @@ The message is "{{msg_text}}\r"
     click.echo(target)
 
     if msg_t:
-        click.echo("Replacing carriage returns")
-        msg_t = str.replace(msg_t, "//r", "/r")
+        click.echo(msg_t)
+        if msg_t.find("\\r") or msg_t.find("\\n"):
+            click.echo("Expanding carriage returns and newlines")
+            msg_t = msg_t.replace("\\r", "\r")
+            msg_t = msg_t.replace("\\n", "\n")
+            click.echo(msg_t)
 
     if data:
         out = messenger.send(data, target=target, msg_t=msg_t)
