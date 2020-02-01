@@ -6,6 +6,13 @@ hobit:
   password: ${ORTHANC_PASSWORD}
   polling_interval: 5
 
+boost:
+  ctype:  ObservableOrthanc
+  host:   orthanc-boost
+  user:   orthanc
+  password: ${ORTHANC_PASSWORD}
+  polling_interval: 5
+
 splunk:
   ctype:  Splunk
   host:   splunk

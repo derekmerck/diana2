@@ -1,16 +1,3 @@
-# $ docker swarm init --advertise-addr=x.x.x.x --data-path-addr=y.y.y.y
-# ## Note -- data-path-addr should be an Internet connected interface
-# $ mkdir -p /data/{splunk,postgres,incoming}
-# $ source ~/siren.env
-# $ docker stack deploy -c admin/admin-stack.yaml admin
-# $ docker stack deploy -c admin/splunk-service.yaml admin
-# ## Note -- $SPLUNK_HOST must be the swarm IP addr, not localhost
-# $ docker stack deploy -c backend/postgres-service.yaml backend
-# ## Note: Soft link subscriptions and env file into this directory for diana-transport
-# $ ln -s ~/siren.env siren.env
-# $ ln -s ~/subscriptions.yaml subscriptions.yaml
-# $ docker stack deploy -c submission-stack.yaml siren
-
 ---
 version: '3.3'
 
@@ -24,17 +11,17 @@ networks:
 
 configs:
   notify_tmpl:
-    file: ./notify.txt.j2
+    file: ${PWD}/notify.txt.j2
   services:
-    file: ./services.yaml
+    file: ${PWD}/services.yaml
   subscriptions:
-    file: ./subscriptions.yaml
+    file: ${PWD}/subscriptions.yaml
 
 services:
 
   diana-transport:
 
-    image: derekmerck/diana2
+    image: derekmerck/diana2:latest
 
 # Best to start by hand, using `screen` or similar
 #    command: >
@@ -54,7 +41,7 @@ services:
       TZ:               "America/New_York"
       DIANA_SERVICES:   "@/services.yaml"
     env_file:
-      - $PWD/diana.env
+      - $PWD/siren.env
 
     configs:
       - source: notify_tmpl
@@ -126,8 +113,8 @@ services:
   orthanc-boost:
     image: derekmerck/orthanc-wbv:latest-amd64
     ports:
-      - 8042:8042
-      - 4242:4242
+      - 8043:8042
+      - 4243:4242
     networks:
       - admin_proxy_network
       - admin_data_network

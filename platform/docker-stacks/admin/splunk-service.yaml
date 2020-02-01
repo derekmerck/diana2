@@ -5,8 +5,12 @@ networks:
   admin_proxy_network:
     external: true   # Created by admin-stack
 
-  admin_data_network:
-    external: true   # Created by admin-stack
+  data_network:
+    driver: overlay
+    attachable: true
+
+#  admin_data_network:
+#    external: true   # Created by admin-stack
 
 #  logging_network:
 #    driver: overlay
@@ -15,14 +19,14 @@ networks:
 
 services:
   splunk:
-    image: splunk/splunk
+    image: splunk/splunk:latest
     ports:
       - "8000:8000"
       - "8088:8088"
       - "8089:8089"
     networks:
       - admin_proxy_network
-      - admin_data_network
+      - data_network
     volumes:
       - type: bind
         source: ${DATA_DIR}/splunk/etc

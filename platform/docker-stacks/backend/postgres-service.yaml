@@ -11,7 +11,7 @@ networks:
 
 services:
   postgres:
-    image: postgres
+    image: postgres:latest
     networks:
       - admin_data_network
     volumes:
