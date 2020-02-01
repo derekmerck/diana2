@@ -33,7 +33,8 @@ The message is "{{msg_text}}\r"
     click.echo(target)
 
     if msg_t:
-        msg_t = msg_t.replace("//r", "/r")
+        click.echo("Replacing carriage returns")
+        msg_t = str.replace(msg_t, "//r", "/r")
 
     if data:
         out = messenger.send(data, target=target, msg_t=msg_t)
