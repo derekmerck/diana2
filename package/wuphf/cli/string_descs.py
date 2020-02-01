@@ -38,4 +38,4 @@ def make_smtp(s):  # smtp:host:user:password
         user=user,
         password=password
     )
-EndpointManager.add_prefix("smtp:", make_gmail)
+EndpointManager.add_prefix("smtp:", make_smtp)
