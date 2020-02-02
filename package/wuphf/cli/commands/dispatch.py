@@ -23,14 +23,14 @@ def dispatch(ctx, config, email_messenger: SmtpMessenger, slack_messenger, sms_m
     """Dispatch data or chained items to subscribers by channel
     
     \b
-    $ wuphf-cli dispatch --config subscriptions.yaml
+    $ diana-cli dispatch --config subscriptions.yaml
                          --email-messenger gmail::
                          --data "msg_text: Hello 123"
                          --template "{{ msg_text }}"
                          --channels testing
 
     \b
-    $ wuphf-cli get path:/hobit/site_xxx IM00001.dcm
+    $ diana-cli get path:/hobit/site_xxx IM00001.dcm
                 setmeta "project: hobit"
                 dispatch -E gmail::
                          -T "Found {{ AccessionNumber }} in {{ FileName }}"

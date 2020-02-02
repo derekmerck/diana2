@@ -14,7 +14,7 @@ class TrialSubscriber(Subscriber):
 
 @attr.s
 class TrialDispatcher(Dispatcher):
-    """Includes some logic to expand trial and site names from short tags on folders"""
+    """Includes logic to expand trial and site names from short tags on folders"""
 
     channel_tags = attr.ib(default=dict)
 

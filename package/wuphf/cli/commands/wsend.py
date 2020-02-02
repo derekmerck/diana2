@@ -15,8 +15,10 @@ from wuphf.abc import Messenger
 def wsend(ctx, messenger, data, target, msg_t):
     """Send data or chained items via Messenger endpoint
 
+    Newline characters are replaced with NL+CR, as (apparently) required by IIS smtp relays.
+
     \b
-    $ diana-cli wsend -t derek.merck@gmail.com --data "msg_text: Hello 123" --msg_t \
+    $ diana-cli wsend -t noone@example.com --data "msg_text: Hello 123" --msg_t \
         'To: {{ target }}\nFrom: no-reply@example.com\nSubject: Test Message\n\nThe message is "{{msg_text}}"\n\n' \
         smtp:
     """
