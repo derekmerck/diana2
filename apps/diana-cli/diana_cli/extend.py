@@ -39,8 +39,6 @@ def extend(ctx,
     """
     click.echo(click.style('Beginning AI analytics extension', underline=True, bold=True))
     try:
-        with open('/opt/diana/debug.log', 'w'):
-            pass
         sub_processes = []
         if not os.path.isdir(proj_path + "/data"):
             os.mkdir(proj_path + "/data")
@@ -62,6 +60,8 @@ def extend(ctx,
 
         clear_counter = 0
         while True:
+            with open('/opt/diana/debug.log', 'w'):
+                pass
             time.sleep(3)  # give json time to finish writing
             while not os.path.isfile("{}/q_results.json".format(proj_path)):
                 time.sleep(3)
@@ -116,15 +116,26 @@ def extend(ctx,
                     if hasattr(PACS_Orthanc, "rfind"):
                         logging.debug("rfind activated")
                         result = PACS_Orthanc.rfind(query, "radarch", level, retrieve=True)
+                        time.sleep(10)
+                        result = PACS_Orthanc.rfind(query, "radarch", level, retrieve=True)
                     else:
                         logging.debug("regular find")
                         result = PACS_Orthanc.find(query, level, retrieve=True)  # should this be True?
+
                     for d in result:
                         if "SeriesDescription" not in d or d['SeriesDescription'] not in SERIES_DESCRIPTIONS:
                             continue
                         # really just need oid, but oid automatically put together in Dixel class
                         dixel = Dixel.from_orthanc(meta={}, tags=d, level=level)
-                        dcm_image = PACS_Orthanc.get(dixel, level=level, view=DixelView.FILE)
+                        try:
+                            dcm_image = PACS_Orthanc.get(dixel, level=level, view=DixelView.FILE)
+                        except FileNotFoundError as e:
+                            try:
+                                dcm_image = PACS_Orthanc.get(dixel, level=level, view=DixelView.FILE)
+                            except FileNotFoundError as e2:
+                                continue
+                                logging.error(e2)
+                            logging.error(e)
                         data_dir.put(dcm_image)
                         try:
                             PACS_Orthanc.delete(dixel)
