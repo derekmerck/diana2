@@ -98,7 +98,7 @@ def upload_zip(ctx, source: DcmDir, fn, dest: Orthanc, fkey, salt):
               help="Fernet key for signature encryption",
               required=True)
 @click.pass_context
-def notify_study(ctx, source: Orthanc, item,
+def notify_study(ctx, source: Orthanc, oid,
                  subscriptions, email_messenger: SmtpMessenger, email_template, dryrun,
                  indexer: Splunk, fkey):
     """Dispatch study notification and send meta to indexer
@@ -122,7 +122,7 @@ def notify_study(ctx, source: Orthanc, item,
             email_messenger.msg_t = email_template
             dispatcher.email_messenger = email_messenger
 
-    handle_notify_study(item, source=source, dispatcher=dispatcher,
+    handle_notify_study({"oid": oid}, source=source, dispatcher=dispatcher,
                         dryrun=dryrun, indexer=indexer, fkey=fkey)
 
 
