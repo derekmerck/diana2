@@ -48,6 +48,9 @@ class Messenger(Endpoint, Serializable):
         if hasattr(self, "from_addr"):
             data["from_addr"] = self.from_addr
 
+        logging.warning(msg_t)
+        logging.warning(target)
+
         msg = render_template(msg_t, target=target, funcs=self.j2_funcs, **data, **kwargs )
 
         # This is relevant for sendmail, I think
