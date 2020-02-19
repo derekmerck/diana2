@@ -170,6 +170,7 @@ def start_watcher(ctx, incoming: DcmDir,
         dispatcher = Dispatcher(channel_tags=ch)
         dispatcher.add_subscribers(subs)
         if email_messenger:
+            email_messenger.from_addr = "siren-ops@umich.edu"
             email_messenger.msg_t = email_template
             dispatcher.email_messenger = email_messenger
 
