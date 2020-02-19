@@ -138,7 +138,13 @@ def handle_upload_dir(source: DcmDir,
             items.append(os.path.join(root, file))
 
     for item in items:
-        _item = source.get(item, file=True)
+        try:
+            _item = source.get(item, file=True)
+        except NotImplementedError as e:
+            print(f"Failed to read {item}")
+            print(e)
+            _item = None
+
         if _item:
             _item.meta["trial"] = trial
             _item.meta["site"] = site
