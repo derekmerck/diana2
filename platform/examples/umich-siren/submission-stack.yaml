@@ -35,7 +35,7 @@ services:
     volumes:
       - type:   bind
         source: $DATA_DIR/incoming
-        target: /incoming/hobit
+        target: /incoming
     environment:
       PYTHONUNBUFFERED: "true"
       TZ:               "America/New_York"

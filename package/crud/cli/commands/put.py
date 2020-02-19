@@ -10,5 +10,9 @@ from crud.cli.utils import CLICK_ENDPOINT, CLICK_MAPPING
 def put(ctx, dest, kwargs):
     """Put chained items in endpoint"""
     click.echo(click.style('Putting Items in Dest', underline=True, bold=True))
+
+    if not kwargs:
+        kwargs = {}
+
     for item in ctx.obj.get("items", []):
         dest.put(item, **kwargs)

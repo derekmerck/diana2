@@ -49,10 +49,15 @@ def cli(ctx, verbose, services, sessions):
     $ diana-cli --version
     diana-cli, version 2.1.x
 
-    Also supports chained operations on dixels.  For example, to read a directory and put all instances in a local orthanc:
+    Supports chained operations on dixels.  For example, to read a directory and put all instances in a local orthanc:
 
     \b
     $ diana-cli dgetall path:/data/dcm oput orthanc:
+
+    To index a dixel in a local Splunk using the ${SPLUNK_HEC_TOKEN} env var:
+
+    \b
+    $ diana-cli get path:/Users/derek/data/test/HOBIT1172 IM3 put splunk:
 
     """
 
@@ -86,6 +91,7 @@ def cli(ctx, verbose, services, sessions):
 
 from crud.cli import commands as crud_cmds
 import_cmds(cli, crud_cmds)
+import crud.cli.string_descs
 
 from diana.cli import commands as diana_cmds
 import_cmds(cli, diana_cmds)

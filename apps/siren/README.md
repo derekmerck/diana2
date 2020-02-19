@@ -33,7 +33,9 @@ Create and source an `config.env` file with some required secrets:
   - `GMAIL_USER` - For using gmail as an email server, _if applicable_
   - `GMAIL_APP_PASSWORD` - Requires creating a special "app password" in the gmail user security panel, _if applicable_
 
-Use Docker to setup administrative services such as [Traefik][] and [Splunk][].  Setting up the baseline administration network and services is documented in `diana.platform.docker-stacks`.  A one-off Splunk container for testing can be created with a command like this:
+Use Docker to setup administrative services such as [Traefik][] and [Splunk][].  Setting up the baseline administration network and services is documented in `diana.platform.docker-stacks`.  
+
+For one-off testing, a Splunk container can be created with a command like this:
 
 ```bash
 $ docker run -d --rm \
@@ -123,11 +125,11 @@ $ python3 siren.py notify-study \
                    xano-nxst-udyx-oid \
                    -S @/subscriptions.yaml \
                    -E gmail: \
-                   -T @/receipt.txt.j2 \
+                   -T @/notify.txt.j2 \
                    -I splunk:
 ```
 
-And similar functionalty using `diana-cli` explicitly:
+And similar functionality using `diana-cli` explicitly:
 
 ```bash
 $ diana-cli oget -m signature -f $DIANA_FKEY orthanc: xano-nxst-udyx-oidx \
