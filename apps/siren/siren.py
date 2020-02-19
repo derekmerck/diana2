@@ -1,4 +1,5 @@
 import logging
+import sys
 import click
 import yaml
 from crud.manager import EndpointManager
@@ -24,7 +25,7 @@ def cli(ctx, verbose, services):
     """Run diana packages for the siren receiver using a command-line interface."""
 
     if verbose:
-        logging.basicConfig(level=logging.DEBUG)
+        logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
         logger = logging.getLogger("cli")
         logger.debug("Debug level logging active")
         click.echo('Verbose mode is ON')
