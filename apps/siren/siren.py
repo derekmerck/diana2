@@ -119,7 +119,7 @@ def notify_study(ctx, source: Orthanc, item,
         )
         dispatcher.add_subscribers(subs)
         if email_messenger:
-            email_messenger.msg_t = email_template
+            email_messenger.msg_t = email_template.read()
             dispatcher.email_messenger = email_messenger
 
     handle_notify_study({"oid": item}, source=source, dispatcher=dispatcher,
