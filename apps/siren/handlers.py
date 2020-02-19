@@ -4,7 +4,7 @@ SIREN Trial image management handlers
 Desired process:
 
 1. As each new PHI, partial-anon, or anon study arrives in the folder
-   "/incoming/proj/site":
+   "/incoming/site/trial":
 2.   Each instance is uploaded
 3.   Each uploaded instance is anonymized and deleted (instance-by-instance to
      create serial instance times, if possible)
