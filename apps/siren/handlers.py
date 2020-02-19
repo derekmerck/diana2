@@ -174,7 +174,13 @@ def handle_file_arrived(item,
                                signature_meta_key=signature_meta_key,
                                anon_salt=anon_salt)
     else:
-        _item = source.get(fn, file=True)
+        try:
+            _item = source.get(fn, file=True)
+        except NotImplementedError as e:
+            print(f"Failed to read {fn}")
+            print(e)
+            _item = None
+
         if item:
             _item.meta["trial"] = trial
             _item.meta["site"] = site

@@ -62,7 +62,7 @@ $ docker run -d --rm \
            derekmerck/orthanc-wbv:latest-amd64
 ```
 
-Setup an incoming data directory `/incoming/hobit/site_xxx` for each submitting site.  Data from each enrolling site should be uploaded to a unique directory for processing.  The directory structure `/incoming/{trial}/{site}` is used to infer the notification channel `f"{trial}-{site}"` for each incoming study.
+Setup an incoming data directory `/incoming/hobit/site_xxx` for each submitting site.  Data from each enrolling site should be uploaded to a unique directory for processing.  The directory structure `/incoming/{site}/{trial}` is used to infer the notification channel `f"{trial}-{site}"` for each incoming study.
 
 Create configuration files:
   - [`services.yaml`](services.yaml) with DIANA service descriptions for orthanc, splunk, local_smtp
@@ -73,7 +73,7 @@ Create a DIANA Docker container with appropriate config file and variable mappin
 
 ```bash
 $ docker run -it --rm \
-        -v $DATA_DIR/incoming:/incoming/hobit \
+        -v $DATA_DIR/incoming:/incoming \
         -v $PWD/services.yaml:/services.yaml \
         -v $PWD/subscriptions.yaml:/subscriptions.yaml \
         -v $PWD/notify.txt.j2:/notify.txt.j2 \
@@ -97,7 +97,7 @@ diana-siren, version 2.1.x
 Upload a study from the incoming directory to the appropriate archive, anonymize and tag with meta:
 
 ```bash
-$ python3 siren.py upload-dir path:/incoming/hobit/site_xxx orthanc:
+$ python3 siren.py upload-dir path:/incoming/site_xxx/hobit hobit
 ```
 
 Similar functionality using `diana-cli` explicitly:
