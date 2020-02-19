@@ -249,8 +249,9 @@ class ShamDixel(Dixel):
                 keep.append('SeriesDescription')
             if self.meta.get('ShamSeriesNumber'):
                 replace['SeriesNumber'] = self.meta.get('ShamSeriesNumber')
-            else:
-                keep.append('SeriesNumber')
+            # Apparently this is invalid
+            # else:
+            #     keep.append('SeriesNumber')
 
         if self.level >= DicomLevel.INSTANCES:
             replace['SOPInstanceUID'] = ShamDixel.ShamInstanceUID(self)
