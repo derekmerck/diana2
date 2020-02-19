@@ -109,9 +109,9 @@ def handle_upload_zip(source: DcmDir,
                       signature_meta_key="signature",
                       anon_salt=None):
 
-    # Assume input DcmDir basepath is incoming/trial/site
-    _path, site = os.path.split(source.path)
-    _, trial = os.path.split(_path)
+    # Assume input DcmDir basepath is incoming/site/trial
+    _path, trial = os.path.split(source.path)
+    _, site = os.path.split(_path)
 
     items = source.get_zipped(fn)
     for item in items:
@@ -128,9 +128,9 @@ def handle_upload_dir(source: DcmDir,
                       signature_meta_key="signature",
                       anon_salt=None):
 
-    # Assume input DcmDir basepath is incoming/trial/site
-    _path, site = os.path.split(source.path)
-    _, trial = os.path.split(_path)
+    # Assume input DcmDir basepath is incoming/site/trial
+    _path, trial = os.path.split(source.path)
+    _, site = os.path.split(_path)
 
     items = []
     for root, dirs, files in os.walk(source.path):
