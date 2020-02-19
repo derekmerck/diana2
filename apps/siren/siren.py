@@ -25,6 +25,8 @@ def cli(ctx, verbose, services):
 
     if verbose:
         logging.basicConfig(level=logging.DEBUG)
+        logger = logging.getLogger("cli")
+        logger.debug("Debug level logging active")
         click.echo('Verbose mode is ON')
     else:
         logging.basicConfig(level=logging.WARNING)
