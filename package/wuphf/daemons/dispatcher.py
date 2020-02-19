@@ -2,6 +2,7 @@
 
 import attr
 from typing import List, Mapping
+import logging
 from ..endpoints import ScreenMessenger
 
 
@@ -50,6 +51,10 @@ class Dispatcher:
         return sent
 
     def send(self, item, sender, receiver, dryrun=False) -> Mapping:  # Returns sent item and msg if successful
+
+        logger = logging.getLogger("Dispatcher")
+        logger.debug("Sending msg")
+
         wrapped_item = {
             "item": item,
             "sender": attr.asdict(sender),
