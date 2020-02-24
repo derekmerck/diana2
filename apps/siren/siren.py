@@ -25,12 +25,14 @@ def cli(ctx, verbose, services):
     """Run diana packages for the siren receiver using a command-line interface."""
 
     if verbose:
+        click.echo('Verbose mode is ON')
         logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
         logger = logging.getLogger("cli")
         logger.debug("Debug level logging active")
-        click.echo('Verbose mode is ON')
     else:
-        logging.basicConfig(level=logging.WARNING)
+        logging.basicConfig(stream=sys.stdout, level=logging.WARNING)
+        logger = logging.getLogger("cli")
+        logger.debug("Warning level logging active")
 
     if verbose:
         click.echo("Using services: {}".format(services))
