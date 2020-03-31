@@ -137,9 +137,8 @@ def handle_upload_dir(source: DcmDir,
     # _, site = os.path.split(_path)
 
     trial = "hobit"
-    _, path_from_incoming = os.path.split(fn)
+    _, path_from_incoming = os.path.split(source.path)
     site, _ = os.path.split(path_from_incoming)
-
 
     items = []
     for root, dirs, files in os.walk(source.path):
