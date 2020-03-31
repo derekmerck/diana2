@@ -1,24 +1,26 @@
 ---
 hobit:
   ctype:     ObservableOrthanc
-  host:      $UMICH_HOST
-#  host:      orthanc-hobit
-  user:      orthanc
-  password:  $ORTHANC_PASSWORD
+  host:      ${UMICH_HOST}
+  user:      ${ORTHANC_USER}
+  password:  ${ORTHANC_PASSWORD}
   polling_interval: 10
 
 splunk:
   ctype:     Splunk
-  host:      localhost
-#  host:      splunk
-  user:      admin
-  index:     dicom
-  password:  $SPLUNK_PASSWORD
-  hec_token: $SPLUNK_HEC_TOKEN
+  host:      ${UMICH_HOST}
+  user:      ${SPLUNK_USER}
+  index:     ${SPLUNK_INDEX}
+  password:  ${SPLUNK_PASSWORD}
+  hec_token: ${SPLUNK_HEC_TOKEN}
 
 smtp_server:
   ctype:     SmtpMessenger
-  host:      $SMTP_HOST
-  port:      25
-  msg_t:     "@/notify.txt.j2"
+  host:      ${SMTP_HOST}
+  user:      ${SMTP_USER}
+  password:  ${SMTP_PASSWORD}
+  tls:       ${SMTP_USE_TLS}
+  port:      ${SMTP_PORT}
+  from_addr: ${SMTP_FROM_ADDR}
+  msg_t:     "@notify.txt.j2"
 ...

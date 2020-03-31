@@ -5,9 +5,10 @@ import yaml
 from crud.manager import EndpointManager
 from crud.endpoints import Splunk
 from crud.cli.utils import CLICK_MAPPING, ClickEndpoint
-from crud.cli.commands import check, ls
+from crud.cli.commands import check, ls, check_all
 from diana import __version__
 from diana.apis import DcmDir, Orthanc, ObservableOrthanc, ObservableDcmDir
+from diana.cli.commands import oget, ogetm
 from wuphf.endpoints import SmtpMessenger
 from trial_dispatcher import TrialDispatcher as Dispatcher
 from handlers import handle_upload_zip, handle_upload_dir, handle_notify_study, start_watcher
@@ -45,8 +46,12 @@ def cli(ctx, verbose, services):
 
     ctx.obj['services'] = service_mgr
 
+
 cli.add_command(check)
+cli.add_command(check_all)
 cli.add_command(ls)
+cli.add_command(oget)
+cli.add_command(ogetm)
 
 
 @cli.command(short_help="Upload directory to dicom archive and anonymize")

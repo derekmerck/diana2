@@ -1,6 +1,10 @@
 """
 SIREN Trial image management handlers
 
+Update
+
+1. Arrives in the folder /incoming/site and is assumed to be for HOBIT
+
 Desired process:
 
 1. As each new PHI, partial-anon, or anon study arrives in the folder
@@ -165,9 +169,13 @@ def handle_file_arrived(item,
 
     # Assume input DcmDir basepath is /incoming and fn is trial/site/fn
 
-    p = Path(fn).relative_to(source.path)
-    pp = p.parent
-    trial, site = os.path.split(pp)
+    # p = Path(fn).relative_to(source.path)
+    # pp = p.parent
+    # trial, site = os.path.split(pp)
+
+    trial = "hobit"
+    _, path_from_incoming = os.path.split(fn)
+    site, _ = os.path.split(path_from_incoming)
 
     if fn.endswith(".zip"):
         items = source.get_zipped(fn)

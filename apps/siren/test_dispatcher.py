@@ -34,7 +34,6 @@ site_yyy:  "YYY City Site"
 ...
 """
 
-
 def test_dispatch(dispatcher):
 
     item = {"meta": {

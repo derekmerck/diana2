@@ -25,9 +25,9 @@ services:
 
 # Best to start by hand, using `screen` or similar
 #    command: >
-#      python3 apps/siren/siren.cli start-watcher
-#                          path:/incoming hobit
-#                          -S @/subscriptions.yaml -E local_smtp -T @/notify.txt.j2
+#      python3 apps/siren/siren.py start-watcher \
+#                          path:/incoming hobit \
+#                          -S /subscriptions.yaml -E smtp_server -T /notify.txt.j2 \
 #                          -I splunk
 
     networks:

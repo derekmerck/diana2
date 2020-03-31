@@ -46,18 +46,38 @@ from handlers import handle_upload_dir, handle_upload_zip, handle_notify_study, 
 from trial_dispatcher import TrialDispatcher as Dispatcher
 
 
-# CONFIG
-_services          = "@./services.yaml"
-_subscriptions     = "@./subscriptions.yaml"
+LOCAL_SERVICES     = False   # Set False to use UMich services
+USE_GMAIL          = True   # Set False to use UMich smtp
+DO_DIR_UPLOAD      = False
+CHECK_SPLUNK       = False   # Set False to skip long wait for dixel to index
+CHECK_WATCH_STUDIES= False   # Set False to skip long wait for orthanc watcher
+EMAIL_DRYRUN       = False   # Set False to send live emails
 
-os.environ["ORTHANC_PASSWORD"] = "passw0rd!"  # Set defaults
-os.environ["SPLUNK_PASSWORD"]  = "passw0rd!"
-os.environ["SPLUNK_HEC_TOKEN"] = "b45a6398-ec35-4552-8b9b-9492a12e60a4"
+
+# CONFIG
+_services          = "@services.yaml"
+_subscriptions     = "@subscriptions.yaml"
+os.environ["SPLUNK_INDEX"] = "testing"
+SMTP_MESSENGER_NAME = "smtp_server"
+
+if LOCAL_SERVICES:
+    # Set everythin back to default
+    os.environ["UMICH_HOST"] = "localhost"  # For testing
+    del os.environ["ORTHANC_USER"]
+    del os.environ["ORTHANC_PASSWORD"]
+    del os.environ["SPLUNK_USER"]
+    del os.environ["SPLUNK_PASSWORD"]
+
+if USE_GMAIL:
+    SMTP_MESSENGER_NAME = "gmail:"
+
+test_email_addr1 = "derek.merck@ufl.edu"
+#test_email_addr1 = "ejacob@med.umich.edu"
+#test_email_addr1   = os.environ.get("TEST_EMAIL_ADDR1")
+# os.environ["TEST_GMAIL_BASE"] = test_email_addr1.split("@")[0]
 
 anon_salt          = "Test+Test+Test"
 fkey               = b'o-KzB3u1a_Vlb8Ji1CdyfTFpZ2FvdsPK4yQCRzFCcss='
-messenger_name     = "gmail:"   # Use "gmail:" or "local_smtp"
-SPLUNK_INDEX       = "testing"  # Set to "dicom" for production or "testing"
 msg_t              = """to: {{ recipient.email }}\nfrom: {{ from_addr }}\nsubject: Test Message\n\nThis is the message text: "{{ item.msg_text }}"\n"""
 notify_msg_t = "@./notify.txt.j2"
 
@@ -65,13 +85,6 @@ notify_msg_t = "@./notify.txt.j2"
 test_sample_zip    = os.path.abspath("../../tests/resources/dcm_zip/test.zip")
 test_sample_file   = os.path.abspath("../../tests/resources/dcm/IM2263")
 test_sample_dir    = os.path.expanduser("~/data/test")  # Need to dl separately
-test_email_addr1   = os.environ.get("TEST_EMAIL_ADDR1")
-os.environ["TEST_GMAIL_BASE"] = test_email_addr1.split("@")[0]
-
-DO_DIR_UPLOAD      = False
-CHECK_SPLUNK       = False   # Set False to skip long wait for dixel to index
-CHECK_WATCH_STUDIES = False   # Set False to skip long wait for orthanc watcher
-EMAIL_DRYRUN       = True    # Set False to send live emails
 
 # TESTS
 
@@ -132,7 +145,7 @@ def test_anonymize_one(orth: Orthanc, dixel: Dixel):
 def test_index_one( splunk: Splunk, dixel: Dixel, check_exists=CHECK_SPLUNK ):
     print("Testing can index")
 
-    splunk.put(dixel, index=SPLUNK_INDEX)
+    splunk.put(dixel, index=os.environ.get("SPLUNK_INDEX"))
 
     if check_exists:
         print("Waiting for 1 min to index")
@@ -465,7 +478,7 @@ def test_siren_receiver(test_file, orth: Orthanc,
                     dispatcher=dispatch,
                     dryrun=dryrun,
                     indexer=indexer,
-                    index_name=SPLUNK_INDEX
+                    index_name=os.environ.get("SPLUNK_INDEX")
                 )
         except RuntimeError:
             print("Stopping watcher subprocess")
@@ -486,39 +499,41 @@ if __name__ == "__main__":
     suppress_watcher_debug()
 
     # Create service endpoints
-    mgr = EndpointManager(serialized_ep_descs=_services)
+    services = EndpointManager(serialized_ep_descs=_services)
 
-    print(pformat(mgr.ep_descs))
+    print(pformat(services.ep_descs))
 
-    orth: ObservableOrthanc = mgr.get("hobit")
+    orth: ObservableOrthanc = services.get("hobit")
     orth.polling_interval = 2.0
-    messenger: SmtpMessenger = mgr.get(messenger_name)
+    messenger: SmtpMessenger = services.get(SMTP_MESSENGER_NAME)
     messenger.msg_t = msg_t
-    splunk: Splunk = mgr.get("splunk")
+    splunk: Splunk = services.get("splunk")
     dcm_dir = DcmDir(path=test_sample_dir)
 
     # Load a dixel
-    dixel = dcm_dir.get("IN000001", file=True)
-    assert( dixel )
-    assert( dixel.file )
-
-    # Verify that all endpoints are online
-    assert( orth.check() )
-    assert( messenger.check() )
-    assert( splunk.check() )
-
-    # Verify basic capabilities:
-    # - upload
-    # - anonymize
-    # - index
-    # - message
-    # - distribute
-
-    assert( test_upload_one(orth, dixel) )
-    assert( test_anonymize_one(orth, dixel) )
-    assert( test_index_one(splunk, dixel) )
+    dixel = dcm_dir.get("HOBIT1172/IM0", file=True)
+    # assert( dixel )
+    # assert( dixel.file )
+    #
+    # # Verify that all endpoints are online
+    # assert( orth.check() )
+    # assert( messenger.check() )
+    # assert( splunk.check() )
+    #
+    # # Verify basic capabilities:
+    # # - upload
+    # # - anonymize
+    # # - index
+    # # - message
+    # # - distribute
+    #
+    # assert( test_upload_one(orth, dixel) )
+    # assert( test_anonymize_one(orth, dixel) )
+    # assert( test_index_one(splunk, dixel) )
     assert( test_email_messenger(messenger) )
-    assert( test_distribute(_subscriptions, messenger) )
+    # assert( test_distribute(_subscriptions, messenger) )
+
+    exit()
 
     # Verify observer daemons:
     # - watch dir
