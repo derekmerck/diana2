@@ -25,8 +25,8 @@ Desired process:
 
 import os
 from functools import partial
+from pathlib import PurePosixPath
 import logging
-from pathlib import Path
 from collections import deque
 from crud.abc import Endpoint, Watcher, Trigger
 from crud.endpoints import Splunk
@@ -113,9 +113,9 @@ def handle_upload_zip(source: DcmDir,
                       signature_meta_key="signature",
                       anon_salt=None):
 
-    # Assume input DcmDir basepath is incoming/site/trial
-    _path, trial = os.path.split(source.path)
-    _, site = os.path.split(_path)
+    trial = "hobit"
+    parts = PurePosixPath(fn).parts
+    site = parts[2]  # /, incoming, site ...
 
     items = source.get_zipped(fn)
     for item in items:
@@ -132,13 +132,9 @@ def handle_upload_dir(source: DcmDir,
                       signature_meta_key="signature",
                       anon_salt=None):
 
-    # Assume input DcmDir basepath is incoming/site/trial
-    # _path, trial = os.path.split(source.path)
-    # _, site = os.path.split(_path)
-
     trial = "hobit"
-    _, path_from_incoming = os.path.split(source.path)
-    site, _ = os.path.split(path_from_incoming)
+    parts = PurePosixPath(source.path).parts
+    site = parts[2]  # /, incoming, site ...
 
     items = []
     for root, dirs, files in os.walk(source.path):
@@ -171,15 +167,9 @@ def handle_file_arrived(item,
 
     fn = item.get("fn")
 
-    # Assume input DcmDir basepath is /incoming and fn is trial/site/fn
-
-    # p = Path(fn).relative_to(source.path)
-    # pp = p.parent
-    # trial, site = os.path.split(pp)
-
     trial = "hobit"
-    _, path_from_incoming = os.path.split(fn)
-    site, _ = os.path.split(path_from_incoming)
+    parts = PurePosixPath(fn).parts
+    site = parts[2]  # /, incoming, site ...
 
     if fn.endswith(".zip"):
         items = source.get_zipped(fn)
