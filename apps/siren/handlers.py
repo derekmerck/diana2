@@ -74,7 +74,10 @@ def handle_notify_study(item,
 
     if dispatcher:
         # Trial Dispatcher type can infer the channels from the item signature
-        dispatcher.put(item, dryrun=dryrun)
+        sent = dispatcher.put(item, dryrun=dryrun)
+
+        if dryrun:
+            logger.warning(sent)
 
     if indexer:
         indexer.put(item, index=index_name)

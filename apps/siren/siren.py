@@ -86,7 +86,7 @@ def upload_zip(ctx, source: DcmDir, fn, dest: Orthanc, fkey, salt):
     """Upload zip file to dicom archive and anonymize
 
     \b
-    $ python3 siren upload_dir path:/incoming/hobit/site_xxx mystudy.zip orthanc:
+    $ python3 siren upload-zip path:/incoming/hobit/site_xxx mystudy.zip orthanc:
     """
     handle_upload_zip(source, fn, dest, fkey=fkey, anon_salt=salt)
 
