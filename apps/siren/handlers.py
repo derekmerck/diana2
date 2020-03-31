@@ -26,6 +26,7 @@ Desired process:
 import os
 from functools import partial
 from pathlib import PurePosixPath
+from pprint import pformat
 import logging
 from collections import deque
 from crud.abc import Endpoint, Watcher, Trigger
@@ -77,7 +78,7 @@ def handle_notify_study(item,
         sent = dispatcher.put(item, dryrun=dryrun)
 
         if dryrun:
-            logger.warning(sent)
+            logger.warning(pformat(sent))
 
     if indexer:
         indexer.put(item, index=index_name)
