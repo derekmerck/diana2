@@ -91,7 +91,7 @@ services:
       TZ:                       "America/New_York"
 
     deploy:
-      replicas: 2  # Multiple nodes, PG provides data persistence
+      replicas: 1  # Much less relevant to run many with threading
       labels:
         - traefik.enable=true
         - traefik.docker.network=admin_proxy_network
@@ -124,7 +124,7 @@ services:
     environment:
       ORTHANC_NAME:             BOOST Image Registry
       ORTHANC_AET:              BOOST
-      ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}  # Admin credentials
+      ORTHANC_PASSWORD:         ${ORTHANC_PASSWORD}        # Admin credentials
       ORTHANC_USER_0:           ${ORTHANC_BOOST_USER_0}    # Reviewer credential
       ORTHANC_USER_1:           ${ORTHANC_BOOST_USER_1}    # Coordination credential
       ORTHANC_METADATA_0:       signature,9875
@@ -140,7 +140,7 @@ services:
       TZ:                       "America/New_York"
 
     deploy:
-      replicas: 2  # Multiple nodes, PG provides data persistence
+      replicas: 1
       labels:
         - traefik.enable=true
         - traefik.docker.network=admin_proxy_network

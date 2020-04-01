@@ -118,7 +118,7 @@ def handle_upload_zip(source: DcmDir,
                       anon_salt=None):
 
     trial = "hobit"
-    parts = PurePosixPath(fn).parts
+    parts = PurePosixPath(source.path).parts
     site = parts[2]  # /, incoming, site ...
 
     items = source.get_zipped(fn)
