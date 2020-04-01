@@ -12,7 +12,7 @@ import numpy as np
 from crud.abc import Serializable
 from .report import RadiologyReport
 from ..utils.dicom import DicomLevel, DicomFormatError
-from ..utils import dicom_simplify, pack_data, unpack_data
+from ..utils import dicom_simplify, pack_data, unpack_data, ExceptionHandlingIterator
 from ..utils.gateways import orthanc_id, Montage
 
 from io import BytesIO
@@ -97,7 +97,10 @@ class Dixel(Serializable):
 
         def dictify_ds(ds):
             output = dict()
-            for elem in ds:
+
+            _ds = ExceptionHandlingIterator(ds)
+
+            for elem in _ds:
                 if elem.keyword == "PixelData":
                     continue
                     # Deal with that separately
