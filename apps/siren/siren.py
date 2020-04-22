@@ -114,10 +114,10 @@ def notify_study(ctx, source: Orthanc, item,
     """Dispatch study notification and send meta to indexer
 
     \b
-    $ python3 siren notify-study orthanc: xxsa-mple-oidx-xxx \\
-                    -S ./subscriptions.yaml \\
-                    -E gmail: \\
-                    -T ./notify.txt.j2 \\
+    $ python3 siren.py notify-study orthanc: xxsa-mple-oidx-xxx \
+                    -S ./subscriptions.yaml \
+                    -E gmail: \
+                    -T ./notify.txt.j2 \
                     -I splunk:
     """
 

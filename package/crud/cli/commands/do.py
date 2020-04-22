@@ -35,7 +35,7 @@ def do(ctx, endpoint: Endpoint, method, args: List = [], mapargs: Mapping = {}, 
             args.append(mapargs)
 
         out = getattr(endpoint, method)(*args, **kwargs)
-        ctx.obj["items"].append(out)
+        ctx.obj["items"].extend(out)
 
     else:
         click.echo(click.style("No such method {}".format(method), fg="red"))
