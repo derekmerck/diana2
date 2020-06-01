@@ -113,6 +113,8 @@ class DcmDir(Endpoint, Serializable):
         _fp = gateway.get_path(item)
         result = set()
         for fn, f in files:
+            print("fn: {}".format(fn))
+            print("f: {}".format(f))
             try:
                 ds = pydicom.dcmread(BytesIO(f), stop_before_pixels=True)
                 fp = os.path.join(_fp, fn)
