@@ -51,8 +51,9 @@ def parse_dicom_datetime(dts: str, tms: str = None) -> datetime:
         dts = dts.split(".")[0]
         ts = DatetimeParser.parse(dts)
         return ts
-    except ValueError:
+    except (ValueError, OverflowError) as e:
         # Wrong format
+        print(e)
         pass
 
     logger = logging.getLogger("DcmStrings")
