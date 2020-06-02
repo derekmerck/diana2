@@ -21,8 +21,9 @@ $ python3 diana-cli.py --verbose -S ../../.secrets/lifespan_services.yml collect
 @click.option('-a', '--anonymize', is_flag=True, default=False)
 @click.option('-b', '--subpath_depth', type=int, default=0,
               help="Number of sub-directories to use  (if dest is directory)")
+@click.option('-c', '--custom_anon', is_flag=True, default=False)
 @click.pass_context
-def collect(ctx, project, data_path, source, domain, dest, anonymize, subpath_depth):
+def collect(ctx, project, data_path, source, domain, dest, anonymize, subpath_depth, custom_anon):
     """Create a PROJECT key at DATA_PATH, then pull data from
     SOURCE and send to DEST."""
     services = ctx.obj.get('services')
@@ -44,4 +45,4 @@ def collect(ctx, project, data_path, source, domain, dest, anonymize, subpath_de
         _dest = services[dest]
         dest_inst = Orthanc(**_dest)
 
-    C.run(project, data_path, source_inst, domain, dest_inst, anonymize)
+    C.run(project, data_path, source_inst, domain, dest_inst, anonymize, custom_anon)

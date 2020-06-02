@@ -38,7 +38,8 @@ class Collector(object):
             data_path: Path,
             source: Orthanc, domain: str,
             dest: Union[Orthanc, DcmDir],
-            anonymize=False):
+            anonymize=False,
+            custom_anon=False):
 
         logging.getLogger("GUIDMint").setLevel(level=logging.WARNING)
 
@@ -57,7 +58,7 @@ class Collector(object):
             C = CsvFile(fp=key_path, level=DicomLevel.STUDIES)
             C.read()
             worklist = C.dixels
-        self.handle_worklist(worklist, source, domain, dest, anonymize)
+        self.handle_worklist(worklist, source, domain, dest, anonymize, custom_anon)
 
     def make_key(self, ids, source: Orthanc, domain: str) -> set:
 
@@ -114,19 +115,19 @@ class Collector(object):
         return items
 
     # TODO: Could replace Orthanc + domain with a ProxiedDICOM source
-    def handle_worklist(self, items: Iterable, source: Orthanc, domain: str, dest: Union[Orthanc, DcmDir], anonymize):
+    def handle_worklist(self, items: Iterable, source: Orthanc, domain: str, dest: Union[Orthanc, DcmDir], anonymize, custom_anon):
 
         print("Handling worklist")
 
         if isinstance(source, Orthanc) and isinstance(dest, Orthanc):
             self.pull_and_send(items, source, domain, dest, anonymize)
         elif isinstance(source, Orthanc) and isinstance(dest, DcmDir):
-            self.pull_and_save(items, source, domain, dest, anonymize)
+            self.pull_and_save(items, source, domain, dest, anonymize, custom_anon)
         else:
             raise ValueError("Unknown handler")
 
     # TODO: Could merge with pull_and_send if the api for Orthanc and DcmDir were closer
-    def pull_and_save(self, items: Iterable, source: Orthanc, domain: str, dest: DcmDir, anonymize=False):
+    def pull_and_save(self, items: Iterable, source: Orthanc, domain: str, dest: DcmDir, anonymize=False, custom_anon=False):
 
         def mkq(d: Dixel):
             return {
@@ -173,7 +174,10 @@ class Collector(object):
 
             if anonymize:
                 try:
-                    replacement_map = ShamDixel.orthanc_sham_map(d)
+                    if custom_anon:
+                        replacement_map = ShamDixel.orthanc_anon_map(d)
+                    else:
+                        replacement_map = ShamDixel.orthanc_sham_map(d)
 
                     anon_id = source.anonymize(d, replacement_map=replacement_map)
 
@@ -229,4 +233,3 @@ class Collector(object):
             source.psend(anon_id, dest)
             source.delete(anon_id)
             source.delete(d)
-

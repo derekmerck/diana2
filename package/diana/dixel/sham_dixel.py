@@ -264,6 +264,15 @@ class ShamDixel(Dixel):
             "Force": True
         }
 
+    def orthanc_anon_map(self):
+        replace = {}
+        keep = []
+        return {
+            "Replace": replace,
+            "Keep": keep,
+            "Force": True
+        }
+
     @property
     def image_base_fn(self):
         """Filename for shammed image instance"""
