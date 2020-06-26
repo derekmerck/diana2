@@ -1,15 +1,21 @@
 import os
-import pydicom
 import zipfile
+import sys
+# sys.path.insert(0, r"C:\Program Files\GDCM 3.0\lib")
+import gdcm
+import pydicom
 
 '''
 Pre-req: grassroots dicom for decompression compatibility
 conda install -c conda-forge gdcm
 Installation successful if import gcdm works, but explicit import unnecessary
+
+Ensure gdcm is imported before pydicom to allow proper configuration
+num_rows_removed may be modified for cropping image PHI banner
 '''
 
-directory = r"D:\Brown\Research\Raw_Data\tirads"
-write_to = r"D:\Brown\Research\Raw_Data\tirads\cropped"
+directory = r"C:\Users\thoma\Desktop\zips"
+write_to = r"C:\Users\thoma\Desktop\cropped"
 
 
 # Traverse subdirectories
@@ -43,6 +49,8 @@ for i, zipfn in enumerate(os.listdir(directory)):
                 continue
 
             ds = pydicom.dcmread(filename)
+            # print(ds.file_meta.TransferSyntaxUID)
+
             try:
                 ds.decompress()
             except OSError:
