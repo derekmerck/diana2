@@ -14,8 +14,6 @@ from ..utils.dicom import DicomLevel, DicomHashUIDMint
 # Special metadata:
 # $ export ORTHANC_METADATA_0=Source,9876
 
-
-
 @attr.s
 class Orthanc(Endpoint, Serializable):
 
