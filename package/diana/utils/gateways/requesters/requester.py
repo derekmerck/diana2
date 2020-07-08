@@ -13,7 +13,7 @@ LARGE_TIMEOUT  = (6.1, 360.1)  # Use large timeout on <1Gb connections
 # On a raspberry pi with a 400Mb connection:
 #   - ~5 mins to pull a 1500 image study
 #   - ~2 mins to anonymize
-#   - ~2 mons to zip
+#   - ~2 mins to zip
 
 TIMEOUTS = LARGE_TIMEOUT
 

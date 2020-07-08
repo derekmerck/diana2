@@ -1,41 +1,19 @@
 import logging
+import random
 from typing import Mapping, Union
+from hashlib import sha224
+from datetime import timedelta
 # from pprint import pformat
 import attr
 from ..dixel import Dixel, ShamDixel, DixelView
 from crud.abc import Endpoint, Serializable
 # from ..utils import Endpoint, Serializable
 from ..utils.gateways import Orthanc as OrthancGateway, GatewayConnectionError
-from ..utils.dicom import DicomLevel
+from ..utils.dicom import DicomLevel, DicomHashUIDMint
 
 # Special metadata:
 # $ export ORTHANC_METADATA_0=Source,9876
 
-#
-# def sham_map(d: ShamDixel):
-#
-#     if d.level > DicomLevel.STUDIES:
-#         raise NotImplementedError("Can only create default sham maps for STUDIES")
-#
-#     logging.debug(d)
-#
-#     m = {
-#         "Replace": {
-#             "PatientName": d.meta["ShamName"],
-#             "PatientID": d.meta["ShamID"],
-#             "PatientBirthDate": d.meta["ShamBirthDate"],
-#             "AccessionNumber": d.meta["ShamAccessionNumber"],
-#             "StudyDate": d.ShamStudyDate(),
-#             "StudyTime": d.ShamStudyTime(),
-#             },
-#         "Keep": [
-#             "PatientSex",
-#             'StudyDescription',
-#             'SeriesDescription',
-#             ],
-#         "Force": True
-#     }
-#     return m
 
 
 @attr.s
