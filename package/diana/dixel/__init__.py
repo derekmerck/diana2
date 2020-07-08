@@ -5,3 +5,4 @@ from .report import RadiologyReport, MammographyReport, LungScreeningReport, Bon
 from .views import DixelView
 from .provenance import Provenance
 from .sham_maps import huid_sham_map
+from .dixel_hashes import DixelHashes
