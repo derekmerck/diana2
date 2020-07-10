@@ -70,7 +70,7 @@ def inventory_directory(fp: str, institution: str):
     # TODO: assert that the final series ID is the same with
     #       files or reversed(files)
 
-    for f in D.files('*')[0:10]:
+    for f in D.files('*'):
         d = D.get(f, file=True, pixels=True)
         if d is None:
             continue
