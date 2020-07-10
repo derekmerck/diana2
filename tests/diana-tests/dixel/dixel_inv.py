@@ -1,4 +1,5 @@
 from pprint import pprint
+import typing as typ
 import sys
 from diana.dixel import Dixel, Provenance, DixelHashes, huid_sham_map
 from diana.apis import DcmDir
@@ -70,7 +71,7 @@ def inventory_directory(fp: str, institution: str):
     # TODO: assert that the final series ID is the same with
     #       files or reversed(files)
 
-    for f in D.files('*'):
+    for f in D.files('*')[0:10]:
         d = D.get(f, file=True, pixels=True)
         if d is None:
             continue
@@ -97,7 +98,7 @@ def inventory_directory(fp: str, institution: str):
 if __name__ == "__main__":
 
     fp = sys.argv[1]
-    inst = sys.argv[2]
+    inst = sys.argv[1].split('/')[-1].capitalize()
 
     insts, collections = inventory_directory(fp, inst)
 
@@ -115,4 +116,37 @@ if __name__ == "__main__":
 
     # print("STUDIES")
     # print("================")
-    pprint(studies)
+    # pprint(studies)
+
+    def pluck(k: str, l: typ.List[typ.Dict], unique=False):
+        values = [d[k] for d in l]
+        if unique:
+            values = list( set(values) )
+        return values
+
+    results = {}
+
+    institutions = pluck( "Institution", studies.values(), unique=True )
+
+    for i in institutions:
+        studies_ = [s for s in studies.values() if s["Institution"] == i]
+        patients = pluck( "PatientID", studies_, unique=True )
+
+        results[i] = {}
+
+        for p in patients:
+            studies__ = [s for s in studies_ if s["PatientID"] == p]
+
+            summaries = []
+            for s in studies__:
+                summary = {"OriginalAccessionNumber": s["AccessionNumber"],
+                           "OriginalDateTime": s["StudyDateTime"].isoformat(),
+                           "NewPatientID": s['NewPatientID'],
+                           "NewAccessionNumber": s["NewAccessionNumber"],
+                           "NumInstances": s["NumInstances"]
+                          }
+                summaries.append(summary)
+
+            results[i][p] = summaries
+
+    pprint(results)
