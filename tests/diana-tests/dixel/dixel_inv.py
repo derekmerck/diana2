@@ -1,8 +1,11 @@
 from pprint import pprint
+import sys
 from diana.dixel import Dixel, Provenance, DixelHashes, huid_sham_map
 from diana.apis import DcmDir
 from diana.utils.dicom import DicomLevel
 
+
+#TODO: No test here -- needs test data
 
 def inventory_directory(fp: str, institution: str):
 
@@ -26,7 +29,8 @@ def inventory_directory(fp: str, institution: str):
                 "PatientID": d.tags["PatientID"],
                 "NewPatientID": d.meta["ShamMap"]["Replace"]["PatientID"],
                 "AccessionNumber": d.tags["AccessionNumber"],
-                "NewAccessionNumber": d.meta["ShamMap"]["Replace"]["AccessionNumber"],
+                "NewAccessionNumber":
+                    d.meta["ShamMap"]["Replace"]["AccessionNumber"],
                 "StudyDateTime": d.meta["StudyDateTime"],
                 "StudyInstanceUID": d.tags["StudyInstanceUID"],
                 "MetaHash": sh,
@@ -63,7 +67,8 @@ def inventory_directory(fp: str, institution: str):
     insts = {}
     collections = {}
 
-    # TODO: assert that the final series ID is the same with files or reversed(files)
+    # TODO: assert that the final series ID is the same with
+    #       files or reversed(files)
 
     for f in D.files('*')[0:10]:
         d = D.get(f, file=True, pixels=True)
@@ -89,21 +94,23 @@ def inventory_directory(fp: str, institution: str):
 
 if __name__ == "__main__":
 
-    insts, collections = inventory_directory(
-        "/Users/derek/data/duke", institution="Duke")
+    fp = sys.argv[1]
+    inst = sys.argv[2]
 
-    print("INSTANCES")
-    print("================")
-    pprint(insts)
+    insts, collections = inventory_directory(fp, inst)
 
-    print("COLLECTIONS")
-    print("================")
-    pprint(collections)
+    # print("INSTANCES")
+    # print("================")
+    # pprint(insts)
+    #
+    # print("COLLECTIONS")
+    # print("================")
+    # pprint(collections)
 
     studies = {k: collections[k]
                for k, v in collections.items()
                  if v["CollectionType"] == "studies"}
 
-    print("STUDIES")
-    print("================")
+    # print("STUDIES")
+    # print("================")
     pprint(studies)
