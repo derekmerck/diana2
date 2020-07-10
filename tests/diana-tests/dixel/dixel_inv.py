@@ -72,6 +72,8 @@ def inventory_directory(fp: str, institution: str):
 
     for f in D.files('*')[0:10]:
         d = D.get(f, file=True, pixels=True)
+        if d is None:
+            continue
 
         h = DixelHashes()
         h.set_meta_hash([d.tags["StudyInstanceUID"],
