@@ -363,7 +363,7 @@ def get_dcmdir_name(ml, proj_path, an):
         files = [f for f in glob.glob("{}/data/{}_process/".format(proj_path, an) + "**/*.dcm", recursive=True)]
         for f in files:
             temp_dcm = pydicom.dcmread(f)
-            if temp_dcm.SeriesDescription.lower() in SERIES_DESCRIPTIONS:
+            if temp_dcm.SeriesDescription.lower() in ICH_SERIES_DESCRIPTIONS:
                 dcmdir_name = os.path.dirname(f)
                 break
         return dcmdir_name, f
@@ -388,7 +388,7 @@ def get_subdirectories(a_dir):
 
 def folder_count(a_dir):
     files = folders = 0
-    for _, dirnames, filenames in os.walk(path):
+    for _, dirnames, filenames in os.walk(a_dir):
         files += len(filenames)
         folders += len(dirnames)
     return files, folders
