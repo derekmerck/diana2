@@ -95,7 +95,7 @@ def extend(ctx,
                 os.remove("{}/{}.studies.txt".format(proj_path, ml))
             with open("{}/{}.studies.txt".format(proj_path, ml), 'a+') as f:
                 for an in accession_nums:
-                    f.write(an + "\n")
+                    f.write(str(an) + "\n")
 
             if len(accession_nums) == 0:
                 clear_counter += 1
