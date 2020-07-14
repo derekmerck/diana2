@@ -88,14 +88,14 @@ def extend(ctx,
                     accession_nums = [f.read().strip()]
                 os.remove("{}/{}_slack_an.txt".format(proj_path, ml))
 
+            # FOR TESTING PURPOSES: manual injection of accession #
+            accession_nums = [53835704]
+
             if os.path.isfile("{}/{}.studies.txt".format(proj_path, ml)):
                 os.remove("{}/{}.studies.txt".format(proj_path, ml))
             with open("{}/{}.studies.txt".format(proj_path, ml), 'a+') as f:
                 for an in accession_nums:
                     f.write(an + "\n")
-
-            # FOR TESTING PURPOSES: manual injection of accession #
-            accession_nums = [53835704]
 
             if len(accession_nums) == 0:
                 clear_counter += 1
