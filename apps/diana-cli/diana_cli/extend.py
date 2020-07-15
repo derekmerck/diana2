@@ -207,7 +207,7 @@ def extend(ctx,
                     # Series-type prediction
                     pred_csv = "{}/src/pred.csv".format(proj_path)
                     df = pd.read_csv(pred_csv)
-                    for _i, _ in enumerate(dcmdir_name):
+                    for _i, _ in enumerate(os.listdir(dcmdir_name)):
                         df["series"][_i] = _
                     df = df.truncate(after=_i)
                     df.to_csv(pred_csv, index=False)
@@ -370,7 +370,7 @@ def get_dcmdir_name(ml, proj_path, an):
     elif ml == "elvos":
         subdirs = get_subdirectories("{}/data/{}_process".format(proj_path, an))
         for fn in subdirs:
-            if folder_count(fn) > 1:
+            if folder_count(fn)[-1] > 1:
                 dcmdir_name = [f.path for f in os.scandir(fn) if f.is_dir()]
                 break
 
