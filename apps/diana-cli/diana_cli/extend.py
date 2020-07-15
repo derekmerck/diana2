@@ -89,7 +89,7 @@ def extend(ctx,
                 os.remove("{}/{}_slack_an.txt".format(proj_path, ml))
 
             # FOR TESTING PURPOSES: manual injection of accession #
-            accession_nums = [53835704]
+            accession_nums = []
 
             if os.path.isfile("{}/{}.studies.txt".format(proj_path, ml)):
                 os.remove("{}/{}.studies.txt".format(proj_path, ml))
@@ -229,11 +229,6 @@ def extend(ctx,
 
                     with open("{}/src/testdir.txt".format(proj_path), "w+") as f:
                         f.write(series_pred['series'][np.argmax(preds)])
-                    # images = []
-                    # for _ in sorted(os.listdir(series_pred['series'][np.argmax(preds)])):
-                    #     images.append(pydicom.dcmread(os.path.join(series_pred['series'][np.argmax(preds)], _)).pixel_array)
-                    # images = np.asarray(images)
-                    # np.save("{}/src/CT-npy/CT.npy".format(proj_path), images)
 
                     # ELVO-type
                     votes = []
@@ -244,9 +239,9 @@ def extend(ctx,
                         time.sleep(0.5)
                         with open("{}/src/pred/predictions.pkl".format(proj_path), "rb") as f:
                             model_results = pickle.load(f)
-                        votes.append(np.argmax(model_results["y_pred"]))
+                        votes.append(np.argmax(model_results["y_pred"][0]))
                         for p_ind in range(3):
-                            percents[p_ind].append(model_results["y_pred"][p_ind])
+                            percents[p_ind].append(model_results["y_pred"][0][p_ind])
                     result = "No acute ELVO"
                     if votes.count(2) > 1:
                         result = "ACUTE ELVO"
@@ -256,7 +251,6 @@ def extend(ctx,
 
                     with open("{}/{}_scores.txt".format(proj_path, ml), "a+") as f:     # none, chronic, acute
                         f.write("{}, {}, {}, {}, {}\n".format(an, str(datetime.now()), probs[0], probs[1], probs[2]))
-                    # np.save("/opt/diana/{}_arr.npy".format(ml), get_3darray_from_dicom(dcmdir_name))
                 else:
                     raise NotImplementedError
 
@@ -286,7 +280,7 @@ def extend(ctx,
                             channels=channel,  # WARNING: check param spelling in updates
                             file="/opt/diana/el_thumb.txt",
                             initial_comment="Accession Number: {},\n".format("XXXX" + an[-4:]) +
-                            "ELVO result: {} - {}%".format(result, prob)
+                            "ELVO result: {} - {}%".format(result, probs[2])
                         )
                         assert(sl_fiup_response["ok"])
                 shutil.rmtree("{}/data/{}_process".format(proj_path, an))
