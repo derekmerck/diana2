@@ -208,7 +208,7 @@ def extend(ctx,
                     pred_csv = "{}/src/pred.csv".format(proj_path)
                     df = pd.read_csv(pred_csv)
                     for _i, _ in enumerate(dcmdir_name):
-                        df.at["series"][_i] = _
+                        df.at[_i, "series"] = _
                     df = df.truncate(after=_i)
                     df.to_csv(pred_csv, index=False)
                     p_predict = subprocess.Popen("python3 run.py --gpu -1 {} predict".format("{}/src/configs/predict/diana_series.yaml".format(proj_path)), shell=True, cwd="{}/src/".format(proj_path))
@@ -223,15 +223,17 @@ def extend(ctx,
                             preds.append(_[0][0])
                     test_csv = "{}/src/test.csv".format(proj_path)
                     df = pd.read_csv(test_csv)
-                    df["series"][0] = series_pred['series'][np.argmax(preds)] + "/CT.npy"
-                    df["label"][0] = 0
+                    df.at[0, "series"] = "{}/src/CT-npy/CT.npy".format(proj_path)
+                    df.at[0, "label"] = 0
                     df.to_csv(test_csv, index=False)
 
-                    images = []
-                    for _ in os.listdir(series_pred['series'][np.argmax(preds)]):
-                        images.append(pydicom.read_dicom(_).pixel_array)
-                    images = np.asarray(images)
-                    np.save("{}/src/CT-npy/CT.npy".format(proj_path), images)
+                    with open("{}/src/testdir.txt".format(proj_path), "w+") as f:
+                        f.write(series_pred['series'][np.argmax(preds)])
+                    # images = []
+                    # for _ in sorted(os.listdir(series_pred['series'][np.argmax(preds)])):
+                    #     images.append(pydicom.dcmread(os.path.join(series_pred['series'][np.argmax(preds)], _)).pixel_array)
+                    # images = np.asarray(images)
+                    # np.save("{}/src/CT-npy/CT.npy".format(proj_path), images)
 
                     # ELVO-type
                     votes = []
@@ -240,7 +242,7 @@ def extend(ctx,
                         p_test = subprocess.Popen("python3 run.py --gpu -1 {} test".format("{}/src/configs/3-models/model{}.yaml".format(proj_path, _)), shell=True, cwd="{}/src/".format(proj_path))
                         p_test.wait()
                         time.sleep(0.5)
-                        with open("{}/src/pred/predictions.pkl", "rb") as f:
+                        with open("{}/src/pred/predictions.pkl".format(proj_path), "rb") as f:
                             model_results = pickle.load(f)
                         votes.append(np.argmax(model_results["y_pred"]))
                         percents.append(model_results["y_pred"][-1])
