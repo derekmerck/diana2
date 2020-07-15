@@ -237,7 +237,7 @@ def extend(ctx,
 
                     # ELVO-type
                     votes = []
-                    percents = []
+                    percents = [[], [], []]
                     for _ in range(3):
                         p_test = subprocess.Popen("python3 run.py --gpu -1 {} test".format("{}/src/configs/3-models/model{}.yaml".format(proj_path, _)), shell=True, cwd="{}/src/".format(proj_path))
                         p_test.wait()
@@ -245,14 +245,17 @@ def extend(ctx,
                         with open("{}/src/pred/predictions.pkl".format(proj_path), "rb") as f:
                             model_results = pickle.load(f)
                         votes.append(np.argmax(model_results["y_pred"]))
-                        percents.append(model_results["y_pred"][-1])
+                        for p_ind in range(3):
+                            percents[p_ind].append(model_results["y_pred"][p_ind])
                     result = "No acute ELVO"
                     if votes.count(2) > 1:
                         result = "ACUTE ELVO"
-                    prob = np.round(np.mean(percents) * 100., 2)
+                    probs = []
+                    for _ in range(3):
+                        probs.append(np.round(np.mean(percents[_]) * 100., 2))
 
-                    with open("{}/{}_scores.txt".format(proj_path, ml), "a+") as f:
-                        f.write("{}, {}, {}\n".format(an, str(datetime.now()), prob))
+                    with open("{}/{}_scores.txt".format(proj_path, ml), "a+") as f:     # none, chronic, acute
+                        f.write("{}, {}, {}, {}, {}\n".format(an, str(datetime.now()), probs[0], probs[1], probs[2]))
                     # np.save("/opt/diana/{}_arr.npy".format(ml), get_3darray_from_dicom(dcmdir_name))
                 else:
                     raise NotImplementedError
