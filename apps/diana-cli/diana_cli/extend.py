@@ -208,7 +208,7 @@ def extend(ctx,
                     pred_csv = "{}/src/pred.csv".format(proj_path)
                     df = pd.read_csv(pred_csv)
                     for _i, _ in enumerate(dcmdir_name):
-                        df["series"][_i] = _
+                        df.at["series"][_i] = _
                     df = df.truncate(after=_i)
                     df.to_csv(pred_csv, index=False)
                     p_predict = subprocess.Popen("python3 run.py --gpu -1 {} predict".format("{}/src/configs/predict/diana_series.yaml".format(proj_path)), shell=True, cwd="{}/src/".format(proj_path))
