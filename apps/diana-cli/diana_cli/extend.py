@@ -207,7 +207,7 @@ def extend(ctx,
                     # Series-type prediction
                     pred_csv = "{}/src/pred.csv".format(proj_path)
                     df = pd.read_csv(pred_csv)
-                    for _i, _ in enumerate(os.listdir(dcmdir_name)):
+                    for _i, _ in enumerate(dcmdir_name):
                         df["series"][_i] = _
                     df = df.truncate(after=_i)
                     df.to_csv(pred_csv, index=False)
@@ -368,18 +368,17 @@ def get_dcmdir_name(ml, proj_path, an):
                 break
         return dcmdir_name, f
     elif ml == "elvos":
-        subdirs = get_subdirectories("{}/data/{}_process".format(proj_path, an))
+        subdirs = get_all_subdirectories("{}/data/{}_process".format(proj_path, an))
         for fn in subdirs:
-            if folder_count(fn)[-1] > 1:
-                dcmdir_name = [f.path for f in os.scandir(fn) if f.is_dir()]
+            if folder_count(fn) > 1:
+                dcmdir_name = get_subdirectories(fn)
                 break
 
     return dcmdir_name
 
 
-# def get_immediate_subdirectories(a_dir):
-#     return [name for name in os.listdir(a_dir)
-#             if os.path.isdir(os.path.join(a_dir, name))]
+def get_all_subdirectories(a_dir):
+    return [_[0] for _ in os.walk(a_dir)]
 
 
 def get_subdirectories(a_dir):
@@ -387,11 +386,7 @@ def get_subdirectories(a_dir):
 
 
 def folder_count(a_dir):
-    files = folders = 0
-    for _, dirnames, filenames in os.walk(a_dir):
-        files += len(filenames)
-        folders += len(dirnames)
-    return files, folders
+    return len([f for f in os.scandir(a_dir) if f.is_dir()])
 
 
 def get_2dslice_from_dicom(dcmfile):
