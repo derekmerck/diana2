@@ -88,8 +88,8 @@ def extend(ctx,
                     accession_nums = [f.read().strip()]
                 os.remove("{}/{}_slack_an.txt".format(proj_path, ml))
 
-            # FOR TESTING PURPOSES: manual injection of accession #
-            accession_nums = []
+            # FOR TESTING PURPOSES: manual injection of accession #. MUST COMMENT OUT AFTERWARDS
+            # accession_nums = []
 
             if os.path.isfile("{}/{}.studies.txt".format(proj_path, ml)):
                 os.remove("{}/{}.studies.txt".format(proj_path, ml))
@@ -331,10 +331,11 @@ def parse_results(json_lines, proj_path, ml):
 
         if ml == "elvos" and (study_desc not in ELVO_STUDY_DESCRIPTIONS):
             continue
-        elif ml == "elvos" and (series_desc in ELVO_SERIES_DESCRIPTIONS):
-            print("Found ELVO study...")
+        # elif ml == "elvos" and (series_desc in ELVO_SERIES_DESCRIPTIONS):
+        #     print("Found ELVO study...")
         elif ml == "elvos":
-            continue
+            print("Found ELVO study...")
+            # continue
 
         with open("{}/{}.studies.txt".format(proj_path, ml), 'a+') as f:
             if entry['AccessionNumber'] in accession_nums:
