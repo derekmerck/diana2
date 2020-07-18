@@ -26,6 +26,8 @@ from diana.utils.dicom import dicom_date
 logging.basicConfig(filename='/opt/diana/debug.log', level=logging.DEBUG)
 
 # Globals
+BA_STUDY_DESCRIPTIONS = [""]
+
 ICH_STUDY_DESCRIPTIONS = ["ct brain wo iv contrast", "ct brain c-spine wo iv contrast", "ct brain face wo iv contrast",
                           "ct brain face c-spine wo iv contrast", "ct brain acute stroke", "ct panscan w iv contrast",
                           "ct panscan with cta neck w iv contrast", "ct panscan face and cta neck w iv contrast", "cta elvo head and neck",
@@ -74,20 +76,23 @@ def extend(ctx,
         if not os.path.isfile("{}/{}_scores.txt".format(proj_path, ml)):
             open("{}/{}_scores.txt".format(proj_path, ml), 'a').close()
 
-        clear_counter = 0
         while True:
             with open('/opt/diana/debug.log', 'w'):
                 pass
-            print("diana-cli ofind -q \"{{\'StudyDescription\': \'cta elvo head and neck\', \'StudyDate\':\'{}\' }} -d radarch sticky_bridge > {}/q_results.json".format(dicom_date(datetime.now()), proj_path))
-            ofind_result = subprocess.Popen("diana-cli ofind -q \"{{\'StudyDescription\': \'cta elvo head and neck\', \'StudyDate\':\'{}\'}}\" -d radarch sticky_bridge > {}/q_results.json".format(dicom_date(datetime.now()), proj_path), shell=True, stdout=subprocess.PIPE).stdout.read()
-            # time.sleep(3)  # give json time to finish writing
-            # while not os.path.isfile("{}/q_results.json".format(proj_path)):
-            #     time.sleep(3)
-            #     logging.debug("Slept while waiting for json to finish writing")
+
+            ML_STUDY_DESCRIPTIONS = ""
+            if ml == "bone_age":
+                ML_STUDY_DESCRIPTIONS = BA_STUDY_DESCRIPTIONS
+            elif ml == "brain_bleed":
+                ML_STUDY_DESCRIPTIONS = ICH_STUDY_DESCRIPTIONS
+            elif ml == "elvos":
+                ML_STUDY_DESCRIPTIONS = ELVO_STUDY_DESCRIPTIONS
+
+            accession_nums = []
+            for st_d in ML_STUDY_DESCRIPTIONS:
+                ofind_result = subprocess.Popen("diana-cli ofind -l series -q \"{{\'StudyDescription\': \'cta elvo head and neck\', \'StudyDate\':\'{}\'}}\" -d radarch sticky_bridge".format(dicom_date(datetime.now())), shell=True, stdout=subprocess.PIPE).stdout.read()
+                accession_nums.append(parse_results(ofind_result, proj_path, ml))
             print("Query {}".format(datetime.now()))
-            # with open("{}/q_results.json".format(proj_path), 'r') as data_file:
-            #     accession_nums = parse_results(data_file, proj_path, ml)
-            accession_nums = parse_results(ofind_result, proj_path, ml)
 
             if os.path.isfile("{}/{}_slack_an.txt".format(proj_path, ml)):
                 with open("{}/{}_slack_an.txt".format(proj_path, ml)) as f:
@@ -104,12 +109,8 @@ def extend(ctx,
                     f.write(str(an) + "\n")
 
             if len(accession_nums) == 0:
-                clear_counter += 1
-                if clear_counter > 1200:
-                    open("{}/q_results.json".format(proj_path), 'w').close()
-                    clear_counter = 0
+                time.sleep(60)
                 continue
-            os.remove("{}/q_results.json".format(proj_path))
 
             if os.path.isfile("{}/{}.key.csv".format(proj_path, ml)):
                 os.remove("{}/{}.key.csv".format(proj_path, ml))
