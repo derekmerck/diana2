@@ -227,7 +227,10 @@ def extend(ctx,
                     preds = []
                     for _ in series_pred['y_pred']:
                         if _ is not None:
-                            preds.append(_[0][0])
+                            if len(_[0]) > 1:
+                                preds.append(_[0][0])
+                            else:
+                                preds.append(_[0])
                     test_csv = "{}/src/test.csv".format(proj_path)
                     df = pd.read_csv(test_csv)
                     df.at[0, "series"] = "{}/src/CT-npy/CT.npy".format(proj_path)
