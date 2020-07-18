@@ -20,7 +20,8 @@ from diana.utils.endpoint import Serializable
 from diana.utils.dicom import DicomLevel
 from diana.dixel import Dixel, DixelView
 from diana.utils.gateways.exceptions import GatewayConnectionError
-from diana.apis import DcmDir, Orthanc
+from diana.apis import DcmDir
+from diana.utils.dicom import dicom_date
 logging.basicConfig(filename='/opt/diana/debug.log', level=logging.DEBUG)
 
 # Globals
@@ -65,9 +66,10 @@ def extend(ctx,
         p_slack_rtm = subprocess.Popen("python /opt/diana/package/diana/daemons/slack_rtm.py {} {}".format(proj_path, ml), shell=True, stdout=subprocess.PIPE)
         sub_processes.append(p_slack_rtm)
 
-        rt = "write_series_AI"
-        p_watch = subprocess.Popen("diana-cli watch -r {} radarch None {}".format(rt, proj_path), shell=True, stdout=subprocess.PIPE)
-        sub_processes.append(p_watch)
+        # rt = "write_series_AI"
+        # p_watch = subprocess.Popen("diana-cli watch -r {} radarch None {}".format(rt, proj_path), shell=True, stdout=subprocess.PIPE)
+        # sub_processes.append(p_watch)
+
         if not os.path.isfile("{}/{}_scores.txt".format(proj_path, ml)):
             open("{}/{}_scores.txt".format(proj_path, ml), 'a').close()
 
@@ -75,6 +77,9 @@ def extend(ctx,
         while True:
             with open('/opt/diana/debug.log', 'w'):
                 pass
+            print("diana-cli ofind -q \"{{\'StudyDescription\': \'cta elvo head and neck\', \'StudyDate\':\'{}\' }} -d radarch sticky_bridge > {}/q_results.json".format(dicom_date(datetime.now()), proj_path))
+            p_watch = subprocess.Popen("diana-cli ofind -q \"{{\'StudyDescription\': \'cta elvo head and neck\', \'StudyDate\':\'{}\' }} -d radarch sticky_bridge > {}/q_results.json".format(dicom_date(datetime.now()), proj_path), shell=True, stdout=subprocess.PIPE)
+            sub_processes.append(p_watch)
             time.sleep(3)  # give json time to finish writing
             while not os.path.isfile("{}/q_results.json".format(proj_path)):
                 time.sleep(3)
