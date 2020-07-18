@@ -90,8 +90,8 @@ def extend(ctx,
 
             accession_nums = []
             for st_d in ML_STUDY_DESCRIPTIONS:
-                ofind_result = subprocess.Popen("diana-cli ofind -l series -q \"{{\'StudyDescription\': \'cta elvo head and neck\', \'StudyDate\':\'{}\'}}\" -d radarch sticky_bridge".format(dicom_date(datetime.now())), shell=True, stdout=subprocess.PIPE).stdout.read()
-                accession_nums.append(parse_results(ofind_result, proj_path, ml))
+                ofind_result = subprocess.Popen("diana-cli ofind -l series -q \"{{\'StudyDescription\': \'{}\', \'StudyDate\':\'{}\'}}\" -d radarch sticky_bridge".format(st_d, dicom_date(datetime.now())), shell=True, stdout=subprocess.PIPE).stdout.read()
+                accession_nums.extend(parse_results(ofind_result, proj_path, ml))
             print("Query {}".format(datetime.now()))
 
             if os.path.isfile("{}/{}_slack_an.txt".format(proj_path, ml)):
