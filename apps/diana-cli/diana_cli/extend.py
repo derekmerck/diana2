@@ -1,6 +1,7 @@
 import ast
 import click
 from datetime import datetime
+import json
 import os
 import glob
 import numpy as np
@@ -20,7 +21,7 @@ from diana.utils.endpoint import Serializable
 from diana.utils.dicom import DicomLevel
 from diana.dixel import Dixel, DixelView
 from diana.utils.gateways.exceptions import GatewayConnectionError
-from diana.apis import DcmDir
+from diana.apis import DcmDir, Orthanc
 from diana.utils.dicom import dicom_date
 logging.basicConfig(filename='/opt/diana/debug.log', level=logging.DEBUG)
 
@@ -78,15 +79,15 @@ def extend(ctx,
             with open('/opt/diana/debug.log', 'w'):
                 pass
             print("diana-cli ofind -q \"{{\'StudyDescription\': \'cta elvo head and neck\', \'StudyDate\':\'{}\' }} -d radarch sticky_bridge > {}/q_results.json".format(dicom_date(datetime.now()), proj_path))
-            p_watch = subprocess.Popen("diana-cli ofind -q \"{{\'StudyDescription\': \'cta elvo head and neck\', \'StudyDate\':\'{}\' }} -d radarch sticky_bridge > {}/q_results.json".format(dicom_date(datetime.now()), proj_path), shell=True, stdout=subprocess.PIPE)
-            sub_processes.append(p_watch)
-            time.sleep(3)  # give json time to finish writing
-            while not os.path.isfile("{}/q_results.json".format(proj_path)):
-                time.sleep(3)
-                logging.debug("Slept while waiting for json to finish writing")
+            ofind_result = subprocess.Popen("diana-cli ofind -q \"{{\'StudyDescription\': \'cta elvo head and neck\', \'StudyDate\':\'{}\'}}\" -d radarch sticky_bridge > {}/q_results.json".format(dicom_date(datetime.now()), proj_path), shell=True, stdout=subprocess.PIPE).stdout.read()
+            # time.sleep(3)  # give json time to finish writing
+            # while not os.path.isfile("{}/q_results.json".format(proj_path)):
+            #     time.sleep(3)
+            #     logging.debug("Slept while waiting for json to finish writing")
             print("Query {}".format(datetime.now()))
-            with open("{}/q_results.json".format(proj_path), 'r') as data_file:
-                accession_nums = parse_results(data_file, proj_path, ml)
+            # with open("{}/q_results.json".format(proj_path), 'r') as data_file:
+            #     accession_nums = parse_results(data_file, proj_path, ml)
+            accession_nums = parse_results(ofind_result, proj_path, ml)
 
             if os.path.isfile("{}/{}_slack_an.txt".format(proj_path, ml)):
                 with open("{}/{}_slack_an.txt".format(proj_path, ml)) as f:
@@ -317,10 +318,13 @@ def extend(ctx,
 
 def parse_results(json_lines, proj_path, ml):
     accession_nums = []
-    for line in json_lines:
-        entry = ast.literal_eval(line)
+    json_lines = json.loads(json_lines.decode("utf-8")[13:-1].replace('\'', '\"').replace('\n', ''))
+    for entry in json_lines:
         study_desc = entry['StudyDescription'].lower()
-        series_desc = entry['SeriesDescription'].lower()
+        try:
+            series_desc = entry['SeriesDescription'].lower()
+        except KeyError:
+            pass
 
         if ml == "bone_age" and ('x-ray' not in study_desc or 'bone' not in study_desc or 'age' not in study_desc):
             continue
