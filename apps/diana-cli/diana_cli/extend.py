@@ -1,4 +1,4 @@
-import ast
+# import ast
 import click
 from datetime import datetime
 import json
@@ -9,7 +9,7 @@ import pandas as pd
 import pickle
 import pydicom
 import shutil
-import signal
+# import signal
 import slack
 import subprocess
 import time
@@ -87,10 +87,15 @@ def extend(ctx,
                 ML_STUDY_DESCRIPTIONS = ICH_STUDY_DESCRIPTIONS
             elif ml == "elvos":
                 ML_STUDY_DESCRIPTIONS = ELVO_STUDY_DESCRIPTIONS
+            else:
+                raise NotImplementedError
 
             accession_nums = []
             for st_d in ML_STUDY_DESCRIPTIONS:
-                ofind_result = subprocess.Popen("diana-cli ofind -l series -q \"{{\'StudyDescription\': \'{}\', \'StudyDate\':\'{}\'}}\" -d radarch sticky_bridge".format(st_d, dicom_date(datetime.now())), shell=True, stdout=subprocess.PIPE).stdout.read()
+                if ml == "bone_age" or ml == "elvos":
+                    ofind_result = subprocess.Popen("diana-cli ofind -l series -q \"{{\'StudyDescription\': \'{}\', \'StudyDate\':\'{}\'}}\" -d radarch sticky_bridge".format(st_d, dicom_date(datetime.now())), shell=True, stdout=subprocess.PIPE).stdout.read()
+                elif ml == "brain_bleed":
+                    ofind_result = subprocess.Popen("diana-cli ofind -l series -q \"{{\'StudyDescription\': \'{}\', \'StudyDate\':\'{}\', \'SeriesDescription\': \'\'}}\" -d radarch sticky_bridge".format(st_d, dicom_date(datetime.now())), shell=True, stdout=subprocess.PIPE).stdout.read()
                 accession_nums.extend(parse_results(ofind_result, proj_path, ml))
             print("Query {}".format(datetime.now()))
 
@@ -305,18 +310,17 @@ def extend(ctx,
             print("Key Error: {}".format(e))
         elif type(e) is AssertionError:
             print("Slack Error: {}".format(e))
+        elif type(e) is KeyboardInterrupt:
+            print("Exiting...")
         else:
             print("Some error: {}".format(e))
 
         try:
             for _ in sub_processes:
-                os.killpg(os.getpgid(_.pid), signal.SIGTERM)
-            # p_slack_rtm.send_signal(signal.SIGTERM)
-            # p_watch.send_signal(signal.SIGTERM)
-            # p_collect.send_signal(signal.SIGTERM)
-            # p_predict.send_signal(signal.SIGTERM)
+                _.kill()
+                # os.killpg(os.getpgid(_.pid), signal.SIGTERM)
         except UnboundLocalError:
-            print("UnboundLocalError on sending SIGTERM signals")  # TODO: address
+            print("UnboundLocalError on exit clean-up")  # TODO: address
             pass
 
 
@@ -325,10 +329,8 @@ def parse_results(json_lines, proj_path, ml):
     json_lines = json.loads(json_lines.decode("utf-8")[13:-1].replace('\'', '\"').replace('\n', ''))
     for entry in json_lines:
         study_desc = entry['StudyDescription'].lower()
-        try:
+        if ml == "brain_bleed":
             series_desc = entry['SeriesDescription'].lower()
-        except KeyError:
-            pass
 
         if ml == "bone_age" and ('x-ray' not in study_desc or 'bone' not in study_desc or 'age' not in study_desc):
             continue
