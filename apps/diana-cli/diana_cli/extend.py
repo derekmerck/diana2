@@ -122,10 +122,10 @@ def extend(ctx,
                     f.write(str(an) + "\n")
 
             if len(accession_nums) == 0:
-                time.sleep(60)
                 if ml == "ablation":
                     print("No ablations found...waiting 24 hrs")
                     time.sleep(86340)
+                time.sleep(60)
                 continue
 
             if os.path.isfile("{}/{}.key.csv".format(proj_path, ml)):
@@ -279,14 +279,11 @@ def extend(ctx,
                     with open("{}/{}_scores.txt".format(proj_path, ml), "a+") as f:     # none, chronic, acute
                         f.write("{}, {}, {}, {}, {}\n".format(an, str(datetime.now()), probs[0], probs[1], probs[2]))
                 elif ml == "ablation":
-                    mfind_result = subprocess.Popen('diana-cli mfind -j -a "{}" "montage" > /ablation/test.json'.format(an), shell=True, cwd=proj_path, stdout=subprocess.PIPE).stdout.read()
                     mfind_result = subprocess.Popen('diana-cli mfind -j -a "{}" "montage"'.format(an), shell=True, cwd=proj_path, stdout=subprocess.PIPE).stdout.read()
-                    mfind_results = json.loads(mfind_result.decode("utf-8")[13:-1].replace('\'', '\"').replace('\n', ''))
+                    mfind_results = json.loads(mfind_result.decode("utf-8")[12:])
                     for i, entry in enumerate(mfind_results):
                         record_i = Dixel.from_montage_json(entry)
                         record_i.report.anonymize()
-
-                    # dump to separate records directory?
                     record_i.to_csv("{}/reports/{}.csv".format(proj_path, an))
                 else:
                     raise NotImplementedError
@@ -320,7 +317,8 @@ def extend(ctx,
                             "ELVO result: {} - {}%".format(result, probs[2])
                         )
                         assert(sl_fiup_response["ok"])
-                shutil.rmtree("{}/data/{}_process".format(proj_path, an))
+                if ml != "ablation":
+                    shutil.rmtree("{}/data/{}_process".format(proj_path, an))
 
             # p_watch.terminate() # WARNING: this may create many many Docker container archives along w/ subsequent re-Popen...
             time.sleep(1)
