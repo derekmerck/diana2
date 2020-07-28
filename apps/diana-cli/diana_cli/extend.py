@@ -1,6 +1,6 @@
 # import ast
 import click
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 import os
 import glob
@@ -26,7 +26,7 @@ from diana.utils.dicom import dicom_date
 logging.basicConfig(filename='/opt/diana/debug.log', level=logging.DEBUG)
 
 # Globals
-BA_STUDY_DESCRIPTIONS = [""]
+BA_STUDY_DESCRIPTIONS = ["x-ray for bone age study"]
 
 ICH_STUDY_DESCRIPTIONS = ["ct brain wo iv contrast", "ct brain c-spine wo iv contrast", "ct brain face wo iv contrast",
                           "ct brain face c-spine wo iv contrast", "ct brain acute stroke", "ct panscan w iv contrast",
@@ -39,6 +39,8 @@ ICH_THRESHOLD = 57.6
 ELVO_STUDY_DESCRIPTIONS = ["cta elvo head and neck", "ct elvo w panscan", "ct elvo w dissection",
                            "ct elvo w panscan and cta aorta bilat runoff", "ct elvo w c spine"]
 ELVO_SERIES_DESCRIPTIONS = [""]
+
+ABL_STUDY_DESCRIPTIONS = ["ct rf ablation renal", "ct ablation abdomen w wo iv contrast follow up"]
 
 
 @click.command(short_help="Extend images to an AI analytics package")
@@ -87,13 +89,19 @@ def extend(ctx,
                 ML_STUDY_DESCRIPTIONS = ICH_STUDY_DESCRIPTIONS
             elif ml == "elvos":
                 ML_STUDY_DESCRIPTIONS = ELVO_STUDY_DESCRIPTIONS
+            elif ml == "ablation":
+                ML_STUDY_DESCRIPTIONS = ABL_STUDY_DESCRIPTIONS
             else:
                 raise NotImplementedError
 
             accession_nums = []
             for st_d in ML_STUDY_DESCRIPTIONS:
-                if ml == "bone_age" or ml == "elvos":
-                    ofind_result = subprocess.Popen("diana-cli ofind -l series -q \"{{\'StudyDescription\': \'{}\', \'StudyDate\':\'{}\'}}\" -d radarch sticky_bridge".format(st_d, dicom_date(datetime.now())), shell=True, stdout=subprocess.PIPE).stdout.read()
+                if ml == "bone_age" or ml == "elvos" or ml == "ablation":
+                    if ml == "ablation":
+                        dtn = dicom_date(datetime.today() - timedelta(days=2))
+                    else:
+                        dtn = dicom_date(datetime.now())
+                    ofind_result = subprocess.Popen("diana-cli ofind -l series -q \"{{\'StudyDescription\': \'{}\', \'StudyDate\':\'{}\'}}\" -d radarch sticky_bridge".format(st_d, dtn), shell=True, stdout=subprocess.PIPE).stdout.read()
                 elif ml == "brain_bleed":
                     ofind_result = subprocess.Popen("diana-cli ofind -l series -q \"{{\'StudyDescription\': \'{}\', \'StudyDate\':\'{}\', \'SeriesDescription\': \'\'}}\" -d radarch sticky_bridge".format(st_d, dicom_date(datetime.now())), shell=True, stdout=subprocess.PIPE).stdout.read()
                 accession_nums.extend(parse_results(ofind_result, proj_path, ml))
@@ -115,12 +123,15 @@ def extend(ctx,
 
             if len(accession_nums) == 0:
                 time.sleep(60)
+                if ml == "ablation":
+                    print("No ablations found...waiting 24 hrs")
+                    time.sleep(86340)
                 continue
 
             if os.path.isfile("{}/{}.key.csv".format(proj_path, ml)):
                 os.remove("{}/{}.key.csv".format(proj_path, ml))
 
-            if ml == "bone_age" or ml == "elvos":
+            if ml == "bone_age" or ml == "elvos" or ml == "ablation":
                 p_collect = subprocess.Popen("diana-cli collect {} {} sticky_bridge radarch".format(ml, proj_path), shell=True)
                 p_collect.wait()
                 time.sleep(10)
@@ -168,11 +179,12 @@ def extend(ctx,
                             logging.error("Failed to delete dixel")
                             logging.error(e)
 
-                if not os.path.isdir("{}/data/{}_process".format(proj_path, an)):
-                    os.rename("{}/data/{}".format(proj_path, an), "{}/data/{}.zip".format(proj_path, an))
-                    with zipfile.ZipFile("{}/data/{}.zip".format(proj_path, an), 'r') as zip_ref:
-                        zip_ref.extractall("{}/data/{}_process".format(proj_path, an))
-                    os.remove("{}/data/{}.zip".format(proj_path, an))
+                if ml != "ablation":
+                    if not os.path.isdir("{}/data/{}_process".format(proj_path, an)):
+                        os.rename("{}/data/{}".format(proj_path, an), "{}/data/{}.zip".format(proj_path, an))
+                        with zipfile.ZipFile("{}/data/{}.zip".format(proj_path, an), 'r') as zip_ref:
+                            zip_ref.extractall("{}/data/{}_process".format(proj_path, an))
+                        os.remove("{}/data/{}.zip".format(proj_path, an))
 
                 dcmdir_name = None
                 dcmdir_name = get_dcmdir_name(ml, proj_path, an)
@@ -266,6 +278,16 @@ def extend(ctx,
 
                     with open("{}/{}_scores.txt".format(proj_path, ml), "a+") as f:     # none, chronic, acute
                         f.write("{}, {}, {}, {}, {}\n".format(an, str(datetime.now()), probs[0], probs[1], probs[2]))
+                elif ml == "ablation":
+                    mfind_result = subprocess.Popen('diana-cli mfind -j -a "{}" "montage" > /ablation/test.json'.format(an), shell=True, cwd=proj_path, stdout=subprocess.PIPE).stdout.read()
+                    mfind_result = subprocess.Popen('diana-cli mfind -j -a "{}" "montage"'.format(an), shell=True, cwd=proj_path, stdout=subprocess.PIPE).stdout.read()
+                    mfind_results = json.loads(mfind_result.decode("utf-8")[13:-1].replace('\'', '\"').replace('\n', ''))
+                    for i, entry in enumerate(mfind_results):
+                        record_i = Dixel.from_montage_json(entry)
+                        record_i.report.anonymize()
+
+                    # dump to separate records directory?
+                    record_i.to_csv("{}/reports/{}.csv".format(proj_path, an))
                 else:
                     raise NotImplementedError
 
@@ -332,7 +354,7 @@ def parse_results(json_lines, proj_path, ml):
         if ml == "brain_bleed":
             series_desc = entry['SeriesDescription'].lower()
 
-        if ml == "bone_age" and ('x-ray' not in study_desc or 'bone' not in study_desc or 'age' not in study_desc):
+        if ml == "bone_age" and (study_desc not in BA_STUDY_DESCRIPTIONS):
             continue
         elif ml == "bone_age":
             print("Found X-Ray for Bone Age Study...")
@@ -350,7 +372,11 @@ def parse_results(json_lines, proj_path, ml):
         #     print("Found ELVO study...")
         elif ml == "elvos":
             print("Found ELVO study...")
-            # continue
+
+        if ml == "ablation" (study_desc not in ABL_STUDY_DESCRIPTIONS):
+            continue
+        elif ml == "ablation":
+            print("Found renal ablation study...")
 
         with open("{}/{}.studies.txt".format(proj_path, ml), 'a+') as f:
             if entry['AccessionNumber'] in accession_nums:
@@ -388,6 +414,8 @@ def get_dcmdir_name(ml, proj_path, an):
             if folder_count(fn) > 1:
                 dcmdir_name = get_subdirectories(fn)
                 break
+    elif ml == "ablation":
+        dcmdir_name = "N/A"
 
     return dcmdir_name
 
