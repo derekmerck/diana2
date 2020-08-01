@@ -372,7 +372,7 @@ def parse_results(json_lines, proj_path, ml):
         elif ml == "elvos":
             print("Found ELVO study...")
 
-        if ml == "ablation" (study_desc not in ABL_STUDY_DESCRIPTIONS):
+        if ml == "ablation" and (study_desc not in ABL_STUDY_DESCRIPTIONS):
             continue
         elif ml == "ablation":
             print("Found renal ablation study...")
