@@ -68,7 +68,7 @@ def extend(ctx,
         ba_channels = ["CM2BV81DX", "CLHKN3W3V"]
         bb_channels = ["GP57V327Q", "GPJ16UN07"]
         el_channels = ["G016ZT9TZTL"]  # , "G016T5RLR9C"]
-        p_slack_rtm = subprocess.Popen("python /opt/diana/package/diana/daemons/slack_rtm.py {} {}".format(proj_path, ml), shell=True, stdout=subprocess.PIPE)
+        p_slack_rtm = subprocess.Popen("python3 /opt/diana/package/diana/daemons/slack_rtm.py {} {}".format(proj_path, ml), shell=True, stdout=subprocess.PIPE)
         sub_processes.append(p_slack_rtm)
 
         # rt = "write_series_AI"
@@ -309,10 +309,11 @@ def extend(ctx,
                         )
                         assert(sl_fiup_response["ok"])
                 elif ml == "elvos":
+                    el_thumb = "{}/ok.png".format(proj_path) if result == "No acute ELVO" else "{}/notok.jpg".format(proj_path)
                     for channel in el_channels:
                         sl_fiup_response = sl_bot_client.files_upload(
                             channels=channel,  # WARNING: check param spelling in updates
-                            file="/opt/diana/el_thumb.txt",
+                            file=el_thumb,
                             initial_comment="Accession Number: {},\n".format("XXXX" + an[-4:]) +
                             "ELVO result: {} - {}%".format(result, probs[2])
                         )
