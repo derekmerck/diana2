@@ -124,8 +124,8 @@ def extend(ctx,
             if len(accession_nums) == 0:
                 if ml == "ablation":
                     print("No ablations found...waiting 24 hrs")
-                    time.sleep(86340)
-                time.sleep(60)
+                    time.sleep(86370)
+                time.sleep(30)
                 continue
 
             if os.path.isfile("{}/{}.key.csv".format(proj_path, ml)):
@@ -285,6 +285,8 @@ def extend(ctx,
                         record_i = Dixel.from_montage_json(entry)
                         record_i.report.anonymize()
                     record_i.to_csv("{}/reports/{}.csv".format(proj_path, an))
+                    with open("{}/{}_scores.txt".format(proj_path, ml), "a+") as f:
+                        f.write("{}, {}\n".format(an, str(datetime.now())))
                 else:
                     raise NotImplementedError
 
