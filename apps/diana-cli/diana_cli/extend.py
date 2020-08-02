@@ -42,7 +42,7 @@ ELVO_SERIES_DESCRIPTIONS = [""]
 
 ABL_STUDY_DESCRIPTIONS = ["ct rf ablation renal", "ct ablation abdomen w wo iv contrast follow up"]
 
-COVID_STUDY_DESCRIPTIONS = ["x-ray chest 1 view ap or pa"]
+COVID_STUDY_DESCRIPTIONS = ["x-ray chest 1 view ap or pa"]  # x-ray chest pa and lateral
 
 
 @click.command(short_help="Extend images to an AI analytics package")
@@ -293,7 +293,7 @@ def extend(ctx,
                     with open("{}/{}_scores.txt".format(proj_path, ml), "a+") as f:
                         f.write("{}, {}\n".format(an, str(datetime.now())))
                 elif ml == "covid":
-                    p_covid = subprocess.Popen("python3 run.py {} --threshold=0.3816".format(dcmdir_name), shell=True, cwd="{}/BinaryCOVIDModel".format(proj_path))
+                    p_covid = subprocess.Popen("python3 run.py '{}' --threshold=0.3816".format(dcmdir_name), shell=True, cwd="{}/BinaryCOVIDModel".format(proj_path))
                     p_covid.wait()
 
                     with open("/opt/diana/output.txt") as f:
