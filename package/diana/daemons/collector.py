@@ -175,7 +175,23 @@ class Collector(object):
             if anonymize:
                 try:
                     if custom_anon:
-                        replacement_map = ShamDixel.orthanc_anon_map(d)
+                        replacement_map = ShamDixel.orthanc_sham_map(d)
+
+                        try:
+                            with open("/opt/diana/pid.txt") as f:
+                                line = f.read().split(",")
+                                pid = line[0]
+                                study_id = line[1]
+
+                            replacement_map["Replace"]["PatientName"] = pid
+                            replacement_map["Replace"]["PatientID"] = pid
+                            replacement_map["Replace"]["StudyID"] = study_id
+                            replacement_map["Replace"].pop('PatientBirthDate', None)
+                            replacement_map["Replace"].pop('StudyDate', None)
+                            replacement_map["Replace"].pop('StudyTime', None)
+                        except FileNotFoundError:
+                            replacement_map = ShamDixel.orthanc_anon_map(d)
+                            pass
                     else:
                         replacement_map = ShamDixel.orthanc_sham_map(d)
 
