@@ -407,7 +407,7 @@ def parse_results(json_lines, proj_path, ml):
 
 def get_dcmdir_name(ml, proj_path, an):
     dcmdir_name = None
-    if ml == "bone_age" or ml == "covid":
+    if ml == "bone_age":
         subdirs = get_subdirectories("{}/data/{}_process".format(proj_path, an))
         for fn in subdirs:
             if "{}".format(an) in fn:
@@ -429,6 +429,9 @@ def get_dcmdir_name(ml, proj_path, an):
                 break
     elif ml == "ablation":
         dcmdir_name = "N/A"
+    elif ml == "covid":
+        files = [f for f in glob.glob("{}/data/{}_process/".format(proj_path, an) + "**/*.dcm", recursive=True)]
+        dcmdir_name = files[0]
 
     return dcmdir_name
 
