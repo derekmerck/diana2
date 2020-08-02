@@ -7,6 +7,7 @@ from diana.utils.gateways import suppress_urllib_debug
 from diana.utils.endpoint import suppress_watcher_debug
 from diana import __version__ as diana_version
 
+from .anonymize import anonymize
 from .check import check
 from .collect import collect
 from .collect2 import collect2
@@ -78,6 +79,7 @@ def cli(ctx, verbose, services, services_path):
 
 
 cmds = [
+    anonymize,
     check,
     collect,
     collect2,
