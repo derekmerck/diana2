@@ -42,7 +42,7 @@ ELVO_SERIES_DESCRIPTIONS = [""]
 
 ABL_STUDY_DESCRIPTIONS = ["ct rf ablation renal", "ct ablation abdomen w wo iv contrast follow up"]
 
-COVID_STUDY_DESCRIPTIONS = ["x-ray chest 1 vw ap or pa"]
+COVID_STUDY_DESCRIPTIONS = ["x-ray chest 1 view ap or pa"]
 
 
 @click.command(short_help="Extend images to an AI analytics package")
