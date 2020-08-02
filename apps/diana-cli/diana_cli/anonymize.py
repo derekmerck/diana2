@@ -1,24 +1,16 @@
 import click
 from datetime import datetime, timedelta
-import json
 import os
 import glob
 from hashlib import md5
 from math import isnan
-import numpy as np
 import pandas as pd
-import pydicom
 import shutil
 import subprocess
 import time
 import zipfile
 
-# Selective querying
 import logging
-from diana.utils.endpoint import Serializable
-from diana.utils.dicom import DicomLevel
-from diana.dixel import Dixel, DixelView
-from diana.apis import DcmDir, Orthanc
 logging.basicConfig(filename='/opt/diana/debug.log', level=logging.DEBUG)
 
 
@@ -34,7 +26,7 @@ def anonymize(ctx,
     """Examples:
     $ diana-cli anonymize /requests_dir /output_dir /temp_dir
     """
-    click.echo(click.style('Initializing anonymization pipeline...', underline=True, bold=True))
+    click.echo(click.style('Anonymization Pipeline Initialized', underline=True, bold=True))
     try:
         with open('/opt/diana/debug.log', 'w'):
             pass
@@ -43,6 +35,7 @@ def anonymize(ctx,
         while True:
             requests = glob.glob("{}/*.csv".format(req_path))
             if len(requests) == 0:
+                print("No new requests {}".format(datetime.now()))
                 time.sleep(15)
                 continue
 
@@ -51,7 +44,7 @@ def anonymize(ctx,
                 for i, pid in enumerate(patient_list["locr_patient_id"]):
                     accession_nums = []
                     for j in range(1, 11):
-                        an_j = patient_list['accession_num{}'.format(j)]
+                        an_j = patient_list['accession_num{}'.format(j)][i]
                         if not isnan(an_j):
                             accession_nums.append(an_j)
 
@@ -75,10 +68,10 @@ def anonymize(ctx,
 
                     if not os.path.isdir("{}/{}".format(out_path, pid)):
                         os.mkdir("{}/{}".format(out_path, pid))
-                    for an in accession_nums:
-                        an = md5("{}".format(an).encode('utf-8')).hexdigest()[:16]
+                    for an_pre in accession_nums:
+                        an = md5("{}".format(an_pre).encode('utf-8')).hexdigest()[:16]
                         if not os.path.isdir("{}/data/{}_process".format(tmp_path, an)):
-                            os.rename("{}/data/{}".format(tmp_path, an), "{}/data/{}.zip".format(tmp_path, an))
+                            # os.rename("{}/data/{}".format(tmp_path, an), "{}/data/{}.zip".format(tmp_path, an))
                             with zipfile.ZipFile("{}/data/{}.zip".format(tmp_path, an), 'r') as zip_ref:
                                 zip_ref.extractall("{}/data/{}_process".format(tmp_path, an))
                             os.remove("{}/data/{}.zip".format(tmp_path, an))
