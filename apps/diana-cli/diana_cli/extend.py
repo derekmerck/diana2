@@ -42,6 +42,8 @@ ELVO_SERIES_DESCRIPTIONS = [""]
 
 ABL_STUDY_DESCRIPTIONS = ["ct rf ablation renal", "ct ablation abdomen w wo iv contrast follow up"]
 
+COVID_STUDY_DESCRIPTIONS = ["x-ray chest 1 vw ap or pa"]
+
 
 @click.command(short_help="Extend images to an AI analytics package")
 @click.argument('proj_path', type=click.STRING)
@@ -67,7 +69,8 @@ def extend(ctx,
         sl_bot_client = slack.WebClient(token=os.environ['SLACK_BOT_TOKEN'])
         ba_channels = ["CM2BV81DX", "CLHKN3W3V"]
         bb_channels = ["GP57V327Q", "GPJ16UN07"]
-        el_channels = ["G016ZT9TZTL"]  # , "G016T5RLR9C"]
+        el_channels = ["G016ZT9TZTL", "G016T5RLR9C"]
+        cv_channels = ["G0183GKJ293"]
         p_slack_rtm = subprocess.Popen("python3 /opt/diana/package/diana/daemons/slack_rtm.py {} {}".format(proj_path, ml), shell=True, stdout=subprocess.PIPE)
         sub_processes.append(p_slack_rtm)
 
@@ -91,12 +94,14 @@ def extend(ctx,
                 ML_STUDY_DESCRIPTIONS = ELVO_STUDY_DESCRIPTIONS
             elif ml == "ablation":
                 ML_STUDY_DESCRIPTIONS = ABL_STUDY_DESCRIPTIONS
+            elif ml == "covid":
+                ML_STUDY_DESCRIPTIONS = COVID_STUDY_DESCRIPTIONS
             else:
                 raise NotImplementedError
 
             accession_nums = []
             for st_d in ML_STUDY_DESCRIPTIONS:
-                if ml == "bone_age" or ml == "elvos" or ml == "ablation":
+                if ml == "bone_age" or ml == "elvos" or ml == "ablation" or ml == "covid":
                     if ml == "ablation":
                         dtn = dicom_date(datetime.today() - timedelta(days=2))
                     else:
@@ -131,7 +136,7 @@ def extend(ctx,
             if os.path.isfile("{}/{}.key.csv".format(proj_path, ml)):
                 os.remove("{}/{}.key.csv".format(proj_path, ml))
 
-            if ml == "bone_age" or ml == "elvos" or ml == "ablation":
+            if ml == "bone_age" or ml == "elvos" or ml == "ablation" or ml == "covid":
                 p_collect = subprocess.Popen("diana-cli collect {} {} sticky_bridge radarch".format(ml, proj_path), shell=True)
                 p_collect.wait()
                 time.sleep(10)
@@ -287,40 +292,42 @@ def extend(ctx,
                     record_i.to_csv("{}/reports/{}.csv".format(proj_path, an))
                     with open("{}/{}_scores.txt".format(proj_path, ml), "a+") as f:
                         f.write("{}, {}\n".format(an, str(datetime.now())))
-                else:
-                    raise NotImplementedError
+                elif ml == "covid":
+                    p_covid = subprocess.Popen("python3 run.py {} --threshold=0.3816".format(dcmdir_name), shell=True, cwd="{}/BinaryCOVIDModel".format(proj_path))
+                    p_covid.wait()
+
+                    with open("/opt/diana/output.txt") as f:
+                        result = f.read()
+                    with open("{}/{}_scores.txt".format(proj_path, ml), "a+") as f:
+                        f.write("{}, {}, {}\n".format(an, str(datetime.now()), result))
 
                 if ml == "bone_age":
                     yrs = int(float(pred_bone_age) / 12)
                     months = round(float(pred_bone_age) % 12, 2)
-                    for channel in ba_channels:
-                        sl_fiup_response = sl_bot_client.files_upload(
-                            channels=channel,  # WARNING: check param spelling in updates
-                            file="/opt/diana/ba_thumb.png",
-                            initial_comment="Accession Number: {},\n".format("XXXX" + an[-4:]) +
-                                 "Bone Age Prediction: {} year(s) and {} month(s)".format(yrs, months)
-                        )
-                        assert(sl_fiup_response["ok"])
+                    thumb = "/opt/diana/ba_thumb.png"
+                    comment = "Accession Number: {},\n".format("XXXX" + an[-4:]) + "Bone Age Prediction: {} year(s) and {} month(s)".format(yrs, months)
+                    channels = ba_channels
                 elif ml == "brain_bleed":
-                    for channel in bb_channels:
-                        sl_fiup_response = sl_bot_client.files_upload(
-                            channels=channel,  # WARNING: check param spelling in updates
-                            file="/opt/diana/bb_thumb.png",
-                            initial_comment="Accession Number: {},\n".format("XXXX" + an[-4:]) +
-                            "ICH Prediction: {} - {}%".format(pred_brain_bleed[-1], pred_brain_bleed[0])
-                        )
-                        assert(sl_fiup_response["ok"])
+                    thumb = "/opt/diana/bb_thumb.png"
+                    channels = bb_channels
+                    comment = "Accession Number: {},\n".format("XXXX" + an[-4:]) + "ICH Prediction: {} - {}%".format(pred_brain_bleed[-1], pred_brain_bleed[0])
                 elif ml == "elvos":
-                    el_thumb = "{}/ok.png".format(proj_path) if result == "No acute ELVO" else "{}/notok.jpg".format(proj_path)
-                    for channel in el_channels:
+                    thumb = "{}/ok.png".format(proj_path) if result == "No acute ELVO" else "{}/notok.jpg".format(proj_path)
+                    channels = el_channels
+                    comment = "Accession Number: {},\n".format("XXXX" + an[-4:]) + "ELVO result: {} - {}%".format(result, probs[2])
+                elif ml == "covid":
+                    thumb = "/opt/diana/cxr.png"
+                    channels = cv_channels
+                    comment = "Accession Number: {},\n".format("XXXX" + an[-4:]) + result
+
+                if ml != "ablation":
+                    for channel in channels:
                         sl_fiup_response = sl_bot_client.files_upload(
                             channels=channel,  # WARNING: check param spelling in updates
-                            file=el_thumb,
-                            initial_comment="Accession Number: {},\n".format("XXXX" + an[-4:]) +
-                            "ELVO result: {} - {}%".format(result, probs[2])
+                            file=thumb,
+                            initial_comment=comment
                         )
                         assert(sl_fiup_response["ok"])
-                if ml != "ablation":
                     shutil.rmtree("{}/data/{}_process".format(proj_path, an))
 
             # p_watch.terminate() # WARNING: this may create many many Docker container archives along w/ subsequent re-Popen...
@@ -379,6 +386,11 @@ def parse_results(json_lines, proj_path, ml):
         elif ml == "ablation":
             print("Found renal ablation study...")
 
+        elif ml == "covid" and (study_desc not in COVID_STUDY_DESCRIPTIONS):
+            continue
+        elif ml == "covid":
+            print("Found CXR...")
+
         with open("{}/{}.studies.txt".format(proj_path, ml), 'a+') as f:
             if entry['AccessionNumber'] in accession_nums:
                 print("...duplicate a/n")
@@ -395,7 +407,7 @@ def parse_results(json_lines, proj_path, ml):
 
 def get_dcmdir_name(ml, proj_path, an):
     dcmdir_name = None
-    if ml == "bone_age":
+    if ml == "bone_age" or ml == "covid":
         subdirs = get_subdirectories("{}/data/{}_process".format(proj_path, an))
         for fn in subdirs:
             if "{}".format(an) in fn:
