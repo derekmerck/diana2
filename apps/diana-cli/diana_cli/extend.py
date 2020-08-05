@@ -43,6 +43,7 @@ ELVO_SERIES_DESCRIPTIONS = [""]
 ABL_STUDY_DESCRIPTIONS = ["ct rf ablation renal", "ct ablation abdomen w wo iv contrast follow up"]
 
 COVID_STUDY_DESCRIPTIONS = ["x-ray chest 1 view ap or pa"]  # x-ray chest pa and lateral
+COVID_STATION_NAMES = ["ed cc rm 1", "ed cc rm 2", "ed cc rm 3", "ed cc rm 4", "ed cc rm 5", "ed cc rm 6", "edrad rm 7", "xp1028101323113"]
 
 
 @click.command(short_help="Extend images to an AI analytics package")
@@ -293,6 +294,16 @@ def extend(ctx,
                     with open("{}/{}_scores.txt".format(proj_path, ml), "a+") as f:
                         f.write("{}, {}\n".format(an, str(datetime.now())))
                 elif ml == "covid":
+                    s = pydicom.dcmread(dcmdir_name)
+                    try:
+                        assert(s.StationName.lower() in COVID_STATION_NAMES)
+                    except (AttributeError, AssertionError):
+                        print("No station name or not ER scanner")
+                        shutil.rmtree("{}/data/{}_process".format(proj_path, an))
+                        with open("{}/{}_scores.txt".format(proj_path, ml), "a+") as f:
+                            f.write("{}, {}, NOT_ER_SCANNER\n".format(an, str(datetime.now())))
+                        continue
+
                     p_covid = subprocess.Popen("python3 run.py '{}' --threshold=0.5".format(dcmdir_name), shell=True, cwd="{}/BinaryCOVIDModel".format(proj_path))
                     p_covid.wait()
 
