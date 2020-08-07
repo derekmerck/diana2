@@ -81,7 +81,7 @@ def anonymize(ctx,
                                 if "SR" in _:
                                     shutil.rmtree(_)
                             shutil.move("{}/data/{}_process".format(tmp_path, an), "{}/{}/{}".format(out_path, pid, an))
-                shutil.move(req, "{}/old".format(tmp_path))
+                shutil.move(req, "/locr/ArchivedRequests")
     except (KeyboardInterrupt, FileNotFoundError, KeyError, AssertionError) as e:
         if type(e) is FileNotFoundError:
             print("Excepted error: {}".format(e))
