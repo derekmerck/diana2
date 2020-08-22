@@ -36,7 +36,7 @@ def anonymize(ctx,
             requests = glob.glob("{}/*.csv".format(req_path))
             if len(requests) == 0:
                 print("No new requests {}".format(datetime.now()))
-                time.sleep(15)
+                time.sleep(60)
                 continue
 
             for req in requests:
