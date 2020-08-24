@@ -108,7 +108,7 @@ def anonymize(ctx,
                                 if "SR" in _:
                                     shutil.rmtree(_)
                             shutil.copy("{}/data/{}_process".format(tmp_path, an), "{}/{}/{}".format(out_path, pid, an))
-                            os.remove("{}/data/{}_process".format(tmp_path, an))
+                            shutil.rmtree("{}/data/{}_process".format(tmp_path, an))
                     with open("{}/done_ids.txt".format(tmp_path), "a+") as f:
                         f.write(str(patient_list["record_id"][i]) + "\n")
                 shutil.move(req, "/locr/ArchivedRequests")
