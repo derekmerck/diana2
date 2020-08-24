@@ -35,6 +35,7 @@ def anonymize(ctx,
             pass
         sub_processes = []
         wait_time = 60  # seconds
+        last_time = datetime.now() - timedelta(seconds=wait_time)
         reqstr = requester.Requester()
         reqstr.base_url = "https://redcap.lifespan.org/redcap/api"
         while True:
@@ -43,15 +44,18 @@ def anonymize(ctx,
                 'content': 'record',
                 'format': 'csv',
                 'returnFormat': 'json',
-                'dateRangeBegin': datetime.now() - timedelta(seconds=wait_time),
+                'dateRangeBegin': last_time,
                 'dateRangeEnd': datetime.now()
             }
             api_resp = reqstr._post('', data=data)
             with open("{}/{}.csv".format(req_path, datetime.now().strftime("%Y%m%d-%H%M%S")), "wb+") as f:
                 f.write(api_resp)
             requests = glob.glob("{}/*.csv".format(req_path))
-            if len(requests) == 0:
+            if len(requests) == 0 or len(api_resp) < 10:
                 print("No new requests {}".format(datetime.now()))
+                for _ in glob.glob("{}/*.csv".format(req_path)):
+                    os.remove(_)
+                last_time = datetime.now()
                 time.sleep(wait_time)
                 continue
 
