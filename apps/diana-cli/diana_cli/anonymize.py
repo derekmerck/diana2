@@ -3,6 +3,7 @@ sys.path.insert(0, "/opt/diana/package")
 from diana.utils.gateways.requesters import requester
 import click
 from datetime import datetime, timedelta
+from distutils.dir_util import copy_tree
 import os
 import glob
 from hashlib import md5
@@ -107,7 +108,7 @@ def anonymize(ctx,
                             for _ in image_folders:
                                 if "SR" in _:
                                     shutil.rmtree(_)
-                            shutil.copy("{}/data/{}_process".format(tmp_path, an), "{}/{}/{}".format(out_path, pid, an))
+                            copy_tree("{}/data/{}_process".format(tmp_path, an), "{}/{}/{}".format(out_path, pid, an))
                             shutil.rmtree("{}/data/{}_process".format(tmp_path, an))
                     with open("{}/done_ids.txt".format(tmp_path), "a+") as f:
                         f.write(str(patient_list["record_id"][i]) + "\n")
