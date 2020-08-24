@@ -35,7 +35,7 @@ def anonymize(ctx,
         with open('/opt/diana/debug.log', 'w'):
             pass
         sub_processes = []
-        Path("{}/done_an.txt".format(tmp_path)).touch()
+        Path("{}/done_ids.txt".format(tmp_path)).touch()
         wait_time = 60  # seconds
         last_time = datetime.now() - timedelta(seconds=wait_time)
         reqstr = requester.Requester()
@@ -65,7 +65,7 @@ def anonymize(ctx,
                 patient_list = pd.read_csv(req)
                 for i, pid in enumerate(patient_list["locr_patient_id"]):
                     with open("{}/done_ids.txt".format(tmp_path)) as done_ids:
-                        if patient_list["record_id"][i] in done_ids.read():
+                        if str(patient_list["record_id"][i]) in done_ids.read():
                             print("Duplicate request record id...")
                             continue
 
@@ -109,7 +109,7 @@ def anonymize(ctx,
                                     shutil.rmtree(_)
                             shutil.move("{}/data/{}_process".format(tmp_path, an), "{}/{}/{}".format(out_path, pid, an))
                     with open("{}/done_ids.txt".format(tmp_path), "a+") as f:
-                        f.write(patient_list["record_id"][i] + "\n")
+                        f.write(str(patient_list["record_id"][i]) + "\n")
                 shutil.move(req, "/locr/ArchivedRequests")
     except (KeyboardInterrupt, FileNotFoundError, KeyError, AssertionError) as e:
         if type(e) is FileNotFoundError:
