@@ -8,6 +8,7 @@ import glob
 from hashlib import md5
 from math import isnan
 import pandas as pd
+from pathlib import Path
 import shutil
 import subprocess
 import time
@@ -34,6 +35,7 @@ def anonymize(ctx,
         with open('/opt/diana/debug.log', 'w'):
             pass
         sub_processes = []
+        Path("{}/done_an.txt".format(tmp_path)).touch()
         wait_time = 60  # seconds
         last_time = datetime.now() - timedelta(seconds=wait_time)
         reqstr = requester.Requester()
@@ -51,7 +53,7 @@ def anonymize(ctx,
             with open("{}/{}.csv".format(req_path, datetime.now().strftime("%Y%m%d-%H%M%S")), "wb+") as f:
                 f.write(api_resp)
             requests = glob.glob("{}/*.csv".format(req_path))
-            if len(requests) == 0 or len(api_resp) < 10 or ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0" in api_resp:
+            if len(requests) == 0 or len(api_resp) < 10 or ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0" in api_resp.decode('utf-8'):
                 print("No new requests {}".format(datetime.now()))
                 for _ in glob.glob("{}/*.csv".format(req_path)):
                     os.remove(_)
@@ -62,6 +64,11 @@ def anonymize(ctx,
             for req in requests:
                 patient_list = pd.read_csv(req)
                 for i, pid in enumerate(patient_list["locr_patient_id"]):
+                    with open("{}/done_ids.txt".format(tmp_path)) as done_ids:
+                        if patient_list["record_id"][i] in done_ids.read():
+                            print("Duplicate request record id...")
+                            continue
+
                     accession_nums = []
                     for j in range(1, 11):
                         an_j = patient_list['accession_num{}'.format(j)][i]
@@ -101,6 +108,8 @@ def anonymize(ctx,
                                 if "SR" in _:
                                     shutil.rmtree(_)
                             shutil.move("{}/data/{}_process".format(tmp_path, an), "{}/{}/{}".format(out_path, pid, an))
+                    with open("{}/done_ids.txt".format(tmp_path), "a+") as f:
+                        f.write(patient_list["record_id"][i] + "\n")
                 shutil.move(req, "/locr/ArchivedRequests")
     except (KeyboardInterrupt, FileNotFoundError, KeyError, AssertionError) as e:
         if type(e) is FileNotFoundError:
