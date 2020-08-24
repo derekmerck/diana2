@@ -51,7 +51,7 @@ def anonymize(ctx,
             with open("{}/{}.csv".format(req_path, datetime.now().strftime("%Y%m%d-%H%M%S")), "wb+") as f:
                 f.write(api_resp)
             requests = glob.glob("{}/*.csv".format(req_path))
-            if len(requests) == 0 or len(api_resp) < 10:
+            if len(requests) == 0 or len(api_resp) < 10 or ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0" in api_resp:
                 print("No new requests {}".format(datetime.now()))
                 for _ in glob.glob("{}/*.csv".format(req_path)):
                     os.remove(_)
