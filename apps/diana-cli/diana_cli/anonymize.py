@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(0, "/opt/diana/package")
+from diana.utils.gateways.requesters import requester
 import click
 from datetime import datetime, timedelta
 import os
@@ -31,12 +34,25 @@ def anonymize(ctx,
         with open('/opt/diana/debug.log', 'w'):
             pass
         sub_processes = []
-
+        wait_time = 60  # seconds
+        reqstr = requester.Requester()
+        reqstr.base_url = "https://redcap.lifespan.org/redcap/api"
         while True:
+            data = {
+                'token': os.environ['REDCAP_TOKEN'],
+                'content': 'record',
+                'format': 'csv',
+                'returnFormat': 'json',
+                'dateRangeBegin': datetime.now() - timedelta(seconds=wait_time),
+                'dateRangeEnd': datetime.now()
+            }
+            api_resp = reqstr._post('', data=data)
+            with open("{}/{}.csv".format(req_path, datetime.now().strftime("%Y%m%d-%H%M%S")), "wb+") as f:
+                f.write(api_resp)
             requests = glob.glob("{}/*.csv".format(req_path))
             if len(requests) == 0:
                 print("No new requests {}".format(datetime.now()))
-                time.sleep(60)
+                time.sleep(wait_time)
                 continue
 
             for req in requests:
