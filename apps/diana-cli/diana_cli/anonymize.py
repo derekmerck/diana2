@@ -112,7 +112,11 @@ def anonymize(ctx,
                             shutil.rmtree("{}/data/{}_process".format(tmp_path, an))
                     with open("{}/done_ids.txt".format(tmp_path), "a+") as f:
                         f.write(str(patient_list["record_id"][i]) + "\n")
-                shutil.move(req, "/locr/ArchivedRequests")
+                try:
+                    shutil.move(req, "/locr/ArchivedRequests")
+                except shutil.Error:
+                    os.remove(req)
+                    time.sleep(60)
     except (KeyboardInterrupt, FileNotFoundError, KeyError, AssertionError) as e:
         if type(e) is FileNotFoundError:
             print("Excepted error: {}".format(e))
