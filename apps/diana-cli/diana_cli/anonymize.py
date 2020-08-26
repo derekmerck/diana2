@@ -47,9 +47,10 @@ def anonymize(ctx,
                 'content': 'record',
                 'format': 'csv',
                 'returnFormat': 'json',
-                'dateRangeBegin': last_time,
-                'dateRangeEnd': datetime.now()
+                'dateRangeBegin': last_time.strftime("%Y-%m-%d %H:%M:%S"),
+                'dateRangeEnd': datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
+            last_time = datetime.now()
             api_resp = reqstr._post('', data=data)
             with open("{}/{}.csv".format(req_path, datetime.now().strftime("%Y%m%d-%H%M%S")), "wb+") as f:
                 f.write(api_resp)
@@ -64,6 +65,7 @@ def anonymize(ctx,
 
             for req in requests:
                 patient_list = pd.read_csv(req)
+
                 for i, pid in enumerate(patient_list["locr_patient_id"]):
                     with open("{}/done_ids.txt".format(tmp_path)) as done_ids:
                         if str(patient_list["record_id"][i]) in done_ids.read():
