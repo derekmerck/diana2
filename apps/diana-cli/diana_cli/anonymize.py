@@ -101,13 +101,19 @@ def anonymize(ctx,
                     for an_pre in accession_nums:
                         an = md5("{}".format(an_pre).encode('utf-8')).hexdigest()[:16]
                         if not os.path.isdir("{}/data/{}_process".format(tmp_path, an)):
-                            # os.rename("{}/data/{}".format(tmp_path, an), "{}/data/{}.zip".format(tmp_path, an))
-                            with zipfile.ZipFile("{}/data/{}.zip".format(tmp_path, an), 'r') as zip_ref:
-                                zip_ref.extractall("{}/data/{}_process".format(tmp_path, an))
+                            try:
+                                with zipfile.ZipFile("{}/data/{}.zip".format(tmp_path, an), 'r') as zip_ref:
+                                    zip_ref.extractall("{}/data/{}_process".format(tmp_path, an))
+                            except FileNotFoundError:
+                                continue
                             os.remove("{}/data/{}.zip".format(tmp_path, an))
 
                             image_folders = [_[0] for _ in os.walk("{}/data/{}_process".format(tmp_path, an))]
                             for _ in image_folders:
+                                fdcms = glob.glob(_ + "/*.dcm", recursive=True)
+                                if len(fdcms) == 1:
+                                    if os.stat(fdcms[0]).st_size < 50000:
+                                        os.remove(fdcms)
                                 if "SR" in _:
                                     shutil.rmtree(_)
                             copy_tree("{}/data/{}_process".format(tmp_path, an), "{}/{}/{}".format(out_path, pid, an))
