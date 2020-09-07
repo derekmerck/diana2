@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import json
 import os
 import glob
+from hashlib import md5
 import numpy as np
 import pandas as pd
 import pickle
@@ -137,7 +138,7 @@ def extend(ctx,
             if os.path.isfile("{}/{}.key.csv".format(proj_path, ml)):
                 os.remove("{}/{}.key.csv".format(proj_path, ml))
 
-            if ml == "bone_age" or ml == "elvos" or ml == "ablation" or ml == "covid":
+            if ml == "bone_age" or ml == "ablation" or ml == "covid":
                 p_collect = subprocess.Popen("diana-cli collect {} {} sticky_bridge radarch".format(ml, proj_path), shell=True)
                 p_collect.wait()
                 time.sleep(10)
@@ -145,6 +146,13 @@ def extend(ctx,
                 p_collect.wait()
             elif ml == "brain_bleed":
                 pass  # selective filtering/pulling below
+            elif ml == "elvos":
+                pass
+                # p_collect = subprocess.Popen("diana-cli collect -a -c {} {} sticky_bridge radarch".format(ml, proj_path), shell=True)
+                # p_collect.wait()
+                # time.sleep(10)
+                # p_collect = subprocess.Popen("diana-cli collect -a -c {} {} sticky_bridge radarch".format(ml, proj_path), shell=True)
+                # p_collect.wait()
             else:
                 raise NotImplementedError
 
@@ -185,7 +193,13 @@ def extend(ctx,
                             logging.error("Failed to delete dixel")
                             logging.error(e)
 
-                if ml != "ablation":
+                if ml == "elvos":
+                    an_h = md5("{}".format(an).encode('utf-8')).hexdigest()[:16]
+                    if not os.path.isdir("{}/data/{}_process".format(proj_path, an)):
+                        with zipfile.ZipFile("{}/data/{}.zip".format(proj_path, an_h), 'r') as zip_ref:
+                            zip_ref.extractall("{}/data/{}_process".format(proj_path, an))
+                        os.remove("{}/data/{}.zip".format(proj_path, an))
+                elif ml != "ablation":
                     if not os.path.isdir("{}/data/{}_process".format(proj_path, an)):
                         os.rename("{}/data/{}".format(proj_path, an), "{}/data/{}.zip".format(proj_path, an))
                         with zipfile.ZipFile("{}/data/{}.zip".format(proj_path, an), 'r') as zip_ref:
