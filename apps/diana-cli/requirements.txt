@@ -1,4 +1,6 @@
 click
+pandas
 pyyaml
 python-diana
+slackclient
 gistsig @ git+https://github.com/derekmerck/gistsig
