@@ -88,7 +88,10 @@ class Splunk(Endpoint, Serializable):
         event = item.tags
 
         event['level'] = str(item.level)
-        event['oid'] = item.oid()
+        try:
+            event['oid'] = item.oid()
+        except TypeError:
+            event["oid"] = None
 
         hec_token = hec_token or self.hec_token
         if not hec_token:
@@ -100,7 +103,7 @@ class Splunk(Endpoint, Serializable):
         logger.debug(event)
         logger.debug(index)
         logger.debug(hec_token)
-
+        
         # at $time $event was reported by $host for $index with credentials $auth
         self.gateway.put_event( event=event, timestamp=timestamp,
                                 hostname=hostname, index=index, hec_token=hec_token )
