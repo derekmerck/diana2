@@ -1,2 +1,9 @@
 click
+pandas
 pyyaml
+<<<<<<< HEAD
+=======
+python-diana
+slackclient
+gistsig @ git+https://github.com/derekmerck/gistsig
+>>>>>>> Added to diana-cli reqs
