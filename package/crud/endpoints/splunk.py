@@ -95,6 +95,7 @@ class Splunk(Endpoint, Serializable):
             event['oid'] = item.oid()
         except TypeError:
             event["oid"] = None
+            event.update(item.meta)
 
         hec_token = hec_token or self.hec_token
         if not hec_token:
