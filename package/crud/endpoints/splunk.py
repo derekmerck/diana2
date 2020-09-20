@@ -88,7 +88,13 @@ class Splunk(Endpoint, Serializable):
             logging.warning("Failed to get item timestamp, using now()")
             timestamp = datetime.now()
 
-        item_dict = item.asdict()
+        event = item.tags
+
+        event['level'] = str(item.level)
+        try:
+            event['oid'] = item.oid()
+        except TypeError:
+            event["oid"] = None
 
         hec_token = hec_token or self.hec_token
         if not hec_token:
@@ -108,7 +114,6 @@ class Splunk(Endpoint, Serializable):
         # Real auth description
         # headers = {'Authorization': 'Splunk {0}'.format(self.hec_tok[hec])}
 
-<<<<<<< HEAD:package/crud/endpoints/splunk.py
     def check(self):
 
         logger = logging.getLogger(self.name)
@@ -125,16 +130,3 @@ class Splunk(Endpoint, Serializable):
 
 
 Splunk.register()
-=======
-    def check(self):
-        logger = logging.getLogger(self.name)
-        logger.debug("Check")
-
-        try:
-            return self.gateway.find_events(q="search ") is not None
-        except GatewayConnectionError as e:
-            logger.warning("Failed to connect to Endpoint")
-            logger.error(type(e))
-            logger.error(e)
-            return False
->>>>>>> Splunk healthcheck:package/diana/apis/splunk.py

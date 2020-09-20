@@ -1,4 +1,5 @@
 import os, logging
+import csv
 from pprint import pprint
 from typing import Union, Mapping
 from functools import partial
@@ -163,6 +164,35 @@ def write_ai(item: str, proj_path: str = None):
     with open("{}/q_results.json".format(proj_path), 'a+') as data_file:
         data_file.write(str(item) + "\n")
 
+def dixelize_and_send(fp: str, dest: Splunk):
+    print(fp)
+    dr = csv.DictReader(open(fp["fn"]))
+    od = next(dr)
+    data = {}
+    for _ in od:
+        data[_] = od[_]
+    tags = {
+            "AccessionNumber": data["AccessionNumber"],
+            "PatientID": data["PatientID"],
+            'StudyDescription': data['StudyDescription'],
+            'ReferringPhysicianName': data['ReferringPhysicianName'],
+            'PatientSex': data['PatientSex'],
+            "StudyDate": data['StudyDateTime'],
+            'Organization': data['Organization'],
+        }
+
+    meta = {
+            'PatientName': data["PatientName"],
+            'PatientAge': data['PatientAge'],
+            "OrderCode": data["OrderCode"],
+            "PatientStatus": data["PatientStatus"],
+            "ReportText": data["ReportText"],
+        }
+
+    d = Dixel(meta=meta,
+              tags=tags,
+              level=DicomLevel.STUDIES)
+    dest.put(d)
 
 def mk_route(hname, source_desc, dest_desc=None, proj_path=None):
 
@@ -250,6 +280,10 @@ def mk_route(hname, source_desc, dest_desc=None, proj_path=None):
         func = partial(index_item,
                        level=DicomLevel.INSTANCES,
                        source=source, dest=dest)
+
+    elif hname == "dixelize_and_send":
+        evtype = DicomEventType.FILE_ADDED
+        func = partial(dixelize_and_send, dest=dest)
 
     else:
         raise NotImplementedError("No handler defined for {}".format(hname))
