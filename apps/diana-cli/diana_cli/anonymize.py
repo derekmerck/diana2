@@ -98,7 +98,7 @@ def anonymize(ctx,
 
                     if not os.path.isdir("{}/{}".format(out_path, pid)):
                         os.mkdir("{}/{}".format(out_path, pid))
-                    for an_pre in accession_nums:
+                    for k, an_pre in enumerate(accession_nums):
                         an = md5("{}".format(an_pre).encode('utf-8')).hexdigest()[:16]
                         if not os.path.isdir("{}/data/{}_process".format(tmp_path, an)):
                             try:
@@ -113,10 +113,21 @@ def anonymize(ctx,
                                 fdcms = glob.glob(_ + "/*.dcm", recursive=True)
                                 if len(fdcms) == 1:
                                     if os.stat(fdcms[0]).st_size < 50000:
-                                        os.remove(fdcms)
+                                        os.remove(fdcms[0])
                                 if "SR" in _:
                                     shutil.rmtree(_)
-                            copy_tree("{}/data/{}_process".format(tmp_path, an), "{}/{}/{}".format(out_path, pid, an))
+                            # copy_tree("{}/data/{}_process".format(tmp_path, an), "{}/{}/{}".format(out_path, pid, an))
+                            dcmfolders = get_subdirectories(get_subdirectories("{}/data/{}_process".format(tmp_path, an))[0])
+                            print(dcmfolders)
+                            for _ in dcmfolders:
+                                print("{}/{}/{}/{}".format(out_path,
+                                                           patient_list["locr_patient_id"][i],
+                                                           pid,
+                                                           patient_list["date_of_scan{}".format(k)][i]))
+                                copy_tree(_, "{}/{}/{}/{}".format(out_path,
+                                                                  patient_list["locr_patient_id"][i],
+                                                                  pid,
+                                                                  patient_list["date_of_scan{}".format(k)][i]))
                             shutil.rmtree("{}/data/{}_process".format(tmp_path, an))
                     with open("{}/done_ids.txt".format(tmp_path), "a+") as f:
                         f.write(str(patient_list["record_id"][i]) + "\n")
@@ -144,3 +155,7 @@ def anonymize(ctx,
         except UnboundLocalError:
             print("UnboundLocalError on exit clean-up")  # TODO: address
             pass
+
+
+def get_subdirectories(a_dir):
+    return [f.path for f in os.scandir(a_dir) if f.is_dir()]
