@@ -123,11 +123,11 @@ def anonymize(ctx,
                                 print("{}/{}/{}/{}".format(out_path,
                                                            patient_list["locr_patient_id"][i],
                                                            pid,
-                                                           patient_list["date_of_scan{}".format(k)][i]))
+                                                           patient_list["date_of_scan{}".format(k)][i].replace("/", ".")))
                                 copy_tree(_, "{}/{}/{}/{}".format(out_path,
                                                                   patient_list["locr_patient_id"][i],
                                                                   pid,
-                                                                  patient_list["date_of_scan{}".format(k)][i]))
+                                                                  patient_list["date_of_scan{}".format(k)][i].replace("/", ".")))
                             shutil.rmtree("{}/data/{}_process".format(tmp_path, an))
                     with open("{}/done_ids.txt".format(tmp_path), "a+") as f:
                         f.write(str(patient_list["record_id"][i]) + "\n")
