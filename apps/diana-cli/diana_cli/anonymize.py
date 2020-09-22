@@ -96,8 +96,8 @@ def anonymize(ctx,
                     p_collect = subprocess.Popen("diana-cli collect -a -c anon {} sticky_bridge radarch".format(tmp_path), shell=True)
                     p_collect.wait()
 
-                    if not os.path.isdir("{}/{}".format(out_path, pid)):
-                        os.mkdir("{}/{}".format(out_path, pid))
+                    if not os.path.isdir("{}/{}".format(out_path, patient_list["sponsor_protocol_number"][i])):
+                        os.mkdir("{}/{}".format(out_path, patient_list["sponsor_protocol_number"][i]))
                     for k, an_pre in enumerate(accession_nums):
                         an = md5("{}".format(an_pre).encode('utf-8')).hexdigest()[:16]
                         if not os.path.isdir("{}/data/{}_process".format(tmp_path, an)):
@@ -108,27 +108,35 @@ def anonymize(ctx,
                                 continue
                             os.remove("{}/data/{}.zip".format(tmp_path, an))
 
-                            image_folders = [_[0] for _ in os.walk("{}/data/{}_process".format(tmp_path, an))]
-                            for _ in image_folders:
-                                fdcms = glob.glob(_ + "/*.dcm", recursive=True)
-                                if len(fdcms) == 1:
-                                    if os.stat(fdcms[0]).st_size < 50000:
-                                        os.remove(fdcms[0])
-                                if "SR" in _:
-                                    shutil.rmtree(_)
-                            # copy_tree("{}/data/{}_process".format(tmp_path, an), "{}/{}/{}".format(out_path, pid, an))
-                            dcmfolders = get_subdirectories(get_subdirectories("{}/data/{}_process".format(tmp_path, an))[0])
-                            print(dcmfolders)
-                            for _ in dcmfolders:
-                                print("{}/{}/{}/{}".format(out_path,
-                                                           patient_list["locr_patient_id"][i],
-                                                           pid,
-                                                           patient_list["date_of_scan{}".format(k+1)][i].replace("/", ".")))
-                                copy_tree(_, "{}/{}/{}/{}".format(out_path,
-                                                                  patient_list["locr_patient_id"][i],
-                                                                  pid,
-                                                                  patient_list["date_of_scan{}".format(k+1)][i].replace("/", ".")))
-                            shutil.rmtree("{}/data/{}_process".format(tmp_path, an))
+                        image_folders = [_[0] for _ in os.walk("{}/data/{}_process".format(tmp_path, an))]
+                        for _ in image_folders:
+                            fdcms = glob.glob(_ + "/*.dcm", recursive=True)
+                            if len(fdcms) == 1:
+                                if os.stat(fdcms[0]).st_size < 50000:
+                                    os.remove(fdcms[0])
+                            if "SR" in _:
+                                shutil.rmtree(_)
+                        # copy_tree("{}/data/{}_process".format(tmp_path, an), "{}/{}/{}".format(out_path, pid, an))
+
+                        os.mkdir("{}/{}/{}".format(out_path,
+                                                   patient_list["sponsor_protocol_number"][i],
+                                                   pid))
+                        os.mkdir("{}/{}/{}/{}".format(out_path,
+                                                      patient_list["sponsor_protocol_number"][i],
+                                                      pid,
+                                                      patient_list["date_of_scan{}".format(k+1)][i].replace("/", ".")))
+                        dcmfolders = get_subdirectories(get_subdirectories("{}/data/{}_process".format(tmp_path, an))[0])
+                        print(dcmfolders)
+                        for _ in dcmfolders:
+                            print("{}/{}/{}/{}".format(out_path,
+                                                       patient_list["sponsor_protocol_number"][i],
+                                                       pid,
+                                                       patient_list["date_of_scan{}".format(k+1)][i].replace("/", ".")))
+                            copy_tree(_, "{}/{}/{}/{}".format(out_path,
+                                                              patient_list["sponsor_protocol_number"][i],
+                                                              pid,
+                                                              patient_list["date_of_scan{}".format(k+1)][i].replace("/", ".")))
+                        shutil.rmtree("{}/data/{}_process".format(tmp_path, an))
                     with open("{}/done_ids.txt".format(tmp_path), "a+") as f:
                         f.write(str(patient_list["record_id"][i]) + "\n")
                 try:
