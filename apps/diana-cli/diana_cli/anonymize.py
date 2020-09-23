@@ -116,26 +116,25 @@ def anonymize(ctx,
                                     os.remove(fdcms[0])
                             if "SR" in _:
                                 shutil.rmtree(_)
-                        # copy_tree("{}/data/{}_process".format(tmp_path, an), "{}/{}/{}".format(out_path, pid, an))
 
-                        os.mkdir("{}/{}/{}".format(out_path,
-                                                   patient_list["sponsor_protocol_number"][i],
-                                                   pid))
-                        os.mkdir("{}/{}/{}/{}".format(out_path,
-                                                      patient_list["sponsor_protocol_number"][i],
-                                                      pid,
-                                                      patient_list["date_of_scan{}".format(k+1)][i].replace("/", ".")))
                         dcmfolders = get_subdirectories(get_subdirectories("{}/data/{}_process".format(tmp_path, an))[0])
                         print(dcmfolders)
+                        print("/{}/({})({})({})({})".format(out_path,
+                                                            patient_list["sponsor_protocol_number"][i],
+                                                            pid,
+                                                            patient_list["date_of_scan{}".format(k+1)][i].replace("/", "."),
+                                                            get_subdirectories("{}/data/{}_process".format(tmp_path, an))[0].split("/")[-1]))
+                        os.mkdir("/{}/({})({})({})({})".format(out_path,
+                                                               patient_list["sponsor_protocol_number"][i],
+                                                               pid,
+                                                               patient_list["date_of_scan{}".format(k+1)][i].replace("/", "."),
+                                                               get_subdirectories("{}/data/{}_process".format(tmp_path, an))[0].split("/")[-1]))
                         for _ in dcmfolders:
-                            print("{}/{}/{}/{}".format(out_path,
-                                                       patient_list["sponsor_protocol_number"][i],
-                                                       pid,
-                                                       patient_list["date_of_scan{}".format(k+1)][i].replace("/", ".")))
-                            copy_tree(_, "{}/{}/{}/{}".format(out_path,
-                                                              patient_list["sponsor_protocol_number"][i],
-                                                              pid,
-                                                              patient_list["date_of_scan{}".format(k+1)][i].replace("/", ".")))
+                            copy_tree(_, "/{}/({})({})({})({})".format(out_path,
+                                                                       patient_list["sponsor_protocol_number"][i],
+                                                                       pid,
+                                                                       patient_list["date_of_scan{}".format(k+1)][i].replace("/", "."),
+                                                                       get_subdirectories("{}/data/{}_process".format(tmp_path, an))[0].split("/")[-1]))
                         shutil.rmtree("{}/data/{}_process".format(tmp_path, an))
                     with open("{}/done_ids.txt".format(tmp_path), "a+") as f:
                         f.write(str(patient_list["record_id"][i]) + "\n")
