@@ -96,8 +96,8 @@ def anonymize(ctx,
                     p_collect = subprocess.Popen("diana-cli collect -a -c anon {} sticky_bridge radarch".format(tmp_path), shell=True)
                     p_collect.wait()
 
-                    if not os.path.isdir("{}/{}".format(out_path, patient_list["sponsor_protocol_number"][i])):
-                        os.mkdir("{}/{}".format(out_path, patient_list["sponsor_protocol_number"][i]))
+
+
                     for k, an_pre in enumerate(accession_nums):
                         an = md5("{}".format(an_pre).encode('utf-8')).hexdigest()[:16]
                         if not os.path.isdir("{}/data/{}_process".format(tmp_path, an)):
@@ -117,24 +117,18 @@ def anonymize(ctx,
                             if "SR" in _:
                                 shutil.rmtree(_)
 
-                        dcmfolder = get_subdirectories(get_subdirectories("{}/data/{}_process".format(tmp_path, an))[0])
+                        dcmfolder = get_subdirectories(get_subdirectories("{}/data/{}_process".format(tmp_path, an))[0])[0]
                         print(dcmfolder)
-                        print("/{}/({})({})({})({})".format(out_path,
-                                                            patient_list["sponsor_protocol_number"][i],
-                                                            pid,
-                                                            patient_list["date_of_scan{}".format(k+1)][i].replace("/", "."),
-                                                            dcmfolder[0].split("/")[-1]))
-                        os.mkdir("/{}/({})({})({})({})".format(out_path,
-                                                               patient_list["sponsor_protocol_number"][i],
-                                                               pid,
-                                                               patient_list["date_of_scan{}".format(k+1)][i].replace("/", "."),
-                                                               dcmfolder[0].split("/")[-1]))
+                        comb_path = "/{}/({})({})({})({})".format(out_path,
+                                                                  patient_list["sponsor_protocol_number"][i],
+                                                                  pid,
+                                                                  patient_list["date_of_scan{}".format(k+1)][i].replace("/", "."),
+                                                                  dcmfolder.split("/")[-1])
+                        print(comb_path)
+                        if not os.path.isdir(comb_path):
+                            os.mkdir(comb_path)
                         for _ in get_subdirectories(dcmfolder):
-                            copy_tree(_, "/{}/({})({})({})({})".format(out_path,
-                                                                       patient_list["sponsor_protocol_number"][i],
-                                                                       pid,
-                                                                       patient_list["date_of_scan{}".format(k+1)][i].replace("/", "."),
-                                                                       dcmfolder[0].split("/")[-1]))
+                            copy_tree(_, comb_path)
                         shutil.rmtree("{}/data/{}_process".format(tmp_path, an))
                     with open("{}/done_ids.txt".format(tmp_path), "a+") as f:
                         f.write(str(patient_list["record_id"][i]) + "\n")
