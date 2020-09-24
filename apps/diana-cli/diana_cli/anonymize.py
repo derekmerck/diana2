@@ -125,10 +125,7 @@ def anonymize(ctx,
                                                                   patient_list["date_of_scan{}".format(k+1)][i].replace("/", "."),
                                                                   dcmfolder.split("/")[-1])
                         print(comb_path)
-                        if not os.path.isdir(comb_path):
-                            os.mkdir(comb_path)
-                        for _ in get_subdirectories(dcmfolder):
-                            copy_tree(_, comb_path)
+                        copy_tree(dcmfolder, comb_path)
                         shutil.rmtree("{}/data/{}_process".format(tmp_path, an))
                     with open("{}/done_ids.txt".format(tmp_path), "a+") as f:
                         f.write(str(patient_list["record_id"][i]) + "\n")
