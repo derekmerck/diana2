@@ -153,7 +153,7 @@ def query_and_index(query: Mapping, level: DicomLevel, source: Orthanc, domain: 
 
 
 # TESTING
-def say(item: str, suffix: str=None):
+def say(item: str, suffix: str = None):
     if suffix:
         item = item + suffix
     pprint(item)
@@ -162,6 +162,7 @@ def say(item: str, suffix: str=None):
 def write_ai(item: str, proj_path: str = None):
     with open("{}/q_results.json".format(proj_path), 'a+') as data_file:
         data_file.write(str(item) + "\n")
+
 
 def dixelize_and_send(fp: str, dest: Splunk):
     print(fp)
@@ -177,21 +178,47 @@ def dixelize_and_send(fp: str, dest: Splunk):
             'ReferringPhysicianName': data['ReferringPhysicianName'],
             'PatientSex': data['PatientSex'],
             "StudyDate": data['StudyDateTime'],
-            'Organization': data['Organization'],
+            'Organization': data['Organization']
         }
+
+    tokeep = ["- Maximal diameter (cm):", "- Laterality:", "- Location:",
+              "- Primary or Metastatic:", "- Tissue of Origin (if metastatic):",
+              "- Initial Ablation or Residual/Recurrent:", "- Biopsy performed:",
+              "- Ablation device:", "- Number of antennae:", "- Duration (minutes):",
+              "- Maximum energy applied (watts):", "- Frequency (MHz):",
+              "- Tissue Separation Method:", "- Displaced Tissues:",
+              "- Tract cauterization performed with applicator removal:"]
+    tokeep2 = ["MaximalDiameter", "Laterality", "Location",
+               "PrimaryOrMetastatic", "TissueOfOrigin",
+               "InitialAblationOrResidualRecurrent", "BiopsyPerformed",
+               "AblationDevice", "NumberOfAntennae", "Duration",
+               "MaximumEnergyapplied", "Frequency",
+               "TissueSeparationMethod", "DisplacedTissues",
+               "TractCauterizationPerformedWithApplicatorRemoval"]
+
+    keepdict = {}
+    for f in zip(tokeep, tokeep2):
+        try:
+            ss = data["ReportText"].split(f[0])[-1].split("\n")[0]
+            keepdict[f[1]] = ss
+        except Exception as e:
+            print(e.message)
+            print(f)
 
     meta = {
             # 'PatientName': data["PatientName"],
             'PatientAge': data['PatientAge'],
             "OrderCode": data["OrderCode"],
             "PatientStatus": data["PatientStatus"],
-            "ReportText": data["ReportText"],
+            "ReportText": data["ReportText"]
         }
+    meta.update(keepdict)
 
     d = Dixel(meta=meta,
               tags=tags,
               level=DicomLevel.STUDIES)
     dest.put(d)
+
 
 def mk_route(hname, source_desc, dest_desc=None, proj_path=None):
 
