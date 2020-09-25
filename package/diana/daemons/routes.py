@@ -186,8 +186,8 @@ def dixelize_and_send(fp: str, dest: Splunk):
               "- Initial Ablation or Residual/Recurrent:", "- Biopsy performed:",
               "- Ablation device:", "- Number of antennae:", "- Duration (minutes):",
               "- Maximum energy applied (watts):", "- Frequency (MHz):",
-              "- Tissue Separation Method:", "- Displaced Tissues:",
-              "- Tract cauterization performed with applicator removal:"]
+              "Method:", "- Displaced Tissues:",
+              "Tract cauterization performed with applicator removal:"]
     tokeep2 = ["MaximalDiameter", "Laterality", "Location",
                "PrimaryOrMetastatic", "TissueOfOrigin",
                "InitialAblationOrResidualRecurrent", "BiopsyPerformed",
