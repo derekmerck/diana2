@@ -200,7 +200,7 @@ def dixelize_and_send(fp: str, dest: Splunk):
     keepdict = {}
     for f in zip(tokeep, tokeep2):
         try:
-            ss = data["ReportText"].split(f[0])[-1].split("\n")[0]
+            ss = data["ReportText"].split(f[0])[-1].split("\n")[0].strip()
             keepdict[f[1]] = ss
         except Exception as e:
             print(e.message)
