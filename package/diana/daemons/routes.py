@@ -207,7 +207,7 @@ def dixelize_and_send(fp: str, dest: Splunk):
             print(f)
 
     meta = {
-            # 'PatientName': data["PatientName"],
+            'PatientName': data["PatientName"],
             'PatientAge': data['PatientAge'],
             "OrderCode": data["OrderCode"],
             "PatientStatus": data["PatientStatus"],
