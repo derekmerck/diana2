@@ -188,14 +188,16 @@ def dixelize_and_send(fp: str, dest: Splunk):
               "- Ablation device:", "- Number of antennae:", "- Duration (minutes):",
               "- Maximum energy applied (watts):", "- Frequency (MHz):",
               "Method:", "- Displaced Tissues:",
-              "Tract cauterization performed with applicator removal:"]
+              "Tract cauterization performed with applicator removal:",
+              "Viable tumor in ablation zone:"]
     tokeep2 = ["MaximalDiameter", "Laterality", "Location",
                "PrimaryOrMetastatic", "TissueOfOrigin",
                "InitialAblationOrResidualRecurrent", "BiopsyPerformed",
                "AblationDevice", "NumberOfAntennae", "Duration",
-               "MaximumEnergyapplied", "Frequency",
+               "MaximumEnergyApplied", "Frequency",
                "TissueSeparationMethod", "DisplacedTissues",
-               "TractCauterizationPerformedWithApplicatorRemoval"]
+               "TractCauterizationPerformedWithApplicatorRemoval",
+               "ViableTumorInAblationZone"]
 
     keepdict = {}
     for f in zip(tokeep, tokeep2):
