@@ -63,6 +63,7 @@ def anonymize(ctx,
                 time.sleep(wait_time)
                 continue
 
+            time.sleep(1)
             for req in requests:
                 patient_list = pd.read_csv(req)
 
