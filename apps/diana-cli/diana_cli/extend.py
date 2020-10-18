@@ -357,6 +357,9 @@ def extend(ctx,
 
             # p_watch.terminate() # WARNING: this may create many many Docker container archives along w/ subsequent re-Popen...
             time.sleep(1)
+            if ml == "ablation":
+                p_rsync = subprocess.Popen("rsync -r init_reports reports", shell=True, cwd="{}".format(proj_path))
+                p_rsync.wait()
             # p_watch = subprocess.Popen("diana-cli watch -r {} radarch None {}".format(rt, proj_path), shell=True, stdout=subprocess.PIPE)
     except (KeyboardInterrupt, FileNotFoundError, KeyError, AssertionError) as e:
         if type(e) is FileNotFoundError:
