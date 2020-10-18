@@ -304,7 +304,7 @@ def extend(ctx,
                     for i, entry in enumerate(mfind_results):
                         record_i = Dixel.from_montage_json(entry)
                         record_i.report.anonymize()
-                    record_i.to_csv("{}/reports/{}.csv".format(proj_path, an))
+                    record_i.to_csv("{}/init_reports/{}.csv".format(proj_path, an))
                     with open("{}/{}_scores.txt".format(proj_path, ml), "a+") as f:
                         f.write("{}, {}\n".format(an, str(datetime.now())))
                 elif ml == "covid":
