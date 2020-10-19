@@ -59,7 +59,7 @@ def anonymize(ctx,
                 print("No new requests {}".format(datetime.now()))
                 manual_file = False
                 for _ in glob.glob("{}/*.csv".format(req_path)):
-                    if os.stat(_).st_size > 1300:
+                    if os.stat(_).st_size > 1200:
                         print(os.stat(_).st_size)
                         manual_file = True
                         continue
@@ -70,6 +70,7 @@ def anonymize(ctx,
                     continue
 
             time.sleep(1)
+            requests = glob.glob("{}/*.csv".format(req_path))
             for req in requests:
                 patient_list = pd.read_csv(req)
 
@@ -102,8 +103,6 @@ def anonymize(ctx,
                     time.sleep(10)
                     p_collect = subprocess.Popen("diana-cli collect -a -c anon {} sticky_bridge radarch".format(tmp_path), shell=True)
                     p_collect.wait()
-
-
 
                     for k, an_pre in enumerate(accession_nums):
                         an = md5("{}".format(an_pre).encode('utf-8')).hexdigest()[:16]
