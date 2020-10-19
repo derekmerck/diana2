@@ -57,11 +57,17 @@ def anonymize(ctx,
             requests = glob.glob("{}/*.csv".format(req_path))
             if len(requests) == 0 or len(api_resp) < 10 or ",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,0" in api_resp.decode('utf-8'):
                 print("No new requests {}".format(datetime.now()))
+                manual_file = False
                 for _ in glob.glob("{}/*.csv".format(req_path)):
+                    if os.stat(_).st_size > 1300:
+                        print(os.stat(_).st_size)
+                        manual_file = True
+                        continue
                     os.remove(_)
-                last_time = datetime.now()
-                time.sleep(wait_time)
-                continue
+                if not manual_file:
+                    last_time = datetime.now()
+                    time.sleep(wait_time)
+                    continue
 
             time.sleep(1)
             for req in requests:
