@@ -318,7 +318,7 @@ def extend(ctx,
                             f.write("{}, {}, NOT_ER_SCANNER\n".format(an, str(datetime.now())))
                         continue
 
-                    p_covid = subprocess.Popen("python3 run.py '{}' --threshold=0.5".format(dcmdir_name), shell=True, cwd="{}/BinaryCOVIDModel".format(proj_path))
+                    p_covid = subprocess.Popen("python3 run.py '{}'".format(dcmdir_name), shell=True, cwd="{}/COVIDModel".format(proj_path))
                     p_covid.wait()
 
                     with open("/opt/diana/output.txt") as f:
