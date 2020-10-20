@@ -75,10 +75,10 @@ def anonymize(ctx,
                 patient_list = pd.read_csv(req)
 
                 for i, pid in enumerate(patient_list["locr_patient_id"]):
-                    with open("{}/done_ids.txt".format(tmp_path)) as done_ids:
-                        if str(patient_list["record_id"][i]) in done_ids.read():
-                            print("Duplicate request record id...")
-                            continue
+                    # with open("{}/done_ids.txt".format(tmp_path)) as done_ids:
+                    #     if str(patient_list["record_id"][i]) in done_ids.read():
+                    #         print("Duplicate request record id...")
+                    #         continue
 
                     accession_nums = []
                     for j in range(1, 11):
@@ -136,8 +136,8 @@ def anonymize(ctx,
                         print(comb_path)
                         copy_tree(dcmfolder, comb_path)
                         shutil.rmtree("{}/data/{}_process".format(tmp_path, an))
-                    with open("{}/done_ids.txt".format(tmp_path), "a+") as f:
-                        f.write(str(patient_list["record_id"][i]) + "\n")
+                    # with open("{}/done_ids.txt".format(tmp_path), "a+") as f:
+                    #     f.write(str(patient_list["record_id"][i]) + "\n")
                 try:
                     shutil.move(req, "/locr/ArchivedRequests")
                 except shutil.Error:
