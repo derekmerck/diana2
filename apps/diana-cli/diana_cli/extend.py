@@ -304,12 +304,9 @@ def extend(ctx,
                     for i, entry in enumerate(mfind_results):
                         record_i = Dixel.from_montage_json(entry)
                         record_i.report.anonymize()
-                    record_i.to_csv("{}/init_reports/{}.csv".format(proj_path, an))
+                    record_i.to_csv("{}/reports/tmp/{}.csv".format(proj_path, an))
                     with open("{}/{}_scores.txt".format(proj_path, ml), "a+") as f:
                         f.write("{}, {}\n".format(an, str(datetime.now())))
-
-                    time.sleep(1)
-                    shutil.copy("{}/init_reports/{}.csv".format(proj_path, an), "{}/reports/{}.csv".format(proj_path, an))
                 elif ml == "covid":
                     s = pydicom.dcmread(dcmdir_name)
                     try:
@@ -359,10 +356,6 @@ def extend(ctx,
                     shutil.rmtree("{}/data/{}_process".format(proj_path, an))
 
             # p_watch.terminate() # WARNING: this may create many many Docker container archives along w/ subsequent re-Popen...
-            # time.sleep(1)
-            # if ml == "ablation":
-            #     p_rsync = subprocess.Popen("rsync -r init_reports/ reports", shell=True, cwd="{}".format(proj_path))
-            #     p_rsync.wait()
             # p_watch = subprocess.Popen("diana-cli watch -r {} radarch None {}".format(rt, proj_path), shell=True, stdout=subprocess.PIPE)
     except (KeyboardInterrupt, FileNotFoundError, KeyError, AssertionError) as e:
         if type(e) is FileNotFoundError:
