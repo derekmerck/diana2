@@ -10,5 +10,5 @@ while True:
     print(datetime.now().strftime("%Y%m%d-%H%M%S"))
     for _ in d1:
         if _ not in d2:
-            shutil.copy(d1, "/reports")
+            shutil.copy(_, "/reports")
     time.sleep(86400)
