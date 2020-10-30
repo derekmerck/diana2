@@ -4,10 +4,9 @@ import shutil
 import subprocess
 import time
 
-d1 = glob.glob("/reports/tmp/*.csv")
-d2 = glob.glob("/reports/*.csv")
-
 while True:
+    d1 = glob.glob("/reports/tmp/*.csv")
+    d2 = glob.glob("/reports/*.csv")
     print(datetime.now().strftime("%Y%m%d-%H%M%S"))
     for _ in d1:
         if _.split("/")[-1] not in [f.split("/")[-1] for f in d2]:
