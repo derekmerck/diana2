@@ -31,9 +31,12 @@ class SplunkGateway(Requester):
     def set_hostname(self):
         return socket.gethostname()
 
+<<<<<<< HEAD:package/crud/gateways/splunk_gateway.py
     def info(self):
         r = self._get("services/server/info", params={'output_mode': 'json'})
         return r
+=======
+>>>>>>> c3897585fb07ccb90d784bea9a92a2dceeca0a46:package/diana/utils/gateways/requesters/splunk.py
     def find_events(self, q, timerange=None, verify=False):
         logger = logging.getLogger(self.name)
 
