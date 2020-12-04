@@ -18,10 +18,10 @@ import zipfile
 
 # Selective querying
 import logging
-from diana.utils.endpoint import Serializable
+from crud.abc import Serializable
 from diana.utils.dicom import DicomLevel
 from diana.dixel import Dixel, DixelView
-from diana.utils.gateways.exceptions import GatewayConnectionError
+from crud.exceptions import GatewayConnectionError
 from diana.apis import DcmDir, Orthanc
 from diana.utils.dicom import dicom_date
 logging.basicConfig(filename='/opt/diana/debug.log', level=logging.DEBUG)

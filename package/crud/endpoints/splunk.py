@@ -7,10 +7,10 @@ import attr
 
 from ..abc import Endpoint, Serializable, Item
 from ..gateways import SplunkGateway
-from ..dixel import Dixel
-from ..utils.endpoint import Endpoint, Serializable
-from ..utils.dicom import DicomLevel
-from ..utils.gateways import Splunk as SplunkGateway, GatewayConnectionError
+from diana.dixel import Dixel
+from ..abc.endpoint import Endpoint
+from diana.utils import DicomLevel
+#from ..utils.gateways import Splunk as SplunkGateway, GatewayConnectionError
 
 # Suppress insecure warning
 import urllib3
