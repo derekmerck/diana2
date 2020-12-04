@@ -2,8 +2,8 @@ import os, logging, json as _json
 import requests
 import attr
 from requests.auth import HTTPBasicAuth
-from ..exceptions import GatewayConnectionError
-from ...smart_json import SmartJSONEncoder
+from crud.exceptions import GatewayConnectionError
+from crud.utils import SmartJSONEncoder
 
 # Enabled sessions to handle cookies from Docker swarm for sticky connections
 USE_SESSIONS = True
@@ -109,10 +109,6 @@ class Requester(object):
         return self.handle_result(result)
 
     def _post(self, resource, json=None, data=None, headers=None, verify=True):
-<<<<<<< HEAD
-        print("Testing: {}".format(self.auth))
-=======
->>>>>>> c3897585fb07ccb90d784bea9a92a2dceeca0a46
         logger = logging.getLogger(self.name)
         logger.debug("Calling post")
         url = self.make_url(resource)
@@ -122,11 +118,8 @@ class Requester(object):
             if USE_SESSIONS:
                 result = self.session.post(url, data=data, headers=headers, auth=HTTPBasicAuth(self.auth[0], self.auth[1]), timeout=TIMEOUTS, verify=verify)
             else:
-<<<<<<< HEAD
                 result = requests.post(url, data=data, headers=headers, auth=HTTPBasicAuth(self.auth[0], self.auth[1]), timeout=TIMEOUTS, verify=verify)
-=======
-                result = requests.post(url, data=data, headers=headers, auth=HTTPBasicAuth(self.auth[0], self.auth[1]), timeout=TIMEOUTS)
->>>>>>> c3897585fb07ccb90d784bea9a92a2dceeca0a46
+
         except requests.exceptions.Timeout as e:
             raise GatewayConnectionError("Response timed out")
         except (requests.exceptions.ConnectionError,
