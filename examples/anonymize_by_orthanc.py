@@ -4,14 +4,20 @@ import sys
 import logging
 import pydicom
 sys.path.insert(0, r"D:\Git\diana2\package")
-from diana.apis import get_service, DcmDir
+from diana.apis import DcmDir
 from diana.utils.dicom import DicomLevel
 from diana.dixel import Dixel
+from crud.manager import EndpointManager
 
-services_path = r"D:\Brown\Research\test_service.yml"
+services_path = r"@D:\Brown\Research\test_service.yml"
 D = DcmDir(path=r"D:\Brown\Research\Raw_Data\image_anonymization\Disc_1\7501")
 
-source = get_service(services_path, "legion", True)
+epman = EndpointManager()
+epman.serialized_ep_descs = services_path
+epman.ep_descs = epman.set_descs()
+# source = get_service(services_path, "legion", True)
+source = epman.get("legion")
+
 for i, subd in enumerate(D.subdirs()):
     if i == 0:
         continue
