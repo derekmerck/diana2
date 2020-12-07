@@ -1,6 +1,7 @@
 # import ast
 import click
 from datetime import datetime, timedelta
+from dateutil import parser
 import json
 import os
 import glob
@@ -105,10 +106,31 @@ def extend(ctx,
             for st_d in ML_STUDY_DESCRIPTIONS:
                 if ml == "bone_age" or ml == "elvos" or ml == "ablation" or ml == "covid":
                     if ml == "ablation":
-                        dtn = dicom_date(datetime.today() - timedelta(days=2))
+                        if os.path.isfile("{}/last_date.txt".format(proj_path)):
+                            with open("{}/last_date.txt".format(proj_path), "r") as f:
+                                last_dt = datetime.today() - parser.parse(f.read())
+                            if last_dt.days < 2:
+                                last_dt = timedelta(days=2)
+                        ofind_result = ""
+                        d_i = last_dt.days
+                        first_ofind = True
+                        while d_i >= 2:
+                            dtn = dicom_date(datetime.today() - timedelta(d_i))
+                            if first_ofind and d_i == 2:
+                                ofind_result = subprocess.Popen("diana-cli ofind -l series -q \"{{\'StudyDescription\': \'{}\', \'StudyDate\':\'{}\'}}\" -d radarch sticky_bridge".format(st_d, dtn), shell=True, stdout=subprocess.PIPE).stdout.read()
+                            elif first_ofind:
+                                ofind_result = subprocess.Popen("diana-cli ofind -l series -q \"{{\'StudyDescription\': \'{}\', \'StudyDate\':\'{}\'}}\" -d radarch sticky_bridge".format(st_d, dtn), shell=True, stdout=subprocess.PIPE).stdout.read()[:-1]
+                            elif d_i == 2:
+                                ofind_result.append("," + subprocess.Popen("diana-cli ofind -l series -q \"{{\'StudyDescription\': \'{}\', \'StudyDate\':\'{}\'}}\" -d radarch sticky_bridge".format(st_d, dtn), shell=True, stdout=subprocess.PIPE).stdout.read()[13:])
+                            else:
+                                ofind_result.append("," + subprocess.Popen("diana-cli ofind -l series -q \"{{\'StudyDescription\': \'{}\', \'StudyDate\':\'{}\'}}\" -d radarch sticky_bridge".format(st_d, dtn), shell=True, stdout=subprocess.PIPE).stdout.read()[13:-1])
+                            d_i -= 1
+                            first_ofind = False
+                        with open("{}/last_date.txt".format(proj_path), "w+") as f:
+                            f.write(str(datetime.today()))
                     else:
                         dtn = dicom_date(datetime.now())
-                    ofind_result = subprocess.Popen("diana-cli ofind -l series -q \"{{\'StudyDescription\': \'{}\', \'StudyDate\':\'{}\'}}\" -d radarch sticky_bridge".format(st_d, dtn), shell=True, stdout=subprocess.PIPE).stdout.read()
+                        ofind_result = subprocess.Popen("diana-cli ofind -l series -q \"{{\'StudyDescription\': \'{}\', \'StudyDate\':\'{}\'}}\" -d radarch sticky_bridge".format(st_d, dtn), shell=True, stdout=subprocess.PIPE).stdout.read()
                 elif ml == "brain_bleed":
                     ofind_result = subprocess.Popen("diana-cli ofind -l series -q \"{{\'StudyDescription\': \'{}\', \'StudyDate\':\'{}\', \'SeriesDescription\': \'\'}}\" -d radarch sticky_bridge".format(st_d, dicom_date(datetime.now())), shell=True, stdout=subprocess.PIPE).stdout.read()
                 accession_nums.extend(parse_results(ofind_result, proj_path, ml))
