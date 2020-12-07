@@ -113,25 +113,16 @@ def extend(ctx,
                                 last_dt = timedelta(days=2)
                         else:
                             last_dt = timedelta(days=2)
-                        ofind_result = ""
                         d_i = last_dt.days
-                        first_ofind = True
                         while d_i >= 2:
                             dtn = dicom_date(datetime.today() - timedelta(d_i))
-                            tmp_ofind = subprocess.Popen("diana-cli ofind -l series -q \"{{\'StudyDescription\': \'{}\', \'StudyDate\':\'{}\'}}\" -d radarch sticky_bridge".format(st_d, dtn), shell=True, stdout=subprocess.PIPE).stdout.read().decode("utf-8")
-                            if first_ofind and d_i == 2:
-                                ofind_result = tmp_ofind
-                            elif first_ofind:
-                                ofind_result = tmp_ofind[:-1]
-                            elif d_i == 2:
-                                ofind_result += "," + tmp_ofind[13:]
-                            else:
-                                ofind_result += "," + tmp_ofind[13:-1]
+                            print("Querying: {}".format(dtn))
+                            ofind_result = subprocess.Popen("diana-cli ofind -l series -q \"{{\'StudyDescription\': \'{}\', \'StudyDate\':\'{}\'}}\" -d radarch sticky_bridge".format(st_d, dtn), shell=True, stdout=subprocess.PIPE).stdout.read()
+                            if not d_i == 2:
+                                accession_nums.extend(parse_results(ofind_result, proj_path, "ablation"))
                             time.sleep(0.5)
-                            first_ofind = False
                             d_i -= 1
 
-                        ofind_result = ofind_result.encode("utf-8")
                         with open("{}/last_date.txt".format(proj_path), "w+") as f:
                             f.write(str(datetime.today()))
                     else:
