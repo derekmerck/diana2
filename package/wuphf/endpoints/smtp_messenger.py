@@ -2,6 +2,7 @@ import logging
 import smtplib
 import attr
 from ..abc import Messenger
+from email.mime.text import MIMEText
 
 sample_msg = """
 to: {{ target }}
@@ -59,7 +60,10 @@ class SmtpMessenger(Messenger):
         logger.info("Sending message via SMTP connector:\n{}".format(msg))
 
         with self.gateway(self.host, self.port, self.user, self.password, self.tls) as g:
-            g.sendmail(self.from_addr, to_addrs, msg.encode(encoding='UTF-8'))
+            if "outlook" in self.host:
+                g.sendmail(self.from_addr, to_addrs, MIMEText(msg).as_string())
+            else:
+                g.sendmail(self.from_addr, to_addrs, msg.encode(encoding='UTF-8'))
 
 
 SmtpMessenger.register()
