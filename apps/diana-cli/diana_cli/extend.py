@@ -127,8 +127,11 @@ def extend(ctx,
                                 ofind_result += "," + tmp_ofind[13:]
                             else:
                                 ofind_result += "," + tmp_ofind[13:-1]
-                            d_i -= 1
+                            time.sleep(0.5)
                             first_ofind = False
+                            d_i -= 1
+
+                        ofind_result = ofind_result.encode("utf-8")
                         with open("{}/last_date.txt".format(proj_path), "w+") as f:
                             f.write(str(datetime.today()))
                     else:
