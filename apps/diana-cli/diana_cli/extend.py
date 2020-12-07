@@ -111,6 +111,8 @@ def extend(ctx,
                                 last_dt = datetime.today() - parser.parse(f.read())
                             if last_dt.days < 2:
                                 last_dt = timedelta(days=2)
+                        else:
+                            last_dt = timedelta(days=2)
                         ofind_result = ""
                         d_i = last_dt.days
                         first_ofind = True
