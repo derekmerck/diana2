@@ -1,6 +1,5 @@
 from datetime import datetime
 import glob
-import shutil
 import subprocess
 import time
 
@@ -12,4 +11,8 @@ while True:
         if _.split("/")[-1] not in [f.split("/")[-1] for f in d2]:
             print("Copied: {}".format(_))
             subprocess.Popen("cp {} /reports".format(_), shell=True)
-    time.sleep(86400)
+
+    a = datetime.now()
+    b = a.replace(day=a.day+1, hour=10, minute=0, second=0, microsecond=0)
+    seconds_till_next = (a-b).seconds
+    time.sleep(seconds_till_next)
