@@ -47,8 +47,8 @@ Provided route handlers:
 @click.command(short_help="Watch sources and route events", epilog=epilog)
 @click.option("--routes", "-r", type=CLICK_MAPPING, default=None)
 @click.option("--handler", "-h", type=click.STRING, default=None)
-@click.option("--source", "-s", type=CLICK_ENDPOINT, default=None)
-@click.option("--dest", "-d",   type=CLICK_ENDPOINT, default=None)
+@click.option("--source", "-s", type=click.STRING, default=None)
+@click.option("--dest", "-d",   type=click.STRING, default=None)
 @click.pass_context
 def watch(ctx, routes, handler, source, dest):
     """Watch sources for events to handle based on ROUTES"""
@@ -58,13 +58,21 @@ def watch(ctx, routes, handler, source, dest):
 
     W = Watcher()
 
-    source  = services.get(source)
-    dest    = services.get(dest)
-    handler = mk_route(handler, source=source, dest=dest)
+    #source  = services.get(source)
+    source = {
+                "ctype": "ObservableDcmDir",
+                "path": "/reports"
+             }
+    #dest    = services.get(dest)
+    dest = {"ctype": "Splunk",
+                "host": "***REMOVED***",
+                "index": "main",
+                "hec_token": "***REMOVED***"}
+    tr = mk_route(handler, source_desc=source, dest_desc=dest)
 
-    tr = Trigger(source=source,
-                 dest=dest,
-                 handler=handler)
+    #tr = Trigger(source=source,
+    #             dest=dest,
+    #             handler=handler)
 
     W.add_trigger(tr)
 
