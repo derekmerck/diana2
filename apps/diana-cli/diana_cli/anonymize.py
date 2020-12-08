@@ -83,7 +83,7 @@ def anonymize(ctx,
             requests = glob.glob("{}/*.csv".format(req_path))
             for req in requests:
                 patient_list = pd.read_csv(req)
-
+                t_start = datetime.now()
                 for i, pid in enumerate(patient_list["locr_patient_id"]):
                     accession_nums = []
                     for j in range(1, 11):
@@ -141,7 +141,8 @@ def anonymize(ctx,
                         print(comb_path)
                         copy_tree(dcmfolder, comb_path)
                         shutil.rmtree("{}/data/{}_process".format(tmp_path, an))
-                        sender._send(patient_list["locr_requestor_email"][i], "NOTICE: your anonymization request has been completed.")
+                    t_elapsed = datetime.now() - t_start
+                    sender._send(patient_list["locr_requestor_email"][i], "NOTICE: your anonymization request was completed in {} min {} s".format(t_elapsed.minutes, t_elapsed.seconds))
                 try:
                     shutil.move(req, "/locr/ArchivedRequests")
                 except shutil.Error:
