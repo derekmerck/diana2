@@ -1,6 +1,8 @@
 import sys
 sys.path.insert(0, "/opt/diana/package")
 from diana.utils.gateways.requesters import requester
+from crud.exceptions import GatewayConnectionError
+from wuphf.endpoints import SmtpMessenger
 import click
 from datetime import datetime, timedelta
 from distutils.dir_util import copy_tree
@@ -41,6 +43,14 @@ def anonymize(ctx,
         last_time = datetime.now() - timedelta(seconds=wait_time)
         reqstr = requester.Requester()
         reqstr.base_url = "https://redcap.lifespan.org/redcap/api"
+
+        sender = SmtpMessenger()
+        sender.host = os.environ['MAIL_HOST']
+        sender.port = os.environ['MAIL_PORT']
+        sender.from_addr = os.environ['MAIL_FROM']
+        sender.user = None
+        sender.password = ""
+
         while True:
             data = {
                 'token': os.environ['REDCAP_TOKEN'],
@@ -75,11 +85,6 @@ def anonymize(ctx,
                 patient_list = pd.read_csv(req)
 
                 for i, pid in enumerate(patient_list["locr_patient_id"]):
-                    # with open("{}/done_ids.txt".format(tmp_path)) as done_ids:
-                    #     if str(patient_list["record_id"][i]) in done_ids.read():
-                    #         print("Duplicate request record id...")
-                    #         continue
-
                     accession_nums = []
                     for j in range(1, 11):
                         an_j = patient_list['accession_num{}'.format(j)][i]
@@ -136,14 +141,21 @@ def anonymize(ctx,
                         print(comb_path)
                         copy_tree(dcmfolder, comb_path)
                         shutil.rmtree("{}/data/{}_process".format(tmp_path, an))
-                    # with open("{}/done_ids.txt".format(tmp_path), "a+") as f:
-                    #     f.write(str(patient_list["record_id"][i]) + "\n")
+                        sender._send(patient_list["locr_requestor_email"][i], "NOTICE: your anonymization request has been completed.")
                 try:
                     shutil.move(req, "/locr/ArchivedRequests")
                 except shutil.Error:
                     os.remove(req)
                     time.sleep(60)
-    except (KeyboardInterrupt, FileNotFoundError, KeyError, AssertionError) as e:
+    except (KeyboardInterrupt, FileNotFoundError, KeyError, AssertionError, GatewayConnectionError) as e:
+        try:
+            for _ in sub_processes:
+                _.kill()
+                # os.killpg(os.getpgid(_.pid), signal.SIGTERM)
+        except UnboundLocalError:
+            print("UnboundLocalError on exit clean-up")  # TODO: address
+            pass
+
         if type(e) is FileNotFoundError:
             print("Excepted error: {}".format(e))
         elif type(e) is KeyError:
@@ -152,16 +164,13 @@ def anonymize(ctx,
             print("Slack Error: {}".format(e))
         elif type(e) is KeyboardInterrupt:
             print("Exiting...")
+        elif type(e) is GatewayConnectionError:
+            sender._send("Anonymizer cannot reach REDCap API", os.environ['SYS_ADMIN1'])
+            sender._send("Anonymizer cannot reach REDCap API", os.environ['SYS_ADMIN2'])
         else:
             print("Some error: {}".format(e))
 
-        try:
-            for _ in sub_processes:
-                _.kill()
-                # os.killpg(os.getpgid(_.pid), signal.SIGTERM)
-        except UnboundLocalError:
-            print("UnboundLocalError on exit clean-up")  # TODO: address
-            pass
+
 
 
 def get_subdirectories(a_dir):
