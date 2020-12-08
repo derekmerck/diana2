@@ -1,4 +1,5 @@
 from .dgetall import dgetall
+from .extend import extend
 from .fdump import fdump
 from .findex import findex, findex_get
 from .guid import guid
