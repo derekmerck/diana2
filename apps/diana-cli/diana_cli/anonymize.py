@@ -165,12 +165,9 @@ def anonymize(ctx,
         elif type(e) is KeyboardInterrupt:
             print("Exiting...")
         elif type(e) is GatewayConnectionError:
-            sender._send("Anonymizer cannot reach REDCap API", os.environ['SYS_ADMIN1'])
-            sender._send("Anonymizer cannot reach REDCap API", os.environ['SYS_ADMIN2'])
+            sender._send("Anonymizer cannot reach REDCap API", [os.environ['SYS_ADMIN1'], os.environ['SYS_ADMIN2']])
         else:
             print("Some error: {}".format(e))
-
-
 
 
 def get_subdirectories(a_dir):

@@ -60,8 +60,10 @@ class SmtpMessenger(Messenger):
         logger.info("Sending message via SMTP connector:\n{}".format(msg))
 
         with self.gateway(self.host, self.port, self.user, self.password, self.tls) as g:
-            if "outlook" in self.host:
-                g.sendmail(self.from_addr, to_addrs, MIMEText(msg).as_string())
+            if "outbound" in self.host:
+                m = MIMEText(msg)
+                m["Subject"] = "UPDATE: Anonymization"
+                g.sendmail(self.from_addr, to_addrs, m.as_string())
             else:
                 g.sendmail(self.from_addr, to_addrs, msg.encode(encoding='UTF-8'))
 
