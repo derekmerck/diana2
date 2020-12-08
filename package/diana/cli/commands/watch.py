@@ -52,9 +52,6 @@ Provided route handlers:
 @click.pass_context
 def watch(ctx, routes, handler, source, dest):
     """Watch sources for events to handle based on ROUTES"""
-
-    raise NotImplementedError
-
     services = ctx.obj.get('services')
 
     click.echo(click.style('Watcher', underline=True, bold=True))
