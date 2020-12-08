@@ -13,11 +13,13 @@ gistsig@git+https://github.com/derekmerck/gistsig
 
 # DIANA reqs
 numpy
+pandas
 pydicom
 pyyaml
 pillow
 python-dateutil
 cryptography
+slackclient
 watchdog
 xmltodict
 pyxnat
