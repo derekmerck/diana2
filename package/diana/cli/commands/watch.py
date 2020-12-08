@@ -74,10 +74,10 @@ def watch(ctx, route, routes_path):
                 "path": r["source"][5:]
             }
         else:
-            source_desc = services[rt['source']]
+            source_desc = services.get(rt['source'])
 
         if services.get( rt['dest'] ):
-            dest_desc = services[rt['dest']]
+            dest_desc = services.get(rt['dest'])
         else:
             dest_desc = None
 
