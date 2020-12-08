@@ -58,16 +58,14 @@ def watch(ctx, routes, handler, source, dest):
 
     W = Watcher()
 
-    for rt in routes:
+    source  = services.get(source)
+    dest    = services.get(dest)
+    handler = mk_route(handler, source=source, dest=dest)
 
-        source  = services.get(rt["source"])
-        dest    = services.get(rt["dest"])
-        handler = mk_route(rt["handler"], source=source, dest=dest)
+    tr = Trigger(source=source,
+                 dest=dest,
+                 handler=handler)
 
-        tr = Trigger(source=source,
-                     dest=dest,
-                     handler=handler)
-
-        W.add_trigger(tr)
+    W.add_trigger(tr)
 
     W.run()
