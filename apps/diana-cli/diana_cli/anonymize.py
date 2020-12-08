@@ -52,6 +52,7 @@ def anonymize(ctx,
         sender.password = ""
 
         while True:
+            req_emails = []
             data = {
                 'token': os.environ['REDCAP_TOKEN'],
                 'content': 'record',
@@ -85,6 +86,10 @@ def anonymize(ctx,
                 patient_list = pd.read_csv(req)
                 t_start = datetime.now()
                 for i, pid in enumerate(patient_list["locr_patient_id"]):
+                    req_emails = []
+                    if patient_list["locr_requestor_email"][i] not in req_emails:
+                        req_emails.append(patient_list["locr_requestor_email"][i])
+
                     accession_nums = []
                     for j in range(1, 11):
                         an_j = patient_list['accession_num{}'.format(j)][i]
@@ -142,7 +147,7 @@ def anonymize(ctx,
                         copy_tree(dcmfolder, comb_path)
                         shutil.rmtree("{}/data/{}_process".format(tmp_path, an))
                     t_elapsed = datetime.now() - t_start
-                    sender._send(patient_list["locr_requestor_email"][i], "NOTICE: your anonymization request was completed in {} min {} s".format(t_elapsed.minutes, t_elapsed.seconds))
+                    sender._send(patient_list["locr_requestor_email"][i], "NOTICE: an anonymization request was completed in {} min {} s".format(t_elapsed.minutes, t_elapsed.seconds))
                 try:
                     shutil.move(req, "/locr/ArchivedRequests")
                 except shutil.Error:
@@ -169,6 +174,9 @@ def anonymize(ctx,
             sender._send("Anonymizer cannot reach REDCap API", [os.environ['SYS_ADMIN1'], os.environ['SYS_ADMIN2']])
         else:
             print("Some error: {}".format(e))
+
+        for _ in req_emails:
+            sender._send(_, "ERROR: Anonymization system is down. Please contact system administrator.")
 
 
 def get_subdirectories(a_dir):
