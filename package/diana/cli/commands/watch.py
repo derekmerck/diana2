@@ -1,43 +1,31 @@
 import click
-from crud.abc import Watcher, Trigger
-from crud.cli.utils import CLICK_MAPPING, CLICK_ENDPOINT
+import yaml
 from diana.daemons import mk_route
-
-# TODO: Fix watcher ...
+from diana.utils.endpoint import Watcher
 
 epilog="""
 Examples:
 
 \b
-$ diana-cli watch upload_files path:/incoming queue
-$ diana-cli watch anon_and_send_instances queue archive
-$ diana-cli watch index_studies pacs splunk
-$ diana-cli watch classify_ba archive splunk
-$ diana-cli watch -r @routes.yml
+$ diana-cli watch -r upload_files path:/incoming queue
+$ diana-cli watch -r anon_and_send_instances queue archive
+$ diana-cli watch -r index_studies pacs splunk
+$ diana-cli watch -r classify_ba archive splunk
+$ diana-cli watch -R routes.yml
 
 Multiple ROUTES file format:
 
 \b
 ---
-- source: orthanc
-  event_type: new_study
-  actions: 
-    - say
-  
-- source: path:/incoming
-  dest: orthanc
-  event_type: new_file
-  action: 
-    - source.get
-    - dest.put
-    - dest.anonymize
-    - dest.delete
-
-- source: orthanc
+- handler: upload_files
+  source: "path:/incoming"
+  dest: queue
+- handler: anon_and_send_instances
+  source: queue
+  dest: archive
+- handler: index_studies
+  source: pacs
   dest: splunk
-  event_type: new_study
-  action: 
-    - put
 ...
 
 Provided route handlers:
@@ -45,37 +33,58 @@ Provided route handlers:
 \b
 - say_dlvl
 - send_dlvl or anon_and_send_dlvl
-- upload_files or upload_and_anon_files
+- upload_files
 - index_dlvl
 """
 
 
 @click.command(short_help="Watch sources and route events", epilog=epilog)
-@click.option("--routes", "-r", type=CLICK_MAPPING, default=None)
-@click.option("--handler", "-h", type=click.STRING)
-@click.option("--source", "-s", type=CLICK_ENDPOINT)
-@click.option("--dest", "-d",   type=CLICK_ENDPOINT)
+@click.option('-r', '--route', default=None, nargs=4)
+@click.option('-R', '--routes_path', type=click.Path(exists=True), default=None)
 @click.pass_context
-def watch(ctx, routes):
+def watch(ctx, route, routes_path):
     """Watch sources for events to handle based on ROUTES"""
-
-    raise NotImplementedError
-
     services = ctx.obj.get('services')
 
     click.echo(click.style('Watcher', underline=True, bold=True))
+
+    routes = []
+
+    if route:
+        r = {"handler": route[0],
+             "source": route[1],
+             "dest": route[2],
+             "proj_path": route[3]
+             }
+
+        routes.append(r)
+
+    if routes_path:
+        with open(routes_path) as f:
+            _routes = yaml.load(f)
+            routes = routes + _routes
 
     W = Watcher()
 
     for rt in routes:
 
-        source  = services.get(rt["source"])
-        dest    = services.get(rt["dest"])
-        handler = mk_route(rt["handler"], source=source, dest=dest)
+        if rt["source"].startswith("path:"):
+            source_desc = {
+                "ctype": "ObservableDcmDir",
+                "path": r["source"][5:]
+            }
+        else:
+            source_desc = services[rt['source']]
 
-        tr = Trigger(source=source,
-                     dest=dest,
-                     handler=handler)
+        if services.get( rt['dest'] ):
+            dest_desc = services[rt['dest']]
+        else:
+            dest_desc = None
+
+        tr = mk_route( rt['handler'],
+                       source_desc=source_desc,
+                       dest_desc=dest_desc,
+                       proj_path=rt['proj_path'])
 
         W.add_trigger(tr)
 
