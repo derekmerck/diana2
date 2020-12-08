@@ -226,7 +226,7 @@ def dixelize_and_send(fp: str, dest: Splunk):
     dest.put(d)
 
 
-def mk_route(hname, source_desc, dest_desc=None, proj_path=None):
+def mk_route(hname, source_desc, dest_desc=None):
 
     print("Adding route {}".format(hname))
 
@@ -263,10 +263,6 @@ def mk_route(hname, source_desc, dest_desc=None, proj_path=None):
     elif hname == "say_studies":
         evtype = DicomEventType.STUDY_ADDED
         func = partial(say)
-
-    elif hname == "write_series_AI":
-        evtype = DicomEventType.SERIES_ADDED
-        func = partial(write_ai, proj_path=proj_path)
 
     elif hname == "say_hello_studies":
         evtype = DicomEventType.STUDY_ADDED

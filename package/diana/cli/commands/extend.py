@@ -77,10 +77,6 @@ def extend(ctx,
         p_slack_rtm = subprocess.Popen("python3 /opt/diana/package/diana/daemons/slack_rtm.py {} {}".format(proj_path, ml), shell=True, stdout=subprocess.PIPE)
         sub_processes.append(p_slack_rtm)
 
-        # rt = "write_series_AI"
-        # p_watch = subprocess.Popen("diana-cli watch -r {} radarch None {}".format(rt, proj_path), shell=True, stdout=subprocess.PIPE)
-        # sub_processes.append(p_watch)
-
         if not os.path.isfile("{}/{}_scores.txt".format(proj_path, ml)):
             open("{}/{}_scores.txt".format(proj_path, ml), 'a').close()
 

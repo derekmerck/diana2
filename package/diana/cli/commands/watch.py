@@ -39,7 +39,7 @@ Provided route handlers:
 
 
 @click.command(short_help="Watch sources and route events", epilog=epilog)
-@click.option('-r', '--route', default=None, nargs=4)
+@click.option('-r', '--route', default=None, nargs=3)
 @click.option('-R', '--routes_path', type=click.Path(exists=True), default=None)
 @click.pass_context
 def watch(ctx, route, routes_path):
@@ -51,11 +51,11 @@ def watch(ctx, route, routes_path):
     routes = []
 
     if route:
-        r = {"handler": route[0],
+        r = {
+             "handler": route[0],
              "source": route[1],
-             "dest": route[2],
-             "proj_path": route[3]
-             }
+             "dest": route[2]
+            }
 
         routes.append(r)
 
@@ -83,8 +83,7 @@ def watch(ctx, route, routes_path):
 
         tr = mk_route( rt['handler'],
                        source_desc=source_desc,
-                       dest_desc=dest_desc,
-                       proj_path=rt['proj_path'])
+                       dest_desc=dest_desc)
 
         W.add_trigger(tr)
 
