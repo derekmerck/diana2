@@ -46,11 +46,11 @@ Provided route handlers:
 
 @click.command(short_help="Watch sources and route events", epilog=epilog)
 @click.option("--routes", "-r", type=CLICK_MAPPING, default=None)
-@click.option("--handler", "-h", type=click.STRING)
-@click.option("--source", "-s", type=CLICK_ENDPOINT)
-@click.option("--dest", "-d",   type=CLICK_ENDPOINT)
+@click.option("--handler", "-h", type=click.STRING, default=None)
+@click.option("--source", "-s", type=CLICK_ENDPOINT, default=None)
+@click.option("--dest", "-d",   type=CLICK_ENDPOINT, default=None)
 @click.pass_context
-def watch(ctx, routes):
+def watch(ctx, routes, handler, source, dest):
     """Watch sources for events to handle based on ROUTES"""
 
     raise NotImplementedError
