@@ -147,7 +147,7 @@ def anonymize(ctx,
                         copy_tree(dcmfolder, comb_path)
                         shutil.rmtree("{}/data/{}_process".format(tmp_path, an))
                     t_elapsed = datetime.now() - t_start
-                    sender._send(patient_list["locr_requestor_email"][i], "NOTICE: an anonymization request was completed in {} min {} s".format(floor(t_elapsed.seconds / 60), t_elapsed.seconds % 60))
+                    sender._send("NOTICE: an anonymization request was completed in {} min {} s".format(floor(t_elapsed.seconds / 60), t_elapsed.seconds % 60), patient_list["locr_requestor_email"][i])
                 try:
                     shutil.move(req, "/locr/ArchivedRequests")
                 except shutil.Error:
@@ -177,7 +177,7 @@ def anonymize(ctx,
 
         for _ in req_emails:
             print("Emailed: {}".format(_))
-            sender._send(_, "ERROR: Anonymization system is down. Please contact system administrator.")
+            sender._send("ERROR: Anonymization system is down. Please contact system administrator.", _)
 
 
 def get_subdirectories(a_dir):
