@@ -147,7 +147,8 @@ def anonymize(ctx,
                         copy_tree(dcmfolder, comb_path)
                         shutil.rmtree("{}/data/{}_process".format(tmp_path, an))
                     t_elapsed = datetime.now() - t_start
-                    sender._send("NOTICE: an anonymization request was completed in {} min {} s".format(floor(t_elapsed.seconds / 60), t_elapsed.seconds % 60), patient_list["locr_requestor_email"][i])
+                    sender._send("NOTICE: an anonymization request was completed in {} min {} s. Thank you for using the Automated Deidentification and Anonymization System (ADAAS).".format(floor(t_elapsed.seconds / 60), t_elapsed.seconds % 60),
+                                 [sender.host, patient_list["locr_requestor_email"][i]])
                 try:
                     shutil.move(req, "/locr/ArchivedRequests")
                 except shutil.Error:
@@ -171,13 +172,14 @@ def anonymize(ctx,
         elif type(e) is KeyboardInterrupt:
             print("Exiting...")
         elif type(e) is GatewayConnectionError:
-            sender._send("Anonymizer cannot reach REDCap API", [os.environ['SYS_ADMIN1'], os.environ['SYS_ADMIN2']])
+            sender._send("Anonymizer cannot reach REDCap API", [sender.host, os.environ['SYS_ADMIN1'], os.environ['SYS_ADMIN2']])
         else:
             print("Some error: {}".format(e))
 
         for _ in req_emails:
             print("Emailed: {}".format(_))
             sender._send("ERROR: Anonymization system is down. Please contact system administrator.", _)
+        sender._send("ERROR: Anonymization system is down. Please contact system administrator.", sender.host)
 
 
 def get_subdirectories(a_dir):
