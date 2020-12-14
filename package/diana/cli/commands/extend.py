@@ -114,8 +114,7 @@ def extend(ctx,
                             dtn = dicom_date(datetime.today() - timedelta(d_i))
                             print("Querying: {}".format(dtn))
                             ofind_result = subprocess.Popen("diana-cli ofind -l series -q \"{{\'StudyDescription\': \'{}\', \'StudyDate\':\'{}\'}}\" -d radarch sticky_bridge".format(st_d, dtn), shell=True, stdout=subprocess.PIPE).stdout.read()
-                            if not d_i == 2:
-                                accession_nums.extend(parse_results(ofind_result, proj_path, "ablation"))
+                            accession_nums.extend(parse_results(ofind_result, proj_path, "ablation"))
                             time.sleep(1)
                             d_i -= 1
 
