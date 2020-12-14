@@ -105,10 +105,10 @@ def extend(ctx,
                         if os.path.isfile("{}/last_date.txt".format(proj_path)):
                             with open("{}/last_date.txt".format(proj_path), "r") as f:
                                 last_dt = datetime.today() - parser.parse(f.read())
-                            if last_dt.days < 2:
-                                last_dt = timedelta(days=2)
+                            if last_dt.days < 30:
+                                last_dt = timedelta(days=30)
                         else:
-                            last_dt = timedelta(days=2)
+                            last_dt = timedelta(days=30)
                         d_i = last_dt.days
                         while d_i >= 2:
                             dtn = dicom_date(datetime.today() - timedelta(d_i))
