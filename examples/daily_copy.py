@@ -13,6 +13,6 @@ while True:
             subprocess.Popen("cp {} /reports".format(_), shell=True)
 
     a = datetime.now()
-    b = a.replace(day=a.day+1, hour=10, minute=0, second=0, microsecond=0)
+    b = a.replace(day=a.day+1, hour=12, minute=0, second=0, microsecond=0)
     seconds_till_next = (a-b).seconds
     time.sleep(seconds_till_next)
