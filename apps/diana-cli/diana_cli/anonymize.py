@@ -147,7 +147,7 @@ def anonymize(ctx,
                         copy_tree(dcmfolder, comb_path)
                         shutil.rmtree("{}/data/{}_process".format(tmp_path, an))
                     t_elapsed = datetime.now() - t_start
-                    sender._send("NOTICE: an anonymization request was completed in {} min {} s. Thank you for using the Automated Deidentification and Anonymization System (ADAAS).".format(floor(t_elapsed.seconds / 60), t_elapsed.seconds % 60),
+                    sender._send("NOTICE: an anonymization request was completed in {} min {} s. Thank you for using the Automated DICOM Attribute Anonymization System (ADAAS).".format(floor(t_elapsed.seconds / 60), t_elapsed.seconds % 60),
                                  [sender.from_addr, patient_list["locr_requestor_email"][i]])
                 try:
                     shutil.move(req, "/locr/ArchivedRequests")
