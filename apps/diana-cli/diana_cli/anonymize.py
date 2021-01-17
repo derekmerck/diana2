@@ -87,10 +87,10 @@ def anonymize(ctx,
                 t_start = datetime.now()
                 for i, pid in enumerate(patient_list["locr_patient_id"]):
                     try:
-                        if not isnan(pid):
-                            pass
+                        if isnan(pid):
+                            continue
                     except TypeError:
-                        continue
+                        pass
                     req_emails = []
                     if patient_list["locr_requestor_email"][i] not in req_emails:
                         req_emails.append(patient_list["locr_requestor_email"][i])
