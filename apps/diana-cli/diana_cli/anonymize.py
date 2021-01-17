@@ -86,6 +86,11 @@ def anonymize(ctx,
                 patient_list = pd.read_csv(req)
                 t_start = datetime.now()
                 for i, pid in enumerate(patient_list["locr_patient_id"]):
+                    try:
+                        if not isnan(pid):
+                            pass
+                    except TypeError:
+                        continue
                     req_emails = []
                     if patient_list["locr_requestor_email"][i] not in req_emails:
                         req_emails.append(patient_list["locr_requestor_email"][i])
@@ -94,7 +99,7 @@ def anonymize(ctx,
                     for j in range(1, 11):
                         an_j = patient_list['accession_num{}'.format(j)][i]
                         if not isnan(an_j):
-                            accession_nums.append(an_j)
+                            accession_nums.append(int(an_j))
 
                     if os.path.isfile("{}/anon.studies.txt".format(tmp_path)):
                         os.remove("{}/anon.studies.txt".format(tmp_path))
