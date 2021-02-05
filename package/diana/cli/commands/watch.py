@@ -1,4 +1,5 @@
 import click
+import os
 from crud.abc import Watcher, Trigger
 from crud.cli.utils import CLICK_MAPPING, CLICK_ENDPOINT
 from diana.daemons import mk_route
@@ -65,9 +66,9 @@ def watch(ctx, routes, handler, source, dest):
              }
     #dest    = services.get(dest)
     dest = {"ctype": "Splunk",
-                "host": "***REMOVED***",
+                "host": os.environ['SPLUNK_HOST'],
                 "index": "main",
-                "hec_token": "***REMOVED***"}
+                "hec_token": os.environ['SPLUNK_HEC_TOKEN']}
     tr = mk_route(handler, source_desc=source, dest_desc=dest)
 
     #tr = Trigger(source=source,
