@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import glob
 import subprocess
 import time
@@ -13,6 +13,9 @@ while True:
             subprocess.Popen("cp {} /reports".format(_), shell=True)
 
     a = datetime.now()
-    b = a.replace(day=a.day+1, hour=12, minute=0, second=0, microsecond=0)
+    try:
+        b = a.replace(day=a.day+1, hour=12, minute=0, second=0, microsecond=0)
+    except ValueError:
+        b = a + timedelta(days=1)
     seconds_till_next = (a-b).seconds
     time.sleep(seconds_till_next)
