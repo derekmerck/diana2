@@ -159,7 +159,7 @@ def anonymize(ctx,
                 except shutil.Error:
                     os.remove(req)
                     time.sleep(60)
-    except (KeyboardInterrupt, FileNotFoundError, KeyError, AssertionError, GatewayConnectionError) as e:
+    except (KeyboardInterrupt, FileNotFoundError, KeyError, AssertionError, GatewayConnectionError, OSError, Exception) as e:
         try:
             for _ in sub_processes:
                 _.kill()
