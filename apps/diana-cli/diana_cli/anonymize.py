@@ -152,7 +152,13 @@ def anonymize(ctx,
                         copy_tree(dcmfolder, comb_path)
                         shutil.rmtree("{}/data/{}_process".format(tmp_path, an))
                     t_elapsed = datetime.now() - t_start
-                    sender._send("NOTICE: an anonymization request was completed in {} min {} s. Thank you for using the Automated DICOM Attribute Anonymization System (ADAAS).".format(floor(t_elapsed.seconds / 60), t_elapsed.seconds % 60),
+                    sender._send(("NOTICE: an anonymization request was completed in {} min {} s.\n"
+                                  "You can access your anonymized imaging in the completed folder by clicking here -> {}.\n"
+                                  "Total size: {} MB\n"
+                                  "Thank you for using the Automated DICOM Attribute Anonymization System (ADAAS).").format(floor(t_elapsed.seconds / 60),
+                                                                                                                            t_elapsed.seconds % 60,
+                                                                                                                            os.environ['COMPLETED_FOLDER'] + "\\{}".format(comb_path.split("/")[-1]),
+                                                                                                                            get_dir_size(comb_path)),
                                  [sender.from_addr, patient_list["locr_requestor_email"][i]])
                 try:
                     shutil.move(req, "/locr/ArchivedRequests")
@@ -177,7 +183,9 @@ def anonymize(ctx,
         elif type(e) is KeyboardInterrupt:
             print("Exiting...")
         elif type(e) is GatewayConnectionError:
-            sender._send("Anonymizer cannot reach REDCap API", [sender.from_addr, os.environ['SYS_ADMIN1'], os.environ['SYS_ADMIN2']])
+            sender._send("Anonymizer cannot reach REDCap API. Will try restarting in an hour.", [sender.from_addr, os.environ['SYS_ADMIN1'], os.environ['SYS_ADMIN2']])
+            time.sleep(3600)
+            os.execv(sys.argv[0], sys.argv)
         else:
             print("Some error: {}".format(e))
 
@@ -189,3 +197,15 @@ def anonymize(ctx,
 
 def get_subdirectories(a_dir):
     return [f.path for f in os.scandir(a_dir) if f.is_dir()]
+
+
+def get_dir_size(start_path):
+    total_size = 0
+    for dirpath, dirnames, filenames in os.walk(start_path):
+        for f in filenames:
+            fp = os.path.join(dirpath, f)
+            # skip if it is symbolic link
+            if not os.path.islink(fp):
+                total_size += os.path.getsize(fp)
+
+    return total_size / 1024 # MB
