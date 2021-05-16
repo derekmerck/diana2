@@ -153,11 +153,11 @@ def anonymize(ctx,
                         shutil.rmtree("{}/data/{}_process".format(tmp_path, an))
                     t_elapsed = datetime.now() - t_start
                     sender._send(("NOTICE: an anonymization request was completed in {} min {} s.\n"
-                                  "You can access your anonymized imaging in the completed folder by clicking here -> {}.\n"
+                                  "You can access your anonymized imaging in the completed folder @ {}.\n"
                                   "Total size: {} MB\n"
                                   "Thank you for using the Automated DICOM Attribute Anonymization System (ADAAS).").format(floor(t_elapsed.seconds / 60),
                                                                                                                             t_elapsed.seconds % 60,
-                                                                                                                            os.environ['COMPLETED_FOLDER'] + "\\{}".format(comb_path.split("/")[-1]),
+                                                                                                                            os.environ['COMPLETED_FOLDER'] + "\\{}".format(comb_path.split("/")[-1]).replace(" ", "%20"),
                                                                                                                             get_dir_size(comb_path)),
                                  [sender.from_addr, patient_list["locr_requestor_email"][i]])
                 try:
@@ -200,12 +200,4 @@ def get_subdirectories(a_dir):
 
 
 def get_dir_size(start_path):
-    total_size = 0
-    for dirpath, dirnames, filenames in os.walk(start_path):
-        for f in filenames:
-            fp = os.path.join(dirpath, f)
-            # skip if it is symbolic link
-            if not os.path.islink(fp):
-                total_size += os.path.getsize(fp)
-
-    return total_size / 1024 # MB
+    return int(sum(f.stat().st_size for f in start_path.glob('**/*') if f.is_file()) / 1024)
