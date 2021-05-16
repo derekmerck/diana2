@@ -200,4 +200,4 @@ def get_subdirectories(a_dir):
 
 
 def get_dir_size(start_path):
-    return int(sum(f.stat().st_size for f in start_path.glob('**/*') if f.is_file()) / 1024)
+    return int(sum(f.stat().st_size for f in Path(start_path).glob('**/*') if f.is_file()) / 1024)
