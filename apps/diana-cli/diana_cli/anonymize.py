@@ -153,7 +153,7 @@ def anonymize(ctx,
                         shutil.rmtree("{}/data/{}_process".format(tmp_path, an))
                     t_elapsed = datetime.now() - t_start
                     sender._send(("NOTICE: an anonymization request was completed in {} min {} s.\n"
-                                  "You can access your anonymized imaging in the completed folder @ {}.\n"
+                                  "You can access your anonymized imaging in the completed folder @ {}\n"
                                   "Total size: {} MB\n"
                                   "Thank you for using the Automated DICOM Attribute Anonymization System (ADAAS).").format(floor(t_elapsed.seconds / 60),
                                                                                                                             t_elapsed.seconds % 60,
@@ -200,4 +200,4 @@ def get_subdirectories(a_dir):
 
 
 def get_dir_size(start_path):
-    return int(sum(f.stat().st_size for f in Path(start_path).glob('**/*') if f.is_file()) / 1024)
+    return int(sum(f.stat().st_size for f in Path(start_path).glob('**/*') if f.is_file()) / 1024 / 1024)  # MB
