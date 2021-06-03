@@ -157,7 +157,7 @@ def anonymize(ctx,
                                   "Total size: {} MB\n"
                                   "Thank you for using the Automated DICOM Attribute Anonymization System (ADAAS).").format(floor(t_elapsed.seconds / 60),
                                                                                                                             t_elapsed.seconds % 60,
-                                                                                                                            os.environ['COMPLETED_FOLDER'] + "\\{}".format(comb_path.split("/")[-1]).replace(" ", "%20"),
+                                                                                                                            os.environ['COMPLETED_FOLDER'],  # + "\\{}".format(comb_path.split("/")[-1]).replace(" ", "%20"),
                                                                                                                             get_dir_size(comb_path)),
                                  [sender.from_addr, patient_list["locr_requestor_email"][i]])
                 try:
