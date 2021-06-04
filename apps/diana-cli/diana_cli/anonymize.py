@@ -149,8 +149,12 @@ def anonymize(ctx,
                                                                   patient_list["date_of_scan{}".format(k+1)][i].replace("/", "."),
                                                                   dcmfolder.split("/")[-1])
                         print(comb_path)
-                        copy_tree(dcmfolder, comb_path)
+                        # copy_tree(dcmfolder, comb_path)
+                        p_copytree = subprocess.Popen("cp -r {} {}".format(dcmfolder, comb_path), shell=True)
+                        p_copytree.wait()
+                        print("Copy complete")
                         shutil.rmtree("{}/data/{}_process".format(tmp_path, an))
+                        print("Removed data")
                     t_elapsed = datetime.now() - t_start
                     sender._send(("NOTICE: an anonymization request was completed in {} min {} s.\n"
                                   "You can access your anonymized imaging in the completed folder @ {}\n"
