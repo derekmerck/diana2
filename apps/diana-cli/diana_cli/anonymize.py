@@ -135,8 +135,11 @@ def anonymize(ctx,
                         image_folders = [_[0] for _ in os.walk("{}/data/{}_process".format(tmp_path, an))]
                         for _ in image_folders:
                             fdcms = glob.glob(_ + "/*.dcm", recursive=True)
+                            for _fdcm in fdcms:
+                                if _fdcm.startswith("US"):
+                                    os.remove(_fdcm)
                             if len(fdcms) == 1:
-                                if os.stat(fdcms[0]).st_size < 50000:
+                                if os.stat(fdcms[0]).st_size < 50000 and os.path.isfile(fdcms[0]):
                                     os.remove(fdcms[0])
                             if "SR" in _:
                                 shutil.rmtree(_)
@@ -150,7 +153,7 @@ def anonymize(ctx,
                                                                   dcmfolder.split("/")[-1])
                         print(comb_path)
                         copy_tree(dcmfolder, comb_path)
-                        # p_copytree = subprocess.Popen('cp -r \"{} \"{}'.format(dcmfolder, comb_path), shell=True)
+                        # p_copytree = subprocess.Popen("cp -r '{}' '{}'".format(dcmfolder, comb_path), shell=True)
                         # p_copytree.wait()
                         print("Copy complete")
                         shutil.rmtree("{}/data/{}_process".format(tmp_path, an))
