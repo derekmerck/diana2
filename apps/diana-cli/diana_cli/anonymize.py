@@ -136,7 +136,7 @@ def anonymize(ctx,
                         for _ in image_folders:
                             fdcms = glob.glob(_ + "/*.dcm", recursive=True)
                             for _fdcm in fdcms:
-                                if _fdcm.startswith("US"):
+                                if _fdcm.split("/")[-1].startswith("US"):
                                     os.remove(_fdcm)
                             if len(fdcms) == 1:
                                 if os.stat(fdcms[0]).st_size < 50000 and os.path.isfile(fdcms[0]):
