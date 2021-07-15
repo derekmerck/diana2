@@ -141,7 +141,7 @@ def anonymize(ctx,
                                 if _fdcm.split("/")[-1].startswith("US") or _fdcm.split("/")[-1].startswith("PR"):
                                     os.remove(_fdcm)
                             if len(fdcms) == 1:
-                                if os.stat(fdcms[0]).st_size < 50000 and os.path.isfile(fdcms[0]):
+                                if os.path.isfile(fdcms[0]) and os.stat(fdcms[0]).st_size < 50000:
                                     os.remove(fdcms[0])
                             if "SR" in _:
                                 shutil.rmtree(_)
