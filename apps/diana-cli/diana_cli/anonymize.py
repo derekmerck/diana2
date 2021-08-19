@@ -121,6 +121,9 @@ def anonymize(ctx,
                     time.sleep(10)
                     p_collect = subprocess.Popen("diana-cli collect -a -c anon {} sticky_bridge radarch".format(tmp_path), shell=True)
                     p_collect.wait()
+                    time.sleep(10)
+                    p_collect = subprocess.Popen("diana-cli collect -a -c anon {} sticky_bridge radarch".format(tmp_path), shell=True)
+                    p_collect.wait()
 
                     for k, an_pre in enumerate(accession_nums):
                         an = md5("{}".format(an_pre).encode('utf-8')).hexdigest()[:16]
