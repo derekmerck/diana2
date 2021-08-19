@@ -140,6 +140,8 @@ def anonymize(ctx,
                             for _fdcm in fdcms:
                                 if _fdcm.split("/")[-1].startswith("US") or _fdcm.split("/")[-1].startswith("PR"):
                                     os.remove(_fdcm)
+                                if "CT Dose Report" in _fdcm:
+                                    os.remove(_fdcm)
                             if len(fdcms) == 1:
                                 if os.path.isfile(fdcms[0]) and os.stat(fdcms[0]).st_size < 50000:
                                     os.remove(fdcms[0])
