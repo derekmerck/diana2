@@ -205,7 +205,7 @@ def anonymize(ctx,
 
         for _ in req_emails:
             print("Emailed: {}".format(_))
-            sender._send("ERROR: Anonymization system is down. Please contact system administrator.", _)
+            sender._send("ERROR: Anonymization system is down. Your request will be automatically reprocessed when the system is online.", _)
         sender._send("ERROR: Anonymization system is down. Please contact system administrator.", [sender.from_addr, os.environ['SYS_ADMIN1']])
 
 
