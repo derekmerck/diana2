@@ -137,13 +137,19 @@ def anonymize(ctx,
 
                         image_folders = [_[0] for _ in os.walk("{}/data/{}_process".format(tmp_path, an))]
                         for _ in image_folders:
-                            if _.endswith("."):
+                            if _.endswith(".") and _.startswith("."):
+                                os.rename(_, _[1:-1])
+                            elif _.startswith("."):
+                                os.rename(_, _[1:])
+                            elif _.endswith("."):
                                 os.rename(_, _[:-1])
                             fdcms = glob.glob(_ + "/*.dcm", recursive=True)
                             for _fdcm in fdcms:
                                 if _fdcm.split("/")[-1].startswith("US") or _fdcm.split("/")[-1].startswith("PR"):
                                     os.remove(_fdcm)
-                                if "CT Dose Report" in _fdcm:
+                                elif "CT Dose Report" in _fdcm:
+                                    os.remove(_fdcm)
+                                elif "XA Radiation Dose Information" in _fdcm:
                                     os.remove(_fdcm)
                             if len(fdcms) == 1:
                                 if os.path.isfile(fdcms[0]) and os.stat(fdcms[0]).st_size < 50000:
