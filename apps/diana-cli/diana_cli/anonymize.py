@@ -122,8 +122,11 @@ def anonymize(ctx,
                     p_collect = subprocess.Popen("diana-cli collect -a -c anon {} sticky_bridge radarch".format(tmp_path), shell=True)
                     p_collect.wait()
                     time.sleep(10)
-                    p_collect = subprocess.Popen("diana-cli collect -a -c anon {} sticky_bridge radarch".format(tmp_path), shell=True)
+                    p_collect = subprocess.Popen("diana-cli collect -a -c anon {} sticky_bridge radarch".format(tmp_path), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     p_collect.wait()
+                    out, err = p_collect.communicate()
+                    if err:
+                        raise NotImplementedError
 
                     for k, an_pre in enumerate(accession_nums):
                         an = md5("{}".format(an_pre).encode('utf-8')).hexdigest()[:16]
@@ -185,7 +188,7 @@ def anonymize(ctx,
                 except shutil.Error:
                     os.remove(req)
                     time.sleep(60)
-    except (KeyboardInterrupt, FileNotFoundError, KeyError, AssertionError, GatewayConnectionError, OSError, Exception) as e:
+    except (NotImplementedError, KeyboardInterrupt, FileNotFoundError, KeyError, AssertionError, GatewayConnectionError, OSError, Exception) as e:
         try:
             for _ in sub_processes:
                 _.kill()
@@ -196,6 +199,8 @@ def anonymize(ctx,
 
         if type(e) is FileNotFoundError:
             print("Excepted error: {}".format(e))
+        elif type(e) is NotImplementedError:
+            print("Likely failure to collect accession error: {}".format(e))
         elif type(e) is KeyError:
             print("Key Error: {}".format(e))
         elif type(e) is AssertionError:
