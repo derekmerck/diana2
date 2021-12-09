@@ -201,6 +201,15 @@ def anonymize(ctx,
             print("Excepted error: {}".format(e))
         elif type(e) is NotImplementedError:
             print("Likely failure to collect accession error: {}".format(e))
+            for _ in req_emails:
+                print("Emailed: {}".format(_))
+                sender._send("ERROR: The accession number you requested is currently not available. This could be due to being a new scan or a network issue. Please contact the system administrator for further information.", _)
+            try:
+                shutil.move(req, "/locr/ArchivedRequests")
+            except shutil.Error:
+                os.remove(req)
+                time.sleep(60)
+            os.execv(sys.argv[0], sys.argv)
         elif type(e) is KeyError:
             print("Key Error: {}".format(e))
         elif type(e) is AssertionError:
