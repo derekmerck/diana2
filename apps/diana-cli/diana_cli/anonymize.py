@@ -83,6 +83,7 @@ def anonymize(ctx,
             time.sleep(1)
             requests = glob.glob("{}/*.csv".format(req_path))
             for req in requests:
+                comb_path = ""
                 patient_list = pd.read_csv(req)
                 t_start = datetime.now()
                 for i, pid in enumerate(patient_list["locr_patient_id"]):
@@ -167,7 +168,7 @@ def anonymize(ctx,
                                                                   pid,
                                                                   patient_list["date_of_scan{}".format(k+1)][i].replace("/", "."),
                                                                   dcmfolder.split("/")[-1])
-                        print(comb_path)
+                        print("comb_path: {}".format(comb_path))
                         copy_tree(dcmfolder, comb_path)
                         # p_copytree = subprocess.Popen("cp -r '{}' '{}'".format(dcmfolder, comb_path), shell=True)
                         # p_copytree.wait()
@@ -185,7 +186,7 @@ def anonymize(ctx,
                                  [sender.from_addr, patient_list["locr_requestor_email"][i]])
                 try:
                     shutil.move(req, "/locr/ArchivedRequests")
-                except shutil.Error:
+                except shutil.Error:  # TODO: reinvestigate
                     os.remove(req)
                     time.sleep(60)
     except (NotImplementedError, KeyboardInterrupt, FileNotFoundError, KeyError, AssertionError, GatewayConnectionError, OSError, Exception) as e:
@@ -207,6 +208,7 @@ def anonymize(ctx,
             try:
                 shutil.move(req, "/locr/ArchivedRequests")
             except shutil.Error:
+                # TODO: change to os.rename
                 os.remove(req)
                 time.sleep(60)
             os.execv(sys.argv[0], sys.argv)
