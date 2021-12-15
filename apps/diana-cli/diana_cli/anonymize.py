@@ -151,15 +151,20 @@ def anonymize(ctx,
                             for _fdcm in fdcms:
                                 if _fdcm.split("/")[-1].startswith("US") or _fdcm.split("/")[-1].startswith("PR"):
                                     os.remove(_fdcm)
+                                    print("Removed US or PR file: {}".format(_fdcm))
                                 elif "CT Dose Report" in _fdcm:
                                     os.remove(_fdcm)
+                                    print("Removed CT Dose Report: {}".format(_fdcm))
                                 elif "XA Radiation Dose Information" in _fdcm:
                                     os.remove(_fdcm)
+                                    print("Removed XA Radiation Dose Info: {}".format(_fdcm))
                             if len(fdcms) == 1:
                                 if os.path.isfile(fdcms[0]) and os.stat(fdcms[0]).st_size < 50000:
                                     os.remove(fdcms[0])
+                                    print("Removed small file, presumed PHI: {}".format(fdcms[0]))
                             if "SR" in _:
                                 shutil.rmtree(_)
+                                print("Removed SR folder")
 
                         dcmfolder = get_subdirectories(get_subdirectories("{}/data/{}_process".format(tmp_path, an))[0])[0]
                         print(dcmfolder)
