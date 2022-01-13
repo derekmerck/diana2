@@ -12,6 +12,7 @@ from hashlib import md5
 from math import floor, isnan
 import pandas as pd
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import time
@@ -162,10 +163,11 @@ def anonymize(ctx,
                                 if os.path.isfile(fdcms[0]) and os.stat(fdcms[0]).st_size < 50000:
                                     os.remove(fdcms[0])
                                     print("Removed small file, presumed PHI: {}".format(fdcms[0]))
-                            if "SR" in _:
+                            if re.search("SR\d\d\d\d\d\d", _):
                                 shutil.rmtree(_)
                                 print("Removed SR folder")
 
+                        time.sleep(3)  # Time for cleanup
                         dcmfolder = get_subdirectories(get_subdirectories("{}/data/{}_process".format(tmp_path, an))[0])[0]
                         print(dcmfolder)
                         comb_path = "/{}/({})({})({})({})".format(out_path,
