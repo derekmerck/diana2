@@ -171,7 +171,7 @@ def anonymize(ctx,
                         dcmfolder = get_subdirectories(get_subdirectories("{}/data/{}_process".format(tmp_path, an))[0])[0]
                         print(dcmfolder)
                         comb_path = "/{}/({})({})({})({})".format(out_path,
-                                                                  patient_list["sponsor_protocol_number"][i],
+                                                                  patient_list["sponsor_protocol_number"][0],
                                                                   pid,
                                                                   patient_list["date_of_scan{}".format(k+1)][i].replace("/", "."),
                                                                   dcmfolder.split("/")[-1])
