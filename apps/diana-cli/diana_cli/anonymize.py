@@ -87,15 +87,15 @@ def anonymize(ctx,
                 comb_path = ""
                 patient_list = pd.read_csv(req)
                 t_start = datetime.now()
+
+                req_emails = [patient_list["locr_requestor_email"][0]]
                 for i, pid in enumerate(patient_list["locr_patient_id"]):
                     try:
                         if isnan(pid):
                             continue
                     except TypeError:
+                        print("ADAAS: Type error of some sort")
                         pass
-                    req_emails = []
-                    if patient_list["locr_requestor_email"][i] not in req_emails:
-                        req_emails.append(patient_list["locr_requestor_email"][i])
 
                     accession_nums = []
                     for j in range(1, 11):
@@ -167,7 +167,7 @@ def anonymize(ctx,
                                 shutil.rmtree(_)
                                 print("Removed SR folder")
 
-                        time.sleep(3)  # Time for cleanup
+                        time.sleep(3)  # time for cleanup
                         dcmfolder = get_subdirectories(get_subdirectories("{}/data/{}_process".format(tmp_path, an))[0])[0]
                         print(dcmfolder)
                         comb_path = "/{}/({})({})({})({})".format(out_path,
@@ -177,6 +177,7 @@ def anonymize(ctx,
                                                                   dcmfolder.split("/")[-1])
                         print("comb_path: {}".format(comb_path))
                         copy_tree(dcmfolder, comb_path)
+                        time.sleep(2)  # time to complete copy
                         # p_copytree = subprocess.Popen("cp -r '{}' '{}'".format(dcmfolder, comb_path), shell=True)
                         # p_copytree.wait()
                         print("Copy complete")
@@ -190,7 +191,7 @@ def anonymize(ctx,
                                                                                                                             t_elapsed.seconds % 60,
                                                                                                                             os.environ['COMPLETED_FOLDER'],  # + "\\{}".format(comb_path.split("/")[-1]).replace(" ", "%20"),
                                                                                                                             get_dir_size(comb_path)),
-                                 [sender.from_addr, patient_list["locr_requestor_email"][i]])
+                                 [sender.from_addr, req_emails[0]])
                 try:
                     shutil.move(req, "/locr/ArchivedRequests")
                 except shutil.Error:  # TODO: reinvestigate
