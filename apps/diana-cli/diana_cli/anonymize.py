@@ -167,10 +167,10 @@ def anonymize(ctx,
                                 shutil.rmtree(_)
                                 print(_)
                                 print("Removed SR folder")
-                            if re.search("-\d$", _):
-                                shutil.rmtree(_)
-                                print(_)
-                                print("Removed duplicate folder")
+                            # if re.search("-\d$", _):
+                            #     shutil.rmtree(_)
+                            #     print(_)
+                            #     print("Removed duplicate folder")
 
                         time.sleep(3)  # time for cleanup
                         dcmfolder = get_subdirectories(get_subdirectories("{}/data/{}_process".format(tmp_path, an))[0])[0]
