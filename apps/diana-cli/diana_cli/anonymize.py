@@ -219,7 +219,7 @@ def anonymize(ctx,
                 print("Emailed: {}".format(_))
                 sender._send("ERROR: The accession number you requested is currently not available. This could be due to being a new scan or a network issue. Please contact the system administrator for further information.", _)
             try:
-                shutil.move(req, "/locr/ArchivedRequests")
+                shutil.move(req, "/locr/FailedRequests")
             except shutil.Error:
                 # TODO: change to os.rename
                 os.remove(req)
