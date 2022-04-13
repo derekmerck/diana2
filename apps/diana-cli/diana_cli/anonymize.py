@@ -178,7 +178,7 @@ def anonymize(ctx,
                         comb_path = "/{}/({})({})({})({})".format(out_path,
                                                                   patient_list["sponsor_protocol_number"][0],
                                                                   pid,
-                                                                  patient_list["date_of_scan{}".format(k+1)][i].replace("/", "."),
+                                                                  str(patient_list["date_of_scan{}".format(k+1)][i]).replace("/", "."),
                                                                   dcmfolder.split("/")[-1])
                         print("comb_path: {}".format(comb_path))
                         copy_tree(dcmfolder, comb_path)
@@ -237,6 +237,12 @@ def anonymize(ctx,
             os.execv(sys.argv[0], sys.argv)
         else:
             print("Some error: {}".format(e))
+
+        try:
+            shutil.move(req, "/locr/FailedRequests")
+        except shutil.Error:
+            # TODO: change to os.rename
+            os.remove(req)
 
         for _ in req_emails:
             print("Emailed: {}".format(_))
