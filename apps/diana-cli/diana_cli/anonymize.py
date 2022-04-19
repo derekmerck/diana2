@@ -115,16 +115,16 @@ def anonymize(ctx,
                     with open("/opt/diana/pid.txt", "w+") as f:
                         f.write("{},{}".format(pid, patient_list["locr_study_name"][i]))
 
-                    p_collect = subprocess.Popen("diana-cli collect -a -c anon {} sticky_bridge radarch".format(tmp_path), shell=True)
+                    p_collect = subprocess.Popen("diana-cli collect -a -c anon {} sticky_bridge radarch201".format(tmp_path), shell=True)
                     p_collect.wait()
                     time.sleep(10)
-                    p_collect = subprocess.Popen("diana-cli collect -a -c anon {} sticky_bridge radarch".format(tmp_path), shell=True)
+                    p_collect = subprocess.Popen("diana-cli collect -a -c anon {} sticky_bridge radarch201".format(tmp_path), shell=True)
                     p_collect.wait()
                     time.sleep(10)
-                    p_collect = subprocess.Popen("diana-cli collect -a -c anon {} sticky_bridge radarch".format(tmp_path), shell=True)
+                    p_collect = subprocess.Popen("diana-cli collect -a -c anon {} sticky_bridge radarch201".format(tmp_path), shell=True)
                     p_collect.wait()
                     time.sleep(10)
-                    p_collect = subprocess.Popen("diana-cli collect -a -c anon {} sticky_bridge radarch".format(tmp_path), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    p_collect = subprocess.Popen("diana-cli collect -a -c anon {} sticky_bridge radarch201".format(tmp_path), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     p_collect.wait()
                     out, err = p_collect.communicate()
                     if err:
