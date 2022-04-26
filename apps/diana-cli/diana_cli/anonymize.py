@@ -118,12 +118,6 @@ def anonymize(ctx,
                     p_collect = subprocess.Popen("diana-cli collect -a -c anon {} sticky_bridge radarch201".format(tmp_path), shell=True)
                     p_collect.wait()
                     time.sleep(10)
-                    p_collect = subprocess.Popen("diana-cli collect -a -c anon {} sticky_bridge radarch201".format(tmp_path), shell=True)
-                    p_collect.wait()
-                    time.sleep(10)
-                    p_collect = subprocess.Popen("diana-cli collect -a -c anon {} sticky_bridge radarch201".format(tmp_path), shell=True)
-                    p_collect.wait()
-                    time.sleep(10)
                     p_collect = subprocess.Popen("diana-cli collect -a -c anon {} sticky_bridge radarch201".format(tmp_path), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     p_collect.wait()
                     out, err = p_collect.communicate()
@@ -242,6 +236,7 @@ def anonymize(ctx,
             shutil.move(req, "/locr/FailedRequests")
         except shutil.Error:
             # TODO: change to os.rename
+            # TODO: FileNotFoundError
             os.remove(req)
 
         for _ in req_emails:
