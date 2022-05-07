@@ -21,7 +21,7 @@ def check(ctx, endpoints):
 
     click.echo(click.style('Checking endpoint status', underline=True, bold=True))
 
-    for k, v in services.items():
+    for k, v in services.ep_descs.items():
         if endpoints and k not in endpoints:
             logging.debug("{} not in list".format(k))
             continue
