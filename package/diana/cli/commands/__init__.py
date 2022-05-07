@@ -1,3 +1,4 @@
+from .check import check
 from .dgetall import dgetall
 from .extend import extend
 from .fdump import fdump
