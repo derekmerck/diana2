@@ -166,5 +166,5 @@ class Orthanc(Requester):
 
     def recho(self, domain):
         resource = "modalities/{}/echo".format(domain)
-        response = self._post(resource, data=self.aet)
+        response = self._post(resource, data=None)
         return response
