@@ -6,7 +6,7 @@ import yaml
 import logging
 
 
-def deserialize_str(value: Union[str, io.IOBase, PathLike] ) -> str:
+def deserialize_str(value: Union[str, io.IOBase, PathLike]) -> str:
     """Convert read @file.txt to str or return input str"""
 
     if not value:
@@ -31,8 +31,7 @@ def deserialize_str(value: Union[str, io.IOBase, PathLike] ) -> str:
     return s
 
 
-
-def deserialize_array(value: Union[str, io.IOBase, PathLike] ) -> List:
+def deserialize_array(value: Union[str, io.IOBase, PathLike]) -> List:
     """Convert comma or line delimited str or @file.txt to array"""
 
     if not value:
@@ -57,7 +56,7 @@ def deserialize_array(value: Union[str, io.IOBase, PathLike] ) -> List:
     return s
 
 
-def deserialize_dict(value: Union[str, io.IOBase, PathLike] ) -> Mapping:
+def deserialize_dict(value: Union[str, io.IOBase, PathLike]) -> Mapping:
     """Convert json str or @file.yaml to dict"""
 
     if not value:
@@ -75,6 +74,8 @@ def deserialize_dict(value: Union[str, io.IOBase, PathLike] ) -> Mapping:
     elif isinstance(value, str) and value.startswith("@"):
         with open(value[1:]) as f:
             s = f.read()
+    elif isinstance(value, dict):  # Unclear why Click default option runs this fxn twice
+        return value
     else:
         # It's a string/json input
         s = value

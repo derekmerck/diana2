@@ -12,10 +12,10 @@ __readme_header__ = """\
 diana-cli
 ==================
 
-Derek Merck  
-<derek.merck@ufl.edu>  
-University of Florida and Shands Hospital  
-Gainesville, FL  
+Derek Merck
+<derek.merck@ufl.edu>
+University of Florida and Shands Hospital
+Gainesville, FL
 
 `diana-cli` provides a command-line interface to DIANA endpoints.
 
@@ -33,7 +33,7 @@ Gainesville, FL
 @click.group(name="diana-cli", chain=True, epilog=epilog)
 @click.version_option(version=__version__, prog_name="diana-cli")
 @click.option('-v', '--verbose', is_flag=True, default=False)
-@click.option('-s', '--services', type=CLICK_MAPPING, default={},
+@click.option('-s', '--services', type=CLICK_MAPPING, default="@/services.yaml",
               help="Services dict as yaml/json format string or @file.yaml")
 @click.option('--sessions/--no-sessions', default=True)
 @click.pass_context
