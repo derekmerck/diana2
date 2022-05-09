@@ -1,0 +1,61 @@
+---
+version: '3.2'
+
+
+networks:
+
+  admin_proxy_network:
+    external: true   # Created by admin-stack
+
+  service_network:
+    driver: overlay
+    attachable: true
+
+
+services:
+  orthanc-bridge:
+    image: jodogne/orthanc:latest
+    ports:
+      - 4242:4242
+    networks:
+      - admin_proxy_network
+      - service_network
+    volumes:
+      - ${ORTHANC_JSON_PATH}:/etc/orthanc/orthanc.json
+    environment:  # ^config instead defined in orthanc.json
+      TZ: "America/New_York"
+    deploy:
+      replicas: 2  # Make sure it has sticky label and access via traefik
+      placement:
+        constraints:
+          - node.labels.bridge==true  # may need to define label via docker cli
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=admin_proxy_network
+        #- "traefik.frontend.rule=PathPrefixStrip:/bridge/"
+        - traefik.http.routers.orthanc-bridge.rule=PathPrefix("/bridge")
+        - traefik.http.routers.orthanc-bridge.middlewares=orthanc-bridge-stripprefix
+        - traefik.http.middlewares.orthanc-bridge-stripprefix.stripprefix.prefixes=/bridge 
+        #- traefik.backend.loadbalancer.stickiness=true
+        - traefik.http.services.orthanc-bridge-service.loadbalancer.sticky=true
+        - traefik.http.services.orthanc-bridge-service.loadbalancer.sticky.cookie.name=StickyCookie
+        #- traefik.port=8042
+        - traefik.http.services.orthanc-bridge-service.loadbalancer.server.port=8042
+        # Note syntax changes from v1 -> v2 Traefik
+
+  diana:
+    image: thomasyi17/diana2-gpg
+    # NOTE: build command is not supported by docker stack
+    command: bash
+    stdin_open: true
+    tty: true
+    volumes:
+      - ${DIANA_SERVICES}:/services.yaml
+      - ${PROJECTS_PATH}:/projects
+    networks:
+      - admin_proxy_network
+    environment:
+      DIANA_SERVICES_PATH: "/services.yaml"
+      ORTHANC_PASSWORD: ${ORTHANC_PASSWORD}
+
+...
