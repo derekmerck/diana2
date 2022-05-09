@@ -49,7 +49,7 @@ services:
         - traefik.http.services.portainer-service.loadbalancer.server.port=9000
 
   traefik:
-    image: traefik:v2.0
+    image: traefik:latest
     command: >
       --api.insecure=true
       --providers.docker=true
