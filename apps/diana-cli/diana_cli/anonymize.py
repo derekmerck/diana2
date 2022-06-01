@@ -81,6 +81,11 @@ def anonymize(ctx,
                     time.sleep(wait_time)
                     continue
 
+            # Security limit
+            if len(requests) > 10:
+                print("Too many requests")
+                quit()
+
             time.sleep(1)
             requests = glob.glob("{}/*.csv".format(req_path))
             for req in requests:
