@@ -214,7 +214,7 @@ def anonymize(ctx,
             print("Excepted error: {}".format(e))
         elif type(e) is NotImplementedError:
             print("Likely failure to collect accession error: {}".format(e))
-            for _ in req_emails:
+            for _ in req_emails + [sender.from_addr]:
                 print("Emailed: {}".format(_))
                 sender._send("ERROR: The accession number you requested is currently not available. This could be due to being a new scan or a network issue. Please contact the system administrator for further information.", _)
             try:
