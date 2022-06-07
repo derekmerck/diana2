@@ -131,11 +131,14 @@ def anonymize(ctx,
 
                     for k, an_pre in enumerate(accession_nums):
                         an = md5("{}".format(an_pre).encode('utf-8')).hexdigest()[:16]
+                        print("Processing: {}".format(an))
                         if not os.path.isdir("{}/data/{}_process".format(tmp_path, an)):
                             try:
+                                print("Unzipping...")
                                 with zipfile.ZipFile("{}/data/{}.zip".format(tmp_path, an), 'r') as zip_ref:
                                     zip_ref.extractall("{}/data/{}_process".format(tmp_path, an))
                             except FileNotFoundError:
+                                print("Zip file not found--possible error with network/PACS pull?")
                                 continue
                             os.remove("{}/data/{}.zip".format(tmp_path, an))
 
