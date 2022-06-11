@@ -123,9 +123,13 @@ def anonymize(ctx,
                     p_collect = subprocess.Popen("diana-cli collect -a -c anon {} sticky_bridge radarch201".format(tmp_path), shell=True)
                     p_collect.wait()
                     time.sleep(10)
+                    p_collect = subprocess.Popen("diana-cli collect -a -c anon {} sticky_bridge radarch201".format(tmp_path), shell=True)
+                    p_collect.wait()
+                    time.sleep(5)
                     p_collect = subprocess.Popen("diana-cli collect -a -c anon {} sticky_bridge radarch201".format(tmp_path), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     p_collect.wait()
                     out, err = p_collect.communicate()
+                    time.sleep(5)
                     if err:
                         raise NotImplementedError
 
