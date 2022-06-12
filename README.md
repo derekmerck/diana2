@@ -127,6 +127,11 @@ $ pytest --cov
 $ codecov --token=$CODCOV_TOK
 ```
 
+Citing
+-------
+
+For citation reference:
+Thomas Yi, Ian Pan, Scott Collins, Fiona Chen, Robert Cueto, Ben Hsieh, Celina Hsieh, Jessica L. Smith, Li Yang, Wei-hua Liao, Lisa H. Merck, Harrison Bai, Derek Merck. DICOM Image ANalysis and Archive (DIANA): an Open-Source System for Clinical AI Applications. Journal of Digital Imaging (JDI). Nov 2021. https://doi.org/10.1007/s10278-021-00488-5
 
 License
 -------
