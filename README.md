@@ -12,7 +12,7 @@ Gainesville, FL
 
 Source: <https://www.github.com/derekmerck/diana2>  
 Documentation: <https://diana.readthedocs.io>  
-Image:  <https://cloud.docker.com/repository/docker/derekmerck/diana2>
+Image: <https://cloud.docker.com/repository/docker/derekmerck/diana2>
 
 
 Overview
@@ -33,6 +33,8 @@ The Python-Diana package for Python >= 3.6 provides an api for a network of DICO
 It comes in two flavors: vanilla and "plus," which includes dependencies on scientific and machine learning packages.
 
 ### Installation
+
+**Note**: for more targeted functionality, please refer to the ```Image_Analysis_Pipeline``` branch
 
 ```bash
 $ pip3 install git+https://github.com/derekmerck/diana2#subdirectory=package
@@ -131,6 +133,7 @@ Citing
 -------
 
 For citation reference:
+
 Thomas Yi, Ian Pan, Scott Collins, Fiona Chen, Robert Cueto, Ben Hsieh, Celina Hsieh, Jessica L. Smith, Li Yang, Wei-hua Liao, Lisa H. Merck, Harrison Bai, Derek Merck. DICOM Image ANalysis and Archive (DIANA): an Open-Source System for Clinical AI Applications. Journal of Digital Imaging (JDI). Nov 2021. https://doi.org/10.1007/s10278-021-00488-5
 
 License
