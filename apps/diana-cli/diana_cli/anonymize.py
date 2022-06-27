@@ -179,7 +179,7 @@ def anonymize(ctx,
                         print(dcmfolder)
                         comb_path = "/{}/({})({})({})({})".format(out_path,
                                                                   patient_list["sponsor_protocol_number"][0],
-                                                                  pid.replace("/", "."),
+                                                                  str(pid).replace("/", "."),
                                                                   str(patient_list["date_of_scan{}".format(k+1)][i]).replace("/", "."),
                                                                   dcmfolder.split("/")[-1])
                         print("comb_path: {}".format(comb_path))
