@@ -3,6 +3,7 @@ import platform
 import subprocess
 import sys
 import time
+from datetime import datetime
 sys.path.insert(0, environ["DIANA_PACKAGE_PATH"])
 from wuphf.endpoints import SmtpMessenger
 
@@ -38,6 +39,7 @@ def main():
         online = ping(host_to_monitor)
         if not online:
             break
+        print(datetime.now())
         time.sleep(60)
 
     sender._send("ALERT: Radiation dose monitoring server was unpingable",
