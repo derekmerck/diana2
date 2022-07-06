@@ -1,4 +1,4 @@
-from os import environ
+from os import environ, execv
 import platform
 import subprocess
 import sys
@@ -25,7 +25,7 @@ def ping(host):
 def main():
     if len(sys.argv) < 2:
         sys.exit("Missing hostname argument")
-    host_to_monitor = sys.argv[1]
+    hosts_to_monitor = sys.argv[1:]
 
     sender = SmtpMessenger()
     sender.host = environ['MAIL_HOST']
@@ -35,15 +35,19 @@ def main():
     sender.password = ""
     send_to = ["SYS_ADMIN1"]  # PRE-REQ: define recipient emails as environment variables
 
+    restart = False
     while(True):
-        online = ping(host_to_monitor)
-        if not online:
-            break
-        print(datetime.now())
+        for host in hosts_to_monitor:
+            online = ping(host)
+            if not online:
+                sender._send("ALERT: {} was unpingable. Ping monitor will automatically restart in 24 hours.".format(host),
+                             [environ[_] for _ in send_to])
+                restart = True
+        if restart:
+            time.sleep(86400)
+            execv(sys.argv[0], sys.argv)
+        print("Hosts online as of: {}".format(datetime.now()))
         time.sleep(60)
-
-    sender._send("ALERT: Radiation dose monitoring server was unpingable",
-                 [environ[_] for _ in send_to])
 
 if __name__=="__main__":
     main()
