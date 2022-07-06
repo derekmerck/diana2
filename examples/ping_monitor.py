@@ -39,11 +39,13 @@ def main():
     while(True):
         for host in hosts_to_monitor:
             online = ping(host)
+            time.sleep(1)
             if not online:
                 sender._send("ALERT: {} was unpingable. Ping monitor will automatically restart in 24 hours.".format(host),
                              [environ[_] for _ in send_to])
                 restart = True
         if restart:
+            print("Monitor will restart in 24 hours...")
             time.sleep(86400)
             execv(sys.argv[0], sys.argv)
         print("Hosts online as of: {}".format(datetime.now()))
