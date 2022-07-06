@@ -3,6 +3,7 @@ import platform
 import subprocess
 import sys
 import time
+sys.path.insert(0, environ["DIANA_PACKAGE_PATH"])
 from diana2.package.wuphf.endpoints import SmtpMessenger
 
 # Courtesy of: https://stackoverflow.com/questions/2953462/pinging-servers-in-python
@@ -39,7 +40,7 @@ def main():
             break
         time.sleep(60)
 
-    sender._send("ERROR: Anonymization system is down. Your request will be automatically reprocessed when the system is online.",
+    sender._send("ALERT: Radiation dose monitoring server was unpingable",
                  [environ[_] for _ in send_to])
 
 if __name__=="__main__":
