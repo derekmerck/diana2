@@ -33,7 +33,7 @@ def main():
     sender.from_addr = environ['MAIL_FROM']
     sender.user = None
     sender.password = ""
-    send_to = ["SYS_ADMIN1"]  # PRE-REQ: define recipient emails as environment variables
+    send_to = ["SYS_ADMIN1", "SYS_ADMIN2", "SYS_ADMIN3"]  # PRE-REQ: define recipient emails as environment variables
 
     restart = False
     while(True):
