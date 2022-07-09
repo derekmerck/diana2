@@ -3,14 +3,14 @@ from os.path import isfile
 import sys
 import time
 from datetime import datetime
-# sys.path.insert(0, environ["DIANA_PACKAGE_PATH"])
-from ..package.wuphf.endpoints import SmtpMessenger
+sys.path.append("..")
+from wuphf.endpoints import SmtpMessenger
 
 # Creates a file meant to be deleted by another entity every ~15 min. Alerts if file is not deleted.
 def main():
     if len(sys.argv) < 2:
         sys.exit("Missing path of offline.txt argument")
-    host = sys.argv[1:]
+    host = sys.argv[1]
 
     sender = SmtpMessenger()
     sender.host = environ['MAIL_HOST']
