@@ -45,6 +45,7 @@ def anonymize(ctx,
         reqstr = requester.Requester()
         reqstr.base_url = "https://redcap.lifespan.org/redcap/api"
 
+        # SMTP Config
         sender = SmtpMessenger()
         sender.host = os.environ['MAIL_HOST']
         sender.port = os.environ['MAIL_PORT']
@@ -53,6 +54,14 @@ def anonymize(ctx,
         sender.password = ""
 
         while True:
+            # Optional seconday downtime check
+            try:
+                if os.path.isfile("/{}/offline.txt".format(out_path.split("/")[1])):
+                    os.remove("/{}/offline.txt".format(out_path.split("/")[1]))
+            except:
+                print("ERROR: failed to remove offline.txt")
+                pass
+
             req_emails = []
             data = {
                 'token': os.environ['REDCAP_TOKEN'],
