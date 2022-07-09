@@ -4,7 +4,7 @@ import subprocess
 import sys
 import time
 from datetime import datetime
-sys.path.insert(0, environ["DIANA_PACKAGE_PATH"])
+sys.path.insert(0, environ["DIANA_PACKAGE_PATH"])  # If in container w/ package installed, can append ".." instead
 from wuphf.endpoints import SmtpMessenger
 
 # Courtesy of: https://stackoverflow.com/questions/2953462/pinging-servers-in-python
