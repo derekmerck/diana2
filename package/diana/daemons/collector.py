@@ -191,6 +191,9 @@ class Collector(object):
                             replacement_map["Replace"]["PatientBirthDate"] = replacement_map["Replace"]["PatientBirthDate"][:4]
                             replacement_map["Replace"].pop('StudyDate', None)
                             replacement_map["Replace"].pop('StudyTime', None)
+                            replacement_map["Keep"].append("SeriesDescription")
+                            replacement_map["Keep"].append("StudyDate")
+                            replacement_map["Keep"].append("StudyTime")
                         except FileNotFoundError:
                             replacement_map = ShamDixel.orthanc_sham_map(d)
                             pass
