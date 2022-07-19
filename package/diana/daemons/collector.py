@@ -136,14 +136,16 @@ class Collector(object):
 
         for d in items:
 
-            working_level = DicomLevel.STUDIES
+            working_level = DicomLevel.SERIES
 
             if anonymize:
 
                 if working_level == DicomLevel.SERIES:
-                    d_fn = "{}-{}.zip".format(
-                        d.meta["ShamAccessionNumber"][0:6],
-                        d.meta["ShamSeriesDescription"])
+                    # d_fn = "{}-{}.zip".format(
+                    #     d.meta["ShamAccessionNumber"][0:6],
+                    #     d.meta["ShamSeriesDescription"])
+                    d_fn = "{}.zip".format(
+                        d.meta["ShamAccessionNumber"][0:16])
                 else:
                     d_fn = "{}.zip".format(
                         d.meta["ShamAccessionNumber"][0:16])
@@ -186,11 +188,11 @@ class Collector(object):
                             replacement_map["Replace"]["PatientName"] = pid
                             replacement_map["Replace"]["PatientID"] = pid
                             replacement_map["Replace"]["StudyID"] = study_id
-                            replacement_map["Replace"].pop('PatientBirthDate', None)
+                            replacement_map["Replace"]["PatientBirthDate"] = replacement_map["Replace"]["PatientBirthDate"][:4]
                             replacement_map["Replace"].pop('StudyDate', None)
                             replacement_map["Replace"].pop('StudyTime', None)
                         except FileNotFoundError:
-                            replacement_map = ShamDixel.orthanc_anon_map(d)
+                            replacement_map = ShamDixel.orthanc_sham_map(d)
                             pass
                     else:
                         replacement_map = ShamDixel.orthanc_sham_map(d)
