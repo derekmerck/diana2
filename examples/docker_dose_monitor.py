@@ -1,5 +1,6 @@
 from os import environ, execv
 import sys
+from datetime import datetime
 import docker
 import time
 sys.path.append("..")
@@ -18,6 +19,7 @@ try:
     while True:
         if len(client.containers.list()) < 4:
             raise NotImplementedError
+        print("Dose monitor likely online as of: {}".format(datetime.now()))
         time.sleep(60)
 except:
     sender._send("ALERT: Dose monitor Docker containers may be down. This alert monitor will auto-restart in 24 hours.",
