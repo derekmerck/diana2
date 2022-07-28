@@ -21,7 +21,7 @@ try:
             raise NotImplementedError
         print("Dose monitor likely online as of: {}".format(datetime.now()))
         time.sleep(60)
-except:
+except Exception as e:
     sender._send("ALERT: Dose monitor Docker containers may be down. This alert monitor will auto-restart in 24 hours.",
                             [environ[_] for _ in send_to])
 
