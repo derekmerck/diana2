@@ -3,7 +3,7 @@ import sys
 from datetime import datetime
 import docker
 import time
-sys.path.append("..")
+sys.path.insert(0, environ["DIANA_PACKAGE_PATH"]) # e.g. /home/username/**/diana2/package
 from wuphf.endpoints import SmtpMessenger
 
 client = docker.from_env()
