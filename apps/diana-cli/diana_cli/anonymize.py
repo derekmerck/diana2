@@ -174,6 +174,9 @@ def anonymize(ctx,
                                 elif "XA Radiation Dose Information" in _fdcm:
                                     os.remove(_fdcm)
                                     print("Removed XA Radiation Dose Info: {}".format(_fdcm))
+                                elif "OT Study acquired outside hospital" in _fdcm:
+                                    os.remove(_fdcm)
+                                    print("Removed OT Study acquired outside hospital: {}".format(_fdcm))    
                             if len(fdcms) == 1:
                                 if os.path.isfile(fdcms[0]) and os.stat(fdcms[0]).st_size < 50000:
                                     os.remove(fdcms[0])
