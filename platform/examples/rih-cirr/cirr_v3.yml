@@ -52,6 +52,7 @@ services:
     volumes:
       - ${DIANA_SERVICES}:/services.yaml
       - ${PROJECTS_PATH}:/projects
+      - ${LOCR_PATH}:/locr
     networks:
       - admin_proxy_network
     environment:
