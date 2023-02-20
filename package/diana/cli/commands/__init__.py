@@ -1,3 +1,4 @@
+from .anonymize import anonymize
 from .check import check
 from .collect import collect
 from .dgetall import dgetall
