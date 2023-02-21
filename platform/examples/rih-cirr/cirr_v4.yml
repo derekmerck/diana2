@@ -43,6 +43,21 @@ services:
         - traefik.http.services.orthanc-bridge-service.loadbalancer.server.port=8042
         # Note syntax changes from v1 -> v2 Traefik
 
+  adaas:
+    image: thomasyi17/diana2-full:latest
+    command: bash
+    stdin_open: true
+    tty: true
+    volumes:
+      - ${DIANA_SERVICES}:/services.yaml
+      - ${PROJECTS_PATH}:/projects
+      - ${LOCR_PATH}:/locr
+    networks:
+      - admin_proxy_network
+    environment:
+      DIANA_SERVICES_PATH: "/services.yaml"
+      ORTHANC_PASSWORD: ${ORTHANC_PASSWORD}
+
   diana:
     image: thomasyi17/diana2-full:latest
     # NOTE: build command is not supported by docker stack
@@ -58,5 +73,4 @@ services:
     environment:
       DIANA_SERVICES_PATH: "/services.yaml"
       ORTHANC_PASSWORD: ${ORTHANC_PASSWORD}
-
 ...
