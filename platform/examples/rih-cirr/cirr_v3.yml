@@ -44,7 +44,7 @@ services:
         # Note syntax changes from v1 -> v2 Traefik
 
   diana:
-    image: thomasyi17/diana2-gpg
+    image: thomasyi17/diana2-full:latest
     # NOTE: build command is not supported by docker stack
     command: bash
     stdin_open: true
