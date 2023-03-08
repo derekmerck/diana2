@@ -28,7 +28,7 @@ services:
       replicas: 2  # Make sure it has sticky label and access via traefik
       placement:
         constraints:
-          - node.labels.bridge==true  # may need to define label via docker cli
+          - node.labels.bridge==true  # need to define label via docker cli; docker node update node_name --label-add bridge=true 
       labels:
         - traefik.enable=true
         - traefik.docker.network=admin_proxy_network
