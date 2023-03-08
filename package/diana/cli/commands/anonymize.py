@@ -103,6 +103,9 @@ def anonymize(ctx,
                 t_start = datetime.now()
 
                 req_emails = [patient_list["locr_requestor_email"][0]]
+                if isnan(patient_list["locr_requestor_email"][0]):
+                    req_emails = ["adaas@lifespan.org"]
+
                 for i, pid in enumerate(patient_list["locr_patient_id"]):
                     try:
                         if isnan(pid):
