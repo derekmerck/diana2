@@ -152,12 +152,13 @@ class Collector(object):
 
             else:
 
-                if working_level == DicomLevel.SERIES:
+                #if working_level == DicomLevel.SERIES:
+                try:
                     d_fn = "{}-{}-{}.zip".format(
                         d.tags["PatientName"][0:6],
                         d.tags["AccessionNumber"][0:8],
                         d.tags["SeriesDescription"])
-                else:
+                except:
                     d_fn = "{}-{}.zip".format(
                         d.tags["PatientName"][0:6],
                         d.tags["AccessionNumber"][0:8])
@@ -196,6 +197,7 @@ class Collector(object):
                             replacement_map["Keep"].append("StudyTime")
                         except FileNotFoundError:
                             replacement_map = ShamDixel.orthanc_sham_map(d)
+                            replacement_map["Keep"].append("SeriesDescription")
                             pass
                     else:
                         replacement_map = ShamDixel.orthanc_sham_map(d)
