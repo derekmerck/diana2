@@ -159,6 +159,7 @@ def anonymize(ctx,
                                     zip_ref.extractall("{}/data/{}_process".format(tmp_path, an))
                             except FileNotFoundError:
                                 print("Zip file not found--possible error with network/PACS pull?")
+                                sender._send("Possible error with network/PACS pull", [sender.from_addr, os.environ['SYS_ADMIN1'], os.environ['SYS_ADMIN2']])
                                 continue
                             os.remove("{}/data/{}.zip".format(tmp_path, an))
 
