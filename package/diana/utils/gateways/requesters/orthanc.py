@@ -66,16 +66,17 @@ class Orthanc(Requester):
 
             for answer in response1:
                 # logger.debug(answer)
-                resource = "queries/{}/answers/{}/content?simplify".format(response0.get('ID'), answer)
-                response2 = self._get(resource)
-                result.append(response2)
-                # logger.debug(response2)
+                for i in range(3):  # retrieve sometimes doesn't pull data despite no C-MOVE error in logs; E[v] success w/ 3 pulls
+                    resource = "queries/{}/answers/{}/content?simplify".format(response0.get('ID'), answer)
+                    response2 = self._get(resource)
+                    result.append(response2)
+                    # logger.debug(response2)
 
-                if retrieve:
-                    resource = "queries/{}/answers/{}/retrieve".format(response0.get('ID'), answer)
-                    response3 = self._post(resource, data=self.aet)
-                    result.append(response3)
-                    # logger.debug(response3)
+                    if retrieve:
+                        resource = "queries/{}/answers/{}/retrieve".format(response0.get('ID'), answer)
+                        response3 = self._post(resource, data=self.aet)
+                        result.append(response3)
+                        # logger.debug(response3)
 
         return result
 
