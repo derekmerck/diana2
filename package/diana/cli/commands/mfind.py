@@ -65,8 +65,8 @@ def mfind(ctx,
 
     if _query:
         query["q"] = _query
-        query["start_date"] = start_date
-        query["end_date"] = end_date
+        query["start_date"] = datetime.strptime(str(start_date), "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d")
+        query["end_date"] = datetime.strptime(str(end_date), "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d")
         result = do_query(query)
 
     elif accession_numbers:

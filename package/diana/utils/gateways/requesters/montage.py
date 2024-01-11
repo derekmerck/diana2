@@ -17,7 +17,7 @@ class MontageModality(IntEnum):
         return str(self.value)
 
 # Max results to review for a given query
-MONTAGE_RESULT_LIMIT = 1000000
+MONTAGE_RESULT_LIMIT = 600
 # Max results to return _per page_ for a given query
 MONTAGE_RESULT_INCR = 200
 
@@ -44,7 +44,7 @@ class Montage(Requester):
 
         offset = 0
         incr = MONTAGE_RESULT_INCR
-
+put
         resource = "index/{}/search/".format(index)
         r = self._get(resource, params={**query,
                                         'offset': offset,
