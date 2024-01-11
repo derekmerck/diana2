@@ -44,7 +44,7 @@ class Montage(Requester):
 
         offset = 0
         incr = MONTAGE_RESULT_INCR
-put
+
         resource = "index/{}/search/".format(index)
         r = self._get(resource, params={**query,
                                         'offset': offset,
