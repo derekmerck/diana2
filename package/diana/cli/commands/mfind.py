@@ -2,7 +2,9 @@ from datetime import datetime
 import logging
 from pprint import pformat
 import click
+import json
 from crud.cli.utils import ClickEndpoint, CLICK_ARRAY, CLICK_MAPPING
+from crud.utils import SmartJSONEncoder
 from diana.apis import Montage
 from diana.dixel import RadiologyReport, LungScreeningReport
 
@@ -23,6 +25,7 @@ from diana.dixel import RadiologyReport, LungScreeningReport
 @click.option('--extraction', '-e', multiple=True,
               type=click.Choice(['radcat', 'lungrads']),
               help="Perform a data extraction on each report")
+@click.option('--json', '-j', "as_json", is_flag=True, default=False, help="Output as json")
 @click.pass_context
 def mfind(ctx,
           source: Montage,
@@ -31,7 +34,8 @@ def mfind(ctx,
           end_date,
           today,
           _query,
-          extraction):
+          extraction,
+          as_json):
     """Find items in Montage by query for chaining.
 
     \b
@@ -41,6 +45,8 @@ def mfind(ctx,
     $ diana-cli mfind -a @my_accessions.txt -e lungrads -e radcat montage print jsonl > output.jsonl
     $ cat output.jsonl
     { ... lungrads='2', current_smoker=False, pack_years=15, radcat=(3,true) ... }
+
+    $ diana-cli mfind -j --start_date="2024-11-21" --end_date="2024-11-21" -q "report text" montage
     """
 
     click.echo(click.style('Montage Find', underline=True, bold=True))
@@ -65,8 +71,8 @@ def mfind(ctx,
 
     if _query:
         query["q"] = _query
-        query["start_date"] = datetime.strptime(str(start_date), "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d")
-        query["end_date"] = datetime.strptime(str(end_date), "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d")
+        query["start_date"] = start_date.strftime("%Y-%m-%d") # datetime.strptime(str(start_date), "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d") 
+        query["end_date"] = end_date.strftime("%Y-%m-%d")
         result = do_query(query)
 
     elif accession_numbers:
@@ -93,3 +99,6 @@ def mfind(ctx,
         len(result),
         "" if len(result) == 1 else "s"
     ))
+
+    if as_json:
+        click.echo(json.dumps([d.asdict() for d in result], cls=SmartJSONEncoder, sort_keys=True, indent=4, separators=(',', ': ')))
