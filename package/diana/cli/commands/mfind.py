@@ -46,6 +46,7 @@ def mfind(ctx,
     $ cat output.jsonl
     { ... lungrads='2', current_smoker=False, pack_years=15, radcat=(3,true) ... }
 
+    Rad-Report-CT/MR:
     $ diana-cli mfind -j --start_date="2024-11-21" --end_date="2024-11-21" -q "report text" montage
     """
 
