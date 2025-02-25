@@ -269,6 +269,7 @@ class Dixel(Serializable):
                 "PatientStatus": data["patient_status"],
                 "ReportText": Montage.clean_text(data['text']),
                 "ReadingPhysiciansName": data['events'][-1]['provider']['name'],
+                "PrelimingPhysiciansName": data['events'][-2]['provider']['name'],
                 'StudyDateTime': study_datetime,
                 "MontageCPTCodes": montage_cpts
             }
