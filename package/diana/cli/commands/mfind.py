@@ -71,6 +71,8 @@ def mfind(ctx,
     query = {}
 
     if _query:
+        if _query == "Rad-Report-CT" or "Rad-Report-MR":
+            _query = '\"{}\"'.format(_query)
         query["q"] = _query
         query["start_date"] = start_date.strftime("%Y-%m-%d") # datetime.strptime(str(start_date), "%Y-%m-%d %H:%M:%S").strftime("%Y-%m-%d") 
         query["end_date"] = end_date.strftime("%Y-%m-%d")
