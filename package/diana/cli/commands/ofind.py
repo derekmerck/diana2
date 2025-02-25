@@ -73,3 +73,6 @@ def ofind(ctx,
         len(results),
         "" if len(results) == 1 else "s"
     ))
+
+    # Extra info in the style of the old ofind command
+    click.echo(pformat(results))
