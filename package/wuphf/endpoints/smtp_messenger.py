@@ -62,7 +62,7 @@ class SmtpMessenger(Messenger):
         with self.gateway(self.host, self.port, self.user, self.password, self.tls) as g:
             if "outbound" in self.host:
                 m = MIMEText(msg)
-                m["Subject"] = "UPDATE: Anonymization"
+                m["Subject"] = "[Secure] Rad-Report Follow-up"
                 g.sendmail(self.from_addr, to_addrs, m.as_string())
             else:
                 g.sendmail(self.from_addr, to_addrs, msg.encode(encoding='UTF-8'))

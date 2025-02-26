@@ -13,4 +13,5 @@ from .oget import oget
 from .ogetm import ogetm
 from .oput import oput
 from .oputm import oputm
+from .radreport import radreport
 from .watch import watch
