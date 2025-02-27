@@ -17,9 +17,7 @@ logging.basicConfig(filename='/opt/diana/debug.log', level=logging.DEBUG)
 
 
 @click.command(short_help="Image Follow-up Macro Pipeline")
-@click.argument('req_path', type=click.STRING)
-@click.argument('out_path', type=click.STRING)
-@click.argument('tmp_path', type=click.STRING)
+@click.argument('work_path', type=click.STRING)
 @click.pass_context
 def radreport(ctx,
               work_path):
@@ -222,7 +220,7 @@ def load_emails(filepath):
     with open(filepath, 'r') as file:
         for line in file:
             line = line.strip()
-            key, value = line.split(';')
+            key, value = line.split(',')
             data_dict[key.strip()] = value.strip()
     return data_dict
 
