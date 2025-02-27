@@ -38,16 +38,16 @@ def radreport(ctx,
         # Load all radiologist emails and uncompleted/completeted accessions from local .txt
         emails = load_emails('{}/emails.txt'.format(work_path))
 
-        if not os.path.isfile('{}/CT_undone_accesions.txt'.format(work_path)):
-            open('{}/CT_undone_accesions.txt'.format(work_path), 'a').close()
-        if not os.path.isfile('{}/MR_undone_accesions.txt'.format(work_path)):
-            open('{}/MR_undone_accesions.txt'.format(work_path), 'a').close()
-        if not os.path.isfile('{}/done_accesions.txt'.format(work_path)):
-            open('{}/done_accesions.txt'.format(work_path), 'a').close()
+        if not os.path.isfile('{}/CT_undone_accessions.txt'.format(work_path)):
+            open('{}/CT_undone_accessions.txt'.format(work_path), 'a').close()
+        if not os.path.isfile('{}/MR_undone_accessions.txt'.format(work_path)):
+            open('{}/MR_undone_accessions.txt'.format(work_path), 'a').close()
+        if not os.path.isfile('{}/done_accessions.txt'.format(work_path)):
+            open('{}/done_accessions.txt'.format(work_path), 'a').close()
 
-        CT_undone_accessions = load_accessions('{}/CT_undone_accesions.txt'.format(work_path))
-        MR_undone_accessions = load_accessions('{}/MR_undone_accesions.txt'.format(work_path))
-        done_accessions = load_accessions('{}/done_accesions.txt'.format(work_path))
+        CT_undone_accessions = load_accessions('{}/CT_undone_accessions.txt'.format(work_path))
+        MR_undone_accessions = load_accessions('{}/MR_undone_accessions.txt'.format(work_path))
+        done_accessions = load_accessions('{}/done_accessions.txt'.format(work_path))
 
         # Load last processed date
         start_date = "2024-11-01"
@@ -70,7 +70,7 @@ def radreport(ctx,
             # out, err = p_collect.communicate()
             # time.sleep(5)
 
-            json_results = parse_json("{}/CT_temp_results.json".format(CT_undone_accessions))
+            json_results = parse_json("{}/CT_temp_results.json".format(work_path))
             CT_undone_accessions.extend(filter_new_accessions(json_results, CT_undone_accessions, done_accessions))
 
             for an in CT_undone_accessions:
@@ -127,7 +127,7 @@ def radreport(ctx,
                 
                 # TODO: may need to refilter done and undone at the end to account for reports that used both Rad-Report-CT/MR
 
-            with open('{}/CT_undone_accesions.txt'.format(work_path), 'w') as f:
+            with open('{}/CT_undone_accessions.txt'.format(work_path), 'w') as f:
                 for _ in CT_undone_accessions:
                     f.write(_ + '\n')
 
@@ -135,7 +135,7 @@ def radreport(ctx,
             # Rad-Report-MR
             # p_collect = subprocess.Popen("diana-cli mfind -j --start_date={} --end_date={} -q {} montage > {}/MR_temp_results.json".format(start_date, last_date, MR_macro, work_path), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             # p_collect.wait()
-            json_results = parse_json("{}/MR_temp_results.json".format(MR_undone_accessions))
+            json_results = parse_json("{}/MR_temp_results.json".format(work_path))
             MR_undone_accessions.extend(filter_new_accessions(json_results, MR_undone_accessions, done_accessions))
 
             for an in MR_undone_accessions:
@@ -196,7 +196,7 @@ def radreport(ctx,
             with open('{}/last_date.txt'.format(work_path), "w") as f:
                 f.write(datetime.today().strftime("%Y-%m-%d"))
 
-            with open('{}/done_accesions.txt'.format(work_path), 'w') as f:
+            with open('{}/done_accessions.txt'.format(work_path), 'w') as f:
                 for _ in done_accessions:
                     f.write(_ + '\n')
 
