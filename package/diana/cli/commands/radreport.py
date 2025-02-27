@@ -42,6 +42,8 @@ def radreport(ctx,
             open('{}/CT_undone_accesions.txt'.format(work_path), 'a').close()
         if not os.path.isfile('{}/MR_undone_accesions.txt'.format(work_path)):
             open('{}/MR_undone_accesions.txt'.format(work_path), 'a').close()
+        if not os.path.isfile('{}/done_accesions.txt'.format(work_path)):
+            open('{}/done_accesions.txt'.format(work_path), 'a').close()
 
         CT_undone_accessions = load_accessions('{}/CT_undone_accesions.txt'.format(work_path))
         MR_undone_accessions = load_accessions('{}/MR_undone_accesions.txt'.format(work_path))
