@@ -39,6 +39,12 @@ def radreport(ctx,
 
         # Load all radiologist emails and uncompleted/completeted accessions from local .txt
         emails = load_emails('{}/emails.txt'.format(work_path))
+
+        if not os.path.isfile('{}/CT_undone_accesions.txt'.format(work_path)):
+            open('{}/CT_undone_accesions.txt'.format(work_path), 'a').close()
+        if not os.path.isfile('{}/MR_undone_accesions.txt'.format(work_path)):
+            open('{}/MR_undone_accesions.txt'.format(work_path), 'a').close()
+
         CT_undone_accessions = load_accessions('{}/CT_undone_accesions.txt'.format(work_path))
         MR_undone_accessions = load_accessions('{}/MR_undone_accesions.txt'.format(work_path))
         done_accessions = load_accessions('{}/done_accesions.txt'.format(work_path))
@@ -73,6 +79,7 @@ def radreport(ctx,
                 p_collect.wait()
                 json_for_MRN_i = parse_json("{}/temp_MRN.json".format(work_path))
                 MRN_i = json_for_MRN_i[0]["tags"]["PatientID"]
+                original_report = json_for_MRN_i[0]["meta"]["ReportText"]
                 start_date_i = parser.parse(json_for_MRN_i[0]["meta"]["StudyDateTime"])
 
                 p_collect = subprocess.Popen("diana-cli mfind -j --start_date={} --end_date={} -q {} montage > {}/temp_patient_studies.json".format(start_date_i, datetime.today().strftime("%Y-%m-%d"), MRN_i, work_path), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -84,40 +91,115 @@ def radreport(ctx,
                 # Try another day if there have been no possible interval follow-ups
                 if len(json_for_followups_i) is 0:
                     continue
+                elif len(json_for_followsup_i) > 1:
+                    print("{}: MULTIPLE FOLLOW-UP STUDIES".format(an))
                 
                 json_for_followups_i = sorted(j_i, key=lambda x: parser.parse(x["meta"]["StudyDateTime"]))  # sort by date
-                
-                for j_i in json_for_followups_i:
-                    
 
+                follow_up_an = 0
+                follow_up_index = 0
+                prelimer = ""
+                attending = ""
+                for i, j_i in enumerate(json_for_followups_i):
+                    if int(j_i["tags"]["AccessionNumber"] is an):
+                        continue
+                    follow_up_an = j_i["tags"]["AccessionNumber"]
+                    follow_up_report = j_i["meta"]["ReportText"]
+                    prelimer = j_i["meta"]["PrelimingPhysiciansName"]
+                    attending = j_i["meta"]["ReadingPhysiciansName"]
+                    break
 
+                # No follow-up found
+                if follow_up_an is 0:
+                    continue
+
+                email_recipients = [get_email(prelimer), get_email(attending)]
+                email_recipients.remove(None)
+                if len(email_recipients) is 0:
+                    sender._send("ALERT: Unfound emails for {} and {}".format(prelimer, attending), os.environ['SYS_ADMIN'])
+
+                email_body = "Original Report:\n" + original_report + "\n\n-----------------------------\n\n" + "Follow-up Report:\n" + follow_up_report
 
                 # Notify relevant parties then delete accession
-                sender._send("msg", "email recipient")
+                sender._send(email_body, email_recipients)
                 done_accessions.append(an)
-                CT_undone_accessions.remove(an)              
+                CT_undone_accessions.remove(an)          
                 
+                # TODO: may need to refilter done and undone at the end to account for reports that used both Rad-Report-CT/MR
 
-                time.sleep(3)
+            with open('{}/CT_undone_accesions.txt'.format(work_path), 'w') as f:
+                for _ in CT_undone_accessions:
+                    f.write(_ + '\n')
 
 
             # Rad-Report-MR
             # p_collect = subprocess.Popen("diana-cli mfind -j --start_date={} --end_date={} -q {} montage > {}/MR_temp_results.json".format(start_date, last_date, MR_macro, work_path), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             # p_collect.wait()
+            json_results = parse_json("{}/MR_temp_results.json".format(MR_undone_accessions))
+            MR_undone_accessions.extend(filter_new_accessions(json_results, MR_undone_accessions, done_accessions))
+
+            for an in MR_undone_accessions:
+                # Find all studies associated with patient and then sort by date to find most recent relevent follow-up study
+                p_collect = subprocess.Popen('diana-cli mfind -j -a "{}" "montage" > {}/temp_MRN.json'.format(an, work_path), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                p_collect.wait()
+                json_for_MRN_i = parse_json("{}/temp_MRN.json".format(work_path))
+                MRN_i = json_for_MRN_i[0]["tags"]["PatientID"]
+                original_report = json_for_MRN_i[0]["meta"]["ReportText"]
+                start_date_i = parser.parse(json_for_MRN_i[0]["meta"]["StudyDateTime"])
+
+                p_collect = subprocess.Popen("diana-cli mfind -j --start_date={} --end_date={} -q {} montage > {}/temp_patient_studies.json".format(start_date_i, datetime.today().strftime("%Y-%m-%d"), MRN_i, work_path), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                p_collect.wait()
+
+                json_for_followups_i = parse_json("{}/temp_patient_studies.json".format(work_path))
+                json_for_followsup_i = [_ for _ in json_for_followups_i if _["tags"]["modality"] is "MR"]   # only keep MR jsons
+                
+                # Try another day if there have been no possible interval follow-ups
+                if len(json_for_followups_i) is 0:
+                    continue
+                elif len(json_for_followsup_i) > 1:
+                    print("{}: MULTIPLE FOLLOW-UP STUDIES".format(an))
+                
+                json_for_followups_i = sorted(j_i, key=lambda x: parser.parse(x["meta"]["StudyDateTime"]))  # sort by date
+
+                follow_up_an = 0
+                follow_up_index = 0
+                prelimer = ""
+                attending = ""
+                for i, j_i in enumerate(json_for_followups_i):
+                    if int(j_i["tags"]["AccessionNumber"] is an):
+                        continue
+                    follow_up_an = j_i["tags"]["AccessionNumber"]
+                    follow_up_report = j_i["meta"]["ReportText"]
+                    prelimer = j_i["meta"]["PrelimingPhysiciansName"]
+                    attending = j_i["meta"]["ReadingPhysiciansName"]
+                    break
+
+                # No follow-up found
+                if follow_up_an is 0:
+                    continue
+
+                email_recipients = [get_email(prelimer), get_email(attending)]
+                email_recipients.remove(None)
+                if len(email_recipients) is 0:
+                    sender._send("ALERT: Unfound emails for {} and {}".format(prelimer, attending), os.environ['SYS_ADMIN'])
+
+                email_body = "Original Report:\n" + original_report + "\n\n-----------------------------\n\n" + "Follow-up Report:\n" + follow_up_report
+
+                # Notify relevant parties then delete accession
+                sender._send(email_body, email_recipients)
+                done_accessions.append(an)
+                MR_undone_accessions.remove(an)
 
 
 
-
-
-
-
-            # Update last processed date and done/undone acccesions
+            # Update last processed date
             with open('{}/last_date.txt'.format(work_path), "w") as f:
                 f.write(datetime.today().strftime("%Y-%m-%d"))
 
+            with open('{}/done_accesions.txt'.format(work_path), 'w') as f:
+                for _ in done_accessions:
+                    f.write(_ + '\n')
 
-
-            
             time.sleep(query_interval)
 
     except (NotImplementedError, KeyboardInterrupt, FileNotFoundError, KeyError, AssertionError, GatewayConnectionError, OSError, Exception) as e:
@@ -143,6 +225,27 @@ def load_emails(filepath):
             key, value = line.split(';')
             data_dict[key.strip()] = value.strip()
     return data_dict
+
+def get_email(name, email_list):
+    parts = name.split(",")
+    if len(parts) != 2:
+        return "Invalid name format"
+
+    last_name = parts[0].strip()
+    first_middle = parts[1].strip().split()
+    first_name = first_middle[0]
+    middle_name = ""
+    if len(first_middle) > 1:
+        middle_name = first_middle[1]
+
+    first_last = first_name + " " + last_name
+    
+    # Default name search in format "first last"
+    if email_list.get(first_last) is not None:
+        return email_list[first_last]
+    
+    # Try with full name including middle initial
+    return email_list.get(first_name + " " + middle_name + " " + last_name)
 
 def load_accessions(filepath):
     accessions = []
