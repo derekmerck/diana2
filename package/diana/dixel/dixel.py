@@ -258,6 +258,10 @@ class Dixel(Serializable):
                 "Modality": data['exam_type']['modality']['label']
             }
 
+            if data['events'][-2]['provider'] is None:
+                prelimer = ""
+            else:
+                prelimer = data['events'][-2]['provider']['name']           
             meta = {
                 'BodyParts': None,  # Placeholder for meta
                 'CPTCodes': None,   # Placeholder for meta
@@ -269,7 +273,7 @@ class Dixel(Serializable):
                 "PatientStatus": data["patient_status"],
                 "ReportText": Montage.clean_text(data['text']),
                 "ReadingPhysiciansName": data['events'][-1]['provider']['name'],
-                "PrelimingPhysiciansName": data['events'][-2]['provider']['name'],
+                "PrelimingPhysiciansName": prelimer,
                 'StudyDateTime': study_datetime,
                 "MontageCPTCodes": montage_cpts
             }
