@@ -51,9 +51,10 @@ def radreport(ctx,
 
         # Load last processed date
         start_date = "2024-11-01"
-        last_date = "2024-11-02"
-        with open('{}/last_date.txt'.format(work_path), 'rb') as f:
-            last_date = f.read()
+        last_date = "2024-02-26"
+        with open('{}/last_date.txt'.format(work_path), 'r') as f:
+            last_date = f.read().strip()
+        print("Processing up to last date: {}".format(last_date))
 
         # SMTP Config
         sender = SmtpMessenger()
@@ -65,25 +66,31 @@ def radreport(ctx,
 
         while True:
             # Rad-Report-CT
-            p_collect = subprocess.Popen("diana-cli mfind -j --start_date={} --end_date={} -q {} montage > {}/CT_temp_results.json".format(start_date, last_date, CT_macro, work_path), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            p_collect.wait()
+            print("Rad-Report-CT...")
+            cmd = ["diana-cli", "mfind", "--start_date={}".format(start_date), "--end_date={}".format(last_date), "-j", "q={}".format(CT_macro), "montage"]
+            with open("{}/CT_temp_results.json".format(work_path), "w") as f:
+                p_collect = subprocess.Popen(cmd, shell=False, stdout=f, stderr=subprocess.PIPE)
+                p_collect.wait()
             # out, err = p_collect.communicate()
-            # time.sleep(5)
 
             json_results = parse_json("{}/CT_temp_results.json".format(work_path))
             CT_undone_accessions.extend(filter_new_accessions(json_results, CT_undone_accessions, done_accessions))
 
             for an in CT_undone_accessions:
                 # Find all studies associated with patient and then sort by date to find most recent relevent follow-up study
-                p_collect = subprocess.Popen('diana-cli mfind -j -a "{}" "montage" > {}/temp_MRN.json'.format(an, work_path), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                p_collect.wait()
+                cmd = ["diana-cli", "mfind", "-j", "-a={}".format(an), "montage"]
+                with open("{}/temp_MRN.json".format(work_path), "w") as f:
+                    p_collect = subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    p_collect.wait()
                 json_for_MRN_i = parse_json("{}/temp_MRN.json".format(work_path))
                 MRN_i = json_for_MRN_i[0]["tags"]["PatientID"]
                 original_report = json_for_MRN_i[0]["meta"]["ReportText"]
                 start_date_i = parser.parse(json_for_MRN_i[0]["meta"]["StudyDateTime"])
 
-                p_collect = subprocess.Popen("diana-cli mfind -j --start_date={} --end_date={} -q {} montage > {}/temp_patient_studies.json".format(start_date_i, datetime.today().strftime("%Y-%m-%d"), MRN_i, work_path), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                p_collect.wait()
+                cmd = ["diana-cli", "mfind", "--start_date={}".format(start_date_i), "--end_date={}".format(datetime.today().strftime("%Y-%m-%d")), "-j", "q={}".format(MRN_i), "montage"]
+                with open("{}/temp_patient_studies.json".format(work_path), "w") as f:
+                    p_collect = subprocess.Popen(cmd, shell=False, stdout=f, stderr=subprocess.PIPE)
+                    p_collect.wait()
 
                 json_for_followups_i = parse_json("{}/temp_patient_studies.json".format(work_path))
                 json_for_followsup_i = [_ for _ in json_for_followups_i if _["tags"]["modality"] is "CT"]   # only keep CT jsons
@@ -118,7 +125,7 @@ def radreport(ctx,
                 if len(email_recipients) is 0:
                     sender._send("ALERT: Unfound emails for {} and {}".format(prelimer, attending), os.environ['SYS_ADMIN'])
 
-                email_body = "Original Report:\n" + original_report + "\n\n-----------------------------\n\n" + "Follow-up Report:\n" + follow_up_report
+                email_body = "Original Report:\n" + original_report + "\n\n--------------------------------------\n\n" + "Follow-up Report:\n" + follow_up_report
 
                 # Notify relevant parties then delete accession
                 sender._send(email_body, email_recipients)
@@ -133,22 +140,31 @@ def radreport(ctx,
 
 
             # Rad-Report-MR
-            # p_collect = subprocess.Popen("diana-cli mfind -j --start_date={} --end_date={} -q {} montage > {}/MR_temp_results.json".format(start_date, last_date, MR_macro, work_path), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            # p_collect.wait()
+            print("Rad-Report-MR...")
+            cmd = ["diana-cli", "mfind", "--start_date={}".format(start_date), "--end_date={}".format(last_date), "-j", "q={}".format(MR_macro), "montage"]
+            with open("{}/MR_temp_results.json".format(work_path), "w") as f:
+                p_collect = subprocess.Popen(cmd, shell=False, stdout=f, stderr=subprocess.PIPE)
+                p_collect.wait()
+
             json_results = parse_json("{}/MR_temp_results.json".format(work_path))
             MR_undone_accessions.extend(filter_new_accessions(json_results, MR_undone_accessions, done_accessions))
 
             for an in MR_undone_accessions:
                 # Find all studies associated with patient and then sort by date to find most recent relevent follow-up study
-                p_collect = subprocess.Popen('diana-cli mfind -j -a "{}" "montage" > {}/temp_MRN.json'.format(an, work_path), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                p_collect.wait()
+                cmd = ["diana-cli", "mfind", "-j", "-a={}".format(an), "montage"]
+                with open("{}/temp_MRN.json".format(work_path), "w") as f:
+                    p_collect = subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    p_collect.wait()
+
                 json_for_MRN_i = parse_json("{}/temp_MRN.json".format(work_path))
                 MRN_i = json_for_MRN_i[0]["tags"]["PatientID"]
                 original_report = json_for_MRN_i[0]["meta"]["ReportText"]
                 start_date_i = parser.parse(json_for_MRN_i[0]["meta"]["StudyDateTime"])
 
-                p_collect = subprocess.Popen("diana-cli mfind -j --start_date={} --end_date={} -q {} montage > {}/temp_patient_studies.json".format(start_date_i, datetime.today().strftime("%Y-%m-%d"), MRN_i, work_path), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                p_collect.wait()
+                cmd = ["diana-cli", "mfind", "--start_date={}".format(start_date_i), "--end_date={}".format(datetime.today().strftime("%Y-%m-%d")), "-j", "q={}".format(MRN_i), "montage"]
+                with open("{}/temp_patient_studies.json".format(work_path), "w") as f:
+                    p_collect = subprocess.Popen(cmd, shell=False, stdout=f, stderr=subprocess.PIPE)
+                    p_collect.wait()
 
                 json_for_followups_i = parse_json("{}/temp_patient_studies.json".format(work_path))
                 json_for_followsup_i = [_ for _ in json_for_followups_i if _["tags"]["modality"] is "MR"]   # only keep MR jsons
@@ -158,7 +174,7 @@ def radreport(ctx,
                     continue
                 elif len(json_for_followsup_i) > 1:
                     print("{}: MULTIPLE FOLLOW-UP STUDIES".format(an))
-                
+
                 json_for_followups_i = sorted(j_i, key=lambda x: parser.parse(x["meta"]["StudyDateTime"]))  # sort by date
 
                 follow_up_an = 0
@@ -200,6 +216,7 @@ def radreport(ctx,
                 for _ in done_accessions:
                     f.write(_ + '\n')
 
+            print("Sleeping...\n")
             time.sleep(query_interval)
 
     except (NotImplementedError, KeyboardInterrupt, FileNotFoundError, KeyError, AssertionError, GatewayConnectionError, OSError, Exception) as e:
