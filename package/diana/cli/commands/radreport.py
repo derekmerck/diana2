@@ -219,7 +219,7 @@ def radreport(ctx,
 
             with open('{}/done_accessions.txt'.format(work_path), 'w') as f:
                 for _ in done_accessions:
-                    f.write(_ + '\n')
+                    f.write(str(_) + '\n')
 
             print("Sleeping...\n")
             time.sleep(query_interval)
