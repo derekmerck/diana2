@@ -85,6 +85,12 @@ def radreport(ctx,
                 json_for_MRN_i = parse_json("{}/temp_MRN.json".format(work_path))
                 MRN_i = json_for_MRN_i[0]["tags"]["PatientID"]
                 original_report = json_for_MRN_i[0]["meta"]["ReportText"]
+                prelimer = ""
+                try:
+                    prelimer = json_for_MRN_i[0]["meta"]["PrelimingPhysiciansName"]
+                except:
+                    prelimer = ""
+                attending = json_for_MRN_i[0]["meta"]["ReadingPhysiciansName"]
                 start_date_i = parser.parse(json_for_MRN_i[0]["meta"]["StudyDateTime"])
 
                 cmd = ["diana-cli", "mfind", "--start_date={}".format(start_date_i.strftime("%Y-%m-%d")), "--end_date={}".format(datetime.today().strftime("%Y-%m-%d")), "-j", "-q", str(MRN_i), "montage"]
@@ -93,7 +99,7 @@ def radreport(ctx,
                     p_collect.wait()
 
                 json_for_followups_i = parse_json("{}/temp_patient_studies.json".format(work_path))
-                json_for_followups_i = [_ for _ in json_for_followups_i if _["tags"]["Modality"] is "CT"]   # only keep CT jsons
+                json_for_followups_i = [_ for _ in json_for_followups_i if _["tags"]["Modality"] == "CT"]   # only keep CT jsons
                 
                 # Try another day if there have been no possible interval follow-ups
                 if len(json_for_followups_i) is 0:
@@ -104,23 +110,18 @@ def radreport(ctx,
                 json_for_followups_i = sorted(json_for_followups_i, key=lambda x: parser.parse(x["meta"]["StudyDateTime"]))  # sort by date
 
                 follow_up_an = 0
-                follow_up_index = 0
-                prelimer = ""
-                attending = ""
                 for i, j_i in enumerate(json_for_followups_i):
                     if int(j_i["tags"]["AccessionNumber"] is an):
                         continue
                     follow_up_an = j_i["tags"]["AccessionNumber"]
                     follow_up_report = j_i["meta"]["ReportText"]
-                    prelimer = j_i["meta"]["PrelimingPhysiciansName"]
-                    attending = j_i["meta"]["ReadingPhysiciansName"]
                     break
 
                 # No follow-up found
                 if follow_up_an is 0:
                     continue
 
-                email_recipients = [get_email(prelimer), get_email(attending)]
+                email_recipients = [get_email(prelimer, emails), get_email(attending, emails)]
                 email_recipients.remove(None)
                 if len(email_recipients) is 0:
                     sender._send("ALERT: Unfound emails for {} and {}".format(prelimer, attending), os.environ['SYS_ADMIN'])
@@ -159,6 +160,13 @@ def radreport(ctx,
                 json_for_MRN_i = parse_json("{}/temp_MRN.json".format(work_path))
                 MRN_i = json_for_MRN_i[0]["tags"]["PatientID"]
                 original_report = json_for_MRN_i[0]["meta"]["ReportText"]
+                prelimer = ""
+                try:
+                    prelimer = json_for_MRN_i[0]["meta"]["PrelimingPhysiciansName"]
+                except:
+                    prelimer = ""
+                attending = json_for_MRN_i[0]["meta"]["ReadingPhysiciansName"]
+
                 start_date_i = parser.parse(json_for_MRN_i[0]["meta"]["StudyDateTime"])
 
                 cmd = ["diana-cli", "mfind", "--start_date={}".format(start_date_i.strftime("%Y-%m-%d")), "--end_date={}".format(datetime.today().strftime("%Y-%m-%d")), "-j", "-q", str(MRN_i), "montage"]
@@ -167,7 +175,7 @@ def radreport(ctx,
                     p_collect.wait()
 
                 json_for_followups_i = parse_json("{}/temp_patient_studies.json".format(work_path))
-                json_for_followups_i = [_ for _ in json_for_followups_i if _["tags"]["Modality"] is "MR"]   # only keep MR jsons
+                json_for_followups_i = [_ for _ in json_for_followups_i if _["tags"]["Modality"] == "MR"]   # only keep MR jsons
                 
                 # Try another day if there have been no possible interval follow-ups
                 if len(json_for_followups_i) is 0:
@@ -178,23 +186,18 @@ def radreport(ctx,
                 json_for_followups_i = sorted(json_for_followups_i, key=lambda x: parser.parse(x["meta"]["StudyDateTime"]))  # sort by date
 
                 follow_up_an = 0
-                follow_up_index = 0
-                prelimer = ""
-                attending = ""
                 for i, j_i in enumerate(json_for_followups_i):
                     if int(j_i["tags"]["AccessionNumber"] is an):
                         continue
                     follow_up_an = j_i["tags"]["AccessionNumber"]
                     follow_up_report = j_i["meta"]["ReportText"]
-                    prelimer = j_i["meta"]["PrelimingPhysiciansName"]
-                    attending = j_i["meta"]["ReadingPhysiciansName"]
                     break
 
                 # No follow-up found
                 if follow_up_an is 0:
                     continue
 
-                email_recipients = [get_email(prelimer), get_email(attending)]
+                email_recipients = [get_email(prelimer, emails), get_email(attending, emails)]
                 email_recipients.remove(None)
                 if len(email_recipients) is 0:
                     sender._send("ALERT: Unfound emails for {} and {}".format(prelimer, attending), os.environ['SYS_ADMIN'])
@@ -206,7 +209,9 @@ def radreport(ctx,
                 done_accessions.append(an)
                 MR_undone_accessions.remove(an)
 
-
+            with open('{}/MR_undone_accessions.txt'.format(work_path), 'w') as f:
+                for _ in MR_undone_accessions:
+                    f.write(str(_) + '\n')
 
             # Update last processed date
             with open('{}/last_date.txt'.format(work_path), "w") as f:
