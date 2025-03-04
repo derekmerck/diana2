@@ -77,13 +77,14 @@ def radreport(ctx,
             CT_undone_accessions.extend(filter_new_accessions(json_results, CT_undone_accessions, done_accessions))
             print(CT_undone_accessions)
 
-            for an in CT_undone_accessions:
+            to_remove = []
+            for i, an in enumerate(CT_undone_accessions):
                 # Find all studies associated with patient and then sort by date to find most recent relevent follow-up study
                 cmd = ["diana-cli", "mfind", "-j", "-a", str(an), "montage"]
                 with open("{}/temp_MRN.json".format(work_path), "w") as f:
                     p_collect = subprocess.Popen(cmd, shell=False, stdout=f, stderr=subprocess.PIPE)
                     p_collect.wait()
-                time.sleep(1)
+
                 json_for_MRN_i = parse_json("{}/temp_MRN.json".format(work_path))
                 MRN_i = json_for_MRN_i[0]["tags"]["PatientID"]
                 original_report = json_for_MRN_i[0]["meta"]["ReportText"]
@@ -112,7 +113,7 @@ def radreport(ctx,
                 json_for_followups_i = sorted(json_for_followups_i, key=lambda x: parser.parse(x["meta"]["StudyDateTime"]))  # sort by date
 
                 follow_up_an = 0
-                for i, j_i in enumerate(json_for_followups_i):
+                for j_i in json_for_followups_i:
                     if int(j_i["tags"]["AccessionNumber"] is an):
                         continue
                     follow_up_an = j_i["tags"]["AccessionNumber"]
@@ -132,11 +133,13 @@ def radreport(ctx,
 
                 # Notify relevant parties then delete accession
                 sender._send(email_body, email_recipients, "[Secure] Rad-Report Follow-up")
-                time.sleep(2)
+                time.sleep(1)
                 done_accessions.append(an)
-                CT_undone_accessions.remove(an)          
+                to_remove.append(i)
                 
                 # TODO: may need to refilter done and undone at the end to account for reports that used both Rad-Report-CT/MR
+            for index in sorted(to_remove, reverse=True):
+                del CT_undone_accessions[index]
 
             with open('{}/CT_undone_accessions.txt'.format(work_path), 'w') as f:
                 for _ in CT_undone_accessions:
@@ -144,7 +147,7 @@ def radreport(ctx,
 
 
             # Rad-Report-MR
-            print("Rad-Report-MR...")
+            print("\n\nRad-Report-MR...")
             cmd = ["diana-cli", "mfind", "--start_date={}".format(start_date), "--end_date={}".format(last_date), "-j", "-q={}".format(MR_macro), "montage"]
             with open("{}/MR_temp_results.json".format(work_path), "w") as f:
                 p_collect = subprocess.Popen(cmd, shell=False, stdout=f, stderr=subprocess.PIPE)
@@ -154,13 +157,14 @@ def radreport(ctx,
             MR_undone_accessions.extend(filter_new_accessions(json_results, MR_undone_accessions, done_accessions))
             print(MR_undone_accessions)
 
-            for an in MR_undone_accessions:
+            to_remove = []
+            for i, an in enumerate(MR_undone_accessions):
                 # Find all studies associated with patient and then sort by date to find most recent relevent follow-up study
                 cmd = ["diana-cli", "mfind", "-j", "-a", str(an), "montage"]
                 with open("{}/temp_MRN.json".format(work_path), "w") as f:
                     p_collect = subprocess.Popen(cmd, shell=False, stdout=f, stderr=subprocess.PIPE)
                     p_collect.wait()
-                time.sleep(1)
+
                 json_for_MRN_i = parse_json("{}/temp_MRN.json".format(work_path))
                 MRN_i = json_for_MRN_i[0]["tags"]["PatientID"]
                 original_report = json_for_MRN_i[0]["meta"]["ReportText"]
@@ -190,7 +194,7 @@ def radreport(ctx,
                 json_for_followups_i = sorted(json_for_followups_i, key=lambda x: parser.parse(x["meta"]["StudyDateTime"]))  # sort by date
 
                 follow_up_an = 0
-                for i, j_i in enumerate(json_for_followups_i):
+                for j_i in json_for_followups_i:
                     if int(j_i["tags"]["AccessionNumber"] is an):
                         continue
                     follow_up_an = j_i["tags"]["AccessionNumber"]
@@ -210,9 +214,12 @@ def radreport(ctx,
 
                 # Notify relevant parties then delete accession
                 sender._send(email_body, email_recipients, "[Secure] Rad-Report Follow-up")
-                time.sleep(2)
+                time.sleep(1)
                 done_accessions.append(an)
-                MR_undone_accessions.remove(an)
+                to_remove.append(i)
+
+            for index in sorted(to_remove, reverse=True):
+                del MR_undone_accessions[index]
 
             with open('{}/MR_undone_accessions.txt'.format(work_path), 'w') as f:
                 for _ in MR_undone_accessions:
