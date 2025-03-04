@@ -71,10 +71,11 @@ def radreport(ctx,
             with open("{}/CT_temp_results.json".format(work_path), "w") as f:
                 p_collect = subprocess.Popen(cmd, shell=False, stdout=f, stderr=subprocess.PIPE)
                 p_collect.wait()
-            # out, err = p_collect.communicate()
+            time.sleep(1)
 
             json_results = parse_json("{}/CT_temp_results.json".format(work_path))
             CT_undone_accessions.extend(filter_new_accessions(json_results, CT_undone_accessions, done_accessions))
+            print(CT_undone_accessions)
 
             for an in CT_undone_accessions:
                 # Find all studies associated with patient and then sort by date to find most recent relevent follow-up study
@@ -82,6 +83,7 @@ def radreport(ctx,
                 with open("{}/temp_MRN.json".format(work_path), "w") as f:
                     p_collect = subprocess.Popen(cmd, shell=False, stdout=f, stderr=subprocess.PIPE)
                     p_collect.wait()
+                time.sleep(1)
                 json_for_MRN_i = parse_json("{}/temp_MRN.json".format(work_path))
                 MRN_i = json_for_MRN_i[0]["tags"]["PatientID"]
                 original_report = json_for_MRN_i[0]["meta"]["ReportText"]
@@ -124,12 +126,13 @@ def radreport(ctx,
                 email_recipients = [get_email(prelimer, emails), get_email(attending, emails)]
                 email_recipients.remove(None)
                 if len(email_recipients) is 0:
-                    sender._send("ALERT: Unfound emails for {} and {}".format(prelimer, attending), os.environ['SYS_ADMIN'])
+                    sender._send("ALERT: Unfound emails for {} and {}".format(prelimer, attending), os.environ['SYS_ADMIN'], "[Alert] Rad-Report Email Error")
 
                 email_body = "Original Report:\n" + original_report + "\n\n--------------------------------------\n\n" + "Follow-up Report:\n" + follow_up_report
 
                 # Notify relevant parties then delete accession
-                sender._send(email_body, email_recipients)
+                sender._send(email_body, email_recipients, "[Secure] Rad-Report Follow-up")
+                time.sleep(2)
                 done_accessions.append(an)
                 CT_undone_accessions.remove(an)          
                 
@@ -146,9 +149,10 @@ def radreport(ctx,
             with open("{}/MR_temp_results.json".format(work_path), "w") as f:
                 p_collect = subprocess.Popen(cmd, shell=False, stdout=f, stderr=subprocess.PIPE)
                 p_collect.wait()
-
+            time.sleep(1)
             json_results = parse_json("{}/MR_temp_results.json".format(work_path))
             MR_undone_accessions.extend(filter_new_accessions(json_results, MR_undone_accessions, done_accessions))
+            print(MR_undone_accessions)
 
             for an in MR_undone_accessions:
                 # Find all studies associated with patient and then sort by date to find most recent relevent follow-up study
@@ -156,7 +160,7 @@ def radreport(ctx,
                 with open("{}/temp_MRN.json".format(work_path), "w") as f:
                     p_collect = subprocess.Popen(cmd, shell=False, stdout=f, stderr=subprocess.PIPE)
                     p_collect.wait()
-
+                time.sleep(1)
                 json_for_MRN_i = parse_json("{}/temp_MRN.json".format(work_path))
                 MRN_i = json_for_MRN_i[0]["tags"]["PatientID"]
                 original_report = json_for_MRN_i[0]["meta"]["ReportText"]
@@ -200,12 +204,13 @@ def radreport(ctx,
                 email_recipients = [get_email(prelimer, emails), get_email(attending, emails)]
                 email_recipients.remove(None)
                 if len(email_recipients) is 0:
-                    sender._send("ALERT: Unfound emails for {} and {}".format(prelimer, attending), os.environ['SYS_ADMIN'])
+                    sender._send("ALERT: Unfound emails for {} and {}".format(prelimer, attending), os.environ['SYS_ADMIN'], "[Alert] Rad-Report Email Error")
 
                 email_body = "Original Report:\n" + original_report + "\n\n-----------------------------\n\n" + "Follow-up Report:\n" + follow_up_report
 
                 # Notify relevant parties then delete accession
-                sender._send(email_body, email_recipients)
+                sender._send(email_body, email_recipients, "[Secure] Rad-Report Follow-up")
+                time.sleep(2)
                 done_accessions.append(an)
                 MR_undone_accessions.remove(an)
 

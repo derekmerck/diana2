@@ -54,7 +54,7 @@ class SmtpMessenger(Messenger):
             g.helo()
         return True
 
-    def _send(self, msg, to_addrs):
+    def _send(self, msg, to_addrs, subj=""):
 
         logger = logging.getLogger(self.name)
         logger.info("Sending message via SMTP connector:\n{}".format(msg))
@@ -62,7 +62,7 @@ class SmtpMessenger(Messenger):
         with self.gateway(self.host, self.port, self.user, self.password, self.tls) as g:
             if "outbound" in self.host:
                 m = MIMEText(msg)
-                m["Subject"] = "[Secure] Rad-Report Follow-up"
+                m["Subject"] = subj
                 g.sendmail(self.from_addr, to_addrs, m.as_string())
             else:
                 g.sendmail(self.from_addr, to_addrs, msg.encode(encoding='UTF-8'))
