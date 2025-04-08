@@ -125,9 +125,10 @@ def radreport(ctx,
                     continue
 
                 email_recipients = [get_email(prelimer, emails), get_email(attending, emails)]
-                email_recipients.remove(None)
+                email_recipients = list(filter(None, email_recipients))
                 if len(email_recipients) is 0:
                     sender._send("ALERT: Unfound emails for {} and {}".format(prelimer, attending), os.environ['SYS_ADMIN'], "[Alert] Rad-Report Email Error")
+                    continue
 
                 email_body = "Original Report:\n" + original_report + "\n\n--------------------------------------\n\n" + "Follow-up Report:\n" + follow_up_report
 
@@ -206,9 +207,10 @@ def radreport(ctx,
                     continue
 
                 email_recipients = [get_email(prelimer, emails), get_email(attending, emails)]
-                email_recipients.remove(None)
+                email_recipients = list(filter(None, email_recipients))
                 if len(email_recipients) is 0:
                     sender._send("ALERT: Unfound emails for {} and {}".format(prelimer, attending), os.environ['SYS_ADMIN'], "[Alert] Rad-Report Email Error")
+                    continue
 
                 email_body = "Original Report:\n" + original_report + "\n\n-----------------------------\n\n" + "Follow-up Report:\n" + follow_up_report
 
