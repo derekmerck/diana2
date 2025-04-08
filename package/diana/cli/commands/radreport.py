@@ -114,7 +114,7 @@ def radreport(ctx,
 
                 follow_up_an = 0
                 for j_i in json_for_followups_i:
-                    if int(j_i["tags"]["AccessionNumber"] is an):
+                    if int(j_i["tags"]["AccessionNumber"]) == int(an):
                         continue
                     follow_up_an = j_i["tags"]["AccessionNumber"]
                     follow_up_report = j_i["meta"]["ReportText"]
@@ -196,7 +196,7 @@ def radreport(ctx,
 
                 follow_up_an = 0
                 for j_i in json_for_followups_i:
-                    if int(j_i["tags"]["AccessionNumber"] is an):
+                    if int(j_i["tags"]["AccessionNumber"]) == int(an):
                         continue
                     follow_up_an = j_i["tags"]["AccessionNumber"]
                     follow_up_report = j_i["meta"]["ReportText"]
@@ -265,7 +265,9 @@ def load_emails(filepath):
 def get_email(name, email_list):
     parts = name.split(",")
     if len(parts) != 2:
-        return "Invalid name format"
+        print("Invalid name format")
+        print(name)
+        return None
 
     last_name = parts[0].strip()
     first_middle = parts[1].strip().split()
